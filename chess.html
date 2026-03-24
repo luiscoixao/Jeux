@@ -19,7 +19,7 @@ body {
   align-items: center;
 }
 
-/* Titre ajusté */
+/* Titre */
 h1 {
   margin-top: 40px;
   margin-bottom: 10px;
@@ -40,16 +40,30 @@ h1 {
   height: 100%;
 }
 
-/* Cases */
+/* Cases FIXES */
 .square {
+  position: relative;
+}
+
+/* Contenu centré */
+.square-content {
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
+  pointer-events: none;
 }
 
+/* Couleurs */
 .white { background: #eeeed2; }
 .black { background: #769656; }
+
+/* Dame */
+.queen {
+  font-size: 24px;
+  line-height: 1;
+}
 
 /* Feedback */
 .correct { background: #a9d18e !important; }
@@ -65,6 +79,25 @@ h1 {
   margin-top: 10px;
   font-size: 16px;
   opacity: 0.9;
+}
+
+#controls {
+  margin-top: 20px;
+  display: flex;
+  gap: 15px;
+}
+
+button {
+  padding: 10px 18px;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  background: #444;
+  color: white;
+}
+
+button:active {
+  background: #666;
 }
 
 #end {
@@ -85,6 +118,12 @@ h1 {
 
 <div id="target"></div>
 <div id="info"></div>
+
+<div id="controls">
+  <button onclick="stopGame()">Stop</button>
+  <button onclick="restart()">Rejouer</button>
+</div>
+
 <div id="end"></div>
 
 <script>
@@ -99,6 +138,8 @@ let target = "";
 let score = 0;
 let locked = false;
 let moves = 0;
+let running = true;
+
 const maxMoves = 10;
 
 let startTime = Date.now();
@@ -106,10 +147,13 @@ let timerInterval;
 
 /* Chrono */
 function startTimer() {
+  clearInterval(timerInterval);
   timerInterval = setInterval(() => {
+    if (!running) return;
+
     const elapsed = Math.floor((Date.now() - startTime) / 1000);
     infoDisplay.innerText = "Temps : " + elapsed + "s | Score : " + moves + "/" + maxMoves;
-  }, 500);
+  }, 300);
 }
 
 /* Génère position */
@@ -128,20 +172,17 @@ function createBoard() {
     for (let col = 0; col < 8; col++) {
 
       const square = document.createElement("div");
-      square.classList.add("square");
-
-      const isWhite = (row + col) % 2 === 0;
-      square.classList.add(isWhite ? "white" : "black");
+      square.className = "square " + ((row + col) % 2 === 0 ? "white" : "black");
 
       const position = letters[col] + row;
 
       square.onclick = () => {
-        if (locked || moves >= maxMoves) return;
+        if (!running || locked || moves >= maxMoves) return;
 
         if (position === target) {
           locked = true;
 
-          square.innerHTML = "♕";
+          square.innerHTML = "<div class='square-content'><span class='queen'>♕</span></div>";
           square.classList.add("correct");
 
           score++;
@@ -168,21 +209,28 @@ function createBoard() {
   }
 }
 
-/* Fin de partie */
+/* Stop */
+function stopGame() {
+  running = false;
+  clearInterval(timerInterval);
+}
+
+/* Fin */
 function endGame() {
+  running = false;
   clearInterval(timerInterval);
 
   const totalTime = Math.floor((Date.now() - startTime) / 1000);
 
   endDisplay.innerHTML =
-    "🏁 Terminé !<br>" +
+    "🏁 Terminé<br>" +
     "Score : " + score + " / " + maxMoves + "<br>" +
-    "Temps : " + totalTime + "s<br><br>" +
-    "<button onclick='restart()'>Rejouer</button>";
+    "Temps : " + totalTime + "s";
 }
 
 /* Restart */
 function restart() {
+  running = true;
   score = 0;
   moves = 0;
   startTime = Date.now();
