@@ -5,11 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
 <title>La Dame Blanche</title>
-<link rel="apple-touch-icon" href="icon.png">
-<link rel="icon" href="icon.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Dame Blanche">
 
 <link rel="apple-touch-icon" href="icon.png">
 
@@ -24,14 +19,12 @@ body {
   align-items: center;
 }
 
-/* Titre */
+/* Titre ajusté */
 h1 {
-      margin: 0;
-      font-size: 2rem;
-      line-height: 1.05;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-    }
+  margin-top: 40px;
+  margin-bottom: 10px;
+  font-size: 28px;
+}
 
 /* Échiquier */
 #board-container {
@@ -68,9 +61,16 @@ h1 {
   font-size: 22px;
 }
 
-#score {
-  margin-top: 5px;
-  opacity: 0.7;
+#info {
+  margin-top: 10px;
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+#end {
+  margin-top: 20px;
+  font-size: 20px;
+  text-align: center;
 }
 </style>
 </head>
@@ -84,18 +84,33 @@ h1 {
 </div>
 
 <div id="target"></div>
-<div id="score"></div>
+<div id="info"></div>
+<div id="end"></div>
 
 <script>
 const board = document.getElementById("board");
 const targetDisplay = document.getElementById("target");
-const scoreDisplay = document.getElementById("score");
+const infoDisplay = document.getElementById("info");
+const endDisplay = document.getElementById("end");
 
 const letters = ['a','b','c','d','e','f','g','h'];
 
 let target = "";
 let score = 0;
 let locked = false;
+let moves = 0;
+const maxMoves = 10;
+
+let startTime = Date.now();
+let timerInterval;
+
+/* Chrono */
+function startTimer() {
+  timerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    infoDisplay.innerText = "Temps : " + elapsed + "s | " + moves + "/" + maxMoves;
+  }, 500);
+}
 
 /* Génère position */
 function generateTarget() {
@@ -121,7 +136,7 @@ function createBoard() {
       const position = letters[col] + row;
 
       square.onclick = () => {
-        if (locked) return;
+        if (locked || moves >= maxMoves) return;
 
         if (position === target) {
           locked = true;
@@ -130,13 +145,17 @@ function createBoard() {
           square.classList.add("correct");
 
           score++;
-          updateScore();
+          moves++;
 
           setTimeout(() => {
-            generateTarget();
-            createBoard();
-            locked = false;
-          }, 700);
+            if (moves >= maxMoves) {
+              endGame();
+            } else {
+              generateTarget();
+              createBoard();
+              locked = false;
+            }
+          }, 500);
 
         } else {
           square.classList.add("wrong");
@@ -149,15 +168,34 @@ function createBoard() {
   }
 }
 
-function updateScore() {
-  scoreDisplay.innerText = "Score : " + score;
+/* Fin de partie */
+function endGame() {
+  clearInterval(timerInterval);
+
+  const totalTime = Math.floor((Date.now() - startTime) / 1000);
+
+  endDisplay.innerHTML =
+    "🏁 Terminé !<br>" +
+    "Score : " + score + " / " + maxMoves + "<br>" +
+    "Temps : " + totalTime + "s<br><br>" +
+    "<button onclick='restart()'>Rejouer</button>";
+}
+
+/* Restart */
+function restart() {
+  score = 0;
+  moves = 0;
+  startTime = Date.now();
+  endDisplay.innerHTML = "";
+  generateTarget();
+  createBoard();
+  startTimer();
 }
 
 /* Init */
 generateTarget();
 createBoard();
-updateScore();
-
+startTimer();
 </script>
 
 </body>
