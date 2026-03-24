@@ -25,12 +25,11 @@ h1 {
   font-size: 28px;
 }
 
-/* Échiquier plein largeur */
+/* Échiquier */
 #board-container {
   width: 95vw;
   max-width: 500px;
   aspect-ratio: 1;
-  position: relative;
 }
 
 #board {
@@ -45,21 +44,11 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 26px;
 }
 
 .white { background: #eeeed2; }
 .black { background: #769656; }
-
-/* Coordonnées */
-.coord {
-  position: absolute;
-  font-size: 12px;
-  opacity: 0.8;
-}
-
-.coord.bottom { bottom: 2px; }
-.coord.left { left: 2px; }
 
 /* Feedback */
 .correct { background: #a9d18e !important; }
@@ -80,7 +69,7 @@ h1 {
 
 <body>
 
-<h1>La Dame Blanche</h1>
+<h1>La Dame Blanche ♕</h1>
 
 <div id="board-container">
   <div id="board"></div>
@@ -122,21 +111,6 @@ function createBoard() {
       square.classList.add(isWhite ? "white" : "black");
 
       const position = letters[col] + row;
-
-      /* Coordonnées */
-      if (row === 1) {
-        const coord = document.createElement("div");
-        coord.className = "coord bottom";
-        coord.innerText = letters[col];
-        square.appendChild(coord);
-      }
-
-      if (col === 0) {
-        const coord = document.createElement("div");
-        coord.className = "coord left";
-        coord.innerText = row;
-        square.appendChild(coord);
-      }
 
       square.onclick = () => {
         if (locked) return;
