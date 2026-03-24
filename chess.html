@@ -8,6 +8,11 @@
 
 <link rel="apple-touch-icon" href="icon.png">
 
+<!-- PWA iPhone -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#2c2c2c">
+
 <style>
 body {
   margin: 0;
@@ -63,25 +68,30 @@ h1 {
 .correct { background: #a9d18e !important; }
 .wrong { outline: 2px solid red; }
 
+/* UI */
 #target { margin-top: 15px; font-size: 22px; }
 #info { margin-top: 10px; }
 
+/* Boutons */
 #controls {
   margin-top: 20px;
   display: flex;
   gap: 20px;
 }
 
-button {
-  padding: 12px 16px;
-  font-size: 22px;
-  border: none;
-  border-radius: 12px;
-  background: #444;
-  color: white;
+.control-btn {
+  background: #3a3a3a;
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
-button:active { background: #666; }
+.control-btn span {
+  font-size: 26px;
+}
 
 #end {
   margin-top: 20px;
@@ -102,9 +112,17 @@ button:active { background: #666; }
 <div id="info"></div>
 
 <div id="controls">
-  <button id="playBtn" onclick="startGame()">▶️</button>
-  <button id="pauseBtn" onclick="togglePause()" style="display:none;">⏸️</button>
-  <button id="stopBtn" onclick="stopGame()" style="display:none;">⏹️</button>
+  <div class="control-btn" id="playBtn" onclick="startGame()">
+    <span>▶️</span>
+  </div>
+
+  <div class="control-btn" id="pauseBtn" onclick="togglePause()" style="display:none;">
+    <span id="pauseIcon">⏸️</span>
+  </div>
+
+  <div class="control-btn" id="stopBtn" onclick="stopGame()" style="display:none;">
+    <span>⏹️</span>
+  </div>
 </div>
 
 <div id="end"></div>
@@ -158,8 +176,8 @@ function startGame() {
   startTime = Date.now();
 
   playBtn.style.display = "none";
-  pauseBtn.style.display = "inline-block";
-  stopBtn.style.display = "inline-block";
+  pauseBtn.style.display = "flex";
+  stopBtn.style.display = "flex";
 
   generateTarget();
   createBoard();
@@ -171,24 +189,26 @@ function togglePause() {
   if (!paused) {
     paused = true;
     pauseStart = Date.now();
-    pauseBtn.innerText = "▶️";
+    document.getElementById("pauseIcon").innerText = "▶️";
   } else {
     paused = false;
     pausedTime += Date.now() - pauseStart;
-    pauseBtn.innerText = "⏸️";
+    document.getElementById("pauseIcon").innerText = "⏸️";
   }
 }
 
-/* Stop définitif */
+/* Stop */
 function stopGame() {
   running = false;
   clearInterval(timerInterval);
 
-  playBtn.style.display = "inline-block";
+  playBtn.style.display = "flex";
   pauseBtn.style.display = "none";
   stopBtn.style.display = "none";
 
   targetDisplay.innerText = "▶️ Nouvelle partie ?";
+  infoDisplay.innerText = "";
+  endDisplay.innerText = "";
 }
 
 /* Position */
@@ -199,7 +219,7 @@ function generateTarget() {
   targetDisplay.innerText = target;
 }
 
-/* Échiquier */
+/* Échiquier (fix iPhone touch) */
 function createBoard() {
   board.innerHTML = "";
 
@@ -211,7 +231,9 @@ function createBoard() {
 
       const position = letters[col] + row;
 
-      square.onclick = () => {
+      square.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+
         if (!running || paused || locked || moves >= maxMoves) return;
 
         if (position === target) {
@@ -237,7 +259,7 @@ function createBoard() {
           square.classList.add("wrong");
           setTimeout(() => square.classList.remove("wrong"), 300);
         }
-      };
+      });
 
       board.appendChild(square);
     }
@@ -254,7 +276,7 @@ function endGame() {
   endDisplay.innerHTML =
     "🏁 Terminé<br>Score : " + score + "/" + maxMoves + "<br>Temps : " + total + "s";
 
-  playBtn.style.display = "inline-block";
+  playBtn.style.display = "flex";
   pauseBtn.style.display = "none";
   stopBtn.style.display = "none";
 }
