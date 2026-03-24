@@ -108,7 +108,7 @@ let timerInterval;
 function startTimer() {
   timerInterval = setInterval(() => {
     const elapsed = Math.floor((Date.now() - startTime) / 1000);
-    infoDisplay.innerText = "Temps : " + elapsed + "s | " + moves + "/" + maxMoves;
+    infoDisplay.innerText = "Temps : " + elapsed + "s | Score : " + moves + "/" + maxMoves;
   }, 500);
 }
 
