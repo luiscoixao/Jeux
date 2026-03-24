@@ -3,119 +3,155 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
 <title>La Dame Blanche</title>
 
 <link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="La Dame Blanche">
 <meta name="theme-color" content="#2c2c2c">
 
 <style>
-:root {
-  --bg: #2c2c2c;
-  --light: #eeeed2;
-  --dark: #769656;
-  --ok: #a9d18e;
+:root{
+  --bg:#2c2c2c;
+  --light:#eeeed2;
+  --dark:#769656;
+  --ok:#a9d18e;
+  --text:#ffffff;
 }
 
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
 }
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont;
-  background: var(--bg);
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-bottom: env(safe-area-inset-bottom);
+html,body{
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
 }
 
-/* Titre */
-h1 {
-  margin-top: calc(env(safe-area-inset-top) + 20px);
-  margin-bottom: 10px;
-  font-size: 28px;
+body{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding-bottom:env(safe-area-inset-bottom);
 }
 
-/* Échiquier */
-#board-container {
-  width: 95vw;
-  max-width: 500px;
-  aspect-ratio: 1;
+h1{
+  margin-top:calc(env(safe-area-inset-top) + 20px);
+  margin-bottom:12px;
+  font-size:28px;
+  line-height:1.1;
+  font-weight:700;
+  text-align:center;
 }
 
-#board {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  width: 100%;
-  height: 100%;
+#board-container{
+  width:95vw;
+  max-width:500px;
+  aspect-ratio:1;
 }
 
-.square {
-  position: relative;
+#board{
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  width:100%;
+  height:100%;
+  touch-action:manipulation;
 }
 
-.square-content {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
+.square{
+  position:relative;
+  width:100%;
+  height:100%;
 }
 
-.white { background: var(--light); }
-.black { background: var(--dark); }
-
-.queen {
-  font-size: 26px;
+.square-content{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
 }
 
-.correct { background: var(--ok) !important; }
-.wrong { outline: 2px solid red; }
+.white{ background:var(--light); }
+.black{ background:var(--dark); }
 
-/* UI */
-#target { margin-top: 15px; font-size: 22px; }
-#info { margin-top: 10px; }
-
-/* CONTROLS = SANS FOND */
-#controls {
-  margin-top: 25px;
-  display: flex;
-  gap: 40px;
+.queen{
+  font-size:26px;
+  line-height:1;
+  display:block;
 }
 
-.control-btn {
-  background: transparent;   /* ✔ suppression totale du gris */
-  border: none;
-  width: 70px;
-  height: 70px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  -webkit-appearance: none;
+.correct{
+  background:var(--ok) !important;
 }
 
-.control-btn span {
-  font-size: 38px;
+.wrong{
+  outline:2px solid red;
 }
 
-.control-btn:active {
-  transform: scale(0.9);
+#target{
+  margin-top:18px;
+  font-size:22px;
+  text-align:center;
+  min-height:32px;
 }
 
-/* Résultat */
-#end {
-  margin-top: 20px;
-  text-align: center;
+#info{
+  margin-top:10px;
+  font-size:16px;
+  text-align:center;
+  min-height:24px;
+}
+
+#controls{
+  margin-top:22px;
+  display:flex;
+  gap:36px;
+  justify-content:center;
+  align-items:center;
+  min-height:70px;
+}
+
+.control-btn{
+  width:70px;
+  height:70px;
+  border:none;
+  background:transparent;
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  appearance:none;
+  -webkit-appearance:none;
+  cursor:pointer;
+  touch-action:manipulation;
+}
+
+.control-btn span{
+  font-size:38px;
+  line-height:1;
+  display:block;
+}
+
+.control-btn:active{
+  transform:scale(0.92);
+}
+
+#end{
+  margin-top:22px;
+  font-size:20px;
+  text-align:center;
+  min-height:100px;
+  line-height:1.4;
 }
 </style>
 </head>
@@ -132,15 +168,15 @@ h1 {
 <div id="info"></div>
 
 <div id="controls">
-  <button class="control-btn" id="playBtn" onclick="startGame()">
+  <button class="control-btn" id="playBtn" type="button" aria-label="Démarrer">
     <span>▶️</span>
   </button>
 
-  <button class="control-btn" id="pauseBtn" onclick="togglePause()" style="display:none;">
+  <button class="control-btn" id="pauseBtn" type="button" aria-label="Pause" style="display:none;">
     <span id="pauseIcon">⏸️</span>
   </button>
 
-  <button class="control-btn" id="stopBtn" onclick="stopGame()" style="display:none;">
+  <button class="control-btn" id="stopBtn" type="button" aria-label="Arrêter" style="display:none;">
     <span>⏹️</span>
   </button>
 </div>
@@ -156,14 +192,14 @@ const endDisplay = document.getElementById("end");
 const playBtn = document.getElementById("playBtn");
 const pauseBtn = document.getElementById("pauseBtn");
 const stopBtn = document.getElementById("stopBtn");
+const pauseIcon = document.getElementById("pauseIcon");
 
-const letters = ['a','b','c','d','e','f','g','h'];
+const letters = ["a","b","c","d","e","f","g","h"];
 
 let target = "";
 let score = 0;
 let moves = 0;
 let locked = false;
-
 let running = false;
 let paused = false;
 
@@ -172,28 +208,102 @@ const maxMoves = 10;
 let startTime = 0;
 let pausedTime = 0;
 let pauseStart = 0;
-let timerInterval;
+let timerInterval = null;
 
-/* Chrono */
-function startTimer() {
-  clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    if (!running || paused) return;
-
-    const elapsed = Math.floor((Date.now() - startTime - pausedTime)/1000);
-    infoDisplay.innerText = "Temps : " + elapsed + "s | Score : " + moves + "/" + maxMoves;
-  }, 300);
+function updateInfo() {
+  if (!running) return;
+  const elapsed = Math.floor((Date.now() - startTime - pausedTime) / 1000);
+  infoDisplay.innerText = "Temps : " + elapsed + "s | Score : " + moves + "/" + maxMoves;
 }
 
-/* Start */
+function startTimer() {
+  clearInterval(timerInterval);
+  updateInfo();
+  timerInterval = setInterval(() => {
+    if (!running || paused) return;
+    updateInfo();
+  }, 250);
+}
+
+function generateTarget() {
+  const col = letters[Math.floor(Math.random() * 8)];
+  const row = Math.floor(Math.random() * 8) + 1;
+  target = col + row;
+  targetDisplay.innerText = target;
+}
+
+function handleSquareTap(square, position) {
+  if (!running || paused || locked || moves >= maxMoves) return;
+
+  if (position === target) {
+    locked = true;
+    square.innerHTML = "<div class='square-content'><span class='queen'>♕</span></div>";
+    square.classList.add("correct");
+
+    score++;
+    moves++;
+    updateInfo();
+
+    setTimeout(() => {
+      if (moves >= maxMoves) {
+        endGame();
+      } else {
+        generateTarget();
+        createBoard();
+        locked = false;
+      }
+    }, 450);
+  } else {
+    square.classList.add("wrong");
+    setTimeout(() => square.classList.remove("wrong"), 250);
+  }
+}
+
+function bindTap(el, handler) {
+  let done = false;
+
+  el.addEventListener("pointerup", (e) => {
+    e.preventDefault();
+    done = true;
+    handler(e);
+    setTimeout(() => { done = false; }, 50);
+  });
+
+  el.addEventListener("click", (e) => {
+    if (done) return;
+    e.preventDefault();
+    handler(e);
+  });
+}
+
+function createBoard() {
+  board.innerHTML = "";
+
+  for (let row = 8; row >= 1; row--) {
+    for (let col = 0; col < 8; col++) {
+      const square = document.createElement("div");
+      square.className = "square " + (((row + col) % 2 === 0) ? "white" : "black");
+
+      const position = letters[col] + row;
+      bindTap(square, () => handleSquareTap(square, position));
+
+      board.appendChild(square);
+    }
+  }
+}
+
 function startGame() {
   running = true;
   paused = false;
-
+  locked = false;
   score = 0;
   moves = 0;
   pausedTime = 0;
+  pauseStart = 0;
   startTime = Date.now();
+
+  endDisplay.innerHTML = "";
+  pauseIcon.innerText = "⏸️";
 
   playBtn.style.display = "none";
   pauseBtn.style.display = "flex";
@@ -204,93 +314,45 @@ function startGame() {
   startTimer();
 }
 
-/* Pause */
 function togglePause() {
+  if (!running) return;
+
   if (!paused) {
     paused = true;
     pauseStart = Date.now();
-    document.getElementById("pauseIcon").innerText = "▶️";
+    pauseIcon.innerText = "▶️";
   } else {
     paused = false;
     pausedTime += Date.now() - pauseStart;
-    document.getElementById("pauseIcon").innerText = "⏸️";
+    pauseIcon.innerText = "⏸️";
+    updateInfo();
   }
 }
 
-/* Stop */
 function stopGame() {
   running = false;
+  paused = false;
+  locked = false;
   clearInterval(timerInterval);
 
   playBtn.style.display = "flex";
   pauseBtn.style.display = "none";
   stopBtn.style.display = "none";
+  pauseIcon.innerText = "⏸️";
 
   targetDisplay.innerText = "▶️ Nouvelle partie ?";
   infoDisplay.innerText = "";
   endDisplay.innerText = "";
+  createBoard();
 }
 
-/* Position */
-function generateTarget() {
-  const col = letters[Math.floor(Math.random()*8)];
-  const row = Math.floor(Math.random()*8) + 1;
-  target = col + row;
-  targetDisplay.innerText = target;
-}
-
-/* Board */
-function createBoard() {
-  board.innerHTML = "";
-
-  for (let row = 8; row >= 1; row--) {
-    for (let col = 0; col < 8; col++) {
-
-      const square = document.createElement("div");
-      square.className = "square " + ((row + col)%2===0 ? "white":"black");
-
-      const position = letters[col] + row;
-
-      square.addEventListener("touchstart", (e) => {
-        e.preventDefault();
-
-        if (!running || paused || locked || moves >= maxMoves) return;
-
-        if (position === target) {
-          locked = true;
-
-          square.innerHTML = "<div class='square-content'><span class='queen'>♕</span></div>";
-          square.classList.add("correct");
-
-          score++;
-          moves++;
-
-          setTimeout(() => {
-            if (moves >= maxMoves) endGame();
-            else {
-              generateTarget();
-              createBoard();
-              locked = false;
-            }
-          }, 500);
-
-        } else {
-          square.classList.add("wrong");
-          setTimeout(() => square.classList.remove("wrong"), 300);
-        }
-      });
-
-      board.appendChild(square);
-    }
-  }
-}
-
-/* End */
 function endGame() {
   running = false;
+  paused = false;
+  locked = false;
   clearInterval(timerInterval);
 
-  const total = Math.floor((Date.now() - startTime - pausedTime)/1000);
+  const total = Math.floor((Date.now() - startTime - pausedTime) / 1000);
 
   endDisplay.innerHTML =
     "🏁 Terminé<br>" +
@@ -300,9 +362,13 @@ function endGame() {
   playBtn.style.display = "flex";
   pauseBtn.style.display = "none";
   stopBtn.style.display = "none";
+  pauseIcon.innerText = "⏸️";
 }
 
-/* Init */
+bindTap(playBtn, startGame);
+bindTap(pauseBtn, togglePause);
+bindTap(stopBtn, stopGame);
+
 createBoard();
 </script>
 
