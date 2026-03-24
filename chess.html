@@ -40,7 +40,6 @@ h1 {
   height: 100%;
 }
 
-/* Cases */
 .square {
   position: relative;
 }
@@ -54,32 +53,19 @@ h1 {
   pointer-events: none;
 }
 
-/* Couleurs */
 .white { background: #eeeed2; }
 .black { background: #769656; }
 
-/* Dame */
 .queen {
   font-size: 24px;
-  line-height: 1;
 }
 
-/* Feedback */
 .correct { background: #a9d18e !important; }
 .wrong { outline: 2px solid red; }
 
-/* UI */
-#target {
-  margin-top: 15px;
-  font-size: 22px;
-}
+#target { margin-top: 15px; font-size: 22px; }
+#info { margin-top: 10px; }
 
-#info {
-  margin-top: 10px;
-  font-size: 16px;
-}
-
-/* Boutons */
 #controls {
   margin-top: 20px;
   display: flex;
@@ -95,9 +81,7 @@ button {
   color: white;
 }
 
-button:active {
-  background: #666;
-}
+button:active { background: #666; }
 
 #end {
   margin-top: 20px;
@@ -114,12 +98,13 @@ button:active {
   <div id="board"></div>
 </div>
 
-<div id="target"></div>
+<div id="target">▶️ Appuie pour commencer</div>
 <div id="info"></div>
 
 <div id="controls">
-  <button id="toggleBtn" onclick="toggleGame()">⏸️</button>
-  <button onclick="restart()">⏹️</button>
+  <button id="playBtn" onclick="startGame()">▶️</button>
+  <button id="pauseBtn" onclick="togglePause()" style="display:none;">⏸️</button>
+  <button id="stopBtn" onclick="stopGame()" style="display:none;">⏹️</button>
 </div>
 
 <div id="end"></div>
@@ -130,31 +115,80 @@ const targetDisplay = document.getElementById("target");
 const infoDisplay = document.getElementById("info");
 const endDisplay = document.getElementById("end");
 
+const playBtn = document.getElementById("playBtn");
+const pauseBtn = document.getElementById("pauseBtn");
+const stopBtn = document.getElementById("stopBtn");
+
 const letters = ['a','b','c','d','e','f','g','h'];
 
 let target = "";
 let score = 0;
 let moves = 0;
 let locked = false;
-let running = true;
+
+let running = false;
+let paused = false;
 
 const maxMoves = 10;
 
-let startTime = Date.now();
-let timerInterval;
-
+let startTime = 0;
 let pausedTime = 0;
 let pauseStart = 0;
+let timerInterval;
 
 /* Chrono */
 function startTimer() {
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
-    if (!running) return;
+    if (!running || paused) return;
 
-    const elapsed = Math.floor((Date.now() - startTime - pausedTime) / 1000);
+    const elapsed = Math.floor((Date.now() - startTime - pausedTime)/1000);
     infoDisplay.innerText = "Temps : " + elapsed + "s | Score : " + moves + "/" + maxMoves;
   }, 300);
+}
+
+/* Démarrer */
+function startGame() {
+  running = true;
+  paused = false;
+
+  score = 0;
+  moves = 0;
+  pausedTime = 0;
+  startTime = Date.now();
+
+  playBtn.style.display = "none";
+  pauseBtn.style.display = "inline-block";
+  stopBtn.style.display = "inline-block";
+
+  generateTarget();
+  createBoard();
+  startTimer();
+}
+
+/* Pause / reprise */
+function togglePause() {
+  if (!paused) {
+    paused = true;
+    pauseStart = Date.now();
+    pauseBtn.innerText = "▶️";
+  } else {
+    paused = false;
+    pausedTime += Date.now() - pauseStart;
+    pauseBtn.innerText = "⏸️";
+  }
+}
+
+/* Stop définitif */
+function stopGame() {
+  running = false;
+  clearInterval(timerInterval);
+
+  playBtn.style.display = "inline-block";
+  pauseBtn.style.display = "none";
+  stopBtn.style.display = "none";
+
+  targetDisplay.innerText = "▶️ Nouvelle partie ?";
 }
 
 /* Position */
@@ -173,12 +207,12 @@ function createBoard() {
     for (let col = 0; col < 8; col++) {
 
       const square = document.createElement("div");
-      square.className = "square " + ((row + col) % 2 === 0 ? "white" : "black");
+      square.className = "square " + ((row + col)%2===0 ? "white":"black");
 
       const position = letters[col] + row;
 
       square.onclick = () => {
-        if (!running || locked || moves >= maxMoves) return;
+        if (!running || paused || locked || moves >= maxMoves) return;
 
         if (position === target) {
           locked = true;
@@ -210,56 +244,23 @@ function createBoard() {
   }
 }
 
-/* Pause / Reprise */
-function toggleGame() {
-  const btn = document.getElementById("toggleBtn");
-
-  if (running) {
-    running = false;
-    pauseStart = Date.now();
-    clearInterval(timerInterval);
-    btn.innerText = "▶️";
-  } else {
-    running = true;
-    pausedTime += Date.now() - pauseStart;
-    startTimer();
-    btn.innerText = "⏸️";
-  }
-}
-
 /* Fin */
 function endGame() {
   running = false;
   clearInterval(timerInterval);
 
-  const totalTime = Math.floor((Date.now() - startTime - pausedTime) / 1000);
+  const total = Math.floor((Date.now() - startTime - pausedTime)/1000);
 
   endDisplay.innerHTML =
-    "🏁 Terminé<br>" +
-    "Score : " + score + " / " + maxMoves + "<br>" +
-    "Temps : " + totalTime + "s";
-}
+    "🏁 Terminé<br>Score : " + score + "/" + maxMoves + "<br>Temps : " + total + "s";
 
-/* Restart */
-function restart() {
-  running = true;
-  score = 0;
-  moves = 0;
-  pausedTime = 0;
-  pauseStart = 0;
-  startTime = Date.now();
-  endDisplay.innerHTML = "";
-  document.getElementById("toggleBtn").innerText = "⏸️";
-
-  generateTarget();
-  createBoard();
-  startTimer();
+  playBtn.style.display = "inline-block";
+  pauseBtn.style.display = "none";
+  stopBtn.style.display = "none";
 }
 
 /* Init */
-generateTarget();
 createBoard();
-startTimer();
 </script>
 
 </body>
