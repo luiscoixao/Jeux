@@ -40,12 +40,11 @@ h1 {
   height: 100%;
 }
 
-/* Cases FIXES */
+/* Cases */
 .square {
   position: relative;
 }
 
-/* Contenu centré */
 .square-content {
   position: absolute;
   inset: 0;
@@ -78,20 +77,20 @@ h1 {
 #info {
   margin-top: 10px;
   font-size: 16px;
-  opacity: 0.9;
 }
 
+/* Boutons */
 #controls {
   margin-top: 20px;
   display: flex;
-  gap: 15px;
+  gap: 20px;
 }
 
 button {
-  padding: 10px 18px;
-  font-size: 16px;
+  padding: 12px 16px;
+  font-size: 22px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   background: #444;
   color: white;
 }
@@ -102,7 +101,6 @@ button:active {
 
 #end {
   margin-top: 20px;
-  font-size: 20px;
   text-align: center;
 }
 </style>
@@ -120,8 +118,8 @@ button:active {
 <div id="info"></div>
 
 <div id="controls">
-  <button onclick="stopGame()">Stop</button>
-  <button onclick="restart()">Rejouer</button>
+  <button id="toggleBtn" onclick="toggleGame()">⏸️</button>
+  <button onclick="restart()">⏹️</button>
 </div>
 
 <div id="end"></div>
@@ -136,8 +134,8 @@ const letters = ['a','b','c','d','e','f','g','h'];
 
 let target = "";
 let score = 0;
-let locked = false;
 let moves = 0;
+let locked = false;
 let running = true;
 
 const maxMoves = 10;
@@ -145,18 +143,21 @@ const maxMoves = 10;
 let startTime = Date.now();
 let timerInterval;
 
+let pausedTime = 0;
+let pauseStart = 0;
+
 /* Chrono */
 function startTimer() {
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
     if (!running) return;
 
-    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const elapsed = Math.floor((Date.now() - startTime - pausedTime) / 1000);
     infoDisplay.innerText = "Temps : " + elapsed + "s | Score : " + moves + "/" + maxMoves;
   }, 300);
 }
 
-/* Génère position */
+/* Position */
 function generateTarget() {
   const col = letters[Math.floor(Math.random()*8)];
   const row = Math.floor(Math.random()*8) + 1;
@@ -164,7 +165,7 @@ function generateTarget() {
   targetDisplay.innerText = target;
 }
 
-/* Création échiquier */
+/* Échiquier */
 function createBoard() {
   board.innerHTML = "";
 
@@ -209,10 +210,21 @@ function createBoard() {
   }
 }
 
-/* Stop */
-function stopGame() {
-  running = false;
-  clearInterval(timerInterval);
+/* Pause / Reprise */
+function toggleGame() {
+  const btn = document.getElementById("toggleBtn");
+
+  if (running) {
+    running = false;
+    pauseStart = Date.now();
+    clearInterval(timerInterval);
+    btn.innerText = "▶️";
+  } else {
+    running = true;
+    pausedTime += Date.now() - pauseStart;
+    startTimer();
+    btn.innerText = "⏸️";
+  }
 }
 
 /* Fin */
@@ -220,7 +232,7 @@ function endGame() {
   running = false;
   clearInterval(timerInterval);
 
-  const totalTime = Math.floor((Date.now() - startTime) / 1000);
+  const totalTime = Math.floor((Date.now() - startTime - pausedTime) / 1000);
 
   endDisplay.innerHTML =
     "🏁 Terminé<br>" +
@@ -233,8 +245,12 @@ function restart() {
   running = true;
   score = 0;
   moves = 0;
+  pausedTime = 0;
+  pauseStart = 0;
   startTime = Date.now();
   endDisplay.innerHTML = "";
+  document.getElementById("toggleBtn").innerText = "⏸️";
+
   generateTarget();
   createBoard();
   startTimer();
