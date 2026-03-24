@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Trouve la Dame</title>
+
+<title>La Dame Blanche</title>
 
 <link rel="apple-touch-icon" href="icon.png">
 
@@ -11,21 +12,32 @@
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont;
-  background: #222;
+  background: #2c2c2c;
   color: white;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  height: 100vh;
 }
 
-/* Échiquier FIXE */
+/* Titre */
+h1 {
+  margin: 20px 0 10px;
+  font-size: 28px;
+}
+
+/* Échiquier plein largeur */
+#board-container {
+  width: 95vw;
+  max-width: 500px;
+  aspect-ratio: 1;
+  position: relative;
+}
+
 #board {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
-  width: 360px;
-  height: 360px;
+  width: 100%;
+  height: 100%;
 }
 
 /* Cases */
@@ -33,32 +45,34 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
-  user-select: none;
+  font-size: 24px;
 }
 
-/* Couleurs style réel */
 .white { background: #eeeed2; }
 .black { background: #769656; }
 
+/* Coordonnées */
+.coord {
+  position: absolute;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.coord.bottom { bottom: 2px; }
+.coord.left { left: 2px; }
+
 /* Feedback */
-.correct {
-  background: #a9d18e !important;
-}
+.correct { background: #a9d18e !important; }
+.wrong { outline: 2px solid red; }
 
-.wrong {
-  outline: 2px solid red;
-}
-
-/* Texte */
+/* UI */
 #target {
-  margin-top: 20px;
+  margin-top: 15px;
   font-size: 22px;
 }
 
 #score {
-  margin-top: 8px;
-  font-size: 16px;
+  margin-top: 5px;
   opacity: 0.7;
 }
 </style>
@@ -66,7 +80,11 @@ body {
 
 <body>
 
-<div id="board"></div>
+<h1>La Dame Blanche</h1>
+
+<div id="board-container">
+  <div id="board"></div>
+</div>
 
 <div id="target"></div>
 <div id="score"></div>
@@ -90,7 +108,7 @@ function generateTarget() {
   targetDisplay.innerText = target;
 }
 
-/* Création échiquier FIXE */
+/* Création échiquier */
 function createBoard() {
   board.innerHTML = "";
 
@@ -105,13 +123,28 @@ function createBoard() {
 
       const position = letters[col] + row;
 
+      /* Coordonnées */
+      if (row === 1) {
+        const coord = document.createElement("div");
+        coord.className = "coord bottom";
+        coord.innerText = letters[col];
+        square.appendChild(coord);
+      }
+
+      if (col === 0) {
+        const coord = document.createElement("div");
+        coord.className = "coord left";
+        coord.innerText = row;
+        square.appendChild(coord);
+      }
+
       square.onclick = () => {
         if (locked) return;
 
         if (position === target) {
           locked = true;
 
-          square.innerHTML = "♕"; // dame blanche
+          square.innerHTML = "♕";
           square.classList.add("correct");
 
           score++;
@@ -119,7 +152,7 @@ function createBoard() {
 
           setTimeout(() => {
             generateTarget();
-            createBoard(); // recrée sans changer taille
+            createBoard();
             locked = false;
           }, 700);
 
