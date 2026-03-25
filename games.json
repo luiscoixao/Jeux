@@ -1,0 +1,891 @@
+[
+  {
+    "id": "morphy-opera",
+    "title": "Morphy – Partie de l’Opéra",
+    "moves": [
+      {
+        "san": "e4"
+      },
+      {
+        "san": "e5"
+      },
+      {
+        "san": "Nf3"
+      },
+      {
+        "san": "d6",
+        "note": "Défense Philidor"
+      },
+      {
+        "san": "d4"
+      },
+      {
+        "san": "Bg4"
+      },
+      {
+        "san": "dxe5"
+      },
+      {
+        "san": "Bxf3"
+      },
+      {
+        "san": "Qxf3"
+      },
+      {
+        "san": "dxe5"
+      },
+      {
+        "san": "Bc4"
+      },
+      {
+        "san": "Nf6"
+      },
+      {
+        "san": "Qb3"
+      },
+      {
+        "san": "Qe7"
+      },
+      {
+        "san": "Nc3"
+      },
+      {
+        "san": "c6"
+      },
+      {
+        "san": "Bg5"
+      },
+      {
+        "san": "b5"
+      },
+      {
+        "san": "Nxb5",
+        "note": "Sacrifice tactique"
+      },
+      {
+        "san": "cxb5"
+      },
+      {
+        "san": "Bxb5+"
+      },
+      {
+        "san": "Nbd7"
+      },
+      {
+        "san": "O-O-O",
+        "note": "Roques opposés"
+      },
+      {
+        "san": "Rd8"
+      },
+      {
+        "san": "Rxd7",
+        "note": "Sacrifice de qualité"
+      },
+      {
+        "san": "Rxd7"
+      },
+      {
+        "san": "Rd1"
+      },
+      {
+        "san": "Qe6"
+      },
+      {
+        "san": "Bxd7+"
+      },
+      {
+        "san": "Nxd7"
+      },
+      {
+        "san": "Qb8+"
+      },
+      {
+        "san": "Nxb8"
+      },
+      {
+        "san": "Rd8#",
+        "note": "Mat"
+      }
+    ]
+  },
+  {
+    "id": "anderssen-immortelle",
+    "title": "Anderssen – Partie Immortelle",
+    "moves": [
+      {
+        "san": "e4"
+      },
+      {
+        "san": "e5"
+      },
+      {
+        "san": "f4",
+        "note": "Gambit du Roi"
+      },
+      {
+        "san": "exf4"
+      },
+      {
+        "san": "Bc4",
+        "note": "Gambit du Roi accepté"
+      },
+      {
+        "san": "Qh4+"
+      },
+      {
+        "san": "Kf1"
+      },
+      {
+        "san": "b5"
+      },
+      {
+        "san": "Bxb5"
+      },
+      {
+        "san": "Nf6"
+      },
+      {
+        "san": "Nf3"
+      },
+      {
+        "san": "Qh6"
+      },
+      {
+        "san": "d3"
+      },
+      {
+        "san": "Nh5"
+      },
+      {
+        "san": "Nh4"
+      },
+      {
+        "san": "Qg5"
+      },
+      {
+        "san": "Nf5"
+      },
+      {
+        "san": "c6"
+      },
+      {
+        "san": "g4"
+      },
+      {
+        "san": "Nf6"
+      },
+      {
+        "san": "Rg1"
+      },
+      {
+        "san": "cxb5"
+      },
+      {
+        "san": "h4"
+      },
+      {
+        "san": "Qg6"
+      },
+      {
+        "san": "h5"
+      },
+      {
+        "san": "Qg5"
+      },
+      {
+        "san": "Qf3"
+      },
+      {
+        "san": "Ng8"
+      },
+      {
+        "san": "Bxf4"
+      },
+      {
+        "san": "Qf6"
+      },
+      {
+        "san": "Nc3"
+      },
+      {
+        "san": "Bc5"
+      },
+      {
+        "san": "Nd5"
+      },
+      {
+        "san": "Qxb2"
+      },
+      {
+        "san": "Bd6"
+      },
+      {
+        "san": "Bxg1"
+      },
+      {
+        "san": "e5"
+      },
+      {
+        "san": "Qxa1+"
+      },
+      {
+        "san": "Ke2"
+      },
+      {
+        "san": "Na6"
+      },
+      {
+        "san": "Nxg7+"
+      },
+      {
+        "san": "Kd8"
+      },
+      {
+        "san": "Qf6+"
+      },
+      {
+        "san": "Nxf6",
+        "note": "Sacrifice de dame"
+      },
+      {
+        "san": "Be7#",
+        "note": "Mat"
+      }
+    ]
+  },
+  {
+    "id": "legal-mate",
+    "title": "Légal – Piège de Légal",
+    "moves": [
+      {
+        "san": "e4"
+      },
+      {
+        "san": "e5"
+      },
+      {
+        "san": "Nf3"
+      },
+      {
+        "san": "Nc6"
+      },
+      {
+        "san": "Bc4"
+      },
+      {
+        "san": "d6"
+      },
+      {
+        "san": "Nc3"
+      },
+      {
+        "san": "Bg4"
+      },
+      {
+        "san": "h3"
+      },
+      {
+        "san": "Bh5"
+      },
+      {
+        "san": "Nxe5",
+        "note": "Sacrifice apparent de dame"
+      },
+      {
+        "san": "Bxd1"
+      },
+      {
+        "san": "Bxf7+"
+      },
+      {
+        "san": "Ke7"
+      },
+      {
+        "san": "Nd5#",
+        "note": "Mat"
+      }
+    ]
+  },
+  {
+    "id": "fools-mate",
+    "title": "Mat du fou",
+    "moves": [
+      {
+        "san": "f3"
+      },
+      {
+        "san": "e5"
+      },
+      {
+        "san": "g4"
+      },
+      {
+        "san": "Qh4#",
+        "note": "Mat"
+      }
+    ]
+  },
+  {
+    "id": "ruy-lopez",
+    "title": "Ouverture Espagnole",
+    "moves": [
+      {
+        "san": "e4"
+      },
+      {
+        "san": "e5"
+      },
+      {
+        "san": "Nf3"
+      },
+      {
+        "san": "Nc6"
+      },
+      {
+        "san": "Bb5",
+        "note": "Espagnole"
+      },
+      {
+        "san": "a6"
+      },
+      {
+        "san": "Ba4"
+      },
+      {
+        "san": "Nf6"
+      },
+      {
+        "san": "O-O"
+      },
+      {
+        "san": "Be7"
+      },
+      {
+        "san": "Re1"
+      },
+      {
+        "san": "b5"
+      },
+      {
+        "san": "Bb3"
+      },
+      {
+        "san": "d6"
+      },
+      {
+        "san": "c3"
+      },
+      {
+        "san": "O-O"
+      },
+      {
+        "san": "h3",
+        "note": "Variante fermée"
+      }
+    ]
+  },
+  {
+    "id": "italian-game",
+    "title": "Partie Italienne",
+    "moves": [
+      {
+        "san": "e4"
+      },
+      {
+        "san": "e5"
+      },
+      {
+        "san": "Nf3"
+      },
+      {
+        "san": "Nc6"
+      },
+      {
+        "san": "Bc4",
+        "note": "Italienne"
+      },
+      {
+        "san": "Bc5"
+      },
+      {
+        "san": "c3"
+      },
+      {
+        "san": "Nf6"
+      },
+      {
+        "san": "d4"
+      },
+      {
+        "san": "exd4"
+      },
+      {
+        "san": "cxd4"
+      },
+      {
+        "san": "Bb4+"
+      },
+      {
+        "san": "Nc3"
+      },
+      {
+        "san": "Nxe4"
+      }
+    ]
+  },
+  {
+    "id": "sicilian-defense",
+    "title": "Défense Sicilienne",
+    "moves": [
+      {
+        "san": "e4"
+      },
+      {
+        "san": "c5",
+        "note": "Sicilienne"
+      },
+      {
+        "san": "Nf3"
+      },
+      {
+        "san": "d6"
+      },
+      {
+        "san": "d4"
+      },
+      {
+        "san": "cxd4"
+      },
+      {
+        "san": "Nxd4"
+      },
+      {
+        "san": "Nf6"
+      },
+      {
+        "san": "Nc3"
+      },
+      {
+        "san": "a6",
+        "note": "Najdorf"
+      }
+    ]
+  },
+  {
+    "id": "french-defense",
+    "title": "Défense Française",
+    "moves": [
+      {
+        "san": "e4"
+      },
+      {
+        "san": "e6",
+        "note": "Française"
+      },
+      {
+        "san": "d4"
+      },
+      {
+        "san": "d5"
+      },
+      {
+        "san": "Nc3"
+      },
+      {
+        "san": "Nf6"
+      },
+      {
+        "san": "Bg5",
+        "note": "Variante classique"
+      },
+      {
+        "san": "Be7"
+      },
+      {
+        "san": "e5"
+      },
+      {
+        "san": "Nfd7"
+      }
+    ]
+  },
+  {
+    "id": "caro-kann",
+    "title": "Défense Caro-Kann",
+    "moves": [
+      {
+        "san": "e4"
+      },
+      {
+        "san": "c6",
+        "note": "Caro-Kann"
+      },
+      {
+        "san": "d4"
+      },
+      {
+        "san": "d5"
+      },
+      {
+        "san": "Nc3"
+      },
+      {
+        "san": "dxe4"
+      },
+      {
+        "san": "Nxe4"
+      },
+      {
+        "san": "Bf5"
+      },
+      {
+        "san": "Ng3"
+      },
+      {
+        "san": "Bg6"
+      },
+      {
+        "san": "h4",
+        "note": "Attaque du fou"
+      }
+    ]
+  },
+  {
+    "id": "queens-gambit",
+    "title": "Gambit de la Dame",
+    "moves": [
+      {
+        "san": "d4"
+      },
+      {
+        "san": "d5"
+      },
+      {
+        "san": "c4",
+        "note": "Gambit de la Dame"
+      },
+      {
+        "san": "e6"
+      },
+      {
+        "san": "Nc3"
+      },
+      {
+        "san": "Nf6"
+      },
+      {
+        "san": "Bg5"
+      },
+      {
+        "san": "Be7"
+      },
+      {
+        "san": "e3"
+      },
+      {
+        "san": "O-O"
+      },
+      {
+        "san": "Nf3"
+      }
+    ]
+  },
+  {
+    "id": "london-system",
+    "title": "Système de Londres",
+    "moves": [
+      {
+        "san": "d4"
+      },
+      {
+        "san": "Nf6"
+      },
+      {
+        "san": "Nf3"
+      },
+      {
+        "san": "e6"
+      },
+      {
+        "san": "Bf4",
+        "note": "Londres"
+      },
+      {
+        "san": "d5"
+      },
+      {
+        "san": "e3"
+      },
+      {
+        "san": "Bd6"
+      },
+      {
+        "san": "Bg3"
+      },
+      {
+        "san": "O-O"
+      },
+      {
+        "san": "Bd3"
+      }
+    ]
+  },
+  {
+    "id": "english-opening",
+    "title": "Ouverture Anglaise",
+    "moves": [
+      {
+        "san": "c4",
+        "note": "Anglaise"
+      },
+      {
+        "san": "e5"
+      },
+      {
+        "san": "Nc3"
+      },
+      {
+        "san": "Nf6"
+      },
+      {
+        "san": "Nf3"
+      },
+      {
+        "san": "Nc6"
+      },
+      {
+        "san": "g3"
+      },
+      {
+        "san": "d5"
+      },
+      {
+        "san": "cxd5"
+      },
+      {
+        "san": "Nxd5"
+      }
+    ]
+  },
+  {
+    "id": "vienna-game",
+    "title": "Partie Viennoise",
+    "moves": [
+      {
+        "san": "e4"
+      },
+      {
+        "san": "e5"
+      },
+      {
+        "san": "Nc3",
+        "note": "Viennoise"
+      },
+      {
+        "san": "Nf6"
+      },
+      {
+        "san": "f4",
+        "note": "Gambit viennois"
+      },
+      {
+        "san": "d5"
+      },
+      {
+        "san": "fxe5"
+      },
+      {
+        "san": "Nxe4"
+      },
+      {
+        "san": "Nf3"
+      }
+    ]
+  },
+  {
+    "id": "scotch-game",
+    "title": "Partie Écossaise",
+    "moves": [
+      {
+        "san": "e4"
+      },
+      {
+        "san": "e5"
+      },
+      {
+        "san": "Nf3"
+      },
+      {
+        "san": "Nc6"
+      },
+      {
+        "san": "d4",
+        "note": "Écossaise"
+      },
+      {
+        "san": "exd4"
+      },
+      {
+        "san": "Nxd4"
+      },
+      {
+        "san": "Nf6"
+      },
+      {
+        "san": "Nc3"
+      },
+      {
+        "san": "Bb4"
+      }
+    ]
+  },
+  {
+    "id": "four-knights",
+    "title": "Quatre Cavaliers",
+    "moves": [
+      {
+        "san": "e4"
+      },
+      {
+        "san": "e5"
+      },
+      {
+        "san": "Nf3"
+      },
+      {
+        "san": "Nc6"
+      },
+      {
+        "san": "Nc3",
+        "note": "Quatre Cavaliers"
+      },
+      {
+        "san": "Nf6"
+      },
+      {
+        "san": "Bb5"
+      },
+      {
+        "san": "Bb4"
+      },
+      {
+        "san": "O-O"
+      }
+    ]
+  },
+  {
+    "id": "philidor-defense",
+    "title": "Défense Philidor",
+    "moves": [
+      {
+        "san": "e4"
+      },
+      {
+        "san": "e5"
+      },
+      {
+        "san": "Nf3"
+      },
+      {
+        "san": "d6",
+        "note": "Philidor"
+      },
+      {
+        "san": "d4"
+      },
+      {
+        "san": "Nf6"
+      },
+      {
+        "san": "Nc3"
+      },
+      {
+        "san": "Nbd7"
+      },
+      {
+        "san": "Bc4"
+      },
+      {
+        "san": "Be7"
+      }
+    ]
+  },
+  {
+    "id": "pirc-defense",
+    "title": "Défense Pirc",
+    "moves": [
+      {
+        "san": "e4"
+      },
+      {
+        "san": "d6",
+        "note": "Pirc"
+      },
+      {
+        "san": "d4"
+      },
+      {
+        "san": "Nf6"
+      },
+      {
+        "san": "Nc3"
+      },
+      {
+        "san": "g6"
+      },
+      {
+        "san": "Nf3"
+      },
+      {
+        "san": "Bg7"
+      },
+      {
+        "san": "Be2"
+      },
+      {
+        "san": "O-O"
+      }
+    ]
+  },
+  {
+    "id": "kings-indian",
+    "title": "Défense Indienne du Roi",
+    "moves": [
+      {
+        "san": "d4"
+      },
+      {
+        "san": "Nf6"
+      },
+      {
+        "san": "c4"
+      },
+      {
+        "san": "g6"
+      },
+      {
+        "san": "Nc3"
+      },
+      {
+        "san": "Bg7"
+      },
+      {
+        "san": "e4"
+      },
+      {
+        "san": "d6"
+      },
+      {
+        "san": "Nf3"
+      },
+      {
+        "san": "O-O"
+      },
+      {
+        "san": "Be2",
+        "note": "Indienne du Roi"
+      }
+    ]
+  }
+]
