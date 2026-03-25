@@ -1,825 +1,465 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>CHESSMASTERS</title>
-
-<link rel="apple-touch-icon" href="icon.png" />
-<link rel="icon" href="icon.png" />
-
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="CHESSMASTERS" />
-<meta name="theme-color" content="#2c2c2c" />
-
-<style>
-:root{
-  --bg:#2c2c2c;
-  --panel:#3a3a3a;
-  --light:#eeeed2;
-  --dark:#769656;
-  --text:#ffffff;
-  --muted:#d7d7d7;
-}
-
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
-
-html,body{
-  margin:0;
-  padding:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
-}
-
-body{
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  padding:0 12px calc(18px + env(safe-area-inset-bottom));
-}
-
-h1{
-  margin:calc(env(safe-area-inset-top) + 18px) 0 12px;
-  font-size:28px;
-  line-height:1.08;
-  font-weight:700;
-  text-align:center;
-}
-
-.app{
-  width:100%;
-  max-width:560px;
-}
-
-.top-panel,
-.move-panel{
-  background:var(--panel);
-  padding:14px;
-  margin-bottom:12px;
-  box-shadow:0 8px 20px rgba(0,0,0,.18);
-}
-
-select{
-  width:100%;
-  height:48px;
-  border:none;
-  background:#4a4a4a;
-  color:#fff;
-  font-size:16px;
-  padding:0 14px;
-  appearance:none;
-  -webkit-appearance:none;
-}
-
-#board-container{
-  width:95vw;
-  max-width:500px;
-  aspect-ratio:1 / 1;
-  overflow:hidden;
-  margin-bottom:12px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.35);
-}
-
-#board{
-  display:grid;
-  grid-template-columns:repeat(8,1fr);
-  grid-template-rows:repeat(8,1fr);
-  width:100%;
-  height:100%;
-}
-
-.square{
-  position:relative;
-  width:100%;
-  height:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  user-select:none;
-  overflow:hidden;
-}
-
-.white{ background:var(--light); }
-.black{ background:var(--dark); }
-
-.coord{
-  position:absolute;
-  font-size:10px;
-  opacity:.65;
-  font-weight:700;
-  pointer-events:none;
-}
-
-.coord.file{
-  left:5px;
-  bottom:3px;
-}
-
-.coord.rank{
-  right:4px;
-  top:2px;
-}
-
-.piece-wrap{
-  width:100%;
-  height:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.piece{
-  line-height:1;
-  position:relative;
-  z-index:2;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:100%;
-  height:100%;
-  filter:drop-shadow(0 1px 0 rgba(0,0,0,.22));
-}
-
-/* pièces grandes, proches de chess.com */
-.piece-N,.piece-B,.piece-R,.piece-Q,.piece-K,
-.piece-n,.piece-b,.piece-r,.piece-q,.piece-k{
-  font-size:clamp(42px, 8vw, 60px);
-}
-
-.piece-P{
-  font-size:clamp(34px, 6.4vw, 48px);
-}
-
-.piece-p{
-  font-size:clamp(29px, 5.4vw, 40px);
-}
-
-.white-piece{
-  color:#ffffff;
-  text-shadow:
-    0 0 1px #000,
-    0 0 2px #000,
-    0 1px 2px rgba(0,0,0,.55),
-    0 0 6px rgba(255,255,255,.16);
-}
-
-.black-piece{
-  color:#141414;
-  text-shadow:
-    0 0 1px rgba(255,255,255,.18),
-    0 1px 1px rgba(255,255,255,.06);
-}
-
-.from-square{
-  outline:3px solid rgba(255,215,0,.85);
-  outline-offset:-3px;
-}
-
-.to-square{
-  outline:3px solid rgba(169,209,142,.95);
-  outline-offset:-3px;
-}
-
-.capture-square{
-  box-shadow:inset 0 0 0 3px rgba(255,99,71,.95);
-}
-
-#move-counter{
-  text-align:center;
-  line-height:1.35;
-  font-size:18px;
-  font-weight:700;
-  margin-bottom:8px;
-}
-
-#status{
-  text-align:center;
-  line-height:1.35;
-  font-size:15px;
-  color:var(--muted);
-  min-height:42px;
-}
-
-#status .san{
-  display:block;
-}
-
-#status .note{
-  display:block;
-  margin-top:6px;
-  font-size:12px;
-  line-height:1.25;
-  color:#cfcfcf;
-}
-
-.controls-panel{
-  background:var(--bg);
-  padding:14px;
-  margin-bottom:12px;
-  box-shadow:0 8px 20px rgba(0,0,0,.18);
-}
-
-.controls{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:28px;
-  background:var(--bg);
-}
-
-.control-btn{
-  width:52px;
-  height:52px;
-  border:none;
-  background:var(--bg);
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  appearance:none;
-  -webkit-appearance:none;
-  cursor:pointer;
-  touch-action:manipulation;
-  box-shadow:none;
-  padding:0;
-}
-
-.control-btn span{
-  font-size:24px;
-  line-height:1;
-  display:block;
-}
-
-.control-btn:active{
-  transform:scale(.94);
-}
-
-@media (max-width:420px){
-  .control-btn{
-    width:46px;
-    height:46px;
-  }
-
-  .control-btn span{
-    font-size:22px;
-  }
-
-  .piece-N,.piece-B,.piece-R,.piece-Q,.piece-K,
-  .piece-n,.piece-b,.piece-r,.piece-q,.piece-k{
-    font-size:clamp(38px, 8.4vw, 52px);
-  }
-
-  .piece-P{
-    font-size:clamp(31px, 6.7vw, 44px);
-  }
-
-  .piece-p{
-    font-size:clamp(27px, 5.7vw, 37px);
-  }
-}
-</style>
-</head>
-<body>
-
-<h1>CHESSMASTERS</h1>
-
-<div class="app">
-  <div class="top-panel">
-    <select id="gameSelect"></select>
-  </div>
-
-  <div id="board-container">
-    <div id="board"></div>
-  </div>
-
-  <div class="move-panel">
-    <div id="move-counter">Coup 0 / 0</div>
-    <div id="status">Position initiale.</div>
-  </div>
-
-  <div class="controls-panel">
-    <div class="controls">
-      <button class="control-btn" id="prevBtn" type="button" aria-label="Coup précédent"><span>◀️</span></button>
-      <button class="control-btn" id="nextBtn" type="button" aria-label="Coup suivant"><span>▶️</span></button>
-    </div>
-  </div>
-</div>
-
-<script>
-const boardEl = document.getElementById("board");
-const gameSelect = document.getElementById("gameSelect");
-const moveCounter = document.getElementById("move-counter");
-const statusEl = document.getElementById("status");
-
-const prevBtn = document.getElementById("prevBtn");
-const nextBtn = document.getElementById("nextBtn");
-
-const FILES = ["a","b","c","d","e","f","g","h"];
-const START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-const PIECES = {
-  "P":"♙","N":"♘","B":"♗","R":"♖","Q":"♕","K":"♔",
-  "p":"♟","n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
-};
-
-const games = [
+[
   {
-    id:"morphy-opera",
-    title:"Morphy – Partie de l’Opéra",
-    moves:[
-      {san:"e4"},
-      {san:"e5"},
-      {san:"Nf3"},
-      {san:"d6", note:"Défense Philidor"},
-      {san:"d4"},
-      {san:"Bg4"},
-      {san:"dxe5"},
-      {san:"Bxf3"},
-      {san:"Qxf3"},
-      {san:"dxe5"},
-      {san:"Bc4"},
-      {san:"Nf6"},
-      {san:"Qb3"},
-      {san:"Qe7"},
-      {san:"Nc3"},
-      {san:"c6"},
-      {san:"Bg5"},
-      {san:"b5"},
-      {san:"Nxb5", note:"Sacrifice tactique"},
-      {san:"cxb5"},
-      {san:"Bxb5+"},
-      {san:"Nbd7"},
-      {san:"O-O-O", note:"Roques opposés"},
-      {san:"Rd8"},
-      {san:"Rxd7", note:"Sacrifice de qualité"},
-      {san:"Rxd7"},
-      {san:"Rd1"},
-      {san:"Qe6"},
-      {san:"Bxd7+"},
-      {san:"Nxd7"},
-      {san:"Qb8+"},
-      {san:"Nxb8"},
-      {san:"Rd8#", note:"Mat"}
+    "id": "famous-morphy-opera",
+    "title": "Partie célèbre — Morphy (Opéra)",
+    "moves": [
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"d6","note":"Philidor"},
+      {"san":"d4"},{"san":"Bg4"},{"san":"dxe5"},{"san":"Bxf3"},
+      {"san":"Qxf3"},{"san":"dxe5"},{"san":"Bc4"},{"san":"Nf6"},
+      {"san":"Qb3"},{"san":"Qe7"},{"san":"Nc3"},{"san":"c6"},
+      {"san":"Bg5"},{"san":"b5"},{"san":"Nxb5","note":"Sacrifice"},
+      {"san":"cxb5"},{"san":"Bxb5+"},{"san":"Nbd7"},{"san":"O-O-O"},
+      {"san":"Rd8"},{"san":"Rxd7"},{"san":"Rxd7"},{"san":"Rd1"},
+      {"san":"Qe6"},{"san":"Bxd7+"},{"san":"Nxd7"},{"san":"Qb8+"},
+      {"san":"Nxb8"},{"san":"Rd8#","note":"Mat"}
     ]
   },
   {
-    id:"anderssen-immortelle",
-    title:"Anderssen – Partie Immortelle",
-    moves:[
-      {san:"e4"},
-      {san:"e5"},
-      {san:"f4", note:"Gambit du Roi"},
-      {san:"exf4"},
-      {san:"Bc4", note:"Gambit du Roi accepté"},
-      {san:"Qh4+"},
-      {san:"Kf1"},
-      {san:"b5"},
-      {san:"Bxb5"},
-      {san:"Nf6"},
-      {san:"Nf3"},
-      {san:"Qh6"},
-      {san:"d3"},
-      {san:"Nh5"},
-      {san:"Nh4"},
-      {san:"Qg5"},
-      {san:"Nf5"},
-      {san:"c6"},
-      {san:"g4"},
-      {san:"Nf6"},
-      {san:"Rg1"},
-      {san:"cxb5"},
-      {san:"h4"},
-      {san:"Qg6"},
-      {san:"h5"},
-      {san:"Qg5"},
-      {san:"Qf3"},
-      {san:"Ng8"},
-      {san:"Bxf4"},
-      {san:"Qf6"},
-      {san:"Nc3"},
-      {san:"Bc5"},
-      {san:"Nd5"},
-      {san:"Qxb2"},
-      {san:"Bd6"},
-      {san:"Bxg1"},
-      {san:"e5"},
-      {san:"Qxa1+"},
-      {san:"Ke2"},
-      {san:"Na6"},
-      {san:"Nxg7+"},
-      {san:"Kd8"},
-      {san:"Qf6+"},
-      {san:"Nxf6", note:"Sacrifice de dame"},
-      {san:"Be7#", note:"Mat"}
+    "id": "famous-anderssen-immortal",
+    "title": "Partie célèbre — Anderssen (Immortelle)",
+    "moves": [
+      {"san":"e4"},{"san":"e5"},{"san":"f4","note":"Gambit du Roi"},
+      {"san":"exf4"},{"san":"Bc4"},{"san":"Qh4+"},{"san":"Kf1"},
+      {"san":"b5"},{"san":"Bxb5"},{"san":"Nf6"},{"san":"Nf3"},
+      {"san":"Qh6"},{"san":"d3"},{"san":"Nh5"},{"san":"Nh4"},
+      {"san":"Qg5"},{"san":"Nf5"},{"san":"c6"},{"san":"g4"},
+      {"san":"Nf6"},{"san":"Rg1"},{"san":"cxb5"},{"san":"h4"},
+      {"san":"Qg6"},{"san":"h5"},{"san":"Qg5"},{"san":"Qf3"},
+      {"san":"Ng8"},{"san":"Bxf4"},{"san":"Qf6"},{"san":"Nc3"},
+      {"san":"Bc5"},{"san":"Nd5"},{"san":"Qxb2"},{"san":"Bd6"},
+      {"san":"Bxg1"},{"san":"e5"},{"san":"Qxa1+"},{"san":"Ke2"},
+      {"san":"Na6"},{"san":"Nxg7+"},{"san":"Kd8"},{"san":"Qf6+"},
+      {"san":"Nxf6","note":"Sacrifice de dame"},{"san":"Be7#","note":"Mat"}
     ]
   },
   {
-    id:"legal-mate",
-    title:"Légal – Piège de Légal",
-    moves:[
-      {san:"e4"},
-      {san:"e5"},
-      {san:"Nf3"},
-      {san:"Nc6"},
-      {san:"Bc4"},
-      {san:"d6"},
-      {san:"Nc3"},
-      {san:"Bg4"},
-      {san:"h3"},
-      {san:"Bh5"},
-      {san:"Nxe5", note:"Sacrifice apparent de dame"},
-      {san:"Bxd1"},
-      {san:"Bxf7+"},
-      {san:"Ke7"},
-      {san:"Nd5#", note:"Mat"}
+    "id": "famous-legal",
+    "title": "Piège — Légal",
+    "moves": [
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"Nc6"},
+      {"san":"Bc4"},{"san":"d6"},{"san":"Nc3"},{"san":"Bg4"},
+      {"san":"h3"},{"san":"Bh5"},{"san":"Nxe5","note":"Fausse dame"},
+      {"san":"Bxd1"},{"san":"Bxf7+"},{"san":"Ke7"},{"san":"Nd5#","note":"Mat"}
     ]
   },
   {
-    id:"fools-mate",
-    title:"Mat du fou",
-    moves:[
-      {san:"f3"},
-      {san:"e5"},
-      {san:"g4"},
-      {san:"Qh4#", note:"Mat"}
+    "id": "trap-scholars-mate",
+    "title": "Piège — Mat du berger",
+    "moves": [
+      {"san":"e4"},{"san":"e5"},{"san":"Bc4"},{"san":"Nc6"},
+      {"san":"Qh5"},{"san":"Nf6"},{"san":"Qxf7#","note":"Mat"}
+    ]
+  },
+  {
+    "id": "trap-fools-mate",
+    "title": "Piège — Mat du fou",
+    "moves": [
+      {"san":"f3"},{"san":"e5"},{"san":"g4"},{"san":"Qh4#","note":"Mat"}
+    ]
+  },
+
+  {
+    "id": "open-ruy-lopez",
+    "title": "Ouverture — Espagnole",
+    "moves": [
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"Nc6"},
+      {"san":"Bb5","note":"Espagnole"},{"san":"a6"},{"san":"Ba4"},
+      {"san":"Nf6"},{"san":"O-O"},{"san":"Be7"},{"san":"Re1"},
+      {"san":"b5"},{"san":"Bb3"},{"san":"d6"},{"san":"c3"},{"san":"O-O"}
+    ]
+  },
+  {
+    "id": "open-italian",
+    "title": "Ouverture — Italienne",
+    "moves": [
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"Nc6"},
+      {"san":"Bc4","note":"Italienne"},{"san":"Bc5"},{"san":"c3"},
+      {"san":"Nf6"},{"san":"d4"},{"san":"exd4"},{"san":"cxd4"},{"san":"Bb4+"}
+    ]
+  },
+  {
+    "id": "open-giuoco-piano",
+    "title": "Ouverture — Giuoco Piano",
+    "moves": [
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"Nc6"},
+      {"san":"Bc4"},{"san":"Bc5","note":"Giuoco Piano"},{"san":"c3"},
+      {"san":"Nf6"},{"san":"d3"},{"san":"d6"},{"san":"O-O"},{"san":"O-O"}
+    ]
+  },
+  {
+    "id": "open-evans",
+    "title": "Ouverture — Gambit Evans",
+    "moves": [
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"Nc6"},
+      {"san":"Bc4"},{"san":"Bc5"},{"san":"b4","note":"Evans"},
+      {"san":"Bxb4"},{"san":"c3"},{"san":"Ba5"},{"san":"d4"},{"san":"exd4"}
+    ]
+  },
+  {
+    "id": "open-scotch",
+    "title": "Ouverture — Écossaise",
+    "moves": [
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"Nc6"},
+      {"san":"d4","note":"Écossaise"},{"san":"exd4"},{"san":"Nxd4"},
+      {"san":"Nf6"},{"san":"Nc3"},{"san":"Bb4"}
+    ]
+  },
+  {
+    "id": "open-four-knights",
+    "title": "Ouverture — Quatre Cavaliers",
+    "moves": [
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"Nc6"},
+      {"san":"Nc3","note":"Quatre Cavaliers"},{"san":"Nf6"},{"san":"Bb5"},{"san":"Bb4"}
+    ]
+  },
+  {
+    "id": "open-vienna",
+    "title": "Ouverture — Viennoise",
+    "moves": [
+      {"san":"e4"},{"san":"e5"},{"san":"Nc3","note":"Viennoise"},
+      {"san":"Nf6"},{"san":"f4","note":"Gambit viennois"},{"san":"d5"},
+      {"san":"fxe5"},{"san":"Nxe4"},{"san":"Nf3"}
+    ]
+  },
+  {
+    "id": "open-kings-gambit",
+    "title": "Ouverture — Gambit du Roi",
+    "moves": [
+      {"san":"e4"},{"san":"e5"},{"san":"f4","note":"Gambit du Roi"},
+      {"san":"exf4"},{"san":"Nf3"},{"san":"g5"},{"san":"h4"},{"san":"g4"},{"san":"Ne5"}
+    ]
+  },
+  {
+    "id": "open-center-game",
+    "title": "Ouverture — Partie du Centre",
+    "moves": [
+      {"san":"e4"},{"san":"e5"},{"san":"d4","note":"Centre"},
+      {"san":"exd4"},{"san":"Qxd4"},{"san":"Nc6"},{"san":"Qe3"},{"san":"Nf6"}
+    ]
+  },
+  {
+    "id": "open-danish-gambit",
+    "title": "Ouverture — Gambit danois",
+    "moves": [
+      {"san":"e4"},{"san":"e5"},{"san":"d4"},{"san":"exd4"},
+      {"san":"c3","note":"Danois"},{"san":"dxc3"},{"san":"Bc4"},{"san":"cxb2"},{"san":"Bxb2"}
+    ]
+  },
+  {
+    "id": "open-bishop",
+    "title": "Ouverture — Début du fou",
+    "moves": [
+      {"san":"e4"},{"san":"e5"},{"san":"Bc4","note":"Ouverture du fou"},
+      {"san":"Nf6"},{"san":"d3"},{"san":"c6"},{"san":"Nf3"},{"san":"d5"}
+    ]
+  },
+  {
+    "id": "open-ponziani",
+    "title": "Ouverture — Ponziani",
+    "moves": [
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"Nc6"},
+      {"san":"c3","note":"Ponziani"},{"san":"Nf6"},{"san":"d4"},{"san":"Nxe4"}
+    ]
+  },
+
+  {
+    "id": "defense-petroff",
+    "title": "Défense — Petroff",
+    "moves": [
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"Nf6","note":"Petroff"},
+      {"san":"Nxe5"},{"san":"d6"},{"san":"Nf3"},{"san":"Nxe4"},{"san":"d4"},{"san":"d5"}
+    ]
+  },
+  {
+    "id": "defense-philidor",
+    "title": "Défense — Philidor",
+    "moves": [
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"d6","note":"Philidor"},
+      {"san":"d4"},{"san":"Nf6"},{"san":"Nc3"},{"san":"Nbd7"},{"san":"Bc4"},{"san":"Be7"}
+    ]
+  },
+  {
+    "id": "defense-sicilian",
+    "title": "Défense — Sicilienne",
+    "moves": [
+      {"san":"e4"},{"san":"c5","note":"Sicilienne"},{"san":"Nf3"},{"san":"d6"},
+      {"san":"d4"},{"san":"cxd4"},{"san":"Nxd4"},{"san":"Nf6"},{"san":"Nc3"},{"san":"a6","note":"Najdorf"}
+    ]
+  },
+  {
+    "id": "defense-sicilian-dragon",
+    "title": "Défense — Sicilienne Dragon",
+    "moves": [
+      {"san":"e4"},{"san":"c5"},{"san":"Nf3"},{"san":"d6"},{"san":"d4"},{"san":"cxd4"},
+      {"san":"Nxd4"},{"san":"Nf6"},{"san":"Nc3"},{"san":"g6","note":"Dragon"}
+    ]
+  },
+  {
+    "id": "defense-sicilian-classical",
+    "title": "Défense — Sicilienne Classique",
+    "moves": [
+      {"san":"e4"},{"san":"c5"},{"san":"Nf3"},{"san":"Nc6","note":"Classique"},
+      {"san":"d4"},{"san":"cxd4"},{"san":"Nxd4"},{"san":"Nf6"},{"san":"Nc3"},{"san":"d6"}
+    ]
+  },
+  {
+    "id": "defense-sicilian-sveshnikov",
+    "title": "Défense — Sicilienne Sveshnikov",
+    "moves": [
+      {"san":"e4"},{"san":"c5"},{"san":"Nf3"},{"san":"Nc6"},
+      {"san":"d4"},{"san":"cxd4"},{"san":"Nxd4"},{"san":"Nf6"},
+      {"san":"Nc3"},{"san":"e5","note":"Sveshnikov"}
+    ]
+  },
+  {
+    "id": "defense-french",
+    "title": "Défense — Française",
+    "moves": [
+      {"san":"e4"},{"san":"e6","note":"Française"},{"san":"d4"},{"san":"d5"},
+      {"san":"Nc3"},{"san":"Nf6"},{"san":"Bg5","note":"Classique"},{"san":"Be7"},{"san":"e5"},{"san":"Nfd7"}
+    ]
+  },
+  {
+    "id": "defense-french-exchange",
+    "title": "Défense — Française d’échange",
+    "moves": [
+      {"san":"e4"},{"san":"e6"},{"san":"d4"},{"san":"d5"},
+      {"san":"exd5","note":"Échange"},{"san":"exd5"},{"san":"Bd3"},{"san":"Bd6"},{"san":"Nf3"},{"san":"Nf6"}
+    ]
+  },
+  {
+    "id": "defense-french-tarrasch",
+    "title": "Défense — Française Tarrasch",
+    "moves": [
+      {"san":"e4"},{"san":"e6"},{"san":"d4"},{"san":"d5"},
+      {"san":"Nd2","note":"Tarrasch"},{"san":"Nf6"},{"san":"e5"},{"san":"Nfd7"},{"san":"Bd3"},{"san":"c5"}
+    ]
+  },
+  {
+    "id": "defense-caro-kann",
+    "title": "Défense — Caro-Kann",
+    "moves": [
+      {"san":"e4"},{"san":"c6","note":"Caro-Kann"},{"san":"d4"},{"san":"d5"},
+      {"san":"Nc3"},{"san":"dxe4"},{"san":"Nxe4"},{"san":"Bf5"},{"san":"Ng3"},{"san":"Bg6"}
+    ]
+  },
+  {
+    "id": "defense-caro-kann-advance",
+    "title": "Défense — Caro-Kann d’avance",
+    "moves": [
+      {"san":"e4"},{"san":"c6"},{"san":"d4"},{"san":"d5"},
+      {"san":"e5","note":"Avance"},{"san":"Bf5"},{"san":"Nf3"},{"san":"e6"},{"san":"Be2"},{"san":"c5"}
+    ]
+  },
+  {
+    "id": "defense-pirc",
+    "title": "Défense — Pirc",
+    "moves": [
+      {"san":"e4"},{"san":"d6","note":"Pirc"},{"san":"d4"},{"san":"Nf6"},
+      {"san":"Nc3"},{"san":"g6"},{"san":"Nf3"},{"san":"Bg7"},{"san":"Be2"},{"san":"O-O"}
+    ]
+  },
+  {
+    "id": "defense-modern",
+    "title": "Défense — Moderne",
+    "moves": [
+      {"san":"e4"},{"san":"g6","note":"Moderne"},{"san":"d4"},{"san":"Bg7"},
+      {"san":"Nc3"},{"san":"d6"},{"san":"Nf3"},{"san":"Nf6"}
+    ]
+  },
+  {
+    "id": "defense-alekhine",
+    "title": "Défense — Alekhine",
+    "moves": [
+      {"san":"e4"},{"san":"Nf6","note":"Alekhine"},{"san":"e5"},{"san":"Nd5"},
+      {"san":"d4"},{"san":"d6"},{"san":"Nf3"},{"san":"Bg4"}
+    ]
+  },
+  {
+    "id": "defense-scandinavian",
+    "title": "Défense — Scandinave",
+    "moves": [
+      {"san":"e4"},{"san":"d5","note":"Scandinave"},{"san":"exd5"},{"san":"Qxd5"},
+      {"san":"Nc3"},{"san":"Qa5"},{"san":"d4"},{"san":"Nf6"}
+    ]
+  },
+  {
+    "id": "defense-owen",
+    "title": "Défense — Owen",
+    "moves": [
+      {"san":"e4"},{"san":"b6","note":"Owen"},{"san":"d4"},{"san":"Bb7"},
+      {"san":"Bd3"},{"san":"e6"},{"san":"Nf3"},{"san":"Nf6"}
+    ]
+  },
+
+  {
+    "id": "queen-gambit",
+    "title": "Ouverture — Gambit de la Dame",
+    "moves": [
+      {"san":"d4"},{"san":"d5"},{"san":"c4","note":"Gambit de la Dame"},
+      {"san":"e6"},{"san":"Nc3"},{"san":"Nf6"},{"san":"Bg5"},{"san":"Be7"},{"san":"e3"},{"san":"O-O"}
+    ]
+  },
+  {
+    "id": "queen-gambit-accepted",
+    "title": "Ouverture — Gambit Dame accepté",
+    "moves": [
+      {"san":"d4"},{"san":"d5"},{"san":"c4"},{"san":"dxc4","note":"Accepté"},
+      {"san":"Nf3"},{"san":"Nf6"},{"san":"e3"},{"san":"e6"},{"san":"Bxc4"}
+    ]
+  },
+  {
+    "id": "slav-defense",
+    "title": "Défense — Slave",
+    "moves": [
+      {"san":"d4"},{"san":"d5"},{"san":"c4"},{"san":"c6","note":"Slave"},
+      {"san":"Nc3"},{"san":"Nf6"},{"san":"Nf3"},{"san":"dxc4"}
+    ]
+  },
+  {
+    "id": "semi-slav",
+    "title": "Défense — Semi-Slave",
+    "moves": [
+      {"san":"d4"},{"san":"d5"},{"san":"c4"},{"san":"e6"},
+      {"san":"Nc3"},{"san":"c6","note":"Semi-Slave"},{"san":"Nf3"},{"san":"Nf6"}
+    ]
+  },
+  {
+    "id": "qgd-orthodox",
+    "title": "Défense — Gambit Dame refusé",
+    "moves": [
+      {"san":"d4"},{"san":"d5"},{"san":"c4"},{"san":"e6","note":"Refusé"},
+      {"san":"Nc3"},{"san":"Nf6"},{"san":"Bg5"},{"san":"Be7"}
+    ]
+  },
+  {
+    "id": "opening-london",
+    "title": "Ouverture — Londres",
+    "moves": [
+      {"san":"d4"},{"san":"Nf6"},{"san":"Nf3"},{"san":"e6"},
+      {"san":"Bf4","note":"Londres"},{"san":"d5"},{"san":"e3"},{"san":"Bd6"},{"san":"Bg3"}
+    ]
+  },
+  {
+    "id": "opening-colle",
+    "title": "Ouverture — Colle",
+    "moves": [
+      {"san":"d4"},{"san":"d5"},{"san":"Nf3"},{"san":"Nf6"},
+      {"san":"e3","note":"Colle"},{"san":"e6"},{"san":"Bd3"},{"san":"c5"},{"san":"c3"}
+    ]
+  },
+  {
+    "id": "opening-catalan",
+    "title": "Ouverture — Catalane",
+    "moves": [
+      {"san":"d4"},{"san":"Nf6"},{"san":"c4"},{"san":"e6"},
+      {"san":"g3","note":"Catalane"},{"san":"d5"},{"san":"Bg2"},{"san":"Be7"},{"san":"Nf3"},{"san":"O-O"}
+    ]
+  },
+
+  {
+    "id": "defense-nimzo",
+    "title": "Défense — Nimzo-Indienne",
+    "moves": [
+      {"san":"d4"},{"san":"Nf6"},{"san":"c4"},{"san":"e6"},
+      {"san":"Nc3"},{"san":"Bb4","note":"Nimzo-Indienne"},{"san":"e3"},{"san":"O-O"}
+    ]
+  },
+  {
+    "id": "defense-queens-indian",
+    "title": "Défense — Indienne de la Dame",
+    "moves": [
+      {"san":"d4"},{"san":"Nf6"},{"san":"c4"},{"san":"e6"},
+      {"san":"Nf3"},{"san":"b6","note":"Indienne de la Dame"},{"san":"g3"},{"san":"Bb7"}
+    ]
+  },
+  {
+    "id": "defense-kings-indian",
+    "title": "Défense — Indienne du Roi",
+    "moves": [
+      {"san":"d4"},{"san":"Nf6"},{"san":"c4"},{"san":"g6"},
+      {"san":"Nc3"},{"san":"Bg7"},{"san":"e4"},{"san":"d6"},
+      {"san":"Nf3"},{"san":"O-O"},{"san":"Be2","note":"Indienne du Roi"}
+    ]
+  },
+  {
+    "id": "defense-grunfeld",
+    "title": "Défense — Grünfeld",
+    "moves": [
+      {"san":"d4"},{"san":"Nf6"},{"san":"c4"},{"san":"g6"},
+      {"san":"Nc3"},{"san":"d5","note":"Grünfeld"},{"san":"cxd5"},{"san":"Nxd5"},{"san":"e4"}
+    ]
+  },
+  {
+    "id": "defense-benoni",
+    "title": "Défense — Benoni",
+    "moves": [
+      {"san":"d4"},{"san":"Nf6"},{"san":"c4"},{"san":"c5","note":"Benoni"},
+      {"san":"d5"},{"san":"e6"},{"san":"Nc3"},{"san":"exd5"},{"san":"cxd5"}
+    ]
+  },
+  {
+    "id": "defense-dutch",
+    "title": "Défense — Hollandaise",
+    "moves": [
+      {"san":"d4"},{"san":"f5","note":"Hollandaise"},{"san":"g3"},{"san":"Nf6"},
+      {"san":"Bg2"},{"san":"e6"},{"san":"Nf3"},{"san":"Be7"}
+    ]
+  },
+  {
+    "id": "defense-budapest",
+    "title": "Défense — Gambit de Budapest",
+    "moves": [
+      {"san":"d4"},{"san":"Nf6"},{"san":"c4"},{"san":"e5","note":"Budapest"},
+      {"san":"dxe5"},{"san":"Ng4"},{"san":"Nf3"},{"san":"Nc6"}
+    ]
+  },
+  {
+    "id": "defense-blumenfeld",
+    "title": "Défense — Gambit Blumenfeld",
+    "moves": [
+      {"san":"d4"},{"san":"Nf6"},{"san":"c4"},{"san":"e6"},
+      {"san":"Nf3"},{"san":"c5"},{"san":"d5"},{"san":"b5","note":"Blumenfeld"}
+    ]
+  },
+
+  {
+    "id": "flank-english",
+    "title": "Ouverture — Anglaise",
+    "moves": [
+      {"san":"c4","note":"Anglaise"},{"san":"e5"},{"san":"Nc3"},{"san":"Nf6"},
+      {"san":"Nf3"},{"san":"Nc6"},{"san":"g3"},{"san":"d5"},{"san":"cxd5"},{"san":"Nxd5"}
+    ]
+  },
+  {
+    "id": "flank-reti",
+    "title": "Ouverture — Réti",
+    "moves": [
+      {"san":"Nf3","note":"Réti"},{"san":"d5"},{"san":"c4"},{"san":"e6"},
+      {"san":"g3"},{"san":"Nf6"},{"san":"Bg2"},{"san":"Be7"}
+    ]
+  },
+  {
+    "id": "flank-bird",
+    "title": "Ouverture — Bird",
+    "moves": [
+      {"san":"f4","note":"Bird"},{"san":"d5"},{"san":"Nf3"},{"san":"Nf6"},
+      {"san":"e3"},{"san":"g6"},{"san":"b3"}
+    ]
+  },
+  {
+    "id": "flank-orangutan",
+    "title": "Ouverture — Orang-outan",
+    "moves": [
+      {"san":"b4","note":"Orang-outan"},{"san":"e5"},{"san":"Bb2"},{"san":"Bxb4"},{"san":"Bxe5"}
+    ]
+  },
+  {
+    "id": "flank-larsen",
+    "title": "Ouverture — Larsen",
+    "moves": [
+      {"san":"b3","note":"Larsen"},{"san":"d5"},{"san":"Bb2"},{"san":"Nf6"},
+      {"san":"e3"},{"san":"e6"},{"san":"Nf3"}
     ]
   }
-];
-
-function bindTap(el, handler){
-  let used = false;
-
-  el.addEventListener("pointerup", e => {
-    e.preventDefault();
-    used = true;
-    handler(e);
-    setTimeout(() => { used = false; }, 60);
-  });
-
-  el.addEventListener("click", e => {
-    if(used) return;
-    e.preventDefault();
-    handler(e);
-  });
-}
-
-function coordsToSquare(file, rank){
-  return FILES[file] + String(rank + 1);
-}
-
-function squareToCoords(square){
-  return {
-    file: FILES.indexOf(square[0]),
-    rank: parseInt(square[1], 10) - 1
-  };
-}
-
-function fenToBoard(fen){
-  const rows = fen.split("/");
-  const board = Array.from({length:8}, () => Array(8).fill(""));
-
-  for(let r = 0; r < 8; r++){
-    let f = 0;
-    for(const ch of rows[r]){
-      if(/\d/.test(ch)){
-        f += parseInt(ch, 10);
-      }else{
-        board[7 - r][f] = ch;
-        f++;
-      }
-    }
-  }
-
-  return board;
-}
-
-function cloneBoard(board){
-  return board.map(row => row.slice());
-}
-
-function isWhite(piece){
-  return piece && piece === piece.toUpperCase();
-}
-
-function sameColor(a, b){
-  return a && b && isWhite(a) === isWhite(b);
-}
-
-function pathClear(board, from, to){
-  const dx = Math.sign(to.file - from.file);
-  const dy = Math.sign(to.rank - from.rank);
-  let f = from.file + dx;
-  let r = from.rank + dy;
-
-  while(f !== to.file || r !== to.rank){
-    if(board[r][f]) return false;
-    f += dx;
-    r += dy;
-  }
-
-  return true;
-}
-
-function canPieceMove(board, piece, from, to, capture, enPassantTarget){
-  const dx = to.file - from.file;
-  const dy = to.rank - from.rank;
-  const adx = Math.abs(dx);
-  const ady = Math.abs(dy);
-  const white = isWhite(piece);
-  const lower = piece.toLowerCase();
-
-  if(from.file === to.file && from.rank === to.rank) return false;
-  if(board[to.rank][to.file] && sameColor(piece, board[to.rank][to.file])) return false;
-
-  if(lower === "p"){
-    const dir = white ? 1 : -1;
-    const startRank = white ? 1 : 6;
-
-    if(capture){
-      if(adx === 1 && dy === dir){
-        if(board[to.rank][to.file]) return true;
-        if(enPassantTarget && coordsToSquare(to.file, to.rank) === enPassantTarget) return true;
-      }
-      return false;
-    }else{
-      if(dx !== 0) return false;
-      if(dy === dir && !board[to.rank][to.file]) return true;
-      if(from.rank === startRank && dy === 2 * dir && !board[to.rank][to.file] && !board[from.rank + dir][from.file]) return true;
-      return false;
-    }
-  }
-
-  if(lower === "n") return (adx === 1 && ady === 2) || (adx === 2 && ady === 1);
-  if(lower === "b") return adx === ady && pathClear(board, from, to);
-  if(lower === "r") return (dx === 0 || dy === 0) && pathClear(board, from, to);
-  if(lower === "q") return ((dx === 0 || dy === 0) || (adx === ady)) && pathClear(board, from, to);
-  if(lower === "k") return Math.max(adx, ady) === 1;
-
-  return false;
-}
-
-function parseSAN(san){
-  let move = san.trim().replace(/[!?+#]+$/g, "");
-
-  if(move === "O-O" || move === "0-0") return { castle:"K" };
-  if(move === "O-O-O" || move === "0-0-0") return { castle:"Q" };
-
-  let promotion = null;
-  const promoMatch = move.match(/=([QRBN])/);
-  if(promoMatch){
-    promotion = promoMatch[1];
-    move = move.replace(/=([QRBN])/, "");
-  }
-
-  const capture = move.includes("x");
-  move = move.replace("x", "");
-
-  let piece = "P";
-  if(/^[KQRBN]/.test(move)){
-    piece = move[0];
-    move = move.slice(1);
-  }
-
-  const toSquare = move.slice(-2);
-  const prefix = move.slice(0, -2);
-
-  let fromFile = null;
-  let fromRank = null;
-
-  if(piece === "P"){
-    if(prefix.length === 1) fromFile = prefix[0];
-  }else{
-    if(prefix.length === 2){
-      fromFile = prefix[0];
-      fromRank = prefix[1];
-    }else if(prefix.length === 1){
-      if(/[a-h]/.test(prefix)) fromFile = prefix;
-      else fromRank = prefix;
-    }
-  }
-
-  return { piece, toSquare, capture, promotion, fromFile, fromRank };
-}
-
-function applyMoveToState(state, san){
-  const board = cloneBoard(state.board);
-  const parsed = parseSAN(san);
-  let fromSquare = null;
-  let toSquare = null;
-  let capture = false;
-
-  if(parsed.castle){
-    const white = state.turn === "w";
-    if(white && parsed.castle === "K"){
-      board[0][4] = ""; board[0][6] = "K"; board[0][7] = ""; board[0][5] = "R";
-      fromSquare = "e1"; toSquare = "g1";
-    }else if(white && parsed.castle === "Q"){
-      board[0][4] = ""; board[0][2] = "K"; board[0][0] = ""; board[0][3] = "R";
-      fromSquare = "e1"; toSquare = "c1";
-    }else if(!white && parsed.castle === "K"){
-      board[7][4] = ""; board[7][6] = "k"; board[7][7] = ""; board[7][5] = "r";
-      fromSquare = "e8"; toSquare = "g8";
-    }else{
-      board[7][4] = ""; board[7][2] = "k"; board[7][0] = ""; board[7][3] = "r";
-      fromSquare = "e8"; toSquare = "c8";
-    }
-
-    return {
-      board,
-      turn: state.turn === "w" ? "b" : "w",
-      enPassantTarget: null,
-      lastMove:{from:fromSquare,to:toSquare,capture:false,san}
-    };
-  }
-
-  const dest = squareToCoords(parsed.toSquare);
-  const wantedWhite = state.turn === "w";
-  const targetPieceChar = wantedWhite ? parsed.piece.toUpperCase() : parsed.piece.toLowerCase();
-
-  const candidates = [];
-
-  for(let rank=0; rank<8; rank++){
-    for(let file=0; file<8; file++){
-      const p = board[rank][file];
-      if(p !== targetPieceChar) continue;
-
-      if(parsed.fromFile !== null && FILES[file] !== parsed.fromFile) continue;
-      if(parsed.fromRank !== null && String(rank+1) !== parsed.fromRank) continue;
-
-      if(canPieceMove(board, p, {file,rank}, dest, parsed.capture, state.enPassantTarget)){
-        candidates.push(coordsToSquare(file, rank));
-      }
-    }
-  }
-
-  if(!candidates.length){
-    throw new Error("Impossible d'appliquer le coup " + san);
-  }
-
-  fromSquare = candidates[0];
-  toSquare = parsed.toSquare;
-
-  const from = squareToCoords(fromSquare);
-  const to = squareToCoords(toSquare);
-  const moving = board[from.rank][from.file];
-
-  capture = !!board[to.rank][to.file];
-
-  if(moving.toLowerCase() === "p" && parsed.capture && !capture && state.enPassantTarget === toSquare){
-    const victimRank = state.turn === "w" ? to.rank - 1 : to.rank + 1;
-    board[victimRank][to.file] = "";
-    capture = true;
-  }
-
-  board[from.rank][from.file] = "";
-  board[to.rank][to.file] = moving;
-
-  if(parsed.promotion){
-    board[to.rank][to.file] = state.turn === "w" ? parsed.promotion : parsed.promotion.toLowerCase();
-  }
-
-  let enPassantTarget = null;
-  if(moving.toLowerCase() === "p" && Math.abs(to.rank - from.rank) === 2){
-    const midRank = (to.rank + from.rank) / 2;
-    enPassantTarget = coordsToSquare(from.file, midRank);
-  }
-
-  return {
-    board,
-    turn: state.turn === "w" ? "b" : "w",
-    enPassantTarget,
-    lastMove:{from:fromSquare,to:toSquare,capture,san}
-  };
-}
-
-function computeStates(game){
-  const states = [{
-    board: fenToBoard(START_FEN),
-    turn:"w",
-    enPassantTarget:null,
-    lastMove:null
-  }];
-
-  for(const mv of game.moves){
-    states.push(applyMoveToState(states[states.length-1], mv.san));
-  }
-
-  return states;
-}
-
-games.forEach(game => {
-  game.states = computeStates(game);
-});
-
-function renderSelect(){
-  gameSelect.innerHTML = "";
-  games.forEach((g, i) => {
-    const opt = document.createElement("option");
-    opt.value = String(i);
-    opt.textContent = g.title;
-    gameSelect.appendChild(opt);
-  });
-}
-
-function renderBoard(state){
-  boardEl.innerHTML = "";
-  const last = state.lastMove || {};
-
-  for(let row = 7; row >= 0; row--){
-    for(let col = 0; col < 8; col++){
-      const sq = document.createElement("div");
-      sq.className = "square " + (((row + col) % 2 === 0) ? "white" : "black");
-      const squareName = coordsToSquare(col, row);
-
-      if(last.from === squareName) sq.classList.add("from-square");
-      if(last.to === squareName) sq.classList.add("to-square");
-      if(last.capture && last.to === squareName) sq.classList.add("capture-square");
-
-      const piece = state.board[row][col];
-      if(piece){
-        const wrap = document.createElement("div");
-        wrap.className = "piece-wrap";
-
-        const span = document.createElement("span");
-        span.className = "piece " + (isWhite(piece) ? "white-piece " : "black-piece ") + "piece-" + piece;
-        span.textContent = PIECES[piece];
-
-        wrap.appendChild(span);
-        sq.appendChild(wrap);
-      }
-
-      if(row === 0){
-        const file = document.createElement("span");
-        file.className = "coord file";
-        file.textContent = FILES[col];
-        sq.appendChild(file);
-      }
-
-      if(col === 7){
-        const rank = document.createElement("span");
-        rank.className = "coord rank";
-        rank.textContent = String(row + 1);
-        sq.appendChild(rank);
-      }
-
-      boardEl.appendChild(sq);
-    }
-  }
-}
-
-let currentGameIndex = 0;
-let moveIndex = 0;
-
-function currentGame(){
-  return games[currentGameIndex];
-}
-
-function updateView(){
-  const game = currentGame();
-  const state = game.states[moveIndex];
-  renderBoard(state);
-
-  moveCounter.textContent = "Coup " + moveIndex + " / " + game.moves.length;
-
-  if(moveIndex === 0){
-    statusEl.innerHTML = '<span class="san">Position initiale.</span>';
-  }else{
-    const mv = game.moves[moveIndex - 1];
-    const num = Math.ceil(moveIndex / 2);
-    const prefix = moveIndex % 2 === 1 ? num + ". " : num + "... ";
-    const noteHtml = mv.note ? '<span class="note">' + mv.note + '</span>' : '';
-    statusEl.innerHTML = '<span class="san">' + prefix + mv.san + '</span>' + noteHtml;
-  }
-}
-
-function loadGame(index){
-  currentGameIndex = index;
-  moveIndex = 0;
-  updateView();
-}
-
-bindTap(prevBtn, () => {
-  if(moveIndex > 0) moveIndex--;
-  updateView();
-});
-
-bindTap(nextBtn, () => {
-  if(moveIndex < currentGame().moves.length) moveIndex++;
-  updateView();
-});
-
-gameSelect.addEventListener("change", e => {
-  loadGame(parseInt(e.target.value, 10));
-});
-
-renderSelect();
-loadGame(0);
-</script>
-
-</body>
-</html>
+]
