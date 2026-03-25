@@ -1,17 +1,11 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CHESSMASTERS</title>
 
-<link rel="apple-touch-icon" href="icon.png" />
-<link rel="icon" href="icon.png" />
-
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="CHESSMASTERS" />
-<meta name="theme-color" content="#2c2c2c" />
+<meta name="theme-color" content="#2c2c2c">
 
 <style>
 :root{
@@ -20,73 +14,47 @@
   --light:#eeeed2;
   --dark:#769656;
   --text:#ffffff;
-  --muted:#d7d7d7;
+  --muted:#cfcfcf;
 }
 
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
-html,body{
+body{
   margin:0;
-  padding:0;
   background:var(--bg);
   color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
-}
-
-body{
-  min-height:100vh;
   display:flex;
   flex-direction:column;
   align-items:center;
-  padding:0 12px calc(18px + env(safe-area-inset-bottom));
 }
 
 h1{
-  margin:calc(env(safe-area-inset-top) + 18px) 0 12px;
+  margin:20px 0 10px;
   font-size:28px;
-  line-height:1.08;
-  font-weight:700;
-  text-align:center;
 }
 
-.app{
-  width:100%;
-  max-width:560px;
-}
+.app{width:100%;max-width:560px}
 
-.top-panel,
-.move-panel{
+.top-panel,.move-panel{
   background:var(--panel);
-  border-radius:0;
   padding:14px;
   margin-bottom:12px;
-  box-shadow:0 8px 20px rgba(0,0,0,.18);
 }
 
 select{
   width:100%;
   height:48px;
-  border:none;
-  border-radius:0;
   background:#4a4a4a;
+  border:none;
   color:#fff;
-  font-size:16px;
-  padding:0 14px;
-  appearance:none;
-  -webkit-appearance:none;
+  padding:0 10px;
 }
 
 #board-container{
   width:95vw;
   max-width:500px;
-  aspect-ratio:1 / 1;
-  border-radius:0;
-  overflow:hidden;
-  box-shadow:0 10px 25px rgba(0,0,0,0.35);
-  margin-bottom:12px;
+  aspect-ratio:1;
 }
 
 #board{
@@ -98,719 +66,323 @@ select{
 }
 
 .square{
-  position:relative;
-  width:100%;
-  height:100%;
   display:flex;
   align-items:center;
   justify-content:center;
-  user-select:none;
-  overflow:hidden;
 }
 
-.white{ background:var(--light); }
-.black{ background:var(--dark); }
-
-.coord{
-  position:absolute;
-  font-size:10px;
-  opacity:.65;
-  font-weight:700;
-  pointer-events:none;
-}
-
-.coord.file{
-  left:5px;
-  bottom:3px;
-}
-
-.coord.rank{
-  right:4px;
-  top:2px;
-}
+.white{background:var(--light)}
+.black{background:var(--dark)}
 
 .piece-wrap{
-  width:90%;
-  height:90%;
+  width:100%;
+  height:100%;
   display:flex;
   align-items:center;
   justify-content:center;
 }
 
 .piece{
-  line-height:1;
-  position:relative;
-  z-index:2;
-  display:block;
-  font-size:clamp(40px,7vw,56px);
-  filter:drop-shadow(0 1px 0 rgba(0,0,0,.22));
+  font-size:85%;
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
+.piece-P{font-size:78%}
+.piece-p{font-size:70%}
+
 .white-piece{
-  color:#ffffff;
-  text-shadow:
-    0 0 1px #000,
-    0 0 2px #000,
-    0 1px 2px rgba(0,0,0,.55),
-    0 0 6px rgba(255,255,255,.16);
+  color:#fff;
+  text-shadow:0 0 2px #000;
 }
 
 .black-piece{
-  color:#141414;
-  text-shadow:
-    0 0 1px rgba(255,255,255,.22),
-    0 1px 1px rgba(255,255,255,.08);
-}
-
-.piece-P{
-  font-size:clamp(33px,6vw,47px);
-}
-
-.piece-p{
-  font-size:clamp(30px,5.4vw,42px);
-}
-
-.piece-n,.piece-b,.piece-r,.piece-q,.piece-k,
-.piece-N,.piece-B,.piece-R,.piece-Q,.piece-K{
-  font-size:clamp(40px,7vw,56px);
-}
-
-.from-square{
-  outline:3px solid rgba(255,215,0,.8);
-  outline-offset:-3px;
-}
-
-.to-square{
-  outline:3px solid rgba(169,209,142,.95);
-  outline-offset:-3px;
-}
-
-.capture-square{
-  box-shadow:inset 0 0 0 3px rgba(255,99,71,.95);
+  color:#111;
 }
 
 #move-counter{
   text-align:center;
-  line-height:1.35;
   font-size:18px;
-  font-weight:700;
-  margin-bottom:8px;
+  margin-bottom:6px;
 }
 
 #status{
   text-align:center;
-  line-height:1.35;
   font-size:15px;
   color:var(--muted);
-  min-height:42px;
 }
 
-#status .san{
-  display:block;
-}
-
-#status .note{
-  display:block;
-  margin-top:6px;
+.note{
   font-size:12px;
-  line-height:1.25;
-  color:#cfcfcf;
-}
-
-.controls-panel{
-  background:var(--bg);
-  border-radius:0;
-  padding:14px;
-  margin-bottom:12px;
-  box-shadow:0 8px 20px rgba(0,0,0,.18);
+  margin-top:4px;
 }
 
 .controls{
   display:flex;
   justify-content:center;
-  align-items:center;
-  gap:18px;
-  flex-wrap:nowrap;
-  background:var(--bg);
+  gap:20px;
+  margin-bottom:20px;
 }
 
-.control-btn{
+button{
   width:52px;
   height:52px;
-  border:none;
-  border-radius:0;
   background:var(--bg);
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  appearance:none;
-  -webkit-appearance:none;
-  cursor:pointer;
-  touch-action:manipulation;
-  box-shadow:none;
-  padding:0;
-}
-
-.control-btn span{
+  border:none;
+  color:white;
   font-size:24px;
-  line-height:1;
-  display:block;
-}
-
-.control-btn:active{
-  transform:scale(.94);
-}
-
-@media (max-width:420px){
-  .control-btn{
-    width:46px;
-    height:46px;
-  }
-
-  .control-btn span{
-    font-size:22px;
-  }
-
-  .piece-n,.piece-b,.piece-r,.piece-q,.piece-k,
-  .piece-N,.piece-B,.piece-R,.piece-Q,.piece-K{
-    font-size:clamp(36px,8vw,50px);
-  }
-
-  .piece-p{
-    font-size:clamp(28px,5.8vw,39px);
-  }
-
-  .piece-P{
-    font-size:clamp(31px,6.4vw,44px);
-  }
 }
 </style>
 </head>
+
 <body>
 
 <h1>CHESSMASTERS</h1>
 
 <div class="app">
-  <div class="top-panel">
-    <select id="gameSelect"></select>
-  </div>
 
-  <div id="board-container">
-    <div id="board"></div>
-  </div>
+<div class="top-panel">
+<select id="gameSelect"></select>
+</div>
 
-  <div class="move-panel">
-    <div id="move-counter">Coup 0 / 0</div>
-    <div id="status">Position initiale.</div>
-  </div>
+<div id="board-container">
+<div id="board"></div>
+</div>
 
-  <div class="controls-panel">
-    <div class="controls">
-      <button class="control-btn" id="prevBtn" type="button" aria-label="Coup précédent"><span>◀️</span></button>
-      <button class="control-btn" id="nextBtn" type="button" aria-label="Coup suivant"><span>▶️</span></button>
-    </div>
-  </div>
+<div class="move-panel">
+<div id="move-counter"></div>
+<div id="status"></div>
+</div>
+
+<div class="controls">
+<button id="prevBtn">◀️</button>
+<button id="nextBtn">▶️</button>
+</div>
+
 </div>
 
 <script>
-const boardEl = document.getElementById("board");
-const gameSelect = document.getElementById("gameSelect");
-const moveCounter = document.getElementById("move-counter");
+const board = document.getElementById("board");
 const statusEl = document.getElementById("status");
-
-const prevBtn = document.getElementById("prevBtn");
-const nextBtn = document.getElementById("nextBtn");
+const counter = document.getElementById("move-counter");
 
 const FILES = ["a","b","c","d","e","f","g","h"];
-const START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+
 const PIECES = {
-  "P":"♙","N":"♘","B":"♗","R":"♖","Q":"♕","K":"♔",
-  "p":"♟","n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
+"P":"♙","N":"♘","B":"♗","R":"♖","Q":"♕","K":"♔",
+"p":"♟","n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
 };
 
-const games = [
-  {
-    id:"morphy-opera",
-    title:"Morphy – Partie de l’Opéra",
-    moves:[
-      {san:"e4"},
-      {san:"e5"},
-      {san:"Nf3"},
-      {san:"d6", note:"Défense Philidor"},
-      {san:"d4"},
-      {san:"Bg4"},
-      {san:"dxe5"},
-      {san:"Bxf3"},
-      {san:"Qxf3"},
-      {san:"dxe5"},
-      {san:"Bc4"},
-      {san:"Nf6"},
-      {san:"Qb3"},
-      {san:"Qe7"},
-      {san:"Nc3"},
-      {san:"c6"},
-      {san:"Bg5"},
-      {san:"b5"},
-      {san:"Nxb5", note:"Sacrifice tactique"},
-      {san:"cxb5"},
-      {san:"Bxb5+"},
-      {san:"Nbd7"},
-      {san:"O-O-O", note:"Roques opposés"},
-      {san:"Rd8"},
-      {san:"Rxd7", note:"Sacrifice de qualité"},
-      {san:"Rxd7"},
-      {san:"Rd1"},
-      {san:"Qe6"},
-      {san:"Bxd7+"},
-      {san:"Nxd7"},
-      {san:"Qb8+"},
-      {san:"Nxb8"},
-      {san:"Rd8#", note:"Mat"}
-    ]
-  },
-  {
-    id:"anderssen-immortelle",
-    title:"Anderssen – Partie Immortelle",
-    moves:[
-      {san:"e4"},
-      {san:"e5"},
-      {san:"f4", note:"Gambit du Roi"},
-      {san:"exf4"},
-      {san:"Bc4", note:"Gambit du Roi accepté"},
-      {san:"Qh4+"},
-      {san:"Kf1"},
-      {san:"b5"},
-      {san:"Bxb5"},
-      {san:"Nf6"},
-      {san:"Nf3"},
-      {san:"Qh6"},
-      {san:"d3"},
-      {san:"Nh5"},
-      {san:"Nh4"},
-      {san:"Qg5"},
-      {san:"Nf5"},
-      {san:"c6"},
-      {san:"g4"},
-      {san:"Nf6"},
-      {san:"Rg1"},
-      {san:"cxb5"},
-      {san:"h4"},
-      {san:"Qg6"},
-      {san:"h5"},
-      {san:"Qg5"},
-      {san:"Qf3"},
-      {san:"Ng8"},
-      {san:"Bxf4"},
-      {san:"Qf6"},
-      {san:"Nc3"},
-      {san:"Bc5"},
-      {san:"Nd5"},
-      {san:"Qxb2"},
-      {san:"Bd6"},
-      {san:"Bxg1"},
-      {san:"e5"},
-      {san:"Qxa1+"},
-      {san:"Ke2"},
-      {san:"Na6"},
-      {san:"Nxg7+"},
-      {san:"Kd8"},
-      {san:"Qf6+"},
-      {san:"Nxf6", note:"Sacrifice de dame"},
-      {san:"Be7#", note:"Mat"}
-    ]
-  }
-];
-
-function bindTap(el, handler){
-  let used = false;
-
-  el.addEventListener("pointerup", e => {
-    e.preventDefault();
-    used = true;
-    handler(e);
-    setTimeout(() => { used = false; }, 60);
-  });
-
-  el.addEventListener("click", e => {
-    if(used) return;
-    e.preventDefault();
-    handler(e);
-  });
-}
-
-function coordsToSquare(file, rank){
-  return FILES[file] + String(rank + 1);
-}
-
-function squareToCoords(square){
-  return {
-    file: FILES.indexOf(square[0]),
-    rank: parseInt(square[1], 10) - 1
-  };
-}
+const START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
 function fenToBoard(fen){
   const rows = fen.split("/");
   const board = Array.from({length:8}, () => Array(8).fill(""));
-
-  for(let r = 0; r < 8; r++){
-    let f = 0;
+  for(let r=0;r<8;r++){
+    let f=0;
     for(const ch of rows[r]){
-      if(/\d/.test(ch)){
-        f += parseInt(ch, 10);
-      }else{
-        board[7 - r][f] = ch;
-        f++;
-      }
+      if(/\d/.test(ch)) f+=parseInt(ch);
+      else{ board[7-r][f]=ch; f++; }
     }
   }
-
   return board;
 }
 
-function cloneBoard(board){
-  return board.map(row => row.slice());
-}
+function clone(b){return b.map(r=>r.slice())}
+function isWhite(p){return p && p===p.toUpperCase()}
 
-function isWhite(piece){
-  return piece && piece === piece.toUpperCase();
-}
+function coordsToSquare(f,r){return FILES[f]+(r+1)}
+function squareToCoords(s){return {file:FILES.indexOf(s[0]),rank:+s[1]-1}}
 
-function sameColor(a, b){
-  return a && b && isWhite(a) === isWhite(b);
-}
-
-function pathClear(board, from, to){
-  const dx = Math.sign(to.file - from.file);
-  const dy = Math.sign(to.rank - from.rank);
-  let f = from.file + dx;
-  let r = from.rank + dy;
-
-  while(f !== to.file || r !== to.rank){
+function pathClear(board,from,to){
+  const dx=Math.sign(to.file-from.file);
+  const dy=Math.sign(to.rank-from.rank);
+  let f=from.file+dx,r=from.rank+dy;
+  while(f!==to.file||r!==to.rank){
     if(board[r][f]) return false;
-    f += dx;
-    r += dy;
+    f+=dx;r+=dy;
   }
-
   return true;
 }
 
-function canPieceMove(board, piece, from, to, capture, enPassantTarget){
-  const dx = to.file - from.file;
-  const dy = to.rank - from.rank;
-  const adx = Math.abs(dx);
-  const ady = Math.abs(dy);
-  const white = isWhite(piece);
-  const lower = piece.toLowerCase();
+function canMove(board,p,from,to,capture){
+  const dx=to.file-from.file,dy=to.rank-from.rank;
+  const adx=Math.abs(dx),ady=Math.abs(dy);
+  const white=isWhite(p),t=p.toLowerCase();
 
-  if(from.file === to.file && from.rank === to.rank) return false;
-  if(board[to.rank][to.file] && sameColor(piece, board[to.rank][to.file])) return false;
+  if(board[to.rank][to.file] && isWhite(p)===isWhite(board[to.rank][to.file])) return false;
 
-  if(lower === "p"){
-    const dir = white ? 1 : -1;
-    const startRank = white ? 1 : 6;
-
-    if(capture){
-      if(adx === 1 && dy === dir){
-        if(board[to.rank][to.file]) return true;
-        if(enPassantTarget && coordsToSquare(to.file, to.rank) === enPassantTarget) return true;
-      }
-      return false;
-    }else{
-      if(dx !== 0) return false;
-      if(dy === dir && !board[to.rank][to.file]) return true;
-      if(from.rank === startRank && dy === 2 * dir && !board[to.rank][to.file] && !board[from.rank + dir][from.file]) return true;
-      return false;
-    }
+  if(t==="p"){
+    const dir=white?1:-1;
+    if(capture) return adx===1 && dy===dir;
+    return dx===0 && dy===dir && !board[to.rank][to.file];
   }
-
-  if(lower === "n") return (adx === 1 && ady === 2) || (adx === 2 && ady === 1);
-  if(lower === "b") return adx === ady && pathClear(board, from, to);
-  if(lower === "r") return (dx === 0 || dy === 0) && pathClear(board, from, to);
-  if(lower === "q") return ((dx === 0 || dy === 0) || (adx === ady)) && pathClear(board, from, to);
-  if(lower === "k") return Math.max(adx, ady) === 1;
-
+  if(t==="n") return (adx===1&&ady===2)||(adx===2&&ady===1);
+  if(t==="b") return adx===ady && pathClear(board,from,to);
+  if(t==="r") return (dx===0||dy===0)&&pathClear(board,from,to);
+  if(t==="q") return ((dx===0||dy===0)||adx===ady)&&pathClear(board,from,to);
+  if(t==="k") return Math.max(adx,ady)===1;
   return false;
 }
 
-function findCandidates(board, pieceLetter, toSquare, opts, state){
-  const dest = squareToCoords(toSquare);
-  const wantedWhite = state.turn === "w";
-  const targetPieceChar = wantedWhite ? pieceLetter.toUpperCase() : pieceLetter.toLowerCase();
-  const out = [];
+function parseSAN(s){
+  s=s.replace(/[+#]/g,"");
+  let capture=s.includes("x");
+  s=s.replace("x","");
+  let piece="P";
+  if(/^[KQRBN]/.test(s)){piece=s[0];s=s.slice(1);}
+  const to=s.slice(-2);
+  return {piece,to,capture};
+}
 
-  for(let rank = 0; rank < 8; rank++){
-    for(let file = 0; file < 8; file++){
-      const p = board[rank][file];
-      if(p !== targetPieceChar) continue;
+function apply(board,turn,san){
+  const b=clone(board);
+  const m=parseSAN(san);
+  const dest=squareToCoords(m.to);
+  const char=turn==="w"?m.piece.toUpperCase():m.piece.toLowerCase();
 
-      if(opts.fromFile !== null && FILES[file] !== opts.fromFile) continue;
-      if(opts.fromRank !== null && String(rank + 1) !== opts.fromRank) continue;
-
-      if(canPieceMove(board, p, {file, rank}, dest, opts.capture, state.enPassantTarget)){
-        out.push(coordsToSquare(file, rank));
+  for(let r=0;r<8;r++){
+    for(let f=0;f<8;f++){
+      if(b[r][f]===char){
+        if(canMove(b,char,{file:f,rank:r},dest,m.capture)){
+          b[dest.rank][dest.file]=char;
+          b[r][f]="";
+          return b;
+        }
       }
     }
   }
-
-  return out;
+  return b;
 }
 
-function parseSAN(san){
-  let move = san.trim().replace(/[!?+#]+$/g, "");
+const games=[
+{
+title:"Morphy – Opéra",
+moves:[
+{san:"e4"},{san:"e5"},{san:"Nf3"},{san:"d6",note:"Philidor"},
+{san:"d4"},{san:"Bg4"},{san:"dxe5"},{san:"Bxf3"},
+{san:"Qxf3"},{san:"dxe5"},{san:"Bc4"},{san:"Nf6"},
+{san:"Qb3"},{san:"Qe7"},{san:"Nc3"},{san:"c6"},
+{san:"Bg5"},{san:"b5"},{san:"Nxb5",note:"Sacrifice"},
+{san:"cxb5"},{san:"Bxb5+"},{san:"Nbd7"},
+{san:"O-O-O",note:"Roques opposés"},
+{san:"Rd8"},{san:"Rxd7",note:"Qualité"},
+{san:"Rxd7"},{san:"Rd1"},{san:"Qe6"},
+{san:"Bxd7+"},{san:"Nxd7"},{san:"Qb8+"},
+{san:"Nxb8"},{san:"Rd8#",note:"Mat"}
+]
+},
+{
+title:"Anderssen – Immortelle",
+moves:[
+{san:"e4"},{san:"e5"},
+{san:"f4",note:"Gambit du Roi"},
+{san:"exf4"},
+{san:"Bc4"},{san:"Qh4+"},
+{san:"Kf1"},{san:"b5"},
+{san:"Bxb5"},{san:"Nf6"},
+{san:"Nf3"},{san:"Qh6"},
+{san:"d3"},{san:"Nh5"},
+{san:"Nh4"},{san:"Qg5"},
+{san:"Nf5"},{san:"c6"},
+{san:"g4"},{san:"Nf6"},
+{san:"Rg1"},{san:"cxb5"},
+{san:"h4"},{san:"Qg6"},
+{san:"h5"},{san:"Qg5"},
+{san:"Qf3"},{san:"Ng8"},
+{san:"Bxf4"},{san:"Qf6"},
+{san:"Nc3"},{san:"Bc5"},
+{san:"Nd5"},{san:"Qxb2"},
+{san:"Bd6"},{san:"Bxg1"},
+{san:"e5"},{san:"Qxa1+"},
+{san:"Ke2"},{san:"Na6"},
+{san:"Nxg7+"},{san:"Kd8"},
+{san:"Qf6+"},{san:"Nxf6",note:"Dame"},
+{san:"Be7#",note:"Mat"}
+]
+}
+];
 
-  if(move === "O-O" || move === "0-0") return { castle:"K" };
-  if(move === "O-O-O" || move === "0-0-0") return { castle:"Q" };
+let gameIndex=0,moveIndex=0;
+let state=fenToBoard(START_FEN),turn="w";
 
-  let promotion = null;
-  const promoMatch = move.match(/=([QRBN])/);
-  if(promoMatch){
-    promotion = promoMatch[1];
-    move = move.replace(/=([QRBN])/, "");
-  }
+function render(){
+board.innerHTML="";
+for(let r=7;r>=0;r--){
+for(let c=0;c<8;c++){
+const sq=document.createElement("div");
+sq.className="square "+((r+c)%2?"black":"white");
 
-  const capture = move.includes("x");
-  move = move.replace("x", "");
-
-  let piece = "P";
-  if(/^[KQRBN]/.test(move)){
-    piece = move[0];
-    move = move.slice(1);
-  }
-
-  const toSquare = move.slice(-2);
-  const prefix = move.slice(0, -2);
-
-  let fromFile = null;
-  let fromRank = null;
-
-  if(piece === "P"){
-    if(prefix.length === 1) fromFile = prefix[0];
-  }else{
-    if(prefix.length === 2){
-      fromFile = prefix[0];
-      fromRank = prefix[1];
-    }else if(prefix.length === 1){
-      if(/[a-h]/.test(prefix)) fromFile = prefix;
-      else fromRank = prefix;
-    }
-  }
-
-  return { piece, toSquare, capture, promotion, fromFile, fromRank };
+const p=state[r][c];
+if(p){
+const w=document.createElement("div");
+w.className="piece-wrap";
+const s=document.createElement("span");
+s.className="piece "+(isWhite(p)?"white-piece":"black-piece")+" piece-"+p;
+s.textContent=PIECES[p];
+w.appendChild(s);
+sq.appendChild(w);
+}
+board.appendChild(sq);
+}}
 }
 
-function applyMoveToState(state, san){
-  const board = cloneBoard(state.board);
-  const parsed = parseSAN(san);
-  let fromSquare = null;
-  let toSquare = null;
-  let capture = false;
-
-  if(parsed.castle){
-    const white = state.turn === "w";
-
-    if(white && parsed.castle === "K"){
-      board[0][4] = "";
-      board[0][6] = "K";
-      board[0][7] = "";
-      board[0][5] = "R";
-      fromSquare = "e1";
-      toSquare = "g1";
-    }else if(white && parsed.castle === "Q"){
-      board[0][4] = "";
-      board[0][2] = "K";
-      board[0][0] = "";
-      board[0][3] = "R";
-      fromSquare = "e1";
-      toSquare = "c1";
-    }else if(!white && parsed.castle === "K"){
-      board[7][4] = "";
-      board[7][6] = "k";
-      board[7][7] = "";
-      board[7][5] = "r";
-      fromSquare = "e8";
-      toSquare = "g8";
-    }else{
-      board[7][4] = "";
-      board[7][2] = "k";
-      board[7][0] = "";
-      board[7][3] = "r";
-      fromSquare = "e8";
-      toSquare = "c8";
-    }
-
-    return {
-      board,
-      turn: state.turn === "w" ? "b" : "w",
-      enPassantTarget: null,
-      lastMove: { from: fromSquare, to: toSquare, capture: false, san }
-    };
-  }
-
-  const candidates = findCandidates(board, parsed.piece, parsed.toSquare, parsed, state);
-  if(!candidates.length){
-    throw new Error("Impossible d'appliquer le coup " + san);
-  }
-
-  fromSquare = candidates[0];
-  toSquare = parsed.toSquare;
-
-  const from = squareToCoords(fromSquare);
-  const to = squareToCoords(toSquare);
-  const moving = board[from.rank][from.file];
-
-  capture = !!board[to.rank][to.file];
-
-  if(moving.toLowerCase() === "p" && parsed.capture && !capture && state.enPassantTarget === toSquare){
-    const victimRank = state.turn === "w" ? to.rank - 1 : to.rank + 1;
-    board[victimRank][to.file] = "";
-    capture = true;
-  }
-
-  board[from.rank][from.file] = "";
-  board[to.rank][to.file] = moving;
-
-  if(parsed.promotion){
-    board[to.rank][to.file] = state.turn === "w" ? parsed.promotion : parsed.promotion.toLowerCase();
-  }
-
-  let enPassantTarget = null;
-  if(moving.toLowerCase() === "p" && Math.abs(to.rank - from.rank) === 2){
-    const midRank = (to.rank + from.rank) / 2;
-    enPassantTarget = coordsToSquare(from.file, midRank);
-  }
-
-  return {
-    board,
-    turn: state.turn === "w" ? "b" : "w",
-    enPassantTarget,
-    lastMove: { from: fromSquare, to: toSquare, capture, san }
-  };
+function update(){
+counter.textContent="Coup "+moveIndex+" / "+games[gameIndex].moves.length;
+if(moveIndex===0){
+statusEl.innerHTML="Position initiale";
+}else{
+const m=games[gameIndex].moves[moveIndex-1];
+statusEl.innerHTML=m.san+(m.note?'<div class="note">'+m.note+'</div>':"");
+}
 }
 
-function computeStates(game){
-  const states = [{
-    board: fenToBoard(START_FEN),
-    turn:"w",
-    enPassantTarget:null,
-    lastMove:null
-  }];
-
-  for(const mv of game.moves){
-    states.push(applyMoveToState(states[states.length - 1], mv.san));
-  }
-
-  return states;
+function reset(){
+state=fenToBoard(START_FEN);
+turn="w";
+moveIndex=0;
+render();update();
 }
 
-games.forEach(game => {
-  game.states = computeStates(game);
+function next(){
+if(moveIndex>=games[gameIndex].moves.length) return;
+const m=games[gameIndex].moves[moveIndex];
+state=apply(state,turn,m.san);
+turn=turn==="w"?"b":"w";
+moveIndex++;
+render();update();
+}
+
+function prev(){
+reset();
+for(let i=0;i<moveIndex-1;i++){
+state=apply(state,turn,games[gameIndex].moves[i].san);
+turn=turn==="w"?"b":"w";
+}
+moveIndex=Math.max(0,moveIndex-1);
+render();update();
+}
+
+document.getElementById("nextBtn").onclick=next;
+document.getElementById("prevBtn").onclick=prev;
+
+const select=document.getElementById("gameSelect");
+games.forEach((g,i)=>{
+let o=document.createElement("option");
+o.value=i;
+o.textContent=g.title;
+select.appendChild(o);
 });
 
-function renderSelect(){
-  gameSelect.innerHTML = "";
-  games.forEach((g, i) => {
-    const opt = document.createElement("option");
-    opt.value = String(i);
-    opt.textContent = g.title;
-    gameSelect.appendChild(opt);
-  });
-}
+select.onchange=e=>{
+gameIndex=parseInt(e.target.value);
+reset();
+};
 
-function renderBoard(state){
-  boardEl.innerHTML = "";
-  const last = state.lastMove || {};
-
-  for(let row = 7; row >= 0; row--){
-    for(let col = 0; col < 8; col++){
-      const sq = document.createElement("div");
-      sq.className = "square " + (((row + col) % 2 === 0) ? "white" : "black");
-      const squareName = coordsToSquare(col, row);
-
-      if(last.from === squareName) sq.classList.add("from-square");
-      if(last.to === squareName) sq.classList.add("to-square");
-      if(last.capture && last.to === squareName) sq.classList.add("capture-square");
-
-      const piece = state.board[row][col];
-      if(piece){
-        const wrap = document.createElement("div");
-        wrap.className = "piece-wrap";
-
-        const span = document.createElement("span");
-        span.className = "piece " + (isWhite(piece) ? "white-piece " : "black-piece ") + "piece-" + piece;
-        span.textContent = PIECES[piece];
-
-        wrap.appendChild(span);
-        sq.appendChild(wrap);
-      }
-
-      if(row === 0){
-        const file = document.createElement("span");
-        file.className = "coord file";
-        file.textContent = FILES[col];
-        sq.appendChild(file);
-      }
-
-      if(col === 7){
-        const rank = document.createElement("span");
-        rank.className = "coord rank";
-        rank.textContent = String(row + 1);
-        sq.appendChild(rank);
-      }
-
-      boardEl.appendChild(sq);
-    }
-  }
-}
-
-let currentGameIndex = 0;
-let moveIndex = 0;
-
-function currentGame(){
-  return games[currentGameIndex];
-}
-
-function updateView(){
-  const game = currentGame();
-  const state = game.states[moveIndex];
-  renderBoard(state);
-
-  moveCounter.textContent = "Coup " + moveIndex + " / " + game.moves.length;
-
-  if(moveIndex === 0){
-    statusEl.innerHTML = '<span class="san">Position initiale.</span>';
-  }else{
-    const mv = game.moves[moveIndex - 1];
-    const num = Math.ceil(moveIndex / 2);
-    const prefix = moveIndex % 2 === 1 ? num + ". " : num + "... ";
-    const noteHtml = mv.note ? '<span class="note">' + mv.note + '</span>' : '';
-    statusEl.innerHTML = '<span class="san">' + prefix + mv.san + '</span>' + noteHtml;
-  }
-}
-
-function loadGame(index){
-  currentGameIndex = index;
-  moveIndex = 0;
-  updateView();
-}
-
-bindTap(prevBtn, () => {
-  if(moveIndex > 0) moveIndex--;
-  updateView();
-});
-
-bindTap(nextBtn, () => {
-  if(moveIndex < currentGame().moves.length) moveIndex++;
-  updateView();
-});
-
-gameSelect.addEventListener("change", e => {
-  loadGame(parseInt(e.target.value, 10));
-});
-
-renderSelect();
-loadGame(0);
+reset();
 </script>
 
 </body>
