@@ -3,25 +3,16 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>ChessMasters</title>
+<title>Maîtres d'Échecs</title>
 
-<link rel="apple-touch-icon" href="icon.png" />
-<link rel="icon" href="icon.png" />
-
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Maîtres d'Échecs" />
 <meta name="theme-color" content="#2c2c2c" />
 
 <style>
 :root{
   --bg:#2c2c2c;
-  --panel:#3a3a3a;
   --light:#eeeed2;
   --dark:#769656;
   --text:#ffffff;
-  --muted:#d7d7d7;
-  --line:rgba(255,255,255,.12);
 }
 
 *{
@@ -29,71 +20,27 @@
   -webkit-tap-highlight-color:transparent;
 }
 
-html,body{
+body{
   margin:0;
-  padding:0;
   background:var(--bg);
   color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
-}
-
-body{
-  min-height:100vh;
   display:flex;
   flex-direction:column;
   align-items:center;
-  padding:0 12px calc(18px + env(safe-area-inset-bottom));
 }
 
 h1{
-  margin:calc(env(safe-area-inset-top) + 18px) 0 12px;
+  margin:20px 0 10px;
   font-size:28px;
-  line-height:1.08;
-  font-weight:700;
   text-align:center;
 }
 
-.app{
-  width:100%;
-  max-width:560px;
-}
-
-.top-panel,.lesson-panel,.move-panel,.controls-panel{
-  background:var(--panel);
-  border-radius:18px;
-  padding:14px;
-  margin-bottom:12px;
-  box-shadow:0 8px 20px rgba(0,0,0,.18);
-}
-
-label{
-  display:block;
-  font-size:14px;
-  font-weight:600;
-  margin-bottom:8px;
-}
-
-select{
-  width:100%;
-  height:48px;
-  border:none;
-  border-radius:14px;
-  background:#4a4a4a;
-  color:#fff;
-  font-size:16px;
-  padding:0 14px;
-  appearance:none;
-  -webkit-appearance:none;
-}
-
 #board-container{
-  width:100%;
-  aspect-ratio:1;
-  max-width:560px;
-  border-radius:18px;
-  overflow:hidden;
-  box-shadow:0 10px 25px rgba(0,0,0,0.35);
-  margin-bottom:12px;
+  width:95vw;
+  max-width:500px;
+  height:95vw;
+  max-height:500px;
 }
 
 #board{
@@ -104,728 +51,147 @@ select{
 }
 
 .square{
-  position:relative;
-  width:100%;
-  height:100%;
   display:flex;
   align-items:center;
   justify-content:center;
-  user-select:none;
 }
 
-.white{ background:var(--light); }
-.black{ background:var(--dark); }
-
-.coord{
-  position:absolute;
-  font-size:10px;
-  opacity:.65;
-  font-weight:700;
-  pointer-events:none;
-}
-
-.coord.file{
-  left:5px;
-  bottom:3px;
-}
-
-.coord.rank{
-  right:4px;
-  top:2px;
-}
+.white{background:var(--light);}
+.black{background:var(--dark);}
 
 .piece{
-  font-size:clamp(26px,5.6vw,42px);
-  line-height:1;
-  position:relative;
-  z-index:2;
-  filter:drop-shadow(0 1px 0 rgba(0,0,0,.25));
+  font-size:32px;
 }
 
-.white-piece{
-  color:#fff;
-  text-shadow:0 0 1px #000, 0 1px 2px rgba(0,0,0,.4);
-}
-
-.black-piece{
-  color:#111;
-  text-shadow:0 0 1px #fff, 0 1px 1px rgba(255,255,255,.25);
-}
-
-.from-square{
-  outline:3px solid rgba(255,215,0,.8);
-  outline-offset:-3px;
-}
-
-.to-square{
-  outline:3px solid rgba(169,209,142,.95);
-  outline-offset:-3px;
-}
-
-.capture-square{
-  box-shadow:inset 0 0 0 3px rgba(255,99,71,.95);
-}
-
-#lesson-title{
-  font-size:22px;
-  font-weight:700;
-  text-align:center;
-  margin-bottom:8px;
-}
-
-#lesson-meta,#move-counter,#status{
-  text-align:center;
-  line-height:1.35;
-}
-
-#lesson-meta{
-  font-size:15px;
-  color:var(--muted);
-  min-height:40px;
-}
-
-#move-counter{
-  font-size:18px;
-  font-weight:700;
-  margin-bottom:8px;
-}
-
-#status{
-  font-size:15px;
-  color:var(--muted);
-  min-height:42px;
-}
-
-.controls{
+#controls{
+  margin-top:20px;
   display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:18px;
-  flex-wrap:wrap;
+  gap:20px;
 }
 
-.control-btn{
+button{
   width:70px;
   height:70px;
+  font-size:30px;
+  background:var(--bg);
   border:none;
-  border-radius:18px;
-  background:var(--bg);
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  appearance:none;
-  -webkit-appearance:none;
-  cursor:pointer;
-  touch-action:manipulation;
-  border:1px solid rgba(255,255,255,0.12);
-  box-shadow:none;
+  color:white;
 }
 
-.control-btn span{
-  font-size:34px;
-  line-height:1;
-  display:block;
-}
-
-.control-btn:active{
-  transform:scale(.94);
-}
-
-.control-btn.primary{
-  background:var(--bg);
-}
-
-@media (max-width:420px){
-  .control-btn{
-    width:62px;
-    height:62px;
-  }
-  .control-btn span{
-    font-size:30px;
-  }
+button:active{
+  transform:scale(0.9);
 }
 </style>
 </head>
+
 <body>
 
-<h1>ChessMasters</h1>
+<h1>Maîtres d'Échecs</h1>
 
-<div class="app">
-  <div class="top-panel">
-    <label for="gameSelect">Choisis une grande partie</label>
-    <select id="gameSelect"></select>
-  </div>
+<div id="board-container">
+  <div id="board"></div>
+</div>
 
-  <div class="lesson-panel">
-    <div id="lesson-title">Chargement…</div>
-    <div id="lesson-meta"></div>
-  </div>
-
-  <div id="board-container">
-    <div id="board"></div>
-  </div>
-
-  <div class="move-panel">
-    <div id="move-counter">Coup 0 / 0</div>
-    <div id="status">Position initiale.</div>
-  </div>
-
-  <div class="controls-panel">
-    <div class="controls">
-      <button class="control-btn" id="startBtn" type="button" aria-label="Revenir au début"><span>⏮️</span></button>
-      <button class="control-btn primary" id="playBtn" type="button" aria-label="Lecture"><span id="playIcon">▶️</span></button>
-      <button class="control-btn" id="prevBtn" type="button" aria-label="Coup précédent"><span>◀️</span></button>
-      <button class="control-btn" id="nextBtn" type="button" aria-label="Coup suivant"><span>▶︎</span></button>
-      <button class="control-btn" id="endBtn" type="button" aria-label="Aller à la fin"><span>⏭️</span></button>
-    </div>
-  </div>
+<div id="controls">
+  <button onclick="prev()">◀️</button>
+  <button onclick="playPause()" id="play">▶️</button>
+  <button onclick="next()">▶️</button>
 </div>
 
 <script>
-const boardEl = document.getElementById("board");
-const gameSelect = document.getElementById("gameSelect");
-const lessonTitle = document.getElementById("lesson-title");
-const lessonMeta = document.getElementById("lesson-meta");
-const moveCounter = document.getElementById("move-counter");
-const statusEl = document.getElementById("status");
+const board = document.getElementById("board");
 
-const startBtn = document.getElementById("startBtn");
-const playBtn = document.getElementById("playBtn");
-const prevBtn = document.getElementById("prevBtn");
-const nextBtn = document.getElementById("nextBtn");
-const endBtn = document.getElementById("endBtn");
-const playIcon = document.getElementById("playIcon");
-
-const FILES = ["a","b","c","d","e","f","g","h"];
-const START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-const PIECES = {
-  "P":"♙","N":"♘","B":"♗","R":"♖","Q":"♕","K":"♔",
-  "p":"♟","n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
-};
-
-const games = [
-  {
-    id:"morphy-opera",
-    title:"Morphy – Partie de l’Opéra",
-    meta:"Paris, 1858 • Paul Morphy vs duc de Brunswick & comte Isouard • 1-0",
-    moves:[
-      {san:"e4", note:"Centre"},
-      {san:"e5", note:"Symétrie"},
-      {san:"Nf3", note:"Développement"},
-      {san:"d6", note:"Défense"},
-      {san:"d4", note:"Ouverture"},
-      {san:"Bg4", note:"Clouage"},
-      {san:"dxe5", note:"Simplification"},
-      {san:"Bxf3", note:"Échange"},
-      {san:"Qxf3", note:"Centralisation"},
-      {san:"dxe5", note:"Reprise"},
-      {san:"Bc4", note:"Pression"},
-      {san:"Nf6", note:"Développement"},
-      {san:"Qb3", note:"Double attaque"},
-      {san:"Qe7", note:"Défense"},
-      {san:"Nc3", note:"Pièces actives"},
-      {san:"c6", note:"Consolidation"},
-      {san:"Bg5", note:"Clouage"},
-      {san:"b5", note:"Chasse le fou"},
-      {san:"Nxb5", note:"Sacrifice"},
-      {san:"cxb5", note:"Accepté"},
-      {san:"Bxb5+", note:"Ouverture"},
-      {san:"Nbd7", note:"Défense"},
-      {san:"O-O-O", note:"Roque long"},
-      {san:"Rd8", note:"Résistance"},
-      {san:"Rxd7", note:"Sacrifice"},
-      {san:"Rxd7", note:"Forcé"},
-      {san:"Rd1", note:"Dernière tour"},
-      {san:"Qe6", note:"Défense"},
-      {san:"Bxd7+", note:"Attraction"},
-      {san:"Nxd7", note:"Forcé"},
-      {san:"Qb8+", note:"Échec"},
-      {san:"Nxb8", note:"Interposition"},
-      {san:"Rd8#", note:"Mat"}
-    ]
-  },
-  {
-    id:"anderssen-immortelle",
-    title:"Anderssen – Partie Immortelle",
-    meta:"Londres, 1851 • Adolf Anderssen vs Lionel Kieseritzky • 1-0",
-    moves:[
-      {san:"e4", note:"Ouverture"},
-      {san:"e5", note:"Réponse"},
-      {san:"f4", note:"Gambit du Roi"},
-      {san:"exf4", note:"Accepté"},
-      {san:"Bc4", note:"Développement"},
-      {san:"Qh4+", note:"Échec"},
-      {san:"Kf1", note:"Le roi marche"},
-      {san:"b5", note:"Contre-attaque"},
-      {san:"Bxb5", note:"Fou actif"},
-      {san:"Nf6", note:"Développement"},
-      {san:"Nf3", note:"Accélération"},
-      {san:"Qh6", note:"Pression"},
-      {san:"d3", note:"Consolidation"},
-      {san:"Nh5", note:"Attaque"},
-      {san:"Nh4", note:"Détour"},
-      {san:"Qg5", note:"Maintien"},
-      {san:"Nf5", note:"Initiative"},
-      {san:"c6", note:"Soutien"},
-      {san:"g4", note:"Chasse la dame"},
-      {san:"Nf6", note:"Retrait"},
-      {san:"Rg1", note:"Tour en attaque"},
-      {san:"cxb5", note:"Matériel"},
-      {san:"h4", note:"Poussée"},
-      {san:"Qg6", note:"Activité"},
-      {san:"h5", note:"Ouverture"},
-      {san:"Qg5", note:"Retour"},
-      {san:"Qf3", note:"Coordination"},
-      {san:"Ng8", note:"Repli"},
-      {san:"Bxf4", note:"Attaque"},
-      {san:"Qf6", note:"Défense"},
-      {san:"Nc3", note:"Développement"},
-      {san:"Bc5", note:"Couverture"},
-      {san:"Nd5", note:"Bond central"},
-      {san:"Qxb2", note:"Cupidité"},
-      {san:"Bd6", note:"Infiltration"},
-      {san:"Bxg1", note:"Tour prise"},
-      {san:"e5", note:"Ouverture"},
-      {san:"Qxa1+", note:"Seconde tour"},
-      {san:"Ke2", note:"Le roi avance"},
-      {san:"Na6", note:"Recherche de cases"},
-      {san:"Nxg7+", note:"Sacrifice"},
-      {san:"Kd8", note:"Fuite"},
-      {san:"Qf6+", note:"Coordination"},
-      {san:"Nxf6", note:"Dame sacrifiée"},
-      {san:"Be7#", note:"Mat"}
-    ]
-  }
+const start = [
+"rnbqkbnr",
+"pppppppp",
+"........",
+"........",
+"........",
+"........",
+"PPPPPPPP",
+"RNBQKBNR"
 ];
 
-function bindTap(el, handler){
-  let used = false;
+const pieces = {
+"P":"♙","R":"♖","N":"♘","B":"♗","Q":"♕","K":"♔",
+"p":"♟","r":"♜","n":"♞","b":"♝","q":"♛","k":"♚"
+};
 
-  el.addEventListener("pointerup", e => {
-    e.preventDefault();
-    used = true;
-    handler(e);
-    setTimeout(() => { used = false; }, 60);
-  });
+let state = JSON.parse(JSON.stringify(start));
+let moves = [
+["e2","e4"],
+["e7","e5"],
+["g1","f3"],
+["b8","c6"]
+];
 
-  el.addEventListener("click", e => {
-    if(used) return;
-    e.preventDefault();
-    handler(e);
-  });
-}
+let index = 0;
+let timer = null;
 
-function coordsToSquare(file, rank){
-  return FILES[file] + String(rank + 1);
-}
-
-function squareToCoords(square){
-  return { file: FILES.indexOf(square[0]), rank: parseInt(square[1], 10) - 1 };
-}
-
-function fenToBoard(fen){
-  const rows = fen.split("/");
-  const board = Array.from({length:8}, () => Array(8).fill(""));
-
-  for(let r = 0; r < 8; r++){
-    let f = 0;
-    for(const ch of rows[r]){
-      if(/\d/.test(ch)){
-        f += parseInt(ch, 10);
-      }else{
-        board[7 - r][f] = ch;
-        f++;
-      }
-    }
-  }
-
-  return board;
-}
-
-function cloneBoard(board){
-  return board.map(row => row.slice());
-}
-
-function isWhite(piece){
-  return piece && piece === piece.toUpperCase();
-}
-
-function sameColor(a, b){
-  return a && b && isWhite(a) === isWhite(b);
-}
-
-function pathClear(board, from, to){
-  const dx = Math.sign(to.file - from.file);
-  const dy = Math.sign(to.rank - from.rank);
-  let f = from.file + dx;
-  let r = from.rank + dy;
-
-  while(f !== to.file || r !== to.rank){
-    if(board[r][f]) return false;
-    f += dx;
-    r += dy;
-  }
-
-  return true;
-}
-
-function canPieceMove(board, piece, from, to, capture, enPassantTarget){
-  const dx = to.file - from.file;
-  const dy = to.rank - from.rank;
-  const adx = Math.abs(dx);
-  const ady = Math.abs(dy);
-  const white = isWhite(piece);
-  const lower = piece.toLowerCase();
-
-  if(from.file === to.file && from.rank === to.rank) return false;
-  if(board[to.rank][to.file] && sameColor(piece, board[to.rank][to.file])) return false;
-
-  if(lower === "p"){
-    const dir = white ? 1 : -1;
-    const startRank = white ? 1 : 6;
-
-    if(capture){
-      if(adx === 1 && dy === dir){
-        if(board[to.rank][to.file]) return true;
-        if(enPassantTarget && coordsToSquare(to.file, to.rank) === enPassantTarget) return true;
-      }
-      return false;
-    }else{
-      if(dx !== 0) return false;
-      if(dy === dir && !board[to.rank][to.file]) return true;
-      if(from.rank === startRank && dy === 2 * dir && !board[to.rank][to.file] && !board[from.rank + dir][from.file]) return true;
-      return false;
-    }
-  }
-
-  if(lower === "n") return (adx === 1 && ady === 2) || (adx === 2 && ady === 1);
-  if(lower === "b") return adx === ady && pathClear(board, from, to);
-  if(lower === "r") return (dx === 0 || dy === 0) && pathClear(board, from, to);
-  if(lower === "q") return ((dx === 0 || dy === 0) || (adx === ady)) && pathClear(board, from, to);
-  if(lower === "k") return Math.max(adx, ady) === 1;
-
-  return false;
-}
-
-function findCandidates(board, pieceLetter, toSquare, opts, state){
-  const dest = squareToCoords(toSquare);
-  const wantedWhite = state.turn === "w";
-  const targetPieceChar = wantedWhite ? pieceLetter.toUpperCase() : pieceLetter.toLowerCase();
-  const out = [];
-
-  for(let rank = 0; rank < 8; rank++){
-    for(let file = 0; file < 8; file++){
-      const p = board[rank][file];
-      if(p !== targetPieceChar) continue;
-
-      if(opts.fromFile !== null && FILES[file] !== opts.fromFile) continue;
-      if(opts.fromRank !== null && String(rank + 1) !== opts.fromRank) continue;
-
-      if(canPieceMove(board, p, {file, rank}, dest, opts.capture, state.enPassantTarget)){
-        out.push(coordsToSquare(file, rank));
-      }
-    }
-  }
-
-  return out;
-}
-
-function parseSAN(san){
-  let move = san.trim().replace(/[!?+#]+$/g, "");
-
-  if(move === "O-O" || move === "0-0") return { castle:"K" };
-  if(move === "O-O-O" || move === "0-0-0") return { castle:"Q" };
-
-  let promotion = null;
-  const promoMatch = move.match(/=([QRBN])/);
-  if(promoMatch){
-    promotion = promoMatch[1];
-    move = move.replace(/=([QRBN])/, "");
-  }
-
-  const capture = move.includes("x");
-  move = move.replace("x", "");
-
-  let piece = "P";
-  if(/^[KQRBN]/.test(move)){
-    piece = move[0];
-    move = move.slice(1);
-  }
-
-  const toSquare = move.slice(-2);
-  const prefix = move.slice(0, -2);
-
-  let fromFile = null;
-  let fromRank = null;
-
-  if(piece === "P"){
-    if(prefix.length === 1) fromFile = prefix[0];
-  }else{
-    if(prefix.length === 2){
-      fromFile = prefix[0];
-      fromRank = prefix[1];
-    }else if(prefix.length === 1){
-      if(/[a-h]/.test(prefix)) fromFile = prefix;
-      else fromRank = prefix;
-    }
-  }
-
-  return { piece, toSquare, capture, promotion, fromFile, fromRank };
-}
-
-function applyMoveToState(state, san){
-  const board = cloneBoard(state.board);
-  const parsed = parseSAN(san);
-  let fromSquare = null;
-  let toSquare = null;
-  let capture = false;
-
-  if(parsed.castle){
-    const white = state.turn === "w";
-
-    if(white && parsed.castle === "K"){
-      board[0][4] = "";
-      board[0][6] = "K";
-      board[0][7] = "";
-      board[0][5] = "R";
-      fromSquare = "e1";
-      toSquare = "g1";
-    }else if(white && parsed.castle === "Q"){
-      board[0][4] = "";
-      board[0][2] = "K";
-      board[0][0] = "";
-      board[0][3] = "R";
-      fromSquare = "e1";
-      toSquare = "c1";
-    }else if(!white && parsed.castle === "K"){
-      board[7][4] = "";
-      board[7][6] = "k";
-      board[7][7] = "";
-      board[7][5] = "r";
-      fromSquare = "e8";
-      toSquare = "g8";
-    }else{
-      board[7][4] = "";
-      board[7][2] = "k";
-      board[7][0] = "";
-      board[7][3] = "r";
-      fromSquare = "e8";
-      toSquare = "c8";
-    }
-
-    return {
-      board,
-      turn: state.turn === "w" ? "b" : "w",
-      enPassantTarget: null,
-      lastMove: { from: fromSquare, to: toSquare, capture: false, san }
-    };
-  }
-
-  const candidates = findCandidates(board, parsed.piece, parsed.toSquare, parsed, state);
-  if(!candidates.length){
-    throw new Error("Impossible d'appliquer le coup " + san);
-  }
-
-  fromSquare = candidates[0];
-  toSquare = parsed.toSquare;
-
-  const from = squareToCoords(fromSquare);
-  const to = squareToCoords(toSquare);
-  const moving = board[from.rank][from.file];
-
-  capture = !!board[to.rank][to.file];
-
-  if(moving.toLowerCase() === "p" && parsed.capture && !capture && state.enPassantTarget === toSquare){
-    const victimRank = state.turn === "w" ? to.rank - 1 : to.rank + 1;
-    board[victimRank][to.file] = "";
-    capture = true;
-  }
-
-  board[from.rank][from.file] = "";
-  board[to.rank][to.file] = moving;
-
-  if(parsed.promotion){
-    board[to.rank][to.file] = state.turn === "w" ? parsed.promotion : parsed.promotion.toLowerCase();
-  }
-
-  let enPassantTarget = null;
-  if(moving.toLowerCase() === "p" && Math.abs(to.rank - from.rank) === 2){
-    const midRank = (to.rank + from.rank) / 2;
-    enPassantTarget = coordsToSquare(from.file, midRank);
-  }
-
-  return {
-    board,
-    turn: state.turn === "w" ? "b" : "w",
-    enPassantTarget,
-    lastMove: { from: fromSquare, to: toSquare, capture, san }
-  };
-}
-
-function computeStates(game){
-  const states = [{
-    board: fenToBoard(START_FEN),
-    turn:"w",
-    enPassantTarget:null,
-    lastMove:null
-  }];
-
-  for(const mv of game.moves){
-    states.push(applyMoveToState(states[states.length - 1], mv.san));
-  }
-
-  return states;
-}
-
-games.forEach(game => {
-  game.states = computeStates(game);
-});
-
-function renderSelect(){
-  gameSelect.innerHTML = "";
-  games.forEach((g, i) => {
-    const opt = document.createElement("option");
-    opt.value = String(i);
-    opt.textContent = g.title;
-    gameSelect.appendChild(opt);
-  });
-}
-
-function renderBoard(state){
-  boardEl.innerHTML = "";
-  const last = state.lastMove || {};
-
-  for(let row = 7; row >= 0; row--){
-    for(let col = 0; col < 8; col++){
+function draw(){
+  board.innerHTML="";
+  for(let r=0;r<8;r++){
+    for(let c=0;c<8;c++){
       const sq = document.createElement("div");
-      sq.className = "square " + (((row + col) % 2 === 0) ? "white" : "black");
-      const squareName = coordsToSquare(col, row);
+      sq.className="square "+((r+c)%2?"black":"white");
 
-      if(last.from === squareName) sq.classList.add("from-square");
-      if(last.to === squareName) sq.classList.add("to-square");
-      if(last.capture && last.to === squareName) sq.classList.add("capture-square");
-
-      const piece = state.board[row][col];
-      if(piece){
+      const piece = state[r][c];
+      if(piece !== "."){
         const span = document.createElement("span");
-        span.className = "piece " + (isWhite(piece) ? "white-piece" : "black-piece");
-        span.textContent = PIECES[piece];
+        span.className="piece";
+        span.textContent = pieces[piece];
         sq.appendChild(span);
       }
 
-      if(row === 0){
-        const file = document.createElement("span");
-        file.className = "coord file";
-        file.textContent = FILES[col];
-        sq.appendChild(file);
-      }
-
-      if(col === 7){
-        const rank = document.createElement("span");
-        rank.className = "coord rank";
-        rank.textContent = String(row + 1);
-        sq.appendChild(rank);
-      }
-
-      boardEl.appendChild(sq);
+      board.appendChild(sq);
     }
   }
 }
 
-let currentGameIndex = 0;
-let moveIndex = 0;
-let playing = false;
-let timer = null;
-
-function currentGame(){
-  return games[currentGameIndex];
+function coord(pos){
+  return [8 - pos[1], pos.charCodeAt(0)-97];
 }
 
-function updateView(){
-  const game = currentGame();
-  const state = game.states[moveIndex];
-  renderBoard(state);
+function move(m){
+  const [r1,c1] = coord(m[0]);
+  const [r2,c2] = coord(m[1]);
 
-  lessonTitle.textContent = game.title;
-  lessonMeta.textContent = game.meta;
-  moveCounter.textContent = "Coup " + moveIndex + " / " + game.moves.length;
+  state[r2] = state[r2].split("");
+  state[r1] = state[r1].split("");
 
-  if(moveIndex === 0){
-    statusEl.textContent = "Position initiale.";
+  state[r2][c2] = state[r1][c1];
+  state[r1][c1] = ".";
+
+  state[r1] = state[r1].join("");
+  state[r2] = state[r2].join("");
+}
+
+function next(){
+  if(index >= moves.length) return;
+  move(moves[index]);
+  index++;
+  draw();
+}
+
+function prev(){
+  index = 0;
+  state = JSON.parse(JSON.stringify(start));
+  for(let i=0;i<index;i++) move(moves[i]);
+  draw();
+}
+
+function playPause(){
+  if(timer){
+    clearInterval(timer);
+    timer=null;
+    play.innerText="▶️";
   }else{
-    const mv = game.moves[moveIndex - 1];
-    const num = Math.ceil(moveIndex / 2);
-    const prefix = moveIndex % 2 === 1 ? num + ". " : num + "... ";
-    statusEl.textContent = prefix + mv.san;
+    play.innerText="⏸️";
+    timer=setInterval(next,1000);
   }
-
-  playIcon.textContent = playing ? "⏸️" : "▶️";
 }
 
-function stopAuto(){
-  playing = false;
-  clearInterval(timer);
-  timer = null;
-  updateView();
-}
-
-function startAuto(){
-  if(moveIndex >= currentGame().moves.length) moveIndex = 0;
-  playing = true;
-  playIcon.textContent = "⏸️";
-
-  clearInterval(timer);
-  timer = setInterval(() => {
-    if(moveIndex < currentGame().moves.length){
-      moveIndex++;
-      updateView();
-    }else{
-      stopAuto();
-    }
-  }, 1600);
-}
-
-function togglePlay(){
-  if(playing) stopAuto();
-  else startAuto();
-}
-
-function loadGame(index){
-  stopAuto();
-  currentGameIndex = index;
-  moveIndex = 0;
-  updateView();
-}
-
-bindTap(playBtn, togglePlay);
-bindTap(prevBtn, () => {
-  stopAuto();
-  if(moveIndex > 0) moveIndex--;
-  updateView();
-});
-bindTap(nextBtn, () => {
-  stopAuto();
-  if(moveIndex < currentGame().moves.length) moveIndex++;
-  updateView();
-});
-bindTap(startBtn, () => {
-  stopAuto();
-  moveIndex = 0;
-  updateView();
-});
-bindTap(endBtn, () => {
-  stopAuto();
-  moveIndex = currentGame().moves.length;
-  updateView();
-});
-
-gameSelect.addEventListener("change", e => {
-  loadGame(parseInt(e.target.value, 10));
-});
-
-renderSelect();
-loadGame(0);
+draw();
 </script>
 
 </body>
