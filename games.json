@@ -1,756 +1,465 @@
 [
   {
-    "id": "morphy-opera",
-    "title": "Morphy – Partie de l’Opéra",
+    "id": "famous-morphy-opera",
+    "title": "Partie célèbre — Morphy (Opéra)",
     "moves": [
-      {"san":"e4"},
-      {"san":"e5"},
-      {"san":"Nf3"},
-      {"san":"d6","note":"Philidor"},
-      {"san":"d4"},
-      {"san":"Bg4"},
-      {"san":"dxe5"},
-      {"san":"Bxf3"},
-      {"san":"Qxf3"},
-      {"san":"dxe5"},
-      {"san":"Bc4"},
-      {"san":"Nf6"},
-      {"san":"Qb3"},
-      {"san":"Qe7"},
-      {"san":"Nc3"},
-      {"san":"c6"},
-      {"san":"Bg5"},
-      {"san":"b5"},
-      {"san":"Nxb5","note":"Sacrifice"},
-      {"san":"cxb5"},
-      {"san":"Bxb5+"},
-      {"san":"Nbd7"},
-      {"san":"O-O-O","note":"Roques opposés"},
-      {"san":"Rd8"},
-      {"san":"Rxd7","note":"Qualité"},
-      {"san":"Rxd7"},
-      {"san":"Rd1"},
-      {"san":"Qe6"},
-      {"san":"Bxd7+"},
-      {"san":"Nxd7"},
-      {"san":"Qb8+"},
-      {"san":"Nxb8"},
-      {"san":"Rd8#","note":"Mat"}
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"d6","note":"Philidor"},
+      {"san":"d4"},{"san":"Bg4"},{"san":"dxe5"},{"san":"Bxf3"},
+      {"san":"Qxf3"},{"san":"dxe5"},{"san":"Bc4"},{"san":"Nf6"},
+      {"san":"Qb3"},{"san":"Qe7"},{"san":"Nc3"},{"san":"c6"},
+      {"san":"Bg5"},{"san":"b5"},{"san":"Nxb5","note":"Sacrifice"},
+      {"san":"cxb5"},{"san":"Bxb5+"},{"san":"Nbd7"},{"san":"O-O-O"},
+      {"san":"Rd8"},{"san":"Rxd7"},{"san":"Rxd7"},{"san":"Rd1"},
+      {"san":"Qe6"},{"san":"Bxd7+"},{"san":"Nxd7"},{"san":"Qb8+"},
+      {"san":"Nxb8"},{"san":"Rd8#","note":"Mat"}
     ]
   },
   {
-    "id": "anderssen-immortelle",
-    "title": "Anderssen – Partie Immortelle",
+    "id": "famous-anderssen-immortal",
+    "title": "Partie célèbre — Anderssen (Immortelle)",
     "moves": [
-      {"san":"e4"},
-      {"san":"e5"},
-      {"san":"f4","note":"Gambit du Roi"},
-      {"san":"exf4"},
-      {"san":"Bc4","note":"Accepté"},
-      {"san":"Qh4+"},
-      {"san":"Kf1"},
-      {"san":"b5"},
-      {"san":"Bxb5"},
-      {"san":"Nf6"},
-      {"san":"Nf3"},
-      {"san":"Qh6"},
-      {"san":"d3"},
-      {"san":"Nh5"},
-      {"san":"Nh4"},
-      {"san":"Qg5"},
-      {"san":"Nf5"},
-      {"san":"c6"},
-      {"san":"g4"},
-      {"san":"Nf6"},
-      {"san":"Rg1"},
-      {"san":"cxb5"},
-      {"san":"h4"},
-      {"san":"Qg6"},
-      {"san":"h5"},
-      {"san":"Qg5"},
-      {"san":"Qf3"},
-      {"san":"Ng8"},
-      {"san":"Bxf4"},
-      {"san":"Qf6"},
-      {"san":"Nc3"},
-      {"san":"Bc5"},
-      {"san":"Nd5"},
-      {"san":"Qxb2"},
-      {"san":"Bd6"},
-      {"san":"Bxg1"},
-      {"san":"e5"},
-      {"san":"Qxa1+"},
-      {"san":"Ke2"},
-      {"san":"Na6"},
-      {"san":"Nxg7+"},
-      {"san":"Kd8"},
-      {"san":"Qf6+"},
-      {"san":"Nxf6","note":"Dame"},
-      {"san":"Be7#","note":"Mat"}
+      {"san":"e4"},{"san":"e5"},{"san":"f4","note":"Gambit du Roi"},
+      {"san":"exf4"},{"san":"Bc4"},{"san":"Qh4+"},{"san":"Kf1"},
+      {"san":"b5"},{"san":"Bxb5"},{"san":"Nf6"},{"san":"Nf3"},
+      {"san":"Qh6"},{"san":"d3"},{"san":"Nh5"},{"san":"Nh4"},
+      {"san":"Qg5"},{"san":"Nf5"},{"san":"c6"},{"san":"g4"},
+      {"san":"Nf6"},{"san":"Rg1"},{"san":"cxb5"},{"san":"h4"},
+      {"san":"Qg6"},{"san":"h5"},{"san":"Qg5"},{"san":"Qf3"},
+      {"san":"Ng8"},{"san":"Bxf4"},{"san":"Qf6"},{"san":"Nc3"},
+      {"san":"Bc5"},{"san":"Nd5"},{"san":"Qxb2"},{"san":"Bd6"},
+      {"san":"Bxg1"},{"san":"e5"},{"san":"Qxa1+"},{"san":"Ke2"},
+      {"san":"Na6"},{"san":"Nxg7+"},{"san":"Kd8"},{"san":"Qf6+"},
+      {"san":"Nxf6","note":"Sacrifice de dame"},{"san":"Be7#","note":"Mat"}
     ]
   },
   {
-    "id": "legal-mate",
-    "title": "Légal – Piège de Légal",
+    "id": "famous-legal",
+    "title": "Piège — Légal",
     "moves": [
-      {"san":"e4"},
-      {"san":"e5"},
-      {"san":"Nf3"},
-      {"san":"Nc6"},
-      {"san":"Bc4"},
-      {"san":"d6"},
-      {"san":"Nc3"},
-      {"san":"Bg4"},
-      {"san":"h3"},
-      {"san":"Bh5"},
-      {"san":"Nxe5","note":"Fausse dame"},
-      {"san":"Bxd1"},
-      {"san":"Bxf7+"},
-      {"san":"Ke7"},
-      {"san":"Nd5#","note":"Mat"}
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"Nc6"},
+      {"san":"Bc4"},{"san":"d6"},{"san":"Nc3"},{"san":"Bg4"},
+      {"san":"h3"},{"san":"Bh5"},{"san":"Nxe5","note":"Fausse dame"},
+      {"san":"Bxd1"},{"san":"Bxf7+"},{"san":"Ke7"},{"san":"Nd5#","note":"Mat"}
     ]
   },
   {
-    "id": "fools-mate",
-    "title": "Mat du fou",
+    "id": "trap-scholars-mate",
+    "title": "Piège — Mat du berger",
     "moves": [
-      {"san":"f3"},
-      {"san":"e5"},
-      {"san":"g4"},
-      {"san":"Qh4#","note":"Mat"}
+      {"san":"e4"},{"san":"e5"},{"san":"Bc4"},{"san":"Nc6"},
+      {"san":"Qh5"},{"san":"Nf6"},{"san":"Qxf7#","note":"Mat"}
     ]
   },
   {
-    "id": "scholars-mate",
-    "title": "Mat du berger",
+    "id": "trap-fools-mate",
+    "title": "Piège — Mat du fou",
     "moves": [
-      {"san":"e4"},
-      {"san":"e5"},
-      {"san":"Bc4"},
-      {"san":"Nc6"},
-      {"san":"Qh5"},
-      {"san":"Nf6"},
-      {"san":"Qxf7#","note":"Mat"}
+      {"san":"f3"},{"san":"e5"},{"san":"g4"},{"san":"Qh4#","note":"Mat"}
+    ]
+  },
+
+  {
+    "id": "open-ruy-lopez",
+    "title": "Ouverture — Espagnole",
+    "moves": [
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"Nc6"},
+      {"san":"Bb5","note":"Espagnole"},{"san":"a6"},{"san":"Ba4"},
+      {"san":"Nf6"},{"san":"O-O"},{"san":"Be7"},{"san":"Re1"},
+      {"san":"b5"},{"san":"Bb3"},{"san":"d6"},{"san":"c3"},{"san":"O-O"}
     ]
   },
   {
-    "id": "anderssen-evergreen",
-    "title": "Anderssen – Evergreen",
+    "id": "open-italian",
+    "title": "Ouverture — Italienne",
     "moves": [
-      {"san":"e4"},
-      {"san":"e5"},
-      {"san":"Nf3"},
-      {"san":"Nc6"},
-      {"san":"Bc4"},
-      {"san":"Bc5"},
-      {"san":"b4","note":"Gambit Evans"},
-      {"san":"Bxb4"},
-      {"san":"c3"},
-      {"san":"Ba5"},
-      {"san":"d4"},
-      {"san":"exd4"},
-      {"san":"O-O"},
-      {"san":"d3"},
-      {"san":"Qb3"},
-      {"san":"Qf6"},
-      {"san":"e5"},
-      {"san":"Qg6"},
-      {"san":"Re1"},
-      {"san":"Nge7"},
-      {"san":"Ba3"},
-      {"san":"b5"},
-      {"san":"Qxb5"},
-      {"san":"Rb8"},
-      {"san":"Qa4"},
-      {"san":"Bb6"},
-      {"san":"Nbd2"},
-      {"san":"Bb7"},
-      {"san":"Ne4"},
-      {"san":"Qf5"},
-      {"san":"Bxd3"},
-      {"san":"Qh5"},
-      {"san":"Nf6+"},
-      {"san":"gxf6"},
-      {"san":"exf6"},
-      {"san":"Rg8"},
-      {"san":"Rad1"},
-      {"san":"Qxf3"},
-      {"san":"Rxe7+"},
-      {"san":"Nxe7"},
-      {"san":"Qxd7+"},
-      {"san":"Kxd7"},
-      {"san":"Bf5+"},
-      {"san":"Ke8"},
-      {"san":"Bd7+"},
-      {"san":"Kf8"},
-      {"san":"Bxe7#","note":"Mat"}
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"Nc6"},
+      {"san":"Bc4","note":"Italienne"},{"san":"Bc5"},{"san":"c3"},
+      {"san":"Nf6"},{"san":"d4"},{"san":"exd4"},{"san":"cxd4"},{"san":"Bb4+"}
     ]
   },
   {
-    "id": "ruy-lopez",
-    "title": "Ouverture Espagnole",
+    "id": "open-giuoco-piano",
+    "title": "Ouverture — Giuoco Piano",
     "moves": [
-      {"san":"e4"},
-      {"san":"e5"},
-      {"san":"Nf3"},
-      {"san":"Nc6"},
-      {"san":"Bb5","note":"Espagnole"},
-      {"san":"a6"},
-      {"san":"Ba4"},
-      {"san":"Nf6"},
-      {"san":"O-O"},
-      {"san":"Be7"},
-      {"san":"Re1"},
-      {"san":"b5"},
-      {"san":"Bb3"},
-      {"san":"d6"},
-      {"san":"c3"},
-      {"san":"O-O"},
-      {"san":"h3","note":"Fermée"}
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"Nc6"},
+      {"san":"Bc4"},{"san":"Bc5","note":"Giuoco Piano"},{"san":"c3"},
+      {"san":"Nf6"},{"san":"d3"},{"san":"d6"},{"san":"O-O"},{"san":"O-O"}
     ]
   },
   {
-    "id": "italian-game",
-    "title": "Partie Italienne",
+    "id": "open-evans",
+    "title": "Ouverture — Gambit Evans",
     "moves": [
-      {"san":"e4"},
-      {"san":"e5"},
-      {"san":"Nf3"},
-      {"san":"Nc6"},
-      {"san":"Bc4","note":"Italienne"},
-      {"san":"Bc5"},
-      {"san":"c3"},
-      {"san":"Nf6"},
-      {"san":"d4"},
-      {"san":"exd4"},
-      {"san":"cxd4"},
-      {"san":"Bb4+"},
-      {"san":"Nc3"},
-      {"san":"Nxe4"}
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"Nc6"},
+      {"san":"Bc4"},{"san":"Bc5"},{"san":"b4","note":"Evans"},
+      {"san":"Bxb4"},{"san":"c3"},{"san":"Ba5"},{"san":"d4"},{"san":"exd4"}
     ]
   },
   {
-    "id": "giuoco-piano",
-    "title": "Giuoco Piano",
+    "id": "open-scotch",
+    "title": "Ouverture — Écossaise",
     "moves": [
-      {"san":"e4"},
-      {"san":"e5"},
-      {"san":"Nf3"},
-      {"san":"Nc6"},
-      {"san":"Bc4"},
-      {"san":"Bc5","note":"Giuoco Piano"},
-      {"san":"c3"},
-      {"san":"Nf6"},
-      {"san":"d3"},
-      {"san":"d6"},
-      {"san":"O-O"},
-      {"san":"O-O"}
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"Nc6"},
+      {"san":"d4","note":"Écossaise"},{"san":"exd4"},{"san":"Nxd4"},
+      {"san":"Nf6"},{"san":"Nc3"},{"san":"Bb4"}
     ]
   },
   {
-    "id": "evans-gambit",
-    "title": "Gambit Evans",
+    "id": "open-four-knights",
+    "title": "Ouverture — Quatre Cavaliers",
     "moves": [
-      {"san":"e4"},
-      {"san":"e5"},
-      {"san":"Nf3"},
-      {"san":"Nc6"},
-      {"san":"Bc4"},
-      {"san":"Bc5"},
-      {"san":"b4","note":"Gambit Evans"},
-      {"san":"Bxb4"},
-      {"san":"c3"},
-      {"san":"Ba5"},
-      {"san":"d4"},
-      {"san":"exd4"}
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"Nc6"},
+      {"san":"Nc3","note":"Quatre Cavaliers"},{"san":"Nf6"},{"san":"Bb5"},{"san":"Bb4"}
     ]
   },
   {
-    "id": "scotch-game",
-    "title": "Partie Écossaise",
+    "id": "open-vienna",
+    "title": "Ouverture — Viennoise",
     "moves": [
-      {"san":"e4"},
-      {"san":"e5"},
-      {"san":"Nf3"},
-      {"san":"Nc6"},
-      {"san":"d4","note":"Écossaise"},
-      {"san":"exd4"},
-      {"san":"Nxd4"},
-      {"san":"Nf6"},
-      {"san":"Nc3"},
-      {"san":"Bb4"}
+      {"san":"e4"},{"san":"e5"},{"san":"Nc3","note":"Viennoise"},
+      {"san":"Nf6"},{"san":"f4","note":"Gambit viennois"},{"san":"d5"},
+      {"san":"fxe5"},{"san":"Nxe4"},{"san":"Nf3"}
     ]
   },
   {
-    "id": "vienna-game",
-    "title": "Partie Viennoise",
+    "id": "open-kings-gambit",
+    "title": "Ouverture — Gambit du Roi",
     "moves": [
-      {"san":"e4"},
-      {"san":"e5"},
-      {"san":"Nc3","note":"Viennoise"},
-      {"san":"Nf6"},
-      {"san":"f4","note":"Gambit"},
-      {"san":"d5"},
-      {"san":"fxe5"},
-      {"san":"Nxe4"},
-      {"san":"Nf3"}
+      {"san":"e4"},{"san":"e5"},{"san":"f4","note":"Gambit du Roi"},
+      {"san":"exf4"},{"san":"Nf3"},{"san":"g5"},{"san":"h4"},{"san":"g4"},{"san":"Ne5"}
     ]
   },
   {
-    "id": "four-knights",
-    "title": "Quatre Cavaliers",
+    "id": "open-center-game",
+    "title": "Ouverture — Partie du Centre",
     "moves": [
-      {"san":"e4"},
-      {"san":"e5"},
-      {"san":"Nf3"},
-      {"san":"Nc6"},
-      {"san":"Nc3","note":"Quatre Cavaliers"},
-      {"san":"Nf6"},
-      {"san":"Bb5"},
-      {"san":"Bb4"},
-      {"san":"O-O"}
+      {"san":"e4"},{"san":"e5"},{"san":"d4","note":"Centre"},
+      {"san":"exd4"},{"san":"Qxd4"},{"san":"Nc6"},{"san":"Qe3"},{"san":"Nf6"}
     ]
   },
   {
-    "id": "petroff-defense",
-    "title": "Défense Petroff",
+    "id": "open-danish-gambit",
+    "title": "Ouverture — Gambit danois",
     "moves": [
-      {"san":"e4"},
-      {"san":"e5"},
-      {"san":"Nf3"},
-      {"san":"Nf6","note":"Petroff"},
-      {"san":"Nxe5"},
-      {"san":"d6"},
-      {"san":"Nf3"},
-      {"san":"Nxe4"},
-      {"san":"d4"},
-      {"san":"d5"}
+      {"san":"e4"},{"san":"e5"},{"san":"d4"},{"san":"exd4"},
+      {"san":"c3","note":"Danois"},{"san":"dxc3"},{"san":"Bc4"},{"san":"cxb2"},{"san":"Bxb2"}
     ]
   },
   {
-    "id": "philidor-defense",
-    "title": "Défense Philidor",
+    "id": "open-bishop",
+    "title": "Ouverture — Début du fou",
     "moves": [
-      {"san":"e4"},
-      {"san":"e5"},
-      {"san":"Nf3"},
-      {"san":"d6","note":"Philidor"},
-      {"san":"d4"},
-      {"san":"Nf6"},
-      {"san":"Nc3"},
-      {"san":"Nbd7"},
-      {"san":"Bc4"},
-      {"san":"Be7"}
+      {"san":"e4"},{"san":"e5"},{"san":"Bc4","note":"Ouverture du fou"},
+      {"san":"Nf6"},{"san":"d3"},{"san":"c6"},{"san":"Nf3"},{"san":"d5"}
     ]
   },
   {
-    "id": "sicilian-defense",
-    "title": "Défense Sicilienne",
+    "id": "open-ponziani",
+    "title": "Ouverture — Ponziani",
     "moves": [
-      {"san":"e4"},
-      {"san":"c5","note":"Sicilienne"},
-      {"san":"Nf3"},
-      {"san":"d6"},
-      {"san":"d4"},
-      {"san":"cxd4"},
-      {"san":"Nxd4"},
-      {"san":"Nf6"},
-      {"san":"Nc3"},
-      {"san":"a6","note":"Najdorf"}
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"Nc6"},
+      {"san":"c3","note":"Ponziani"},{"san":"Nf6"},{"san":"d4"},{"san":"Nxe4"}
+    ]
+  },
+
+  {
+    "id": "defense-petroff",
+    "title": "Défense — Petroff",
+    "moves": [
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"Nf6","note":"Petroff"},
+      {"san":"Nxe5"},{"san":"d6"},{"san":"Nf3"},{"san":"Nxe4"},{"san":"d4"},{"san":"d5"}
     ]
   },
   {
-    "id": "sicilian-dragon",
-    "title": "Sicilienne Dragon",
+    "id": "defense-philidor",
+    "title": "Défense — Philidor",
     "moves": [
-      {"san":"e4"},
-      {"san":"c5"},
-      {"san":"Nf3"},
-      {"san":"d6"},
-      {"san":"d4"},
-      {"san":"cxd4"},
-      {"san":"Nxd4"},
-      {"san":"Nf6"},
-      {"san":"Nc3"},
-      {"san":"g6","note":"Dragon"}
+      {"san":"e4"},{"san":"e5"},{"san":"Nf3"},{"san":"d6","note":"Philidor"},
+      {"san":"d4"},{"san":"Nf6"},{"san":"Nc3"},{"san":"Nbd7"},{"san":"Bc4"},{"san":"Be7"}
     ]
   },
   {
-    "id": "sicilian-scheveningen",
-    "title": "Sicilienne Scheveningen",
+    "id": "defense-sicilian",
+    "title": "Défense — Sicilienne",
     "moves": [
-      {"san":"e4"},
-      {"san":"c5"},
-      {"san":"Nf3"},
-      {"san":"d6"},
-      {"san":"d4"},
-      {"san":"cxd4"},
-      {"san":"Nxd4"},
-      {"san":"Nf6"},
-      {"san":"Nc3"},
-      {"san":"e6","note":"Scheveningen"}
+      {"san":"e4"},{"san":"c5","note":"Sicilienne"},{"san":"Nf3"},{"san":"d6"},
+      {"san":"d4"},{"san":"cxd4"},{"san":"Nxd4"},{"san":"Nf6"},{"san":"Nc3"},{"san":"a6","note":"Najdorf"}
     ]
   },
   {
-    "id": "sicilian-sveshnikov",
-    "title": "Sicilienne Sveshnikov",
+    "id": "defense-sicilian-dragon",
+    "title": "Défense — Sicilienne Dragon",
     "moves": [
-      {"san":"e4"},
-      {"san":"c5"},
-      {"san":"Nf3"},
-      {"san":"Nc6"},
-      {"san":"d4"},
-      {"san":"cxd4"},
-      {"san":"Nxd4"},
-      {"san":"Nf6"},
-      {"san":"Nc3"},
-      {"san":"e5","note":"Sveshnikov"}
+      {"san":"e4"},{"san":"c5"},{"san":"Nf3"},{"san":"d6"},{"san":"d4"},{"san":"cxd4"},
+      {"san":"Nxd4"},{"san":"Nf6"},{"san":"Nc3"},{"san":"g6","note":"Dragon"}
     ]
   },
   {
-    "id": "french-defense",
-    "title": "Défense Française",
+    "id": "defense-sicilian-classical",
+    "title": "Défense — Sicilienne Classique",
     "moves": [
-      {"san":"e4"},
-      {"san":"e6","note":"Française"},
-      {"san":"d4"},
-      {"san":"d5"},
-      {"san":"Nc3"},
-      {"san":"Nf6"},
-      {"san":"Bg5","note":"Classique"},
-      {"san":"Be7"},
-      {"san":"e5"},
-      {"san":"Nfd7"}
+      {"san":"e4"},{"san":"c5"},{"san":"Nf3"},{"san":"Nc6","note":"Classique"},
+      {"san":"d4"},{"san":"cxd4"},{"san":"Nxd4"},{"san":"Nf6"},{"san":"Nc3"},{"san":"d6"}
     ]
   },
   {
-    "id": "french-exchange",
-    "title": "Française Variante d’échange",
+    "id": "defense-sicilian-sveshnikov",
+    "title": "Défense — Sicilienne Sveshnikov",
     "moves": [
-      {"san":"e4"},
-      {"san":"e6"},
-      {"san":"d4"},
-      {"san":"d5"},
-      {"san":"exd5","note":"Échange"},
-      {"san":"exd5"},
-      {"san":"Bd3"},
-      {"san":"Bd6"},
-      {"san":"Nf3"},
-      {"san":"Nf6"}
+      {"san":"e4"},{"san":"c5"},{"san":"Nf3"},{"san":"Nc6"},
+      {"san":"d4"},{"san":"cxd4"},{"san":"Nxd4"},{"san":"Nf6"},
+      {"san":"Nc3"},{"san":"e5","note":"Sveshnikov"}
     ]
   },
   {
-    "id": "caro-kann",
-    "title": "Défense Caro-Kann",
+    "id": "defense-french",
+    "title": "Défense — Française",
     "moves": [
-      {"san":"e4"},
-      {"san":"c6","note":"Caro-Kann"},
-      {"san":"d4"},
-      {"san":"d5"},
-      {"san":"Nc3"},
-      {"san":"dxe4"},
-      {"san":"Nxe4"},
-      {"san":"Bf5"},
-      {"san":"Ng3"},
-      {"san":"Bg6"},
-      {"san":"h4","note":"Chasse le fou"}
+      {"san":"e4"},{"san":"e6","note":"Française"},{"san":"d4"},{"san":"d5"},
+      {"san":"Nc3"},{"san":"Nf6"},{"san":"Bg5","note":"Classique"},{"san":"Be7"},{"san":"e5"},{"san":"Nfd7"}
     ]
   },
   {
-    "id": "caro-kann-advance",
-    "title": "Caro-Kann Variante d’avance",
+    "id": "defense-french-exchange",
+    "title": "Défense — Française d’échange",
     "moves": [
-      {"san":"e4"},
-      {"san":"c6"},
-      {"san":"d4"},
-      {"san":"d5"},
-      {"san":"e5","note":"Avance"},
-      {"san":"Bf5"},
-      {"san":"Nf3"},
-      {"san":"e6"},
-      {"san":"Be2"},
-      {"san":"c5"}
+      {"san":"e4"},{"san":"e6"},{"san":"d4"},{"san":"d5"},
+      {"san":"exd5","note":"Échange"},{"san":"exd5"},{"san":"Bd3"},{"san":"Bd6"},{"san":"Nf3"},{"san":"Nf6"}
     ]
   },
   {
-    "id": "pirc-defense",
-    "title": "Défense Pirc",
+    "id": "defense-french-tarrasch",
+    "title": "Défense — Française Tarrasch",
     "moves": [
-      {"san":"e4"},
-      {"san":"d6","note":"Pirc"},
-      {"san":"d4"},
-      {"san":"Nf6"},
-      {"san":"Nc3"},
-      {"san":"g6"},
-      {"san":"Nf3"},
-      {"san":"Bg7"},
-      {"san":"Be2"},
-      {"san":"O-O"}
+      {"san":"e4"},{"san":"e6"},{"san":"d4"},{"san":"d5"},
+      {"san":"Nd2","note":"Tarrasch"},{"san":"Nf6"},{"san":"e5"},{"san":"Nfd7"},{"san":"Bd3"},{"san":"c5"}
     ]
   },
   {
-    "id": "modern-defense",
-    "title": "Défense Moderne",
+    "id": "defense-caro-kann",
+    "title": "Défense — Caro-Kann",
     "moves": [
-      {"san":"e4"},
-      {"san":"g6","note":"Moderne"},
-      {"san":"d4"},
-      {"san":"Bg7"},
-      {"san":"Nc3"},
-      {"san":"d6"},
-      {"san":"Nf3"},
-      {"san":"Nf6"}
+      {"san":"e4"},{"san":"c6","note":"Caro-Kann"},{"san":"d4"},{"san":"d5"},
+      {"san":"Nc3"},{"san":"dxe4"},{"san":"Nxe4"},{"san":"Bf5"},{"san":"Ng3"},{"san":"Bg6"}
     ]
   },
   {
-    "id": "alekhine-defense",
-    "title": "Défense Alekhine",
+    "id": "defense-caro-kann-advance",
+    "title": "Défense — Caro-Kann d’avance",
     "moves": [
-      {"san":"e4"},
-      {"san":"Nf6","note":"Alekhine"},
-      {"san":"e5"},
-      {"san":"Nd5"},
-      {"san":"d4"},
-      {"san":"d6"},
-      {"san":"Nf3"},
-      {"san":"Bg4"}
+      {"san":"e4"},{"san":"c6"},{"san":"d4"},{"san":"d5"},
+      {"san":"e5","note":"Avance"},{"san":"Bf5"},{"san":"Nf3"},{"san":"e6"},{"san":"Be2"},{"san":"c5"}
     ]
   },
   {
-    "id": "queens-gambit",
-    "title": "Gambit de la Dame",
+    "id": "defense-pirc",
+    "title": "Défense — Pirc",
     "moves": [
-      {"san":"d4"},
-      {"san":"d5"},
-      {"san":"c4","note":"Gambit"},
-      {"san":"e6"},
-      {"san":"Nc3"},
-      {"san":"Nf6"},
-      {"san":"Bg5"},
-      {"san":"Be7"},
-      {"san":"e3"},
-      {"san":"O-O"},
-      {"san":"Nf3"}
+      {"san":"e4"},{"san":"d6","note":"Pirc"},{"san":"d4"},{"san":"Nf6"},
+      {"san":"Nc3"},{"san":"g6"},{"san":"Nf3"},{"san":"Bg7"},{"san":"Be2"},{"san":"O-O"}
     ]
   },
   {
-    "id": "queens-gambit-accepted",
-    "title": "Gambit de la Dame accepté",
+    "id": "defense-modern",
+    "title": "Défense — Moderne",
     "moves": [
-      {"san":"d4"},
-      {"san":"d5"},
-      {"san":"c4"},
-      {"san":"dxc4","note":"Accepté"},
-      {"san":"Nf3"},
-      {"san":"Nf6"},
-      {"san":"e3"},
-      {"san":"e6"},
-      {"san":"Bxc4"}
+      {"san":"e4"},{"san":"g6","note":"Moderne"},{"san":"d4"},{"san":"Bg7"},
+      {"san":"Nc3"},{"san":"d6"},{"san":"Nf3"},{"san":"Nf6"}
+    ]
+  },
+  {
+    "id": "defense-alekhine",
+    "title": "Défense — Alekhine",
+    "moves": [
+      {"san":"e4"},{"san":"Nf6","note":"Alekhine"},{"san":"e5"},{"san":"Nd5"},
+      {"san":"d4"},{"san":"d6"},{"san":"Nf3"},{"san":"Bg4"}
+    ]
+  },
+  {
+    "id": "defense-scandinavian",
+    "title": "Défense — Scandinave",
+    "moves": [
+      {"san":"e4"},{"san":"d5","note":"Scandinave"},{"san":"exd5"},{"san":"Qxd5"},
+      {"san":"Nc3"},{"san":"Qa5"},{"san":"d4"},{"san":"Nf6"}
+    ]
+  },
+  {
+    "id": "defense-owen",
+    "title": "Défense — Owen",
+    "moves": [
+      {"san":"e4"},{"san":"b6","note":"Owen"},{"san":"d4"},{"san":"Bb7"},
+      {"san":"Bd3"},{"san":"e6"},{"san":"Nf3"},{"san":"Nf6"}
+    ]
+  },
+
+  {
+    "id": "queen-gambit",
+    "title": "Ouverture — Gambit de la Dame",
+    "moves": [
+      {"san":"d4"},{"san":"d5"},{"san":"c4","note":"Gambit de la Dame"},
+      {"san":"e6"},{"san":"Nc3"},{"san":"Nf6"},{"san":"Bg5"},{"san":"Be7"},{"san":"e3"},{"san":"O-O"}
+    ]
+  },
+  {
+    "id": "queen-gambit-accepted",
+    "title": "Ouverture — Gambit Dame accepté",
+    "moves": [
+      {"san":"d4"},{"san":"d5"},{"san":"c4"},{"san":"dxc4","note":"Accepté"},
+      {"san":"Nf3"},{"san":"Nf6"},{"san":"e3"},{"san":"e6"},{"san":"Bxc4"}
     ]
   },
   {
     "id": "slav-defense",
-    "title": "Défense Slave",
+    "title": "Défense — Slave",
     "moves": [
-      {"san":"d4"},
-      {"san":"d5"},
-      {"san":"c4"},
-      {"san":"c6","note":"Slave"},
-      {"san":"Nc3"},
-      {"san":"Nf6"},
-      {"san":"Nf3"},
-      {"san":"dxc4"}
+      {"san":"d4"},{"san":"d5"},{"san":"c4"},{"san":"c6","note":"Slave"},
+      {"san":"Nc3"},{"san":"Nf6"},{"san":"Nf3"},{"san":"dxc4"}
     ]
   },
   {
     "id": "semi-slav",
-    "title": "Semi-Slave",
+    "title": "Défense — Semi-Slave",
     "moves": [
-      {"san":"d4"},
-      {"san":"d5"},
-      {"san":"c4"},
-      {"san":"e6"},
-      {"san":"Nc3"},
-      {"san":"c6","note":"Semi-Slave"},
-      {"san":"Nf3"},
-      {"san":"Nf6"}
+      {"san":"d4"},{"san":"d5"},{"san":"c4"},{"san":"e6"},
+      {"san":"Nc3"},{"san":"c6","note":"Semi-Slave"},{"san":"Nf3"},{"san":"Nf6"}
     ]
   },
   {
-    "id": "nimzo-indian",
-    "title": "Défense Nimzo-Indienne",
+    "id": "qgd-orthodox",
+    "title": "Défense — Gambit Dame refusé",
     "moves": [
-      {"san":"d4"},
-      {"san":"Nf6"},
-      {"san":"c4"},
-      {"san":"e6"},
-      {"san":"Nc3"},
-      {"san":"Bb4","note":"Nimzo-Indienne"},
-      {"san":"e3"},
-      {"san":"O-O"}
+      {"san":"d4"},{"san":"d5"},{"san":"c4"},{"san":"e6","note":"Refusé"},
+      {"san":"Nc3"},{"san":"Nf6"},{"san":"Bg5"},{"san":"Be7"}
     ]
   },
   {
-    "id": "queens-indian",
-    "title": "Défense Indienne de la Dame",
+    "id": "opening-london",
+    "title": "Ouverture — Londres",
     "moves": [
-      {"san":"d4"},
-      {"san":"Nf6"},
-      {"san":"c4"},
-      {"san":"e6"},
-      {"san":"Nf3"},
-      {"san":"b6","note":"Indienne de la Dame"},
-      {"san":"g3"},
-      {"san":"Bb7"}
+      {"san":"d4"},{"san":"Nf6"},{"san":"Nf3"},{"san":"e6"},
+      {"san":"Bf4","note":"Londres"},{"san":"d5"},{"san":"e3"},{"san":"Bd6"},{"san":"Bg3"}
     ]
   },
   {
-    "id": "kings-indian",
-    "title": "Défense Indienne du Roi",
+    "id": "opening-colle",
+    "title": "Ouverture — Colle",
     "moves": [
-      {"san":"d4"},
-      {"san":"Nf6"},
-      {"san":"c4"},
-      {"san":"g6"},
-      {"san":"Nc3"},
-      {"san":"Bg7"},
-      {"san":"e4"},
-      {"san":"d6"},
-      {"san":"Nf3"},
-      {"san":"O-O"},
-      {"san":"Be2","note":"Indienne du Roi"}
+      {"san":"d4"},{"san":"d5"},{"san":"Nf3"},{"san":"Nf6"},
+      {"san":"e3","note":"Colle"},{"san":"e6"},{"san":"Bd3"},{"san":"c5"},{"san":"c3"}
     ]
   },
   {
-    "id": "grunfeld-defense",
-    "title": "Défense Grünfeld",
+    "id": "opening-catalan",
+    "title": "Ouverture — Catalane",
     "moves": [
-      {"san":"d4"},
-      {"san":"Nf6"},
-      {"san":"c4"},
-      {"san":"g6"},
-      {"san":"Nc3"},
-      {"san":"d5","note":"Grünfeld"},
-      {"san":"cxd5"},
-      {"san":"Nxd5"},
-      {"san":"e4"}
+      {"san":"d4"},{"san":"Nf6"},{"san":"c4"},{"san":"e6"},
+      {"san":"g3","note":"Catalane"},{"san":"d5"},{"san":"Bg2"},{"san":"Be7"},{"san":"Nf3"},{"san":"O-O"}
+    ]
+  },
+
+  {
+    "id": "defense-nimzo",
+    "title": "Défense — Nimzo-Indienne",
+    "moves": [
+      {"san":"d4"},{"san":"Nf6"},{"san":"c4"},{"san":"e6"},
+      {"san":"Nc3"},{"san":"Bb4","note":"Nimzo-Indienne"},{"san":"e3"},{"san":"O-O"}
     ]
   },
   {
-    "id": "benoni-defense",
-    "title": "Défense Benoni",
+    "id": "defense-queens-indian",
+    "title": "Défense — Indienne de la Dame",
     "moves": [
-      {"san":"d4"},
-      {"san":"Nf6"},
-      {"san":"c4"},
-      {"san":"c5","note":"Benoni"},
-      {"san":"d5"},
-      {"san":"e6"},
-      {"san":"Nc3"},
-      {"san":"exd5"},
-      {"san":"cxd5"}
+      {"san":"d4"},{"san":"Nf6"},{"san":"c4"},{"san":"e6"},
+      {"san":"Nf3"},{"san":"b6","note":"Indienne de la Dame"},{"san":"g3"},{"san":"Bb7"}
     ]
   },
   {
-    "id": "london-system",
-    "title": "Système de Londres",
+    "id": "defense-kings-indian",
+    "title": "Défense — Indienne du Roi",
     "moves": [
-      {"san":"d4"},
-      {"san":"Nf6"},
-      {"san":"Nf3"},
-      {"san":"e6"},
-      {"san":"Bf4","note":"Londres"},
-      {"san":"d5"},
-      {"san":"e3"},
-      {"san":"Bd6"},
-      {"san":"Bg3"},
-      {"san":"O-O"},
-      {"san":"Bd3"}
+      {"san":"d4"},{"san":"Nf6"},{"san":"c4"},{"san":"g6"},
+      {"san":"Nc3"},{"san":"Bg7"},{"san":"e4"},{"san":"d6"},
+      {"san":"Nf3"},{"san":"O-O"},{"san":"Be2","note":"Indienne du Roi"}
     ]
   },
   {
-    "id": "colle-system",
-    "title": "Système Colle",
+    "id": "defense-grunfeld",
+    "title": "Défense — Grünfeld",
     "moves": [
-      {"san":"d4"},
-      {"san":"d5"},
-      {"san":"Nf3"},
-      {"san":"Nf6"},
-      {"san":"e3","note":"Colle"},
-      {"san":"e6"},
-      {"san":"Bd3"},
-      {"san":"c5"},
-      {"san":"c3"}
+      {"san":"d4"},{"san":"Nf6"},{"san":"c4"},{"san":"g6"},
+      {"san":"Nc3"},{"san":"d5","note":"Grünfeld"},{"san":"cxd5"},{"san":"Nxd5"},{"san":"e4"}
     ]
   },
   {
-    "id": "english-opening",
-    "title": "Ouverture Anglaise",
+    "id": "defense-benoni",
+    "title": "Défense — Benoni",
     "moves": [
-      {"san":"c4","note":"Anglaise"},
-      {"san":"e5"},
-      {"san":"Nc3"},
-      {"san":"Nf6"},
-      {"san":"Nf3"},
-      {"san":"Nc6"},
-      {"san":"g3"},
-      {"san":"d5"},
-      {"san":"cxd5"},
-      {"san":"Nxd5"}
+      {"san":"d4"},{"san":"Nf6"},{"san":"c4"},{"san":"c5","note":"Benoni"},
+      {"san":"d5"},{"san":"e6"},{"san":"Nc3"},{"san":"exd5"},{"san":"cxd5"}
     ]
   },
   {
-    "id": "reti-opening",
-    "title": "Ouverture Réti",
+    "id": "defense-dutch",
+    "title": "Défense — Hollandaise",
     "moves": [
-      {"san":"Nf3","note":"Réti"},
-      {"san":"d5"},
-      {"san":"c4"},
-      {"san":"e6"},
-      {"san":"g3"},
-      {"san":"Nf6"},
-      {"san":"Bg2"},
-      {"san":"Be7"}
+      {"san":"d4"},{"san":"f5","note":"Hollandaise"},{"san":"g3"},{"san":"Nf6"},
+      {"san":"Bg2"},{"san":"e6"},{"san":"Nf3"},{"san":"Be7"}
     ]
   },
   {
-    "id": "bird-opening",
-    "title": "Ouverture Bird",
+    "id": "defense-budapest",
+    "title": "Défense — Gambit de Budapest",
     "moves": [
-      {"san":"f4","note":"Bird"},
-      {"san":"d5"},
-      {"san":"Nf3"},
-      {"san":"Nf6"},
-      {"san":"e3"},
-      {"san":"g6"},
-      {"san":"b3"}
+      {"san":"d4"},{"san":"Nf6"},{"san":"c4"},{"san":"e5","note":"Budapest"},
+      {"san":"dxe5"},{"san":"Ng4"},{"san":"Nf3"},{"san":"Nc6"}
     ]
   },
   {
-    "id": "orangutan",
-    "title": "Ouverture Orang-outan",
+    "id": "defense-blumenfeld",
+    "title": "Défense — Gambit Blumenfeld",
     "moves": [
-      {"san":"b4","note":"Orang-outan"},
-      {"san":"e5"},
-      {"san":"Bb2"},
-      {"san":"Bxb4"},
-      {"san":"Bxe5"}
+      {"san":"d4"},{"san":"Nf6"},{"san":"c4"},{"san":"e6"},
+      {"san":"Nf3"},{"san":"c5"},{"san":"d5"},{"san":"b5","note":"Blumenfeld"}
+    ]
+  },
+
+  {
+    "id": "flank-english",
+    "title": "Ouverture — Anglaise",
+    "moves": [
+      {"san":"c4","note":"Anglaise"},{"san":"e5"},{"san":"Nc3"},{"san":"Nf6"},
+      {"san":"Nf3"},{"san":"Nc6"},{"san":"g3"},{"san":"d5"},{"san":"cxd5"},{"san":"Nxd5"}
     ]
   },
   {
-    "id": "catalan",
-    "title": "Ouverture Catalane",
+    "id": "flank-reti",
+    "title": "Ouverture — Réti",
     "moves": [
-      {"san":"d4"},
-      {"san":"Nf6"},
-      {"san":"c4"},
-      {"san":"e6"},
-      {"san":"g3","note":"Catalane"},
-      {"san":"d5"},
-      {"san":"Bg2"},
-      {"san":"Be7"},
-      {"san":"Nf3"},
-      {"san":"O-O"}
+      {"san":"Nf3","note":"Réti"},{"san":"d5"},{"san":"c4"},{"san":"e6"},
+      {"san":"g3"},{"san":"Nf6"},{"san":"Bg2"},{"san":"Be7"}
+    ]
+  },
+  {
+    "id": "flank-bird",
+    "title": "Ouverture — Bird",
+    "moves": [
+      {"san":"f4","note":"Bird"},{"san":"d5"},{"san":"Nf3"},{"san":"Nf6"},
+      {"san":"e3"},{"san":"g6"},{"san":"b3"}
+    ]
+  },
+  {
+    "id": "flank-orangutan",
+    "title": "Ouverture — Orang-outan",
+    "moves": [
+      {"san":"b4","note":"Orang-outan"},{"san":"e5"},{"san":"Bb2"},{"san":"Bxb4"},{"san":"Bxe5"}
+    ]
+  },
+  {
+    "id": "flank-larsen",
+    "title": "Ouverture — Larsen",
+    "moves": [
+      {"san":"b3","note":"Larsen"},{"san":"d5"},{"san":"Bb2"},{"san":"Nf6"},
+      {"san":"e3"},{"san":"e6"},{"san":"Nf3"}
     ]
   }
 ]
