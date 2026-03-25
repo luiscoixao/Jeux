@@ -677,6 +677,19 @@ function loadGame(index){
 async function loadGames(){
   const response=await fetch("games.json");
   games=await response.json();
+  
+  games.sort((a, b) => {
+  const order = ["Ouverture", "Défense", "Piège", "Partie célèbre"];
+
+  const getCat = t => order.find(c => t.startsWith(c)) || "Z";
+
+  const catA = getCat(a.title);
+  const catB = getCat(b.title);
+
+  if (catA !== catB) return order.indexOf(catA) - order.indexOf(catB);
+
+  return a.title.localeCompare(b.title, "fr", { sensitivity: "base" });
+});
 
   games.forEach(game=>{
     game.states=computeStates(game);
