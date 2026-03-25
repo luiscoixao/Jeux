@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Maîtres d'Échecs</title>
+<title>ChessMasters</title>
 
 <link rel="apple-touch-icon" href="icon.png" />
 <link rel="icon" href="icon.png" />
@@ -23,88 +23,233 @@
   --muted:#d7d7d7;
   --line:rgba(255,255,255,.12);
 }
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
 html,body{
-  margin:0;padding:0;background:var(--bg);color:var(--text);
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
 }
+
 body{
-  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
   padding:0 12px calc(18px + env(safe-area-inset-bottom));
 }
+
 h1{
-  margin:calc(env(safe-area-inset-top) + 18px) 0 10px;
-  font-size:28px;line-height:1.08;font-weight:700;text-align:center;
+  margin:calc(env(safe-area-inset-top) + 18px) 0 12px;
+  font-size:28px;
+  line-height:1.08;
+  font-weight:700;
+  text-align:center;
 }
-.subtitle{
-  text-align:center;font-size:15px;line-height:1.35;color:var(--muted);
-  max-width:560px;margin-bottom:14px;
+
+.app{
+  width:100%;
+  max-width:560px;
 }
-.app{width:100%;max-width:560px}
+
 .top-panel,.lesson-panel,.move-panel,.controls-panel{
-  background:var(--panel);border-radius:18px;padding:14px;margin-bottom:12px;
+  background:var(--panel);
+  border-radius:18px;
+  padding:14px;
+  margin-bottom:12px;
   box-shadow:0 8px 20px rgba(0,0,0,.18);
 }
-label{display:block;font-size:14px;font-weight:600;margin-bottom:8px}
+
+label{
+  display:block;
+  font-size:14px;
+  font-weight:600;
+  margin-bottom:8px;
+}
+
 select{
-  width:100%;height:48px;border:none;border-radius:14px;background:#4a4a4a;
-  color:#fff;font-size:16px;padding:0 14px;appearance:none;-webkit-appearance:none;
+  width:100%;
+  height:48px;
+  border:none;
+  border-radius:14px;
+  background:#4a4a4a;
+  color:#fff;
+  font-size:16px;
+  padding:0 14px;
+  appearance:none;
+  -webkit-appearance:none;
 }
-#board-container{width:100%;aspect-ratio:1;max-width:560px}
+
+#board-container{
+  width:100%;
+  aspect-ratio:1;
+  max-width:560px;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 10px 25px rgba(0,0,0,0.35);
+  margin-bottom:12px;
+}
+
 #board{
-  display:grid;grid-template-columns:repeat(8,1fr);
-  width:100%;height:100%;border-radius:14px;overflow:hidden;
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  width:100%;
+  height:100%;
 }
+
 .square{
-  position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  position:relative;
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   user-select:none;
 }
-.white{background:var(--light)}
-.black{background:var(--dark)}
+
+.white{ background:var(--light); }
+.black{ background:var(--dark); }
+
 .coord{
-  position:absolute;font-size:10px;opacity:.65;font-weight:700;pointer-events:none;
+  position:absolute;
+  font-size:10px;
+  opacity:.65;
+  font-weight:700;
+  pointer-events:none;
 }
-.coord.file{left:5px;bottom:3px}
-.coord.rank{right:4px;top:2px}
+
+.coord.file{
+  left:5px;
+  bottom:3px;
+}
+
+.coord.rank{
+  right:4px;
+  top:2px;
+}
+
 .piece{
-  font-size:clamp(26px,5.6vw,42px);line-height:1;position:relative;z-index:2;
+  font-size:clamp(26px,5.6vw,42px);
+  line-height:1;
+  position:relative;
+  z-index:2;
   filter:drop-shadow(0 1px 0 rgba(0,0,0,.25));
 }
-.white-piece{color:#fff;text-shadow:0 0 1px #000, 0 1px 2px rgba(0,0,0,.4)}
-.black-piece{color:#111;text-shadow:0 0 1px #fff, 0 1px 1px rgba(255,255,255,.25)}
-.from-square{outline:3px solid rgba(255,215,0,.8);outline-offset:-3px}
-.to-square{outline:3px solid rgba(169,209,142,.95);outline-offset:-3px}
-.capture-square{box-shadow:inset 0 0 0 3px rgba(255,99,71,.95)}
-#lesson-title{font-size:22px;font-weight:700;text-align:center;margin-bottom:8px}
+
+.white-piece{
+  color:#fff;
+  text-shadow:0 0 1px #000, 0 1px 2px rgba(0,0,0,.4);
+}
+
+.black-piece{
+  color:#111;
+  text-shadow:0 0 1px #fff, 0 1px 1px rgba(255,255,255,.25);
+}
+
+.from-square{
+  outline:3px solid rgba(255,215,0,.8);
+  outline-offset:-3px;
+}
+
+.to-square{
+  outline:3px solid rgba(169,209,142,.95);
+  outline-offset:-3px;
+}
+
+.capture-square{
+  box-shadow:inset 0 0 0 3px rgba(255,99,71,.95);
+}
+
+#lesson-title{
+  font-size:22px;
+  font-weight:700;
+  text-align:center;
+  margin-bottom:8px;
+}
+
 #lesson-meta,#move-counter,#status{
-  text-align:center;line-height:1.35;
+  text-align:center;
+  line-height:1.35;
 }
-#lesson-meta{font-size:15px;color:var(--muted);min-height:40px}
-#move-counter{font-size:18px;font-weight:700;margin-bottom:8px}
-#status{font-size:15px;color:var(--muted);min-height:42px}
+
+#lesson-meta{
+  font-size:15px;
+  color:var(--muted);
+  min-height:40px;
+}
+
+#move-counter{
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:8px;
+}
+
+#status{
+  font-size:15px;
+  color:var(--muted);
+  min-height:42px;
+}
+
 .controls{
-  display:flex;justify-content:center;align-items:center;gap:18px;flex-wrap:wrap;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:18px;
+  flex-wrap:wrap;
 }
+
 .control-btn{
-  width:70px;height:70px;border:none;border-radius:18px;background:#4a4a4a;color:#fff;
-  display:flex;align-items:center;justify-content:center;appearance:none;-webkit-appearance:none;
-  cursor:pointer;touch-action:manipulation;box-shadow:0 5px 12px rgba(0,0,0,.18);
+  width:70px;
+  height:70px;
+  border:none;
+  border-radius:18px;
+  background:var(--bg);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  appearance:none;
+  -webkit-appearance:none;
+  cursor:pointer;
+  touch-action:manipulation;
+  border:1px solid rgba(255,255,255,0.12);
+  box-shadow:none;
 }
-.control-btn span{font-size:34px;line-height:1;display:block}
-.control-btn:active{transform:scale(.94)}
-.control-btn.primary{background:#5a5a5a}
-.endnote{
-  font-size:14px;text-align:center;color:var(--muted);line-height:1.45
+
+.control-btn span{
+  font-size:34px;
+  line-height:1;
+  display:block;
 }
+
+.control-btn:active{
+  transform:scale(.94);
+}
+
+.control-btn.primary{
+  background:var(--bg);
+}
+
 @media (max-width:420px){
-  .control-btn{width:62px;height:62px}
-  .control-btn span{font-size:30px}
+  .control-btn{
+    width:62px;
+    height:62px;
+  }
+  .control-btn span{
+    font-size:30px;
+  }
 }
 </style>
 </head>
 <body>
-<h1>Maîtres d'Échecs ♟️</h1>
-<div class="subtitle">Étudie de grandes parties célèbres coup par coup, sur un échiquier inspiré de “La Dame Blanche”.</div>
+
+<h1>ChessMasters</h1>
 
 <div class="app">
   <div class="top-panel">
@@ -123,7 +268,7 @@ select{
 
   <div class="move-panel">
     <div id="move-counter">Coup 0 / 0</div>
-    <div id="status">▶️ Choisis une partie puis lance la lecture.</div>
+    <div id="status">Position initiale.</div>
   </div>
 
   <div class="controls-panel">
@@ -134,10 +279,6 @@ select{
       <button class="control-btn" id="nextBtn" type="button" aria-label="Coup suivant"><span>▶︎</span></button>
       <button class="control-btn" id="endBtn" type="button" aria-label="Aller à la fin"><span>⏭️</span></button>
     </div>
-  </div>
-
-  <div class="top-panel endnote">
-    Version corrigée avec parties intégrées directement dans le fichier. Mets ce fichier en <strong>index.html</strong> sur GitHub Pages.
   </div>
 </div>
 
@@ -167,107 +308,107 @@ const games = [
   {
     id:"morphy-opera",
     title:"Morphy – Partie de l’Opéra",
-    meta:"Paris, 1858 • Paul Morphy vs duc de Brunswick & comte Isouard • Mat d’attaque célèbre",
-    result:"1-0",
+    meta:"Paris, 1858 • Paul Morphy vs duc de Brunswick & comte Isouard • 1-0",
     moves:[
-      {san:"e4", note:"Morphy prend immédiatement le centre."},
-      {san:"e5", note:"Les Noirs répondent symétriquement."},
-      {san:"Nf3", note:"Développement rapide et pression sur e5."},
-      {san:"d6", note:"Une défense plus passive."},
-      {san:"d4", note:"Morphy ouvre le jeu sans tarder."},
-      {san:"Bg4", note:"Les Noirs clouent le cavalier."},
-      {san:"dxe5", note:"Morphy simplifie et gagne du temps."},
-      {san:"Bxf3", note:"Les Noirs échangent trop tôt."},
-      {san:"Qxf3", note:"La dame blanche centralise."},
-      {san:"dxe5", note:"Les Noirs reprennent le pion."},
-      {san:"Bc4", note:"Développement harmonieux vers le roi noir."},
-      {san:"Nf6", note:"Développement noir, mais l’initiative blanche grandit."},
-      {san:"Qb3", note:"Double pression sur f7 et b7."},
-      {san:"Qe7", note:"Défense maladroite."},
-      {san:"Nc3", note:"Toutes les pièces blanches entrent dans la partie."},
-      {san:"c6", note:"Les Noirs veulent consolider."},
-      {san:"Bg5", note:"Nouveau clouage et montée de la pression."},
-      {san:"b5", note:"Les Noirs chassent le fou, au prix de faiblesses."},
-      {san:"Nxb5", note:"Sacrifice tactique typique de Morphy."},
-      {san:"cxb5", note:"Accepté."},
-      {san:"Bxb5+", note:"Les lignes s’ouvrent contre le roi noir."},
-      {san:"Nbd7", note:"Défense forcée."},
-      {san:"O-O-O", note:"Le roi blanc se met à l’abri et la tour arrive en jeu."},
-      {san:"Rd8", note:"Les Noirs s’accrochent."},
-      {san:"Rxd7", note:"Sacrifice décisif pour détruire la coordination adverse."},
-      {san:"Rxd7", note:"Reprise forcée."},
-      {san:"Rd1", note:"La dernière tour blanche entre avec tempo."},
-      {san:"Qe6", note:"Tentative de défense centrale."},
-      {san:"Bxd7+", note:"Encore un sacrifice pour attirer la dame."},
-      {san:"Nxd7", note:"Forcé."},
-      {san:"Qb8+", note:"Le roi noir est exposé."},
-      {san:"Nxb8", note:"La dame noire doit interposer."},
-      {san:"Rd8#", note:"Mat célèbre : toutes les pièces blanches participent."}
+      {san:"e4", note:"Centre"},
+      {san:"e5", note:"Symétrie"},
+      {san:"Nf3", note:"Développement"},
+      {san:"d6", note:"Défense"},
+      {san:"d4", note:"Ouverture"},
+      {san:"Bg4", note:"Clouage"},
+      {san:"dxe5", note:"Simplification"},
+      {san:"Bxf3", note:"Échange"},
+      {san:"Qxf3", note:"Centralisation"},
+      {san:"dxe5", note:"Reprise"},
+      {san:"Bc4", note:"Pression"},
+      {san:"Nf6", note:"Développement"},
+      {san:"Qb3", note:"Double attaque"},
+      {san:"Qe7", note:"Défense"},
+      {san:"Nc3", note:"Pièces actives"},
+      {san:"c6", note:"Consolidation"},
+      {san:"Bg5", note:"Clouage"},
+      {san:"b5", note:"Chasse le fou"},
+      {san:"Nxb5", note:"Sacrifice"},
+      {san:"cxb5", note:"Accepté"},
+      {san:"Bxb5+", note:"Ouverture"},
+      {san:"Nbd7", note:"Défense"},
+      {san:"O-O-O", note:"Roque long"},
+      {san:"Rd8", note:"Résistance"},
+      {san:"Rxd7", note:"Sacrifice"},
+      {san:"Rxd7", note:"Forcé"},
+      {san:"Rd1", note:"Dernière tour"},
+      {san:"Qe6", note:"Défense"},
+      {san:"Bxd7+", note:"Attraction"},
+      {san:"Nxd7", note:"Forcé"},
+      {san:"Qb8+", note:"Échec"},
+      {san:"Nxb8", note:"Interposition"},
+      {san:"Rd8#", note:"Mat"}
     ]
   },
   {
     id:"anderssen-immortelle",
     title:"Anderssen – Partie Immortelle",
-    meta:"Londres, 1851 • Adolf Anderssen vs Lionel Kieseritzky • Triple sacrifice légendaire",
-    result:"1-0",
+    meta:"Londres, 1851 • Adolf Anderssen vs Lionel Kieseritzky • 1-0",
     moves:[
-      {san:"e4", note:"Ouverture du pion roi."},
-      {san:"e5", note:"Réponse classique."},
-      {san:"f4", note:"Gambit du Roi."},
-      {san:"exf4", note:"Accepté."},
-      {san:"Bc4", note:"Développement agressif."},
-      {san:"Qh4+", note:"Échec typique."},
-      {san:"Kf1", note:"Anderssen accepte de perdre le roque pour l’initiative."},
-      {san:"b5", note:"Contre-attaque sur le fou."},
-      {san:"Bxb5", note:"Le fou reste actif."},
-      {san:"Nf6", note:"Développement noir."},
-      {san:"Nf3", note:"Les Blancs accélèrent."},
-      {san:"Qh6", note:"La dame noire vise h2."},
-      {san:"d3", note:"Anderssen consolide le centre."},
-      {san:"Nh5", note:"Les Noirs cherchent l’attaque."},
-      {san:"Nh4", note:"Le cavalier blanc détourne la dame."},
-      {san:"Qg5", note:"Maintien de la pression."},
-      {san:"Nf5", note:"Un cavalier surgit."},
-      {san:"c6", note:"Les Noirs soutiennent b5."},
-      {san:"g4", note:"Les Blancs chassent la dame."},
-      {san:"Nf6", note:"Retrait."},
-      {san:"Rg1", note:"La tour entre dans l’attaque."},
-      {san:"cxb5", note:"Les Noirs gagnent du matériel."},
-      {san:"h4", note:"Encore un pion lancé vers le roi noir."},
-      {san:"Qg6", note:"La dame noire reste active."},
-      {san:"h5", note:"Ouverture de lignes."},
-      {san:"Qg5", note:"Retour."},
-      {san:"Qf3", note:"Anderssen coordonne toutes ses pièces."},
-      {san:"Ng8", note:"Les Noirs se replient."},
-      {san:"Bxf4", note:"Le fou rejoint l’attaque."},
-      {san:"Qf6", note:"Défense centrale."},
-      {san:"Nc3", note:"Encore une pièce développée."},
-      {san:"Bc5", note:"Les Noirs tentent de couvrir."},
-      {san:"Nd5", note:"Un cavalier blanc bondit au centre."},
-      {san:"Qxb2", note:"Les Noirs mangent du matériel mais perdent du temps."},
-      {san:"Bd6", note:"Une pièce blanche s’infiltre."},
-      {san:"Bxg1", note:"Les Noirs prennent la tour."},
-      {san:"e5", note:"Coup puissant ouvrant tout."},
-      {san:"Qxa1+", note:"Les Noirs prennent la seconde tour."},
-      {san:"Ke2", note:"Le roi blanc marche, sans crainte."},
-      {san:"Na6", note:"Les Noirs cherchent des cases."},
-      {san:"Nxg7+", note:"Sacrifice et ouverture des lignes."},
-      {san:"Kd8", note:"Le roi noir fuit."},
-      {san:"Qf6+", note:"Coordination spectaculaire."},
-      {san:"Nxf6", note:"La dame blanche est sacrifiée."},
-      {san:"Be7#", note:"Mat immortel avec deux fous et un cavalier."}
+      {san:"e4", note:"Ouverture"},
+      {san:"e5", note:"Réponse"},
+      {san:"f4", note:"Gambit du Roi"},
+      {san:"exf4", note:"Accepté"},
+      {san:"Bc4", note:"Développement"},
+      {san:"Qh4+", note:"Échec"},
+      {san:"Kf1", note:"Le roi marche"},
+      {san:"b5", note:"Contre-attaque"},
+      {san:"Bxb5", note:"Fou actif"},
+      {san:"Nf6", note:"Développement"},
+      {san:"Nf3", note:"Accélération"},
+      {san:"Qh6", note:"Pression"},
+      {san:"d3", note:"Consolidation"},
+      {san:"Nh5", note:"Attaque"},
+      {san:"Nh4", note:"Détour"},
+      {san:"Qg5", note:"Maintien"},
+      {san:"Nf5", note:"Initiative"},
+      {san:"c6", note:"Soutien"},
+      {san:"g4", note:"Chasse la dame"},
+      {san:"Nf6", note:"Retrait"},
+      {san:"Rg1", note:"Tour en attaque"},
+      {san:"cxb5", note:"Matériel"},
+      {san:"h4", note:"Poussée"},
+      {san:"Qg6", note:"Activité"},
+      {san:"h5", note:"Ouverture"},
+      {san:"Qg5", note:"Retour"},
+      {san:"Qf3", note:"Coordination"},
+      {san:"Ng8", note:"Repli"},
+      {san:"Bxf4", note:"Attaque"},
+      {san:"Qf6", note:"Défense"},
+      {san:"Nc3", note:"Développement"},
+      {san:"Bc5", note:"Couverture"},
+      {san:"Nd5", note:"Bond central"},
+      {san:"Qxb2", note:"Cupidité"},
+      {san:"Bd6", note:"Infiltration"},
+      {san:"Bxg1", note:"Tour prise"},
+      {san:"e5", note:"Ouverture"},
+      {san:"Qxa1+", note:"Seconde tour"},
+      {san:"Ke2", note:"Le roi avance"},
+      {san:"Na6", note:"Recherche de cases"},
+      {san:"Nxg7+", note:"Sacrifice"},
+      {san:"Kd8", note:"Fuite"},
+      {san:"Qf6+", note:"Coordination"},
+      {san:"Nxf6", note:"Dame sacrifiée"},
+      {san:"Be7#", note:"Mat"}
     ]
   }
 ];
 
 function bindTap(el, handler){
   let used = false;
+
   el.addEventListener("pointerup", e => {
     e.preventDefault();
     used = true;
     handler(e);
-    setTimeout(() => used = false, 60);
+    setTimeout(() => { used = false; }, 60);
   });
+
   el.addEventListener("click", e => {
     if(used) return;
     e.preventDefault();
@@ -275,41 +416,65 @@ function bindTap(el, handler){
   });
 }
 
-function coordsToSquare(file, rank){ return FILES[file] + String(rank + 1); }
-function squareToCoords(square){ return {file: FILES.indexOf(square[0]), rank: parseInt(square[1],10)-1}; }
+function coordsToSquare(file, rank){
+  return FILES[file] + String(rank + 1);
+}
+
+function squareToCoords(square){
+  return { file: FILES.indexOf(square[0]), rank: parseInt(square[1], 10) - 1 };
+}
 
 function fenToBoard(fen){
   const rows = fen.split("/");
-  const board = Array.from({length:8},()=>Array(8).fill(""));
-  for(let r=0;r<8;r++){
-    let f=0;
+  const board = Array.from({length:8}, () => Array(8).fill(""));
+
+  for(let r = 0; r < 8; r++){
+    let f = 0;
     for(const ch of rows[r]){
-      if(/\d/.test(ch)){ f += parseInt(ch,10); }
-      else { board[7-r][f] = ch; f++; }
+      if(/\d/.test(ch)){
+        f += parseInt(ch, 10);
+      }else{
+        board[7 - r][f] = ch;
+        f++;
+      }
     }
   }
+
   return board;
 }
 
-function cloneBoard(board){ return board.map(row => row.slice()); }
-function isWhite(piece){ return piece && piece === piece.toUpperCase(); }
-function sameColor(a,b){ return a && b && isWhite(a) === isWhite(b); }
+function cloneBoard(board){
+  return board.map(row => row.slice());
+}
+
+function isWhite(piece){
+  return piece && piece === piece.toUpperCase();
+}
+
+function sameColor(a, b){
+  return a && b && isWhite(a) === isWhite(b);
+}
 
 function pathClear(board, from, to){
   const dx = Math.sign(to.file - from.file);
   const dy = Math.sign(to.rank - from.rank);
-  let f = from.file + dx, r = from.rank + dy;
+  let f = from.file + dx;
+  let r = from.rank + dy;
+
   while(f !== to.file || r !== to.rank){
     if(board[r][f]) return false;
-    f += dx; r += dy;
+    f += dx;
+    r += dy;
   }
+
   return true;
 }
 
 function canPieceMove(board, piece, from, to, capture, enPassantTarget){
   const dx = to.file - from.file;
   const dy = to.rank - from.rank;
-  const adx = Math.abs(dx), ady = Math.abs(dy);
+  const adx = Math.abs(dx);
+  const ady = Math.abs(dy);
   const white = isWhite(piece);
   const lower = piece.toLowerCase();
 
@@ -321,15 +486,15 @@ function canPieceMove(board, piece, from, to, capture, enPassantTarget){
     const startRank = white ? 1 : 6;
 
     if(capture){
-      if(ady === 1 && dy === dir){
+      if(adx === 1 && dy === dir){
         if(board[to.rank][to.file]) return true;
-        if(enPassantTarget && coordsToSquare(to.file,to.rank) === enPassantTarget) return true;
+        if(enPassantTarget && coordsToSquare(to.file, to.rank) === enPassantTarget) return true;
       }
       return false;
-    } else {
+    }else{
       if(dx !== 0) return false;
       if(dy === dir && !board[to.rank][to.file]) return true;
-      if(from.rank === startRank && dy === 2*dir && !board[to.rank][to.file] && !board[from.rank+dir][from.file]) return true;
+      if(from.rank === startRank && dy === 2 * dir && !board[to.rank][to.file] && !board[from.rank + dir][from.file]) return true;
       return false;
     }
   }
@@ -338,7 +503,8 @@ function canPieceMove(board, piece, from, to, capture, enPassantTarget){
   if(lower === "b") return adx === ady && pathClear(board, from, to);
   if(lower === "r") return (dx === 0 || dy === 0) && pathClear(board, from, to);
   if(lower === "q") return ((dx === 0 || dy === 0) || (adx === ady)) && pathClear(board, from, to);
-  if(lower === "k") return Math.max(adx,ady) === 1;
+  if(lower === "k") return Math.max(adx, ady) === 1;
+
   return false;
 }
 
@@ -348,36 +514,38 @@ function findCandidates(board, pieceLetter, toSquare, opts, state){
   const targetPieceChar = wantedWhite ? pieceLetter.toUpperCase() : pieceLetter.toLowerCase();
   const out = [];
 
-  for(let rank=0; rank<8; rank++){
-    for(let file=0; file<8; file++){
+  for(let rank = 0; rank < 8; rank++){
+    for(let file = 0; file < 8; file++){
       const p = board[rank][file];
       if(p !== targetPieceChar) continue;
 
       if(opts.fromFile !== null && FILES[file] !== opts.fromFile) continue;
-      if(opts.fromRank !== null && String(rank+1) !== opts.fromRank) continue;
+      if(opts.fromRank !== null && String(rank + 1) !== opts.fromRank) continue;
 
-      if(canPieceMove(board, p, {file,rank}, dest, opts.capture, state.enPassantTarget)){
+      if(canPieceMove(board, p, {file, rank}, dest, opts.capture, state.enPassantTarget)){
         out.push(coordsToSquare(file, rank));
       }
     }
   }
+
   return out;
 }
 
 function parseSAN(san){
   let move = san.trim().replace(/[!?+#]+$/g, "");
-  if(move === "O-O" || move === "0-0") return {castle:"K"};
-  if(move === "O-O-O" || move === "0-0-0") return {castle:"Q"};
+
+  if(move === "O-O" || move === "0-0") return { castle:"K" };
+  if(move === "O-O-O" || move === "0-0-0") return { castle:"Q" };
 
   let promotion = null;
   const promoMatch = move.match(/=([QRBN])/);
   if(promoMatch){
     promotion = promoMatch[1];
-    move = move.replace(/=([QRBN])/,"");
+    move = move.replace(/=([QRBN])/, "");
   }
 
   const capture = move.includes("x");
-  move = move.replace("x","");
+  move = move.replace("x", "");
 
   let piece = "P";
   if(/^[KQRBN]/.test(move)){
@@ -388,43 +556,69 @@ function parseSAN(san){
   const toSquare = move.slice(-2);
   const prefix = move.slice(0, -2);
 
-  let fromFile = null, fromRank = null;
+  let fromFile = null;
+  let fromRank = null;
+
   if(piece === "P"){
     if(prefix.length === 1) fromFile = prefix[0];
-  } else {
-    if(prefix.length === 2){ fromFile = prefix[0]; fromRank = prefix[1]; }
-    else if(prefix.length === 1){
+  }else{
+    if(prefix.length === 2){
+      fromFile = prefix[0];
+      fromRank = prefix[1];
+    }else if(prefix.length === 1){
       if(/[a-h]/.test(prefix)) fromFile = prefix;
       else fromRank = prefix;
     }
   }
 
-  return {piece, toSquare, capture, promotion, fromFile, fromRank};
+  return { piece, toSquare, capture, promotion, fromFile, fromRank };
 }
 
 function applyMoveToState(state, san){
   const board = cloneBoard(state.board);
   const parsed = parseSAN(san);
-  let fromSquare = null, toSquare = null, capture = false;
+  let fromSquare = null;
+  let toSquare = null;
+  let capture = false;
 
   if(parsed.castle){
     const white = state.turn === "w";
+
     if(white && parsed.castle === "K"){
-      board[0][4] = ""; board[0][6] = "K"; board[0][7] = ""; board[0][5] = "R";
-      fromSquare = "e1"; toSquare = "g1";
-    } else if(white && parsed.castle === "Q"){
-      board[0][4] = ""; board[0][2] = "K"; board[0][0] = ""; board[0][3] = "R";
-      fromSquare = "e1"; toSquare = "c1";
-    } else if(!white && parsed.castle === "K"){
-      board[7][4] = ""; board[7][6] = "k"; board[7][7] = ""; board[7][5] = "r";
-      fromSquare = "e8"; toSquare = "g8";
-    } else {
-      board[7][4] = ""; board[7][2] = "k"; board[7][0] = ""; board[7][3] = "r";
-      fromSquare = "e8"; toSquare = "c8";
+      board[0][4] = "";
+      board[0][6] = "K";
+      board[0][7] = "";
+      board[0][5] = "R";
+      fromSquare = "e1";
+      toSquare = "g1";
+    }else if(white && parsed.castle === "Q"){
+      board[0][4] = "";
+      board[0][2] = "K";
+      board[0][0] = "";
+      board[0][3] = "R";
+      fromSquare = "e1";
+      toSquare = "c1";
+    }else if(!white && parsed.castle === "K"){
+      board[7][4] = "";
+      board[7][6] = "k";
+      board[7][7] = "";
+      board[7][5] = "r";
+      fromSquare = "e8";
+      toSquare = "g8";
+    }else{
+      board[7][4] = "";
+      board[7][2] = "k";
+      board[7][0] = "";
+      board[7][3] = "r";
+      fromSquare = "e8";
+      toSquare = "c8";
     }
+
     return {
-      board, turn: state.turn === "w" ? "b" : "w",
-      enPassantTarget: null, lastMove:{from:fromSquare,to:toSquare,capture:false,san}
+      board,
+      turn: state.turn === "w" ? "b" : "w",
+      enPassantTarget: null,
+      lastMove: { from: fromSquare, to: toSquare, capture: false, san }
     };
   }
 
@@ -435,6 +629,7 @@ function applyMoveToState(state, san){
 
   fromSquare = candidates[0];
   toSquare = parsed.toSquare;
+
   const from = squareToCoords(fromSquare);
   const to = squareToCoords(toSquare);
   const moving = board[from.rank][from.file];
@@ -464,7 +659,7 @@ function applyMoveToState(state, san){
     board,
     turn: state.turn === "w" ? "b" : "w",
     enPassantTarget,
-    lastMove:{from:fromSquare,to:toSquare,capture,san}
+    lastMove: { from: fromSquare, to: toSquare, capture, san }
   };
 }
 
@@ -475,9 +670,11 @@ function computeStates(game){
     enPassantTarget:null,
     lastMove:null
   }];
+
   for(const mv of game.moves){
-    states.push(applyMoveToState(states[states.length-1], mv.san));
+    states.push(applyMoveToState(states[states.length - 1], mv.san));
   }
+
   return states;
 }
 
@@ -498,8 +695,9 @@ function renderSelect(){
 function renderBoard(state){
   boardEl.innerHTML = "";
   const last = state.lastMove || {};
-  for(let row=7; row>=0; row--){
-    for(let col=0; col<8; col++){
+
+  for(let row = 7; row >= 0; row--){
+    for(let col = 0; col < 8; col++){
       const sq = document.createElement("div");
       sq.className = "square " + (((row + col) % 2 === 0) ? "white" : "black");
       const squareName = coordsToSquare(col, row);
@@ -522,10 +720,11 @@ function renderBoard(state){
         file.textContent = FILES[col];
         sq.appendChild(file);
       }
+
       if(col === 7){
         const rank = document.createElement("span");
         rank.className = "coord rank";
-        rank.textContent = String(row+1);
+        rank.textContent = String(row + 1);
         sq.appendChild(rank);
       }
 
@@ -539,7 +738,9 @@ let moveIndex = 0;
 let playing = false;
 let timer = null;
 
-function currentGame(){ return games[currentGameIndex]; }
+function currentGame(){
+  return games[currentGameIndex];
+}
 
 function updateView(){
   const game = currentGame();
@@ -547,16 +748,16 @@ function updateView(){
   renderBoard(state);
 
   lessonTitle.textContent = game.title;
-  lessonMeta.textContent = game.meta + " • Résultat : " + game.result;
+  lessonMeta.textContent = game.meta;
   moveCounter.textContent = "Coup " + moveIndex + " / " + game.moves.length;
 
   if(moveIndex === 0){
     statusEl.textContent = "Position initiale.";
-  } else {
+  }else{
     const mv = game.moves[moveIndex - 1];
     const num = Math.ceil(moveIndex / 2);
     const prefix = moveIndex % 2 === 1 ? num + ". " : num + "... ";
-    statusEl.textContent = prefix + mv.san + " — " + mv.note;
+    statusEl.textContent = prefix + mv.san;
   }
 
   playIcon.textContent = playing ? "⏸️" : "▶️";
@@ -573,12 +774,13 @@ function startAuto(){
   if(moveIndex >= currentGame().moves.length) moveIndex = 0;
   playing = true;
   playIcon.textContent = "⏸️";
+
   clearInterval(timer);
   timer = setInterval(() => {
     if(moveIndex < currentGame().moves.length){
       moveIndex++;
       updateView();
-    } else {
+    }else{
       stopAuto();
     }
   }, 1600);
@@ -597,14 +799,34 @@ function loadGame(index){
 }
 
 bindTap(playBtn, togglePlay);
-bindTap(prevBtn, () => { stopAuto(); if(moveIndex > 0) moveIndex--; updateView(); });
-bindTap(nextBtn, () => { stopAuto(); if(moveIndex < currentGame().moves.length) moveIndex++; updateView(); });
-bindTap(startBtn, () => { stopAuto(); moveIndex = 0; updateView(); });
-bindTap(endBtn, () => { stopAuto(); moveIndex = currentGame().moves.length; updateView(); });
-gameSelect.addEventListener("change", e => loadGame(parseInt(e.target.value, 10)));
+bindTap(prevBtn, () => {
+  stopAuto();
+  if(moveIndex > 0) moveIndex--;
+  updateView();
+});
+bindTap(nextBtn, () => {
+  stopAuto();
+  if(moveIndex < currentGame().moves.length) moveIndex++;
+  updateView();
+});
+bindTap(startBtn, () => {
+  stopAuto();
+  moveIndex = 0;
+  updateView();
+});
+bindTap(endBtn, () => {
+  stopAuto();
+  moveIndex = currentGame().moves.length;
+  updateView();
+});
+
+gameSelect.addEventListener("change", e => {
+  loadGame(parseInt(e.target.value, 10));
+});
 
 renderSelect();
 loadGame(0);
 </script>
+
 </body>
 </html>
