@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Maîtres d'Échecs</title>
+<title>CHESSMASTERS</title>
 
 <link rel="apple-touch-icon" href="icon.png" />
 <link rel="icon" href="icon.png" />
 
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Maîtres d'Échecs" />
+<meta name="apple-mobile-web-app-title" content="CHESSMASTERS" />
 <meta name="theme-color" content="#2c2c2c" />
 
 <style>
@@ -21,7 +21,6 @@
   --dark:#769656;
   --text:#ffffff;
   --muted:#d7d7d7;
-  --line:rgba(255,255,255,.12);
 }
 
 *{
@@ -58,19 +57,13 @@ h1{
   max-width:560px;
 }
 
-.top-panel,.lesson-panel,.move-panel,.controls-panel{
+.top-panel,
+.move-panel{
   background:var(--panel);
   border-radius:0;
   padding:14px;
   margin-bottom:12px;
   box-shadow:0 8px 20px rgba(0,0,0,.18);
-}
-
-label{
-  display:block;
-  font-size:14px;
-  font-weight:600;
-  margin-bottom:8px;
 }
 
 select{
@@ -137,7 +130,7 @@ select{
 }
 
 .piece{
-  font-size:clamp(26px,5.6vw,42px);
+  font-size:clamp(30px,4.8vw,38px);
   line-height:1;
   position:relative;
   z-index:2;
@@ -145,13 +138,19 @@ select{
 }
 
 .white-piece{
-  color:#fff;
-  text-shadow:0 0 1px #000, 0 1px 2px rgba(0,0,0,.4);
+  color:#ffffff;
+  text-shadow:
+    0 0 1px #000,
+    0 0 2px #000,
+    0 1px 2px rgba(0,0,0,.55),
+    0 0 6px rgba(255,255,255,.18);
 }
 
 .black-piece{
-  color:#111;
-  text-shadow:0 0 1px #fff, 0 1px 1px rgba(255,255,255,.25);
+  color:#111111;
+  text-shadow:
+    0 0 1px rgba(255,255,255,.45),
+    0 1px 1px rgba(255,255,255,.2);
 }
 
 .from-square{
@@ -168,51 +167,42 @@ select{
   box-shadow:inset 0 0 0 3px rgba(255,99,71,.95);
 }
 
-.lesson-panel{
-  display:none;
-}
-
-#lesson-title{
-  font-size:22px;
-  font-weight:700;
-  text-align:center;
-  margin-bottom:8px;
-}
-
-#lesson-meta,#move-counter,#status{
+#move-counter{
   text-align:center;
   line-height:1.35;
-}
-
-#lesson-meta{
-  font-size:15px;
-  color:var(--muted);
-  min-height:40px;
-}
-
-#move-counter{
   font-size:18px;
   font-weight:700;
   margin-bottom:8px;
 }
 
 #status{
+  text-align:center;
+  line-height:1.35;
   font-size:15px;
   color:var(--muted);
   min-height:42px;
+}
+
+.controls-panel{
+  background:var(--bg);
+  border-radius:0;
+  padding:14px;
+  margin-bottom:12px;
+  box-shadow:0 8px 20px rgba(0,0,0,.18);
 }
 
 .controls{
   display:flex;
   justify-content:center;
   align-items:center;
-  gap:18px;
+  gap:12px;
   flex-wrap:wrap;
+  background:var(--bg);
 }
 
 .control-btn{
-  width:70px;
-  height:70px;
+  width:52px;
+  height:52px;
   border:none;
   border-radius:0;
   background:var(--bg);
@@ -225,10 +215,11 @@ select{
   cursor:pointer;
   touch-action:manipulation;
   box-shadow:none;
+  padding:0;
 }
 
 .control-btn span{
-  font-size:34px;
+  font-size:24px;
   line-height:1;
   display:block;
 }
@@ -237,34 +228,24 @@ select{
   transform:scale(.94);
 }
 
-.control-btn.primary{
-  background:var(--bg);
-}
-
 @media (max-width:420px){
   .control-btn{
-    width:62px;
-    height:62px;
+    width:46px;
+    height:46px;
   }
   .control-btn span{
-    font-size:30px;
+    font-size:22px;
   }
 }
 </style>
 </head>
 <body>
 
-<h1>Maîtres d'Échecs ♟️</h1>
+<h1>CHESSMASTERS</h1>
 
 <div class="app">
   <div class="top-panel">
-    <label for="gameSelect">Choisis une grande partie</label>
     <select id="gameSelect"></select>
-  </div>
-
-  <div class="lesson-panel">
-    <div id="lesson-title">Chargement…</div>
-    <div id="lesson-meta"></div>
   </div>
 
   <div id="board-container">
@@ -279,9 +260,9 @@ select{
   <div class="controls-panel">
     <div class="controls">
       <button class="control-btn" id="startBtn" type="button" aria-label="Revenir au début"><span>⏮️</span></button>
-      <button class="control-btn primary" id="playBtn" type="button" aria-label="Lecture"><span id="playIcon">▶️</span></button>
+      <button class="control-btn" id="playBtn" type="button" aria-label="Lecture"><span id="playIcon">▶️</span></button>
       <button class="control-btn" id="prevBtn" type="button" aria-label="Coup précédent"><span>◀️</span></button>
-      <button class="control-btn" id="nextBtn" type="button" aria-label="Coup suivant"><span>▶︎</span></button>
+      <button class="control-btn" id="nextBtn" type="button" aria-label="Coup suivant"><span>▶️</span></button>
       <button class="control-btn" id="endBtn" type="button" aria-label="Aller à la fin"><span>⏭️</span></button>
     </div>
   </div>
@@ -290,8 +271,6 @@ select{
 <script>
 const boardEl = document.getElementById("board");
 const gameSelect = document.getElementById("gameSelect");
-const lessonTitle = document.getElementById("lesson-title");
-const lessonMeta = document.getElementById("lesson-meta");
 const moveCounter = document.getElementById("move-counter");
 const statusEl = document.getElementById("status");
 
@@ -313,7 +292,6 @@ const games = [
   {
     id:"morphy-opera",
     title:"Morphy – Partie de l’Opéra",
-    meta:"Paris, 1858 • Paul Morphy vs duc de Brunswick & comte Isouard • 1-0",
     moves:[
       {san:"e4", note:"Centre"},
       {san:"e5", note:"Symétrie"},
@@ -353,7 +331,6 @@ const games = [
   {
     id:"anderssen-immortelle",
     title:"Anderssen – Partie Immortelle",
-    meta:"Londres, 1851 • Adolf Anderssen vs Lionel Kieseritzky • 1-0",
     moves:[
       {san:"e4", note:"Ouverture"},
       {san:"e5", note:"Réponse"},
@@ -426,7 +403,10 @@ function coordsToSquare(file, rank){
 }
 
 function squareToCoords(square){
-  return { file: FILES.indexOf(square[0]), rank: parseInt(square[1], 10) - 1 };
+  return {
+    file: FILES.indexOf(square[0]),
+    rank: parseInt(square[1], 10) - 1
+  };
 }
 
 function fenToBoard(fen){
@@ -752,8 +732,6 @@ function updateView(){
   const state = game.states[moveIndex];
   renderBoard(state);
 
-  lessonTitle.textContent = "";
-  lessonMeta.textContent = "";
   moveCounter.textContent = "Coup " + moveIndex + " / " + game.moves.length;
 
   if(moveIndex === 0){
