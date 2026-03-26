@@ -117,52 +117,6 @@
     ]
   },
   {
-    "id": "famous-alekhine-nimzowitsch",
-    "title": "Partie célèbre — Alekhine vs Nimzowitsch",
-    "moves": [
-      {"san":"d4"},{"san":"Nf6"},{"san":"c4"},{"san":"e6"},
-      {"san":"Nc3"},{"san":"Bb4"},{"san":"e3"},{"san":"O-O"},
-      {"san":"Bd3"},{"san":"d5"},{"san":"Nf3"},{"san":"c5"},
-      {"san":"O-O"},{"san":"Nc6"},{"san":"a3"},{"san":"Bxc3"},
-      {"san":"bxc3"},{"san":"dxc4"},{"san":"Bxc4"},{"san":"Qc7"},
-      {"san":"Bd3"},{"san":"e5"},{"san":"Nd2"},{"san":"Re8"}
-    ]
-  },
-  {
-    "id": "famous-spassky-fischer",
-    "title": "Partie célèbre — Fischer vs Spassky",
-    "moves": [
-      {"san":"c4"},{"san":"Nf6"},{"san":"Nc3"},{"san":"e6"},
-      {"san":"Nf3"},{"san":"d5"},{"san":"d4"},{"san":"Be7"},
-      {"san":"Bg5"},{"san":"h6"},{"san":"Bh4"},{"san":"O-O"},
-      {"san":"e3"},{"san":"b6"},{"san":"cxd5"},{"san":"Nxd5"},
-      {"san":"Bxe7"},{"san":"Qxe7"},{"san":"Nxd5"},{"san":"exd5"},
-      {"san":"Rc1"}
-    ]
-  },
-  {
-    "id": "famous-karpov-kasparov",
-    "title": "Partie célèbre — Karpov vs Kasparov",
-    "moves": [
-      {"san":"d4"},{"san":"Nf6"},{"san":"c4"},{"san":"e6"},
-      {"san":"Nc3"},{"san":"Bb4"},{"san":"e3"},{"san":"O-O"},
-      {"san":"Bd3"},{"san":"d5"},{"san":"Nf3"},{"san":"c5"},
-      {"san":"O-O"},{"san":"Nc6"},{"san":"a3"},{"san":"Bxc3"},
-      {"san":"bxc3"},{"san":"dxc4"},{"san":"Bxc4"}
-    ]
-  },
-  {
-    "id": "famous-anand-aronian",
-    "title": "Partie célèbre — Anand vs Aronian",
-    "moves": [
-      {"san":"d4"},{"san":"Nf6"},{"san":"c4"},{"san":"e6"},
-      {"san":"Nf3"},{"san":"d5"},{"san":"Nc3"},{"san":"Be7"},
-      {"san":"Bg5"},{"san":"h6"},{"san":"Bh4"},{"san":"O-O"},
-      {"san":"e3"},{"san":"b6"},{"san":"cxd5"},{"san":"Nxd5"},
-      {"san":"Bxe7"},{"san":"Qxe7"}
-    ]
-  },
-  {
     "id": "trap-scholars",
     "title": "Piège — Mat du berger",
     "moves": [
