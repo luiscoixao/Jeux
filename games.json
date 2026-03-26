@@ -52,7 +52,24 @@
       {"san":"Bxe7#"}
     ]
   },
-
+  {
+    "id": "famous-fischer-byrne",
+    "title": "Partie célèbre — Fischer (Partie du siècle)",
+    "moves": [
+      {"san":"Nf3"},{"san":"Nf6"},{"san":"c4"},{"san":"g6"},
+      {"san":"Nc3"},{"san":"Bg7"},{"san":"d4"},{"san":"O-O"},
+      {"san":"Bf4"},{"san":"d5"},{"san":"Qb3"},{"san":"dxc4"},
+      {"san":"Qxc4"},{"san":"c6"},{"san":"e4"},{"san":"Nbd7"},
+      {"san":"Rd1"},{"san":"Nb6"},{"san":"Qc5"},{"san":"Bg4"},
+      {"san":"Bg5"},{"san":"Na4"},{"san":"Qa3"},{"san":"Nxc3"},
+      {"san":"bxc3"},{"san":"Nxe4"},{"san":"Bxe7"},{"san":"Qb6"},
+      {"san":"Bc4"},{"san":"Nxc3"},{"san":"Bc5"},{"san":"Rfe8+"},
+      {"san":"Kf1"},{"san":"Be6"},{"san":"Bxb6"},{"san":"Bxc4+"},
+      {"san":"Kg1"},{"san":"Ne2+"},{"san":"Kf1"},{"san":"Nxd4+"},
+      {"san":"Kg1"},{"san":"Ne2+"},{"san":"Kf1"},{"san":"Nc3+"},
+      {"san":"Kg1"},{"san":"axb6"}
+    ]
+  },
   {
     "id": "trap-scholars",
     "title": "Piège — Mat du berger",
