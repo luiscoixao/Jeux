@@ -71,25 +71,6 @@
     ]
   },
   {
-    "id": "famous-kasparov-topalov",
-    "title": "Partie célèbre — Kasparov vs Topalov",
-    "moves": [
-      {"san":"e4"},{"san":"d6"},{"san":"d4"},{"san":"Nf6"},
-      {"san":"Nc3"},{"san":"g6"},{"san":"Be3"},{"san":"Bg7"},
-      {"san":"Qd2"},{"san":"c6"},{"san":"f3"},{"san":"b5"},
-      {"san":"Nge2"},{"san":"Nbd7"},{"san":"Bh6"},{"san":"Bxh6"},
-      {"san":"Qxh6"},{"san":"Bb7"},{"san":"a3"},{"san":"e5"},
-      {"san":"O-O-O"},{"san":"Qe7"},{"san":"Kb1"},{"san":"a6"},
-      {"san":"Nc1"},{"san":"O-O"},{"san":"Nb3"},{"san":"exd4"},
-      {"san":"Rxd4"},{"san":"c5"},{"san":"Rd1"},{"san":"Nb6"},
-      {"san":"g4"},{"san":"Be6"},{"san":"g5"},{"san":"Nh5"},
-      {"san":"Qh4"},{"san":"f6"},{"san":"Bh3"},{"san":"Bxh3"},
-      {"san":"Qxh3"},{"san":"fxg5"},{"san":"Qe6+"},{"san":"Qf7"},
-      {"san":"Nd5"},{"san":"Nxd5"},{"san":"exd5"},{"san":"Qxf3"},
-      {"san":"Qd7"}
-    ]
-  },
-  {
     "id": "trap-scholars",
     "title": "Piège — Mat du berger",
     "moves": [
