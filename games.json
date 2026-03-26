@@ -201,13 +201,6 @@
     ]
   },
   {
-    "id": "opening-london",
-    "title": "Ouverture — Londres",
-    "moves": [
-      {"san":"d4"},{"san":"Nf6"},{"san":"Bf4"}
-    ]
-  },
-  {
     "id": "opening-english",
     "title": "Ouverture — Anglaise",
     "moves": [
