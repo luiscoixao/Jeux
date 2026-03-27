@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>CHESSTACTICS</title>
+
+<link rel="apple-touch-icon" href="iconchessmemory.png" />
+<link rel="icon" href="iconchessmemory.png" />
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="CHESSMEMORY" />
+<meta name="theme-color" content="#2c2c2c" />
+
+<style>
+:root{
+  --bg:#2c2c2c;
+  --panel:#3a3a3a;
+  --light:#eeeed2;
+  --dark:#769656;
+  --text:#ffffff;
+  --gold:#d4af37;
+}
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
+}
+
+body{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:0 12px calc(18px + env(safe-area-inset-bottom));
+}
+
+h1{
+  margin:calc(env(safe-area-inset-top) + 18px) 0 12px;
+  font-size:28px;
+  line-height:1.08;
+  font-weight:700;
+  text-align:center;
+}
+
+.app{
+  width:100%;
+  max-width:560px;
+}
+
+.controls-panel{
+  background:var(--panel);
+  padding:14px;
+  margin-bottom:12px;
+  box-shadow:0 8px 20px rgba(0,0,0,.18);
+}
+
+#board-container{
+  width:95vw;
+  max-width:500px;
+  aspect-ratio:1 / 1;
+  overflow:hidden;
+  margin-bottom:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.35);
+}
+
+#board{
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  grid-template-rows:repeat(8,1fr);
+  width:100%;
+  height:100%;
+}
+
+.square{
+  position:relative;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+
+.white{ background:var(--light); }
+.black{ background:var(--dark); }
+
+.coord{
+  position:absolute;
+  font-size:10px;
+  opacity:.65;
+  font-weight:700;
+  pointer-events:none;
+  z-index:5;
+}
+
+.coord.file{
+  left:5px;
+  bottom:3px;
+}
+
+.coord.rank{
+  right:4px;
+  top:2px;
+}
+
+.card{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  border:none;
+  background:none;
+  padding:0;
+  margin:0;
+  cursor:pointer;
+  touch-action:manipulation;
+  perspective:900px;
+}
+
+.card-inner{
+  position:relative;
+  width:100%;
+  height:100%;
+  transition:transform .42s ease;
+  transform-style:preserve-3d;
+}
+
+.square.flipped .card-inner{
+  transform:rotateY(180deg);
+}
+
+.face{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+
+.back{
+  background:transparent;
+}
+
+.back::before{
+  content:"";
+  width:44%;
+  height:44%;
+  border-radius:50%;
+  background:rgba(0,0,0,.10);
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,.08),
+    0 1px 3px rgba(0,0,0,.12);
+}
+
+.front{
+  transform:rotateY(180deg);
+  padding:3px;
+}
+
+.mini{
+  width:100%;
+  height:100%;
+  border-radius:3px;
+  box-shadow:inset 0 0 0 1.5px rgba(0,0,0,.18);
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+}
+
+.square.matched{
+  box-shadow:inset 0 0 0 3px rgba(212,175,55,.95);
+}
+
+.controls{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:28px;
+  background:var(--panel);
+}
+
+.control-btn{
+  width:52px;
+  height:52px;
+  border:none;
+  background:var(--bg);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  appearance:none;
+  -webkit-appearance:none;
+  cursor:pointer;
+  touch-action:manipulation;
+  box-shadow:none;
+  padding:0;
+}
+
+.control-btn span{
+  font-size:24px;
+  line-height:1;
+  display:block;
+}
+
+.control-btn:active{
+  transform:scale(.94);
+}
+
+.footer-note{
+  text-align:center;
+  color:#cfcfcf;
+  font-size:12px;
+  line-height:1.35;
+  margin-top:4px;
+  opacity:.82;
+}
+
+@media (max-width:420px){
+  .control-btn{
+    width:46px;
+    height:46px;
+  }
+
+  .control-btn span{
+    font-size:22px;
+  }
+}
+</style>
+</head>
+<body>
+
+<h1>CHESSMEMORY</h1>
+
+<div class="app">
+  <div id="board-container">
+    <div id="board"></div>
+  </div>
+
+  <div class="controls-panel">
+    <div class="controls">
+      <button class="control-btn" id="restartBtn" type="button" aria-label="Rejouer"><span>🔄</span></button>
+    </div>
+  </div>
+
+  <div class="footer-note">Jeu imaginé par Luis et créé par ChatGPT</div>
+</div>
+
+<script>
+const boardEl=document.getElementById("board");
+const restartBtn=document.getElementById("restartBtn");
+
+const FILES=["a","b","c","d","e","f","g","h"];
+const PIECES={
+  "P":"♙","N":"♘","B":"♗","R":"♖","Q":"♕","K":"♔",
+  "p":"♟","n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
+};
+
+const TACTIC_CARDS = [
+  {
+    pairId:"fork",
+    pieces:[["e5","N"],["d7","q"],["f7","r"],["g1","K"],["g8","k"]],
+  },
+  {
+    pairId:"fork",
+    pieces:[["d6","n"],["c4","Q"],["e4","R"],["b1","K"],["g8","k"]],
+  },
+
+  {
+    pairId:"pin",
+    pieces:[["b5","B"],["c6","n"],["e8","k"],["g1","K"]],
+  },
+  {
+    pairId:"pin",
+    pieces:[["g5","b"],["f4","N"],["e3","K"],["c1","k"]],
+  },
+
+  {
+    pairId:"skewer",
+    pieces:[["c4","B"],["d5","q"],["e6","k"],["g1","K"]],
+  },
+  {
+    pairId:"skewer",
+    pieces:[["h5","b"],["g4","Q"],["f3","K"],["a8","k"]],
+  },
+
+  {
+    pairId:"discovered",
+    pieces:[["a1","R"],["d1","B"],["g1","K"],["d8","q"],["g8","k"]],
+  },
+  {
+    pairId:"discovered",
+    pieces:[["h1","r"],["e1","b"],["b1","k"],["e8","Q"],["b8","K"]],
+  },
+
+  {
+    pairId:"mate1",
+    pieces:[["g7","Q"],["h6","K"],["g8","k"]],
+  },
+  {
+    pairId:"mate1",
+    pieces:[["b7","q"],["a6","k"],["b1","K"]],
+  },
+
+  {
+    pairId:"loose",
+    pieces:[["d4","N"],["e6","q"],["g1","K"],["g8","k"]],
+  },
+  {
+    pairId:"loose",
+    pieces:[["f5","n"],["e3","R"],["b1","K"],["b8","k"]],
+  },
+
+  {
+    pairId:"deflection",
+    pieces:[["d1","R"],["d7","r"],["d8","k"],["g1","K"],["h7","q"]],
+  },
+  {
+    pairId:"deflection",
+    pieces:[["e8","r"],["e2","R"],["e1","K"],["b8","k"],["a2","Q"]],
+  },
+
+  {
+    pairId:"attraction",
+    pieces:[["h5","Q"],["g6","k"],["g1","K"],["f7","r"]],
+  },
+  {
+    pairId:"attraction",
+    pieces:[["a4","q"],["b3","K"],["h8","k"],["c2","R"]],
+  }
+];
+
+let squares=[];
+let picks=[];
+let lockBoard=false;
+let matchedPairs=0;
+const totalPairs=8;
+
+function shuffle(array){
+  const arr=[...array];
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function coordsToSquare(file,rank){
+  return FILES[file]+String(rank+1);
+}
+
+function squareToCoords(square){
+  return {
+    file:FILES.indexOf(square[0]),
+    rank:parseInt(square[1],10)-1
+  };
+}
+
+function miniBoardSVG(card){
+  const size=160;
+  const cell=size/8;
+  let svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
+  svg+=`<rect width="${size}" height="${size}" fill="#111"/>`;
+
+  for(let r=7;r>=0;r--){
+    for(let c=0;c<8;c++){
+      const x=c*cell;
+      const y=(7-r)*cell;
+      const fill=((r+c)%2===0) ? "#eeeed2" : "#769656";
+      svg+=`<rect x="${x}" y="${y}" width="${cell}" height="${cell}" fill="${fill}"/>`;
+    }
+  }
+
+  for(const [sq,piece] of card.pieces){
+    const {file,rank}=squareToCoords(sq);
+    const x=file*cell + cell/2;
+    const y=(7-rank)*cell + cell/2 + 6;
+    const isWhite=piece===piece.toUpperCase();
+    const fill=isWhite ? "#ffffff" : "#141414";
+    const stroke=isWhite ? "#000000" : "#ffffff22";
+    const symbol=PIECES[piece];
+    svg+=`<text x="${x}" y="${y}" text-anchor="middle" font-size="${cell*0.9}" font-family="Arial, Helvetica, sans-serif" fill="${fill}" stroke="${stroke}" stroke-width="${isWhite?1.2:0.4}">${symbol}</text>`;
+  }
+
+  svg+=`</svg>`;
+  return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`;
+}
+
+function createDeck(){
+  return shuffle(
+    TACTIC_CARDS.map((card,index)=>({
+      pairId:card.pairId,
+      pieces:card.pieces,
+      image:miniBoardSVG(card),
+      uid:"u"+index+"-"+Math.random().toString(36).slice(2,8),
+      state:"hidden"
+    }))
+  );
+}
+
+function occupiedIndices(){
+  const idx=[];
+  for(let r=0;r<8;r++){
+    for(let c=0;c<8;c++){
+      if((r+c)%2===1) idx.push(r*8+c);
+    }
+  }
+  return idx;
+}
+
+function createBoard(){
+  const deck=createDeck();
+  const filled=occupiedIndices();
+
+  squares=Array.from({length:64},()=>({empty:true}));
+  picks=[];
+  lockBoard=false;
+  matchedPairs=0;
+
+  filled.forEach((cellIndex,i)=>{
+    squares[cellIndex]=deck[i];
+  });
+
+  renderBoard();
+}
+
+function renderBoard(){
+  boardEl.innerHTML="";
+
+  for(let row=7;row>=0;row--){
+    for(let col=0;col<8;col++){
+      const idx=row*8+col;
+      const data=squares[idx];
+
+      const sq=document.createElement("div");
+      sq.className="square "+(((row+col)%2===0)?"white":"black");
+
+      if(!data.empty && (data.state==="revealed" || data.state==="matched")) sq.classList.add("flipped");
+      if(!data.empty && data.state==="matched") sq.classList.add("matched");
+
+      if(!data.empty){
+        const button=document.createElement("button");
+        button.className="card";
+        button.type="button";
+        button.setAttribute("aria-label", coordsToSquare(col,row));
+
+        const inner=document.createElement("div");
+        inner.className="card-inner";
+
+        const back=document.createElement("div");
+        back.className="face back";
+
+        const front=document.createElement("div");
+        front.className="face front";
+
+        const mini=document.createElement("div");
+        mini.className="mini";
+        mini.style.backgroundImage=data.image;
+
+        front.appendChild(mini);
+        inner.appendChild(back);
+        inner.appendChild(front);
+        button.appendChild(inner);
+        button.onclick=()=>handleSquare(idx);
+        sq.appendChild(button);
+      }
+
+      if(row===0){
+        const file=document.createElement("span");
+        file.className="coord file";
+        file.textContent=FILES[col];
+        sq.appendChild(file);
+      }
+
+      if(col===7){
+        const rank=document.createElement("span");
+        rank.className="coord rank";
+        rank.textContent=String(row+1);
+        sq.appendChild(rank);
+      }
+
+      boardEl.appendChild(sq);
+    }
+  }
+}
+
+function isPair(a,b){
+  return a.pairId===b.pairId && a.uid!==b.uid;
+}
+
+function handleSquare(index){
+  if(lockBoard) return;
+
+  const card=squares[index];
+  if(card.empty || card.state!=="hidden") return;
+
+  card.state="revealed";
+  picks.push(index);
+  renderBoard();
+
+  if(picks.length<2) return;
+
+  lockBoard=true;
+
+  const [i1,i2]=picks;
+  const a=squares[i1];
+  const b=squares[i2];
+
+  if(isPair(a,b)){
+    a.state="matched";
+    b.state="matched";
+    matchedPairs++;
+    picks=[];
+    lockBoard=false;
+    renderBoard();
+
+    if(matchedPairs===totalPairs){
+      setTimeout(()=>alert("✓"),160);
+    }
+    return;
+  }
+
+  setTimeout(()=>{
+    a.state="hidden";
+    b.state="hidden";
+    picks=[];
+    lockBoard=false;
+    renderBoard();
+  },900);
+}
+
+restartBtn.addEventListener("click",createBoard);
+
+createBoard();
+</script>
+
+</body>
+</html>
