@@ -185,12 +185,14 @@
     .board-wrap{
       padding:10px;
       flex:1;
+      overflow-x:auto; /* ✅ */
     }
 
     .board{
       width:100%;
       display:grid;
       gap:var(--gap);
+      justify-content:start; /* ✅ */
     }
 
     .card{
@@ -391,217 +393,10 @@
   <script>
     const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
     const board = document.getElementById("board");
-    const restartBtn = document.getElementById("restartBtn");
-    const playAgainBtn = document.getElementById("playAgainBtn");
-    const sizeSelect = document.getElementById("sizeSelect");
-    const overlay = document.getElementById("overlay");
-    const resultText = document.getElementById("resultText");
-    const bestText = document.getElementById("bestText");
-    const movesStat = document.getElementById("movesStat");
-    const timeStat = document.getElementById("timeStat");
-
-    let grid = {rows:4, cols:4};
-    let cards = [];
-    let firstCard = null;
-    let secondCard = null;
-    let lockBoard = false;
-    let moves = 0;
-    let matches = 0;
-    let timer = null;
-    let seconds = 0;
-    let started = false;
-
-    function parseSize(value){
-      const [rows, cols] = value.split("x").map(Number);
-      return { rows, cols };
-    }
-
-    function formatTime(totalSeconds){
-      const min = String(Math.floor(totalSeconds / 60)).padStart(2,"0");
-      const sec = String(totalSeconds % 60).padStart(2,"0");
-      return `${min}:${sec}`;
-    }
-
-    function shuffle(array){
-      for(let i = array.length - 1; i > 0; i--){
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
-
-    function scoreKey(){
-      return `memory-alpha-best-${grid.rows}x${grid.cols}`;
-    }
-
-    function loadBestScore(){
-      try{
-        return JSON.parse(localStorage.getItem(scoreKey()) || "null");
-      }catch{
-        return null;
-      }
-    }
-
-    function saveBestScore(){
-      const current = { moves, seconds };
-      const best = loadBestScore();
-      const isBetter = !best || current.moves < best.moves || (current.moves === best.moves && current.seconds < best.seconds);
-      if(isBetter){
-        localStorage.setItem(scoreKey(), JSON.stringify(current));
-        return current;
-      }
-      return best;
-    }
-
-    function updateStats(){
-      movesStat.textContent = `${moves} coup${moves > 1 ? "s" : ""}`;
-      timeStat.textContent = formatTime(seconds);
-    }
-
-    function stopTimer(){
-      if(timer){
-        clearInterval(timer);
-        timer = null;
-      }
-    }
-
-    function startTimer(){
-      if(started) return;
-      started = true;
-      timer = setInterval(() => {
-        seconds += 1;
-        updateStats();
-      }, 1000);
-    }
-
-    function buildDeck(pairCount){
-      const letters = shuffle([...ALPHABET]).slice(0, pairCount);
-      return shuffle([...letters, ...letters]).map((letter, index) => ({
-        id:`${letter}-${index}-${Math.random().toString(36).slice(2,7)}`,
-        letter
-      }));
-    }
 
     function setGridCSS(){
-      board.style.gridTemplateColumns = `repeat(${grid.cols}, 1fr)`;
+      board.style.gridTemplateColumns = `repeat(${grid.cols}, minmax(0, 1fr))`;
     }
-
-    function createCardElement(cardData){
-      const button = document.createElement("button");
-      button.className = "card";
-      button.type = "button";
-      button.dataset.id = cardData.id;
-      button.dataset.letter = cardData.letter;
-      button.setAttribute("aria-label", "Carte cachée");
-
-      const inner = document.createElement("div");
-      inner.className = "card-inner";
-
-      const front = document.createElement("div");
-      front.className = "face front";
-
-      const back = document.createElement("div");
-      back.className = "face back";
-      back.innerHTML = `<span class="letter">${cardData.letter}</span>`;
-
-      inner.appendChild(front);
-      inner.appendChild(back);
-      button.appendChild(inner);
-      button.addEventListener("click", handleCardClick);
-      return button;
-    }
-
-    function renderBoard(){
-      board.innerHTML = "";
-      setGridCSS();
-      cards.forEach(card => board.appendChild(createCardElement(card)));
-    }
-
-    function resetState(){
-      firstCard = null;
-      secondCard = null;
-      lockBoard = false;
-      moves = 0;
-      matches = 0;
-      seconds = 0;
-      started = false;
-      stopTimer();
-      updateStats();
-    }
-
-    function beginGame(){
-      grid = parseSize(sizeSelect.value);
-      const totalCards = grid.rows * grid.cols;
-      const pairCount = totalCards / 2;
-      cards = buildDeck(pairCount);
-      resetState();
-      renderBoard();
-      overlay.style.display = "none";
-    }
-
-    function handleCardClick(e){
-      const cardEl = e.currentTarget;
-      if(lockBoard || cardEl === firstCard || cardEl.classList.contains("matched")) return;
-
-      startTimer();
-      cardEl.classList.add("flipped");
-      cardEl.setAttribute("aria-label", `Lettre ${cardEl.dataset.letter}`);
-
-      if(!firstCard){
-        firstCard = cardEl;
-        return;
-      }
-
-      secondCard = cardEl;
-      moves += 1;
-      updateStats();
-      checkMatch();
-    }
-
-    function checkMatch(){
-      const isMatch = firstCard.dataset.letter === secondCard.dataset.letter;
-
-      if(isMatch){
-        firstCard.classList.add("matched");
-        secondCard.classList.add("matched");
-        matches += 1;
-        resetTurn();
-
-        if(matches === cards.length / 2){
-          finishGame();
-        }
-      }else{
-        lockBoard = true;
-        setTimeout(() => {
-          firstCard.classList.remove("flipped");
-          secondCard.classList.remove("flipped");
-          firstCard.setAttribute("aria-label", "Carte cachée");
-          secondCard.setAttribute("aria-label", "Carte cachée");
-          resetTurn();
-        }, 700);
-      }
-    }
-
-    function resetTurn(){
-      firstCard = null;
-      secondCard = null;
-      lockBoard = false;
-    }
-
-    function finishGame(){
-      stopTimer();
-      const best = saveBestScore();
-      resultText.textContent = `Tu as terminé la grille ${grid.rows} × ${grid.cols} en ${moves} coups, en ${formatTime(seconds)}.`;
-      bestText.textContent = best ? `Meilleur score : ${best.moves} coups — ${formatTime(best.seconds)}` : "";
-      overlay.style.display = "flex";
-    }
-
-    restartBtn.addEventListener("click", beginGame);
-    playAgainBtn.addEventListener("click", beginGame);
-    sizeSelect.addEventListener("change", beginGame);
-
-    updateStats();
-    beginGame();
   </script>
 </body>
 </html>
