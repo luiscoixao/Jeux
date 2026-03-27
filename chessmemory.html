@@ -243,55 +243,18 @@ select{
   display:flex;
   align-items:center;
   justify-content:center;
-  appearance:none;
-  -webkit-appearance:none;
-  cursor:pointer;
-  touch-action:manipulation;
-  box-shadow:none;
-  padding:0;
 }
 
 .control-btn span{
   font-size:24px;
-  line-height:1;
-  display:block;
-}
-
-.control-btn:active{
-  transform:scale(.94);
 }
 
 .footer-note{
   text-align:center;
   color:#cfcfcf;
   font-size:12px;
-  line-height:1.35;
   margin-top:4px;
   opacity:.82;
-}
-
-@media (max-width:420px){
-  .control-btn{
-    width:46px;
-    height:46px;
-  }
-
-  .control-btn span{
-    font-size:22px;
-  }
-
-  .piece.N,.piece.B,.piece.R,.piece.Q,.piece.K,
-  .piece.n,.piece.b,.piece.r,.piece.q,.piece.k{
-    font-size:clamp(26px, 6vw, 40px);
-  }
-
-  .piece.P{
-    font-size:clamp(22px, 4.8vw, 34px);
-  }
-
-  .piece.p{
-    font-size:clamp(20px, 4.1vw, 30px);
-  }
 }
 </style>
 </head>
@@ -313,7 +276,7 @@ select{
 
   <div class="controls-panel">
     <div class="controls">
-      <button class="control-btn" id="restartBtn" type="button" aria-label="Rejouer"><span>🔄</span></button>
+      <button class="control-btn" id="restartBtn"><span>🔄</span></button>
     </div>
   </div>
 
@@ -348,60 +311,24 @@ let lockBoard=false;
 let matchedPairs=0;
 let totalPairs=0;
 
-function bindTap(el,handler){
-  let used=false;
-  el.addEventListener("pointerup",e=>{
-    e.preventDefault();
-    used=true;
-    handler(e);
-    setTimeout(()=>{used=false},60);
-  });
-  el.addEventListener("click",e=>{
-    if(used) return;
-    e.preventDefault();
-    handler(e);
-  });
-}
-
-function shuffle(array){
-  const arr=[...array];
-  for(let i=arr.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [arr[i],arr[j]]=[arr[j],arr[i]];
-  }
-  return arr;
-}
-
-function coordsToSquare(file,rank){
-  return FILES[file]+String(rank+1);
+function shuffle(a){
+  return a.sort(()=>Math.random()-0.5);
 }
 
 function buildDeck(mode){
-  const pairSource = mode==="64"
-    ? [...PAIRS_BASE, ...PAIRS_BASE]
-    : [...PAIRS_BASE];
+  const pairSource = mode==="64" ? [...PAIRS_BASE, ...PAIRS_BASE] : [...PAIRS_BASE];
 
   const cards=[];
-
   pairSource.forEach((pair,idx)=>{
-    cards.push({
-      piece:pair[0],
-      pairId:"pair-"+idx,
-      uid:"a-"+idx+"-"+Math.random().toString(36).slice(2,7)
-    });
-    cards.push({
-      piece:pair[1],
-      pairId:"pair-"+idx,
-      uid:"b-"+idx+"-"+Math.random().toString(36).slice(2,7)
-    });
+    cards.push({piece:pair[0],pairId:"pair-"+idx,uid:"a-"+idx+Math.random()});
+    cards.push({piece:pair[1],pairId:"pair-"+idx,uid:"b-"+idx+Math.random()});
   });
 
   return shuffle(cards);
 }
 
 function createBoard(){
-  const mode=modeSelect.value;
-  const deck=buildDeck(mode);
+  const deck=buildDeck(modeSelect.value);
 
   squares=[];
   firstPick=null;
@@ -410,37 +337,16 @@ function createBoard(){
   matchedPairs=0;
   totalPairs=deck.length/2;
 
-  const needed = mode==="64" ? 64 : 32;
-  const empties = 64-needed;
+  const needed = modeSelect.value==="64" ? 64 : 32;
+  const cells=shuffle([...Array(64).keys()]);
+  const filled=new Set(cells.slice(0,needed));
 
-  const allCells=[];
-  for(let i=0;i<64;i++) allCells.push(i);
-
-  const shuffledCells=shuffle(allCells);
-  const filledSet=new Set(shuffledCells.slice(0,needed));
-
-  let deckIndex=0;
-
+  let d=0;
   for(let i=0;i<64;i++){
-    if(filledSet.has(i)){
-      const card=deck[deckIndex++];
-      squares.push({
-        piece:card.piece,
-        pairId:card.pairId,
-        uid:card.uid,
-        flipped:false,
-        matched:false,
-        empty:false
-      });
+    if(filled.has(i)){
+      squares.push({...deck[d++],flipped:false,matched:false,empty:false});
     }else{
-      squares.push({
-        piece:"",
-        pairId:null,
-        uid:null,
-        flipped:false,
-        matched:false,
-        empty:true
-      });
+      squares.push({empty:true});
     }
   }
 
@@ -450,23 +356,19 @@ function createBoard(){
 function renderBoard(){
   boardEl.innerHTML="";
 
-  for(let row=7;row>=0;row--){
-    for(let col=0;col<8;col++){
-      const idx=row*8+col;
-      const data=squares[idx];
-      const sq=document.createElement("div");
-      sq.className="square "+(((row+col)%2===0)?"white":"black");
+  for(let r=7;r>=0;r--){
+    for(let c=0;c<8;c++){
+      const i=r*8+c;
+      const data=squares[i];
 
+      const sq=document.createElement("div");
+      sq.className="square "+(((r+c)%2===0)?"white":"black");
       if(data.flipped) sq.classList.add("flipped");
       if(data.matched) sq.classList.add("matched");
 
-      const squareName=coordsToSquare(col,row);
-
       if(!data.empty){
-        const button=document.createElement("button");
-        button.className="card";
-        button.type="button";
-        button.setAttribute("aria-label", squareName);
+        const btn=document.createElement("button");
+        btn.className="card";
 
         const inner=document.createElement("div");
         inner.className="card-inner";
@@ -477,31 +379,17 @@ function renderBoard(){
         const front=document.createElement("div");
         front.className="face front";
 
-        const piece=document.createElement("span");
-        piece.className="piece "+(data.piece===data.piece.toUpperCase()?"white-piece ":"black-piece ")+data.piece;
-        piece.textContent=PIECES[data.piece];
+        const p=document.createElement("span");
+        p.className="piece "+(data.piece===data.piece.toUpperCase()?"white-piece ":"black-piece ")+data.piece;
+        p.textContent=PIECES[data.piece];
 
-        front.appendChild(piece);
+        front.appendChild(p);
         inner.appendChild(back);
         inner.appendChild(front);
-        button.appendChild(inner);
+        btn.appendChild(inner);
 
-        bindTap(button,()=>handleSquare(idx));
-        sq.appendChild(button);
-      }
-
-      if(row===0){
-        const file=document.createElement("span");
-        file.className="coord file";
-        file.textContent=FILES[col];
-        sq.appendChild(file);
-      }
-
-      if(col===7){
-        const rank=document.createElement("span");
-        rank.className="coord rank";
-        rank.textContent=String(row+1);
-        sq.appendChild(rank);
+        btn.onclick=()=>handleSquare(i);
+        sq.appendChild(btn);
       }
 
       boardEl.appendChild(sq);
@@ -510,60 +398,61 @@ function renderBoard(){
 }
 
 function isPair(a,b){
-  if(!a || !b) return false;
-  if(a.empty || b.empty) return false;
-  return a.pairId===b.pairId && a.uid!==b.uid;
+  return a && b && !a.empty && !b.empty && a.pairId===b.pairId && a.uid!==b.uid;
 }
 
-function handleSquare(index){
+function handleSquare(i){
   if(lockBoard) return;
 
-  const card=squares[index];
+  const card=squares[i];
   if(card.empty || card.flipped || card.matched) return;
 
   card.flipped=true;
   renderBoard();
 
   if(firstPick===null){
-    firstPick=index;
+    firstPick=i;
     return;
   }
 
-  secondPick=index;
+  secondPick=i;
   lockBoard=true;
 
   const a=squares[firstPick];
   const b=squares[secondPick];
 
   if(isPair(a,b)){
+    a.flipped=true;
+    b.flipped=true;
     a.matched=true;
     b.matched=true;
-    matchedPairs++;
 
+    matchedPairs++;
+    firstPick=null;
+    secondPick=null;
+    lockBoard=false;
+
+    renderBoard();
+
+    if(matchedPairs===totalPairs){
+      setTimeout(()=>alert("✓"),150);
+    }
+
+    return;
+  }
+
+  setTimeout(()=>{
+    a.flipped=false;
+    b.flipped=false;
     firstPick=null;
     secondPick=null;
     lockBoard=false;
     renderBoard();
-
-    if(matchedPairs===totalPairs){
-      setTimeout(()=>{
-        alert("✓");
-      },160);
-    }
-  }else{
-    setTimeout(()=>{
-      a.flipped=false;
-      b.flipped=false;
-      firstPick=null;
-      secondPick=null;
-      lockBoard=false;
-      renderBoard();
-    },700);
-  }
+  },700);
 }
 
-modeSelect.addEventListener("change",createBoard);
-bindTap(restartBtn,createBoard);
+modeSelect.onchange=createBoard;
+restartBtn.onclick=createBoard;
 
 createBoard();
 </script>
