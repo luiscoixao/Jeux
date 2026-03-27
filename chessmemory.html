@@ -57,24 +57,11 @@ h1{
   max-width:560px;
 }
 
-.top-panel,
 .controls-panel{
   background:var(--panel);
   padding:14px;
   margin-bottom:12px;
   box-shadow:0 8px 20px rgba(0,0,0,.18);
-}
-
-select{
-  width:100%;
-  height:48px;
-  border:none;
-  background:#4a4a4a;
-  color:#fff;
-  font-size:16px;
-  padding:0 14px;
-  appearance:none;
-  -webkit-appearance:none;
 }
 
 #board-container{
@@ -196,15 +183,6 @@ select{
   font-size:clamp(30px, 6.2vw, 46px);
 }
 
-.piece.P{
-  font-size:clamp(25px, 5.1vw, 38px);
-}
-
-.piece.p{
-  font-size:clamp(22px, 4.6vw, 33px);
-  transform:scale(.78);
-}
-
 .white-piece{
   color:#ffffff;
   text-shadow:
@@ -283,14 +261,6 @@ select{
   .piece.n,.piece.b,.piece.r,.piece.q,.piece.k{
     font-size:clamp(26px, 6vw, 40px);
   }
-
-  .piece.P{
-    font-size:clamp(22px, 4.8vw, 34px);
-  }
-
-  .piece.p{
-    font-size:clamp(20px, 4.1vw, 30px);
-  }
 }
 </style>
 </head>
@@ -299,13 +269,6 @@ select{
 <h1>CHESSMEMORY</h1>
 
 <div class="app">
-  <div class="top-panel">
-    <select id="modeSelect">
-      <option value="same">Mêmes pièces</option>
-      <option value="opposite">Blanc / noir</option>
-    </select>
-  </div>
-
   <div id="board-container">
     <div id="board"></div>
   </div>
@@ -321,18 +284,18 @@ select{
 
 <script>
 const boardEl=document.getElementById("board");
-const modeSelect=document.getElementById("modeSelect");
 const restartBtn=document.getElementById("restartBtn");
 
 const FILES=["a","b","c","d","e","f","g","h"];
 const PIECES={
-  "P":"♙","N":"♘","B":"♗","R":"♖","Q":"♕","K":"♔",
-  "p":"♟","n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
+  "N":"♘","B":"♗","R":"♖","Q":"♕","K":"♔",
+  "n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
 };
 
-const SAME_MODE_DECK = [
+const BASE_DECK = [
   {piece:"K", pairId:"K1"}, {piece:"K", pairId:"K1"},
   {piece:"k", pairId:"k1"}, {piece:"k", pairId:"k1"},
+
   {piece:"Q", pairId:"Q1"}, {piece:"Q", pairId:"Q1"},
   {piece:"q", pairId:"q1"}, {piece:"q", pairId:"q1"},
 
@@ -349,81 +312,7 @@ const SAME_MODE_DECK = [
   {piece:"N", pairId:"N1"}, {piece:"N", pairId:"N1"},
   {piece:"N", pairId:"N2"}, {piece:"N", pairId:"N2"},
   {piece:"n", pairId:"n1"}, {piece:"n", pairId:"n1"},
-  {piece:"n", pairId:"n2"}, {piece:"n", pairId:"n2"},
-
-  {piece:"P", pairId:"Pw1"}, {piece:"P", pairId:"Pw1"},
-  {piece:"P", pairId:"Pw2"}, {piece:"P", pairId:"Pw2"},
-  {piece:"P", pairId:"Pw3"}, {piece:"P", pairId:"Pw3"},
-  {piece:"P", pairId:"Pw4"}, {piece:"P", pairId:"Pw4"},
-  {piece:"P", pairId:"Pw5"}, {piece:"P", pairId:"Pw5"},
-  {piece:"P", pairId:"Pw6"}, {piece:"P", pairId:"Pw6"},
-  {piece:"P", pairId:"Pw7"}, {piece:"P", pairId:"Pw7"},
-  {piece:"P", pairId:"Pw8"}, {piece:"P", pairId:"Pw8"},
-
-  {piece:"p", pairId:"Pb1"}, {piece:"p", pairId:"Pb1"},
-  {piece:"p", pairId:"Pb2"}, {piece:"p", pairId:"Pb2"},
-  {piece:"p", pairId:"Pb3"}, {piece:"p", pairId:"Pb3"},
-  {piece:"p", pairId:"Pb4"}, {piece:"p", pairId:"Pb4"},
-  {piece:"p", pairId:"Pb5"}, {piece:"p", pairId:"Pb5"},
-  {piece:"p", pairId:"Pb6"}, {piece:"p", pairId:"Pb6"},
-  {piece:"p", pairId:"Pb7"}, {piece:"p", pairId:"Pb7"},
-  {piece:"p", pairId:"Pb8"}, {piece:"p", pairId:"Pb8"}
-];
-
-const OPPOSITE_MODE_DECK = [
-  {piece:"K", pairId:"K1"}, {piece:"k", pairId:"K1"},
-  {piece:"Q", pairId:"Q1"}, {piece:"q", pairId:"Q1"},
-
-  {piece:"R", pairId:"R1"}, {piece:"r", pairId:"R1"},
-  {piece:"R", pairId:"R2"}, {piece:"r", pairId:"R2"},
-  {piece:"R", pairId:"R3"}, {piece:"r", pairId:"R3"},
-  {piece:"R", pairId:"R4"}, {piece:"r", pairId:"R4"},
-
-  {piece:"B", pairId:"B1"}, {piece:"b", pairId:"B1"},
-  {piece:"B", pairId:"B2"}, {piece:"b", pairId:"B2"},
-  {piece:"B", pairId:"B3"}, {piece:"b", pairId:"B3"},
-  {piece:"B", pairId:"B4"}, {piece:"b", pairId:"B4"},
-
-  {piece:"N", pairId:"N1"}, {piece:"n", pairId:"N1"},
-  {piece:"N", pairId:"N2"}, {piece:"n", pairId:"N2"},
-  {piece:"N", pairId:"N3"}, {piece:"n", pairId:"N3"},
-  {piece:"N", pairId:"N4"}, {piece:"n", pairId:"N4"},
-
-  {piece:"P", pairId:"P1"}, {piece:"p", pairId:"P1"},
-  {piece:"P", pairId:"P2"}, {piece:"p", pairId:"P2"},
-  {piece:"P", pairId:"P3"}, {piece:"p", pairId:"P3"},
-  {piece:"P", pairId:"P4"}, {piece:"p", pairId:"P4"},
-  {piece:"P", pairId:"P5"}, {piece:"p", pairId:"P5"},
-  {piece:"P", pairId:"P6"}, {piece:"p", pairId:"P6"},
-  {piece:"P", pairId:"P7"}, {piece:"p", pairId:"P7"},
-  {piece:"P", pairId:"P8"}, {piece:"p", pairId:"P8"},
-
-  {piece:"K", pairId:"K2"}, {piece:"k", pairId:"K2"},
-  {piece:"Q", pairId:"Q2"}, {piece:"q", pairId:"Q2"},
-
-  {piece:"R", pairId:"R5"}, {piece:"r", pairId:"R5"},
-  {piece:"R", pairId:"R6"}, {piece:"r", pairId:"R6"},
-  {piece:"R", pairId:"R7"}, {piece:"r", pairId:"R7"},
-  {piece:"R", pairId:"R8"}, {piece:"r", pairId:"R8"},
-
-  {piece:"B", pairId:"B5"}, {piece:"b", pairId:"B5"},
-  {piece:"B", pairId:"B6"}, {piece:"b", pairId:"B6"},
-  {piece:"B", pairId:"B7"}, {piece:"b", pairId:"B7"},
-  {piece:"B", pairId:"B8"}, {piece:"b", pairId:"B8"},
-
-  {piece:"N", pairId:"N5"}, {piece:"n", pairId:"N5"},
-  {piece:"N", pairId:"N6"}, {piece:"n", pairId:"N6"},
-  {piece:"N", pairId:"N7"}, {piece:"n", pairId:"N7"},
-  {piece:"N", pairId:"N8"}, {piece:"n", pairId:"N8"},
-
-  {piece:"P", pairId:"P9"},  {piece:"p", pairId:"P9"},
-  {piece:"P", pairId:"P10"}, {piece:"p", pairId:"P10"},
-  {piece:"P", pairId:"P11"}, {piece:"p", pairId:"P11"},
-  {piece:"P", pairId:"P12"}, {piece:"p", pairId:"P12"},
-  {piece:"P", pairId:"P13"}, {piece:"p", pairId:"P13"},
-  {piece:"P", pairId:"P14"}, {piece:"p", pairId:"P14"},
-  {piece:"P", pairId:"P15"}, {piece:"p", pairId:"P15"},
-  {piece:"P", pairId:"P16"}, {piece:"p", pairId:"P16"}
+  {piece:"n", pairId:"n2"}, {piece:"n", pairId:"n2"}
 ];
 
 let squares=[];
@@ -442,10 +331,10 @@ function shuffle(array){
 }
 
 function createDeck(){
-  const source = modeSelect.value==="opposite" ? OPPOSITE_MODE_DECK : SAME_MODE_DECK;
-  return shuffle(source.map((card,index)=>({
+  const full=[...BASE_DECK,...BASE_DECK];
+  return shuffle(full.map((card,index)=>({
     piece:card.piece,
-    pairId:card.pairId,
+    pairId:card.pairId+"-"+Math.floor(index/2),
     uid:"u"+index+"-"+Math.random().toString(36).slice(2,8),
     state:"hidden"
   })));
@@ -566,7 +455,6 @@ function handleSquare(index){
   },700);
 }
 
-modeSelect.addEventListener("change",createBoard);
 restartBtn.addEventListener("click",createBoard);
 
 createBoard();
