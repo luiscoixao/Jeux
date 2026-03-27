@@ -93,23 +93,18 @@
     .controls{
       display:flex;
       align-items:center;
-      justify-content:space-between;
+      justify-content:flex-start;
       gap:8px;
       padding:10px;
       flex-wrap:wrap;
     }
 
-    .left-controls,.right-controls{
+    .left-controls{
       display:flex;
       align-items:center;
       gap:8px;
       min-width:0;
       flex-wrap:wrap;
-    }
-
-    .right-controls{
-      flex-wrap:nowrap;
-      flex:0 0 auto;
     }
 
     .chip, .stat{
@@ -363,11 +358,6 @@
         </select>
         <button id="restartBtn" class="btn-primary">Nouveau</button>
       </div>
-
-      <div class="right-controls">
-        <div class="stat" id="movesStat">0 coups</div>
-        <div class="stat" id="timeStat">00:00</div>
-      </div>
     </div>
 
     <div class="panel board-wrap">
@@ -397,8 +387,6 @@
     const overlay = document.getElementById("overlay");
     const resultText = document.getElementById("resultText");
     const bestText = document.getElementById("bestText");
-    const movesStat = document.getElementById("movesStat");
-    const timeStat = document.getElementById("timeStat");
 
     let grid = {rows:4, cols:4};
     let cards = [];
@@ -453,11 +441,6 @@
       return best;
     }
 
-    function updateStats(){
-      movesStat.textContent = `${moves} coup${moves > 1 ? "s" : ""}`;
-      timeStat.textContent = formatTime(seconds);
-    }
-
     function stopTimer(){
       if(timer){
         clearInterval(timer);
@@ -470,7 +453,6 @@
       started = true;
       timer = setInterval(() => {
         seconds += 1;
-        updateStats();
       }, 1000);
     }
 
@@ -526,7 +508,6 @@
       seconds = 0;
       started = false;
       stopTimer();
-      updateStats();
     }
 
     function beginGame(){
@@ -554,7 +535,6 @@
 
       secondCard = cardEl;
       moves += 1;
-      updateStats();
       checkMatch();
     }
 
@@ -600,7 +580,6 @@
     playAgainBtn.addEventListener("click", beginGame);
     sizeSelect.addEventListener("change", beginGame);
 
-    updateStats();
     beginGame();
   </script>
 </body>
