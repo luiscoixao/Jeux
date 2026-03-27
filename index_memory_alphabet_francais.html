@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-<title>Memory — Alphabet français</title>
+<title>Memory — Alphabet</title>
 
+<!-- ✅ icône corrigée -->
 <link rel="apple-touch-icon" href="iconmemory.png">
 <link rel="icon" href="iconmemory.png">
 
@@ -26,95 +27,47 @@ body{
 }
 
 .app{
+  padding:10px;
   max-width:600px;
   margin:auto;
-  padding:14px;
 }
 
 .logo{
   text-align:center;
-  font-size:42px;
+  font-size:40px;
   font-weight:900;
   background:var(--grad);
   -webkit-background-clip:text;
   color:transparent;
 }
 
-.subtitle{
-  text-align:center;
-  letter-spacing:3px;
-  font-size:14px;
-  margin-bottom:10px;
-  color:#7b2ff7;
-}
-
-.panel{
-  background:rgba(255,255,255,.6);
-  backdrop-filter:blur(10px);
-  border-radius:20px;
-  padding:12px;
-}
-
 .controls{
   display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-}
-
-.left{
-  display:flex;
-  gap:10px;
-}
-
-select{
-  padding:10px;
-  border-radius:14px;
-  border:none;
-  font-weight:700;
-}
-
-button{
-  padding:10px 18px;
-  border-radius:999px;
-  border:none;
-  font-weight:800;
-  color:white;
-  background:linear-gradient(135deg,#ff2a68,#7b2ff7);
-}
-
-.stats{
-  display:flex;
   gap:8px;
-  margin-top:10px;
+  justify-content:space-between;
+  margin:10px 0;
 }
 
-.stat{
-  width:110px;
-  height:48px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:16px;
-  background:white;
+select,button{
+  padding:10px;
+  border-radius:12px;
+  border:none;
   font-weight:700;
-  font-size:13px;
 }
 
 .board{
   display:grid;
-  gap:10px;
-  margin-top:14px;
+  gap:8px;
 }
 
 .card{
   aspect-ratio:1;
-  border-radius:18px;
+  border-radius:12px;
   background:linear-gradient(135deg,#ff2a68,#7b2ff7);
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:28px;
+  font-size:24px;
   color:white;
   font-weight:900;
 }
@@ -123,20 +76,36 @@ button{
   background:white;
   color:#7b2ff7;
 }
+
+/* ✅ correction du décalage */
+.stats{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:8px;
+}
+
+.stats div{
+  width:110px;
+  height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:white;
+  border-radius:12px;
+  font-size:14px;
+  font-weight:700;
+  white-space:nowrap;
+}
 </style>
 </head>
 
 <body>
-
 <div class="app">
 
 <div class="logo">Memory</div>
-<div class="subtitle">ALPHABET FRANÇAIS</div>
-
-<div class="panel">
 
 <div class="controls">
-<div class="left">
 <select id="size">
   <option value="4x4">4×4</option>
   <option value="4x5">4×5</option>
@@ -149,17 +118,14 @@ button{
 
 <button onclick="startGame()">Nouveau</button>
 </div>
-</div>
+
+<div class="board" id="board"></div>
 
 <div class="stats">
-<div class="stat" id="moves">0 coups</div>
-<div class="stat" id="time">00:00</div>
-<div class="stat" id="best">Record --</div>
+<div id="moves">0 coups</div>
+<div id="time">00:00</div>
+<div id="best">Record --</div>
 </div>
-
-</div>
-
-<div id="board" class="board"></div>
 
 </div>
 
@@ -200,11 +166,9 @@ function format(t){
 
 function startGame(){
   clearInterval(timer);
-  timer=null;
   seconds=0;
   moves=0;
   matches=0;
-
   document.getElementById("time").textContent="00:00";
   document.getElementById("moves").textContent="0 coups";
 
@@ -278,7 +242,7 @@ function showBest(size){
   let best=loadBest(size);
   if(best){
     document.getElementById("best").textContent=
-      "Record "+best.moves+" ("+format(best.seconds)+")";
+      "Record "+best.moves+" coups ("+format(best.seconds)+")";
   }else{
     document.getElementById("best").textContent="Record --";
   }
