@@ -23,7 +23,10 @@
   --gold:#d4af37;
 }
 
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
 
 html,body{
   margin:0;
@@ -44,6 +47,7 @@ body{
 h1{
   margin:calc(env(safe-area-inset-top) + 18px) 0 12px;
   font-size:28px;
+  line-height:1.08;
   font-weight:700;
   text-align:center;
 }
@@ -70,83 +74,164 @@ select{
   font-size:16px;
   padding:0 14px;
   appearance:none;
+  -webkit-appearance:none;
+}
+
+#board-container{
+  width:95vw;
+  max-width:500px;
+  aspect-ratio:1 / 1;
+  overflow:hidden;
+  margin-bottom:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.35);
 }
 
 #board{
   display:grid;
-  gap:8px;
+  grid-template-columns:repeat(8,1fr);
+  grid-template-rows:repeat(8,1fr);
   width:100%;
-  margin-bottom:12px;
+  height:100%;
 }
 
-.board-12{ grid-template-columns:repeat(3,1fr); }
-.board-24{ grid-template-columns:repeat(4,1fr); }
+.square{
+  position:relative;
+  width:100%;
+  height:100%;
+  user-select:none;
+  overflow:hidden;
+  perspective:900px;
+}
+
+.white{ background:var(--light); }
+.black{ background:var(--dark); }
+
+.coord{
+  position:absolute;
+  font-size:10px;
+  opacity:.65;
+  font-weight:700;
+  pointer-events:none;
+  z-index:4;
+}
+
+.coord.file{
+  left:5px;
+  bottom:3px;
+}
+
+.coord.rank{
+  right:4px;
+  top:2px;
+}
 
 .card{
-  aspect-ratio:1;
-  perspective:1000px;
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
   border:none;
   background:none;
+  padding:0;
+  margin:0;
+  cursor:pointer;
+  touch-action:manipulation;
 }
 
 .card-inner{
+  position:relative;
   width:100%;
   height:100%;
-  transition:transform .45s;
+  transition:transform .42s ease;
   transform-style:preserve-3d;
 }
 
-.card.flipped .card-inner,
-.card.matched .card-inner{
+.square.flipped .card-inner,
+.square.matched .card-inner{
   transform:rotateY(180deg);
 }
 
-.card-face{
+.face{
   position:absolute;
   inset:0;
   display:flex;
   align-items:center;
   justify-content:center;
   backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
 }
 
-.card-back{
-  background:var(--panel);
+.back{
+  background:transparent;
 }
 
-.card-back::before{
-  content:"♞";
-  font-size:40px;
-  opacity:.2;
+.back::before{
+  content:"";
+  width:44%;
+  height:44%;
+  border-radius:50%;
+  background:rgba(0,0,0,.10);
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,.08),
+    0 1px 3px rgba(0,0,0,.12);
 }
 
-.card-front{
+.front{
   transform:rotateY(180deg);
 }
 
-.white-square{ background:var(--light); }
-.black-square{ background:var(--dark); }
-
 .piece{
-  font-size:48px;
+  line-height:1;
+  position:relative;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  height:100%;
+  filter:drop-shadow(0 1px 0 rgba(0,0,0,.22));
+}
+
+.piece.N,.piece.B,.piece.R,.piece.Q,.piece.K,
+.piece.n,.piece.b,.piece.r,.piece.q,.piece.k{
+  font-size:clamp(30px, 6.2vw, 46px);
+}
+
+.piece.P{
+  font-size:clamp(25px, 5.1vw, 38px);
+}
+
+.piece.p{
+  font-size:clamp(22px, 4.6vw, 33px);
+  transform:scale(.78);
 }
 
 .white-piece{
-  color:#fff;
-  text-shadow:0 0 2px #000;
+  color:#ffffff;
+  text-shadow:
+    0 0 1px #000,
+    0 0 2px #000,
+    0 1px 2px rgba(0,0,0,.55),
+    0 0 6px rgba(255,255,255,.16);
 }
 
 .black-piece{
-  color:#111;
+  color:#141414;
+  text-shadow:
+    0 0 1px rgba(255,255,255,.18),
+    0 1px 1px rgba(255,255,255,.06);
 }
 
-.card.matched .card-front{
-  box-shadow:0 0 0 3px var(--gold) inset;
+.square.matched{
+  box-shadow:inset 0 0 0 3px rgba(212,175,55,.95);
 }
 
 .controls{
   display:flex;
   justify-content:center;
+  align-items:center;
+  gap:28px;
+  background:var(--panel);
 }
 
 .control-btn{
@@ -155,159 +240,327 @@ select{
   border:none;
   background:var(--bg);
   color:#fff;
-  font-size:22px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  appearance:none;
+  -webkit-appearance:none;
+  cursor:pointer;
+  touch-action:manipulation;
+  box-shadow:none;
+  padding:0;
+}
+
+.control-btn span{
+  font-size:24px;
+  line-height:1;
+  display:block;
+}
+
+.control-btn:active{
+  transform:scale(.94);
 }
 
 .footer-note{
   text-align:center;
+  color:#cfcfcf;
   font-size:12px;
-  opacity:.6;
+  line-height:1.35;
+  margin-top:4px;
+  opacity:.82;
+}
+
+@media (max-width:420px){
+  .control-btn{
+    width:46px;
+    height:46px;
+  }
+
+  .control-btn span{
+    font-size:22px;
+  }
+
+  .piece.N,.piece.B,.piece.R,.piece.Q,.piece.K,
+  .piece.n,.piece.b,.piece.r,.piece.q,.piece.k{
+    font-size:clamp(26px, 6vw, 40px);
+  }
+
+  .piece.P{
+    font-size:clamp(22px, 4.8vw, 34px);
+  }
+
+  .piece.p{
+    font-size:clamp(20px, 4.1vw, 30px);
+  }
 }
 </style>
 </head>
-
 <body>
 
 <h1>CHESSMEMORY</h1>
 
 <div class="app">
-
   <div class="top-panel">
     <select id="modeSelect">
-      <option value="12">12</option>
-      <option value="24">24</option>
+      <option value="32">32 cases occupées</option>
+      <option value="64">64 cases occupées</option>
     </select>
   </div>
 
-  <div id="board" class="board-12"></div>
+  <div id="board-container">
+    <div id="board"></div>
+  </div>
 
   <div class="controls-panel">
     <div class="controls">
-      <button class="control-btn" id="restartBtn">🔄</button>
+      <button class="control-btn" id="restartBtn" type="button" aria-label="Rejouer"><span>🔄</span></button>
     </div>
   </div>
 
   <div class="footer-note">Jeu imaginé par Luis et créé par ChatGPT</div>
-
 </div>
 
 <script>
-const boardEl = document.getElementById("board");
-const modeSelect = document.getElementById("modeSelect");
-const restartBtn = document.getElementById("restartBtn");
+const boardEl=document.getElementById("board");
+const modeSelect=document.getElementById("modeSelect");
+const restartBtn=document.getElementById("restartBtn");
 
-const BASE = [
-["♔","white-square","white-piece","k"],
-["♚","black-square","black-piece","k"],
-["♕","white-square","white-piece","q"],
-["♛","black-square","black-piece","q"],
-["♖","white-square","white-piece","r"],
-["♜","black-square","black-piece","r"],
-["♗","white-square","white-piece","b"],
-["♝","black-square","black-piece","b"],
-["♘","white-square","white-piece","n"],
-["♞","black-square","black-piece","n"],
-["♙","white-square","white-piece","p"],
-["♟","black-square","black-piece","p"]
+const FILES=["a","b","c","d","e","f","g","h"];
+const PIECES={
+  "P":"♙","N":"♘","B":"♗","R":"♖","Q":"♕","K":"♔",
+  "p":"♟","n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
+};
+
+const PAIRS_BASE=[
+  ["K","k"],["Q","q"],["R","r"],["R","r"],["B","b"],["B","b"],["N","n"],["N","n"],
+  ["P","p"],["P","p"],["P","p"],["P","p"],["P","p"],["P","p"],["P","p"],["P","p"]
 ];
 
-let cards=[],flipped=[],lock=false,matched=0,total=0;
+let squares=[];
+let firstPick=null;
+let secondPick=null;
+let lockBoard=false;
+let matchedPairs=0;
+let totalPairs=0;
 
-function shuffle(a){
-  return a.sort(()=>Math.random()-0.5);
-}
-
-function createDeck(mode){
-  let base=[...BASE];
-  if(mode==="24") base=[...BASE,...BASE];
-  return shuffle(base.map((p,i)=>({
-    symbol:p[0],
-    square:p[1],
-    color:p[2],
-    id:p[3],
-    uid:i+Math.random(),
-    flipped:false,
-    matched:false
-  })));
-}
-
-function render(){
-  boardEl.innerHTML="";
-  boardEl.className=cards.length===12?"board-12":"board-24";
-
-  cards.forEach((c,i)=>{
-    const card=document.createElement("button");
-    card.className="card"+(c.flipped?" flipped":"")+(c.matched?" matched":"");
-
-    const inner=document.createElement("div");
-    inner.className="card-inner";
-
-    const back=document.createElement("div");
-    back.className="card-face card-back";
-
-    const front=document.createElement("div");
-    front.className="card-face card-front "+c.square;
-
-    const piece=document.createElement("div");
-    piece.className="piece "+c.color;
-    piece.textContent=c.symbol;
-
-    front.appendChild(piece);
-    inner.appendChild(back);
-    inner.appendChild(front);
-    card.appendChild(inner);
-
-    card.onclick=()=>clickCard(i);
-    boardEl.appendChild(card);
+function bindTap(el,handler){
+  let used=false;
+  el.addEventListener("pointerup",e=>{
+    e.preventDefault();
+    used=true;
+    handler(e);
+    setTimeout(()=>{used=false},60);
+  });
+  el.addEventListener("click",e=>{
+    if(used) return;
+    e.preventDefault();
+    handler(e);
   });
 }
 
-function start(){
-  cards=createDeck(modeSelect.value);
-  flipped=[];lock=false;matched=0;
-  total=cards.length/2;
-  render();
+function shuffle(array){
+  const arr=[...array];
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
 }
 
-function clickCard(i){
-  if(lock||cards[i].flipped||cards[i].matched) return;
+function coordsToSquare(file,rank){
+  return FILES[file]+String(rank+1);
+}
 
-  cards[i].flipped=true;
-  flipped.push(i);
-  render();
+function buildDeck(mode){
+  const pairSource = mode==="64"
+    ? [...PAIRS_BASE, ...PAIRS_BASE]
+    : [...PAIRS_BASE];
 
-  if(flipped.length<2) return;
+  const cards=[];
 
-  lock=true;
+  pairSource.forEach((pair,idx)=>{
+    cards.push({
+      piece:pair[0],
+      pairId:"pair-"+idx,
+      uid:"a-"+idx+"-"+Math.random().toString(36).slice(2,7)
+    });
+    cards.push({
+      piece:pair[1],
+      pairId:"pair-"+idx,
+      uid:"b-"+idx+"-"+Math.random().toString(36).slice(2,7)
+    });
+  });
 
-  const [a,b]=flipped;
-  if(cards[a].id===cards[b].id && cards[a].uid!==cards[b].uid){
-    cards[a].matched=true;
-    cards[b].matched=true;
-    matched++;
-    flipped=[];
-    lock=false;
+  return shuffle(cards);
+}
 
-    if(matched===total){
-      setTimeout(()=>alert("✓"),200);
+function createBoard(){
+  const mode=modeSelect.value;
+  const deck=buildDeck(mode);
+
+  squares=[];
+  firstPick=null;
+  secondPick=null;
+  lockBoard=false;
+  matchedPairs=0;
+  totalPairs=deck.length/2;
+
+  const needed = mode==="64" ? 64 : 32;
+  const empties = 64-needed;
+
+  const allCells=[];
+  for(let i=0;i<64;i++) allCells.push(i);
+
+  const shuffledCells=shuffle(allCells);
+  const filledSet=new Set(shuffledCells.slice(0,needed));
+
+  let deckIndex=0;
+
+  for(let i=0;i<64;i++){
+    if(filledSet.has(i)){
+      const card=deck[deckIndex++];
+      squares.push({
+        piece:card.piece,
+        pairId:card.pairId,
+        uid:card.uid,
+        flipped:false,
+        matched:false,
+        empty:false
+      });
+    }else{
+      squares.push({
+        piece:"",
+        pairId:null,
+        uid:null,
+        flipped:false,
+        matched:false,
+        empty:true
+      });
     }
+  }
 
-    render();
-  }else{
-    setTimeout(()=>{
-      cards[a].flipped=false;
-      cards[b].flipped=false;
-      flipped=[];
-      lock=false;
-      render();
-    },800);
+  renderBoard();
+}
+
+function renderBoard(){
+  boardEl.innerHTML="";
+
+  for(let row=7;row>=0;row--){
+    for(let col=0;col<8;col++){
+      const idx=row*8+col;
+      const data=squares[idx];
+      const sq=document.createElement("div");
+      sq.className="square "+(((row+col)%2===0)?"white":"black");
+
+      if(data.flipped) sq.classList.add("flipped");
+      if(data.matched) sq.classList.add("matched");
+
+      const squareName=coordsToSquare(col,row);
+
+      if(!data.empty){
+        const button=document.createElement("button");
+        button.className="card";
+        button.type="button";
+        button.setAttribute("aria-label", squareName);
+
+        const inner=document.createElement("div");
+        inner.className="card-inner";
+
+        const back=document.createElement("div");
+        back.className="face back";
+
+        const front=document.createElement("div");
+        front.className="face front";
+
+        const piece=document.createElement("span");
+        piece.className="piece "+(data.piece===data.piece.toUpperCase()?"white-piece ":"black-piece ")+data.piece;
+        piece.textContent=PIECES[data.piece];
+
+        front.appendChild(piece);
+        inner.appendChild(back);
+        inner.appendChild(front);
+        button.appendChild(inner);
+
+        bindTap(button,()=>handleSquare(idx));
+        sq.appendChild(button);
+      }
+
+      if(row===0){
+        const file=document.createElement("span");
+        file.className="coord file";
+        file.textContent=FILES[col];
+        sq.appendChild(file);
+      }
+
+      if(col===7){
+        const rank=document.createElement("span");
+        rank.className="coord rank";
+        rank.textContent=String(row+1);
+        sq.appendChild(rank);
+      }
+
+      boardEl.appendChild(sq);
+    }
   }
 }
 
-modeSelect.onchange=start;
-restartBtn.onclick=start;
+function isPair(a,b){
+  if(!a || !b) return false;
+  if(a.empty || b.empty) return false;
+  return a.pairId===b.pairId && a.uid!==b.uid;
+}
 
-start();
+function handleSquare(index){
+  if(lockBoard) return;
+
+  const card=squares[index];
+  if(card.empty || card.flipped || card.matched) return;
+
+  card.flipped=true;
+  renderBoard();
+
+  if(firstPick===null){
+    firstPick=index;
+    return;
+  }
+
+  secondPick=index;
+  lockBoard=true;
+
+  const a=squares[firstPick];
+  const b=squares[secondPick];
+
+  if(isPair(a,b)){
+    a.matched=true;
+    b.matched=true;
+    matchedPairs++;
+
+    firstPick=null;
+    secondPick=null;
+    lockBoard=false;
+    renderBoard();
+
+    if(matchedPairs===totalPairs){
+      setTimeout(()=>{
+        alert("✓");
+      },160);
+    }
+  }else{
+    setTimeout(()=>{
+      a.flipped=false;
+      b.flipped=false;
+      firstPick=null;
+      secondPick=null;
+      lockBoard=false;
+      renderBoard();
+    },700);
+  }
+}
+
+modeSelect.addEventListener("change",createBoard);
+bindTap(restartBtn,createBoard);
+
+createBoard();
 </script>
 
 </body>
