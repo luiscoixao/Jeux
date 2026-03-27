@@ -400,9 +400,15 @@
     let started = false;
 
     function parseSize(value){
-      const [rows, cols] = value.split("x").map(Number);
-      return { rows, cols };
-    }
+  let [rows, cols] = value.split("x").map(Number);
+
+  // ✅ inversion automatique si trop large
+  if(cols > rows){
+    [rows, cols] = [cols, rows];
+  }
+
+  return { rows, cols };
+}
 
     function formatTime(totalSeconds){
       const min = String(Math.floor(totalSeconds / 60)).padStart(2,"0");
