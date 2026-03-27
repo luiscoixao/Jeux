@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>CHESSMEMORY</title>
+
+<link rel="apple-touch-icon" href="iconchessmemory.png" />
+<link rel="icon" href="iconchessmemory.png" />
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="CHESSMEMORY" />
+<meta name="theme-color" content="#2c2c2c" />
+
+<style>
+:root{
+  --bg:#2c2c2c;
+  --panel:#3a3a3a;
+  --light:#eeeed2;
+  --dark:#769656;
+  --text:#ffffff;
+  --gold:#d4af37;
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+html,body{
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
+}
+
+body{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:0 12px calc(18px + env(safe-area-inset-bottom));
+}
+
+h1{
+  margin:calc(env(safe-area-inset-top) + 18px) 0 12px;
+  font-size:28px;
+  font-weight:700;
+  text-align:center;
+}
+
+.app{
+  width:100%;
+  max-width:560px;
+}
+
+.top-panel,
+.controls-panel{
+  background:var(--panel);
+  padding:14px;
+  margin-bottom:12px;
+  box-shadow:0 8px 20px rgba(0,0,0,.18);
+}
+
+select{
+  width:100%;
+  height:48px;
+  border:none;
+  background:#4a4a4a;
+  color:#fff;
+  font-size:16px;
+  padding:0 14px;
+  appearance:none;
+}
+
+#board{
+  display:grid;
+  gap:8px;
+  width:100%;
+  margin-bottom:12px;
+}
+
+.board-12{ grid-template-columns:repeat(3,1fr); }
+.board-24{ grid-template-columns:repeat(4,1fr); }
+
+.card{
+  aspect-ratio:1;
+  perspective:1000px;
+  border:none;
+  background:none;
+}
+
+.card-inner{
+  width:100%;
+  height:100%;
+  transition:transform .45s;
+  transform-style:preserve-3d;
+}
+
+.card.flipped .card-inner,
+.card.matched .card-inner{
+  transform:rotateY(180deg);
+}
+
+.card-face{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  backface-visibility:hidden;
+}
+
+.card-back{
+  background:var(--panel);
+}
+
+.card-back::before{
+  content:"♞";
+  font-size:40px;
+  opacity:.2;
+}
+
+.card-front{
+  transform:rotateY(180deg);
+}
+
+.white-square{ background:var(--light); }
+.black-square{ background:var(--dark); }
+
+.piece{
+  font-size:48px;
+}
+
+.white-piece{
+  color:#fff;
+  text-shadow:0 0 2px #000;
+}
+
+.black-piece{
+  color:#111;
+}
+
+.card.matched .card-front{
+  box-shadow:0 0 0 3px var(--gold) inset;
+}
+
+.controls{
+  display:flex;
+  justify-content:center;
+}
+
+.control-btn{
+  width:52px;
+  height:52px;
+  border:none;
+  background:var(--bg);
+  color:#fff;
+  font-size:22px;
+}
+
+.footer-note{
+  text-align:center;
+  font-size:12px;
+  opacity:.6;
+}
+</style>
+</head>
+
+<body>
+
+<h1>CHESSMEMORY</h1>
+
+<div class="app">
+
+  <div class="top-panel">
+    <select id="modeSelect">
+      <option value="12">12</option>
+      <option value="24">24</option>
+    </select>
+  </div>
+
+  <div id="board" class="board-12"></div>
+
+  <div class="controls-panel">
+    <div class="controls">
+      <button class="control-btn" id="restartBtn">🔄</button>
+    </div>
+  </div>
+
+  <div class="footer-note">Jeu imaginé par Luis et créé par ChatGPT</div>
+
+</div>
+
+<script>
+const boardEl = document.getElementById("board");
+const modeSelect = document.getElementById("modeSelect");
+const restartBtn = document.getElementById("restartBtn");
+
+const BASE = [
+["♔","white-square","white-piece","k"],
+["♚","black-square","black-piece","k"],
+["♕","white-square","white-piece","q"],
+["♛","black-square","black-piece","q"],
+["♖","white-square","white-piece","r"],
+["♜","black-square","black-piece","r"],
+["♗","white-square","white-piece","b"],
+["♝","black-square","black-piece","b"],
+["♘","white-square","white-piece","n"],
+["♞","black-square","black-piece","n"],
+["♙","white-square","white-piece","p"],
+["♟","black-square","black-piece","p"]
+];
+
+let cards=[],flipped=[],lock=false,matched=0,total=0;
+
+function shuffle(a){
+  return a.sort(()=>Math.random()-0.5);
+}
+
+function createDeck(mode){
+  let base=[...BASE];
+  if(mode==="24") base=[...BASE,...BASE];
+  return shuffle(base.map((p,i)=>({
+    symbol:p[0],
+    square:p[1],
+    color:p[2],
+    id:p[3],
+    uid:i+Math.random(),
+    flipped:false,
+    matched:false
+  })));
+}
+
+function render(){
+  boardEl.innerHTML="";
+  boardEl.className=cards.length===12?"board-12":"board-24";
+
+  cards.forEach((c,i)=>{
+    const card=document.createElement("button");
+    card.className="card"+(c.flipped?" flipped":"")+(c.matched?" matched":"");
+
+    const inner=document.createElement("div");
+    inner.className="card-inner";
+
+    const back=document.createElement("div");
+    back.className="card-face card-back";
+
+    const front=document.createElement("div");
+    front.className="card-face card-front "+c.square;
+
+    const piece=document.createElement("div");
+    piece.className="piece "+c.color;
+    piece.textContent=c.symbol;
+
+    front.appendChild(piece);
+    inner.appendChild(back);
+    inner.appendChild(front);
+    card.appendChild(inner);
+
+    card.onclick=()=>clickCard(i);
+    boardEl.appendChild(card);
+  });
+}
+
+function start(){
+  cards=createDeck(modeSelect.value);
+  flipped=[];lock=false;matched=0;
+  total=cards.length/2;
+  render();
+}
+
+function clickCard(i){
+  if(lock||cards[i].flipped||cards[i].matched) return;
+
+  cards[i].flipped=true;
+  flipped.push(i);
+  render();
+
+  if(flipped.length<2) return;
+
+  lock=true;
+
+  const [a,b]=flipped;
+  if(cards[a].id===cards[b].id && cards[a].uid!==cards[b].uid){
+    cards[a].matched=true;
+    cards[b].matched=true;
+    matched++;
+    flipped=[];
+    lock=false;
+
+    if(matched===total){
+      setTimeout(()=>alert("✓"),200);
+    }
+
+    render();
+  }else{
+    setTimeout(()=>{
+      cards[a].flipped=false;
+      cards[b].flipped=false;
+      flipped=[];
+      lock=false;
+      render();
+    },800);
+  }
+}
+
+modeSelect.onchange=start;
+restartBtn.onclick=start;
+
+start();
+</script>
+
+</body>
+</html>
