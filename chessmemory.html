@@ -146,8 +146,7 @@ select{
   transform-style:preserve-3d;
 }
 
-.square.flipped .card-inner,
-.square.matched .card-inner{
+.square.flipped .card-inner{
   transform:rotateY(180deg);
 }
 
@@ -431,7 +430,7 @@ let squares=[];
 let picks=[];
 let lockBoard=false;
 let matchedPairs=0;
-let totalPairs=32;
+const totalPairs=32;
 
 function shuffle(array){
   const arr=[...array];
@@ -448,8 +447,7 @@ function createDeck(){
     piece:card.piece,
     pairId:card.pairId,
     uid:"u"+index+"-"+Math.random().toString(36).slice(2,8),
-    revealed:false,
-    matched:false
+    state:"hidden"
   })));
 }
 
@@ -476,8 +474,8 @@ function renderBoard(){
       const sq=document.createElement("div");
       sq.className="square "+(((row+col)%2===0)?"white":"black");
 
-      if(data.revealed || data.matched) sq.classList.add("flipped");
-      if(data.matched) sq.classList.add("matched");
+      if(data.state==="revealed" || data.state==="matched") sq.classList.add("flipped");
+      if(data.state==="matched") sq.classList.add("matched");
 
       const button=document.createElement("button");
       button.className="card";
@@ -531,9 +529,9 @@ function handleSquare(index){
   if(lockBoard) return;
 
   const card=squares[index];
-  if(card.matched || card.revealed) return;
+  if(card.state!=="hidden") return;
 
-  card.revealed=true;
+  card.state="revealed";
   picks.push(index);
   renderBoard();
 
@@ -546,8 +544,8 @@ function handleSquare(index){
   const b=squares[i2];
 
   if(isPair(a,b)){
-    a.matched=true;
-    b.matched=true;
+    a.state="matched";
+    b.state="matched";
     matchedPairs++;
     picks=[];
     lockBoard=false;
@@ -560,8 +558,8 @@ function handleSquare(index){
   }
 
   setTimeout(()=>{
-    a.revealed=false;
-    b.revealed=false;
+    a.state="hidden";
+    b.state="hidden";
     picks=[];
     lockBoard=false;
     renderBoard();
