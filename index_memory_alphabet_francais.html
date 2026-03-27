@@ -2,10 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
   <title>Memory — Alphabet français</title>
 
   <meta name="theme-color" content="#eef0f8" />
@@ -21,7 +18,6 @@
       --bg2:#f7eef5;
       --text:#231942;
       --muted:#7a6f95;
-      --card:#ffffffcc;
       --line:rgba(255,255,255,.55);
       --shadow:0 18px 40px rgba(70,55,120,.12);
       --shadow-soft:0 10px 24px rgba(70,55,120,.10);
@@ -29,10 +25,7 @@
       --grad2:linear-gradient(135deg,rgba(255,42,104,.92),rgba(162,36,235,.92));
       --safe-top:env(safe-area-inset-top,0px);
       --safe-bottom:env(safe-area-inset-bottom,0px);
-      --header-h:150px;
-      --controls-h:66px;
       --gap:10px;
-      --radius:24px;
     }
 
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -46,15 +39,11 @@
         radial-gradient(circle at top right, rgba(255,77,133,.10), transparent 28%),
         linear-gradient(135deg,var(--bg1),var(--bg2));
       min-height:100dvh;
-      overflow:hidden;
     }
 
     .app{
       min-height:100dvh;
-      padding:
-        calc(18px + var(--safe-top))
-        16px
-        calc(16px + var(--safe-bottom));
+      padding:calc(18px + var(--safe-top)) 16px calc(16px + var(--safe-bottom));
       display:flex;
       flex-direction:column;
       gap:12px;
@@ -63,14 +52,12 @@
     }
 
     .hero{
-      min-height:var(--header-h);
       display:flex;
       flex-direction:column;
       align-items:center;
       justify-content:center;
       text-align:center;
       padding-top:8px;
-      position:relative;
     }
 
     .logo{
@@ -118,7 +105,7 @@
     }
 
     .controls{
-      min-height:var(--controls-h);
+      min-height:66px;
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -159,11 +146,7 @@
       background-repeat:no-repeat;
     }
 
-    .stat{
-      padding:10px 12px;
-      white-space:nowrap;
-      font-size:13px;
-    }
+    .stat{white-space:nowrap;font-size:13px}
 
     .btn-primary, .btn-secondary{
       border:none;
@@ -172,9 +155,7 @@
       cursor:pointer;
       transition:transform .15s ease, filter .15s ease, opacity .15s ease;
     }
-    .btn-primary:active, .btn-secondary:active, .card:active{
-      transform:scale(.98);
-    }
+    .btn-primary:active, .btn-secondary:active, .card:active{transform:scale(.98)}
 
     .btn-primary{
       background:var(--grad2);
@@ -221,41 +202,27 @@
       gap:12px;
     }
 
-    .game-top{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap:wrap;
-    }
-
     .board-wrap{
-      flex:1;
-      min-height:0;
       padding:12px;
-      position:relative;
     }
 
     .board{
       width:100%;
-      height:100%;
       display:grid;
       gap:var(--gap);
-      align-content:stretch;
-      justify-content:stretch;
     }
 
     .card{
       position:relative;
       width:100%;
-      height:100%;
-      min-height:0;
+      aspect-ratio:1 / 1;
       border:none;
       background:transparent;
       padding:0;
       border-radius:20px;
       perspective:1000px;
       cursor:pointer;
+      min-width:0;
     }
 
     .card-inner{
@@ -285,8 +252,7 @@
     }
 
     .face.back{
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.55));
+      background:linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.55));
       border:1px solid rgba(255,255,255,.85);
       box-shadow:var(--shadow-soft);
       transform:rotateY(180deg);
@@ -296,7 +262,7 @@
     }
 
     .face.back .letter{
-      font-size:clamp(22px,6.4vw,42px);
+      font-size:clamp(20px,6vw,42px);
       line-height:1;
     }
 
@@ -321,12 +287,10 @@
       background-image:radial-gradient(rgba(255,255,255,.45) 1.6px, transparent 1.6px);
       background-size:10px 10px;
       opacity:.75;
-      filter:blur(.1px);
     }
 
     .matched .face.back{
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.92), rgba(242,233,255,.82));
+      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(242,233,255,.82));
       box-shadow:0 0 0 2px rgba(150,78,231,.20), var(--shadow-soft);
     }
 
@@ -367,12 +331,6 @@
       font-size:15px;
     }
 
-    .modal .actions{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-
     .best{
       font-weight:700;
       color:#7a3de1;
@@ -386,16 +344,10 @@
     }
 
     @media (max-height: 760px){
-      :root{
-        --header-h:118px;
-        --controls-h:58px;
-        --gap:8px;
-      }
-      .subtitle{font-size:16px}
-      .dots{margin-top:12px}
-      .controls{padding:8px 10px}
+      :root{ --gap:8px; }
+      .controls{min-height:58px;padding:8px 10px}
       .chip,.stat{padding:9px 10px}
-      .face.back .letter{font-size:clamp(18px,6vw,32px)}
+      .face.back .letter{font-size:clamp(18px,5vw,32px)}
       .btn-primary{min-height:54px}
     }
   </style>
@@ -432,7 +384,7 @@
     </section>
 
     <section class="game-screen" id="gameScreen">
-      <div class="hero" style="min-height:auto;padding-top:0">
+      <div class="hero" style="padding-top:0">
         <h1 class="logo" style="font-size:clamp(36px,9.6vw,56px)">Memory</h1>
         <div class="subtitle" style="margin-top:4px">Alphabet français</div>
       </div>
@@ -467,7 +419,7 @@
       <h2>Bravo</h2>
       <p id="resultText"></p>
       <div class="best" id="bestText"></div>
-      <div class="actions" style="margin-top:16px">
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">
         <button class="btn-primary" id="playAgainBtn" style="width:100%">Rejouer</button>
         <button class="btn-secondary" id="changeSizeBtn">Changer la grille</button>
       </div>
@@ -527,8 +479,7 @@
 
     function loadBestScore(){
       try{
-        const saved = JSON.parse(localStorage.getItem(scoreKey()) || "null");
-        return saved;
+        return JSON.parse(localStorage.getItem(scoreKey()) || "null");
       }catch{
         return null;
       }
@@ -568,17 +519,14 @@
 
     function buildDeck(pairCount){
       const letters = shuffle([...ALPHABET]).slice(0, pairCount);
-      const deck = shuffle([...letters, ...letters]).map((letter, index) => ({
+      return shuffle([...letters, ...letters]).map((letter, index) => ({
         id:`${letter}-${index}-${Math.random().toString(36).slice(2,7)}`,
-        letter,
-        matched:false
+        letter
       }));
-      return deck;
     }
 
     function setGridCSS(){
       board.style.gridTemplateColumns = `repeat(${grid.cols}, 1fr)`;
-      board.style.gridTemplateRows = `repeat(${grid.rows}, 1fr)`;
     }
 
     function createCardElement(cardData){
@@ -602,7 +550,6 @@
       inner.appendChild(front);
       inner.appendChild(back);
       button.appendChild(inner);
-
       button.addEventListener("click", handleCardClick);
       return button;
     }
@@ -627,7 +574,8 @@
 
     function beginGame(){
       grid = parseSize(sizeSelectGame.value || sizeSelect.value);
-      const pairCount = (grid.rows * grid.cols) / 2;
+      const totalCards = grid.rows * grid.cols;
+      const pairCount = totalCards / 2;
       cards = buildDeck(pairCount);
       resetState();
       renderBoard();
@@ -667,9 +615,7 @@
         secondCard.classList.add("matched");
         matches += 1;
         resetTurn();
-        if(matches === cards.length / 2){
-          finishGame();
-        }
+        if(matches === cards.length / 2) finishGame();
       }else{
         lockBoard = true;
         setTimeout(() => {
@@ -683,16 +629,16 @@
     }
 
     function resetTurn(){
-      [firstCard, secondCard, lockBoard] = [null, null, false];
+      firstCard = null;
+      secondCard = null;
+      lockBoard = false;
     }
 
     function finishGame(){
       stopTimer();
       const best = saveBestScore();
       resultText.textContent = `Tu as terminé la grille ${grid.rows} × ${grid.cols} en ${moves} coups, en ${formatTime(seconds)}.`;
-      bestText.textContent = best
-        ? `Meilleur score : ${best.moves} coups — ${formatTime(best.seconds)}`
-        : "";
+      bestText.textContent = best ? `Meilleur score : ${best.moves} coups — ${formatTime(best.seconds)}` : "";
       overlay.style.display = "flex";
     }
 
@@ -704,6 +650,7 @@
     startBtn.addEventListener("click", startFromWelcome);
     restartBtn.addEventListener("click", beginGame);
     playAgainBtn.addEventListener("click", beginGame);
+
     changeSizeBtn.addEventListener("click", () => {
       overlay.style.display = "none";
       gameScreen.style.display = "none";
@@ -716,12 +663,6 @@
     sizeSelectGame.addEventListener("change", () => {
       syncSelectors(sizeSelectGame.value);
       beginGame();
-    });
-
-    window.addEventListener("resize", () => {
-      if(gameScreen.style.display === "flex"){
-        setGridCSS();
-      }
     });
 
     syncSelectors(sizeSelect.value);
