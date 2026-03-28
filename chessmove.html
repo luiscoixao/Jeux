@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>CHESSMOVE</title>
 
-<link rel="apple-touch-icon" href="iconchessmasters.png" />
-<link rel="icon" href="iconchessmove.png" />
+<link rel="apple-touch-icon" href="iconchessmove.png" />
+<link rel="icon" href="icon.png" />
 
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="CHESSMASTERS" />
+<meta name="apple-mobile-web-app-title" content="CHESSMOVE" />
 <meta name="theme-color" content="#2c2c2c" />
 
 <style>
@@ -63,7 +63,8 @@ h1{
 .move-panel,
 .pieces-panel,
 .controls-panel,
-.image-panel{
+.image-panel,
+.fen-panel{
   background:var(--panel);
   padding:14px;
   margin-bottom:12px;
@@ -105,6 +106,23 @@ h1{
   color:#1d1d1d;
 }
 
+#fenInput{
+  width:100%;
+  min-height:46px;
+  border:none;
+  background:#4a4a4a;
+  color:#fff;
+  font-size:15px;
+  padding:12px;
+  outline:none;
+  appearance:none;
+  -webkit-appearance:none;
+}
+
+#fenInput::placeholder{
+  color:#cfcfcf;
+}
+
 #board-container{
   width:95vw;
   max-width:500px;
@@ -131,6 +149,7 @@ h1{
   justify-content:center;
   user-select:none;
   overflow:hidden;
+  cursor:pointer;
 }
 
 .white{ background:var(--light); }
@@ -246,7 +265,8 @@ h1{
 }
 
 .palette-title,
-.image-title{
+.image-title,
+.fen-title{
   font-size:14px;
   font-weight:700;
   text-transform:uppercase;
@@ -290,12 +310,31 @@ h1{
 #imagePreviewWrap{
   display:none;
   margin-top:10px;
+  position:relative;
 }
 
 #imagePreview{
   width:100%;
   display:block;
   border:1px solid rgba(255,255,255,.12);
+}
+
+#imageGrid{
+  position:absolute;
+  inset:0;
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  grid-template-rows:repeat(8,1fr);
+}
+
+.image-cell{
+  border:1px solid rgba(255,255,255,.08);
+  cursor:pointer;
+  touch-action:manipulation;
+}
+
+.image-cell:active{
+  background:rgba(255,215,0,.18);
 }
 
 .helper{
@@ -342,13 +381,24 @@ h1{
     <div class="image-title">Image de référence</div>
     <div class="small-row">
       <label class="file-label" for="imageInput">Choisir une image</label>
-      <button class="small-btn" id="loadSampleBtn" type="button">Charger l’exemple</button>
     </div>
     <input id="imageInput" type="file" accept="image/*" />
     <div id="imagePreviewWrap">
       <img id="imagePreview" alt="Aperçu de l’image" />
+      <div id="imageGrid"></div>
     </div>
-      <div class="helper"></div>
+    <div class="helper">Importe une capture d’échiquier, choisis une pièce, puis touche directement la case correspondante sur l’image ou sur l’échiquier en mode Reproduction.</div>
+  </div>
+
+  <div class="fen-panel">
+    <div class="fen-title">Saisie FEN</div>
+    <div class="small-row" style="margin-bottom:10px;">
+      <input id="fenInput" type="text" placeholder="Exemple : r5k1/2p2p1p/1p2pqp1/p2p4/2PBn3/1P6/2R2PPP/4QRK1" />
+    </div>
+    <div class="small-row">
+      <button class="small-btn" id="loadFenBtn" type="button">Charger FEN</button>
+    </div>
+    <div class="helper">Le FEN décrit la position des pièces. Colle une position puis appuie sur “Charger FEN”.</div>
   </div>
 
   <div class="panel">
@@ -369,7 +419,7 @@ h1{
       <button class="small-btn active" id="placeBtn" type="button">Poser</button>
       <button class="small-btn" id="eraseBtn" type="button">Effacer</button>
     </div>
-    <div class="helper"></div>
+    <div class="helper">Choisis une pièce puis touche une case pour la placer. Utilise Effacer pour vider une case.</div>
   </div>
 
   <div class="move-panel">
@@ -379,7 +429,6 @@ h1{
 
   <div class="controls-panel">
     <div class="action-row">
-      <button class="action-btn" id="resetSampleBtn" type="button">Réinitialiser la position</button>
       <button class="action-btn" id="clearBoardBtn" type="button">Vider l’échiquier</button>
     </div>
   </div>
@@ -395,12 +444,13 @@ const setupPanel=document.getElementById("setupPanel");
 const paletteEl=document.getElementById("palette");
 const placeBtn=document.getElementById("placeBtn");
 const eraseBtn=document.getElementById("eraseBtn");
-const loadSampleBtn=document.getElementById("loadSampleBtn");
-const resetSampleBtn=document.getElementById("resetSampleBtn");
 const clearBoardBtn=document.getElementById("clearBoardBtn");
 const imageInput=document.getElementById("imageInput");
 const imagePreview=document.getElementById("imagePreview");
 const imagePreviewWrap=document.getElementById("imagePreviewWrap");
+const imageGrid=document.getElementById("imageGrid");
+const fenInput=document.getElementById("fenInput");
+const loadFenBtn=document.getElementById("loadFenBtn");
 
 const FILES=["a","b","c","d","e","f","g","h"];
 const PIECES={
@@ -408,9 +458,7 @@ const PIECES={
   "p":"♟","n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
 };
 
-const SAMPLE_POSITION = "r5k1/2p2p1p/1p2pqp1/p2p4/2PBn3/1P6/2R2PPP/4QRK1";
-
-let board=fenToBoard(SAMPLE_POSITION);
+let board=createEmptyBoard();
 let mode="setup";
 let setupAction="place";
 let selectedPalettePiece="K";
@@ -421,18 +469,11 @@ let turn="w";
 let lastMove=null;
 
 function bindTap(el,handler){
-  let used=false;
-  el.addEventListener("pointerup",e=>{
-    e.preventDefault();
-    used=true;
-    handler(e);
-    setTimeout(()=>{used=false},60);
-  });
-  el.addEventListener("click",e=>{
-    if(used) return;
-    e.preventDefault();
-    handler(e);
-  });
+  el.addEventListener("click",handler);
+}
+
+function createEmptyBoard(){
+  return Array.from({length:8},()=>Array(8).fill(""));
 }
 
 function coordsToSquare(file,rank){
@@ -447,7 +488,11 @@ function squareToCoords(square){
 }
 
 function fenToBoard(fen){
-  const rows=fen.split("/");
+  const rows=fen.trim().split("/");
+  if(rows.length!==8){
+    throw new Error("FEN invalide");
+  }
+
   const newBoard=Array.from({length:8},()=>Array(8).fill(""));
 
   for(let r=0;r<8;r++){
@@ -455,17 +500,20 @@ function fenToBoard(fen){
     for(const ch of rows[r]){
       if(/\d/.test(ch)){
         f+=parseInt(ch,10);
-      }else{
+      }else if("KQRBNPkqrbnp".includes(ch)){
+        if(f>7) throw new Error("FEN invalide");
         newBoard[7-r][f]=ch;
         f++;
+      }else{
+        throw new Error("FEN invalide");
       }
     }
+    if(f!==8){
+      throw new Error("FEN invalide");
+    }
   }
-  return newBoard;
-}
 
-function cloneBoard(src){
-  return src.map(row=>row.slice());
+  return newBoard;
 }
 
 function isWhite(piece){
@@ -575,12 +623,48 @@ function renderPalette(){
     const cls=isWhite(code)?"white-piece":"black-piece";
     const pawnMini=(code==="p")?" mini":"";
     btn.innerHTML='<span class="piece piece-'+code+' '+cls+pawnMini+'">'+symbol+'</span>';
+
     bindTap(btn,()=>{
       selectedPalettePiece=code;
       renderPalette();
     });
+
     paletteEl.appendChild(btn);
   });
+}
+
+function createImageGrid(){
+  imageGrid.innerHTML="";
+  for(let r=0;r<8;r++){
+    for(let c=0;c<8;c++){
+      const cell=document.createElement("div");
+      cell.className="image-cell";
+      bindTap(cell,()=>onImageCellTap(r,c));
+      imageGrid.appendChild(cell);
+    }
+  }
+}
+
+function onImageCellTap(r,c){
+  if(mode!=="setup"){
+    statusEl.textContent="Passe en mode reproduction pour utiliser l’image.";
+    return;
+  }
+
+  const boardRow=7-r;
+  const squareName=coordsToSquare(c,boardRow);
+
+  if(setupAction==="erase"){
+    board[boardRow][c]="";
+    lastMove=null;
+    statusEl.textContent=squareName+" vidée depuis l’image.";
+  }else{
+    board[boardRow][c]=selectedPalettePiece;
+    lastMove=null;
+    statusEl.textContent=squareName+" mise à jour depuis l’image.";
+  }
+
+  renderBoard();
 }
 
 function renderBoard(){
@@ -642,7 +726,7 @@ function handleSquareTap(squareName){
     }else{
       board[rank][file]=selectedPalettePiece;
       lastMove=null;
-      statusEl.textContent=PIECES[selectedPalettePiece]+" placée sur "+squareName+".";
+      statusEl.textContent=squareName+" mise à jour.";
     }
     renderBoard();
     return;
@@ -714,20 +798,30 @@ function movePiece(fromSquare,toSquare){
   renderBoard();
 }
 
-function loadSamplePosition(){
-  board=fenToBoard(SAMPLE_POSITION);
-  selectedSquare=null;
-  legalTargets=[];
-  moveCount=0;
-  turn="w";
-  lastMove=null;
-  moveCounter.textContent="Coups joués : 0";
-  statusEl.textContent="Position de l’image chargée. Aux blancs de jouer.";
-  renderBoard();
+function loadFenPosition(){
+  const value=fenInput.value.trim();
+  if(!value){
+    statusEl.textContent="Saisis une position FEN.";
+    return;
+  }
+
+  try{
+    board=fenToBoard(value);
+    selectedSquare=null;
+    legalTargets=[];
+    moveCount=0;
+    turn="w";
+    lastMove=null;
+    moveCounter.textContent="Coups joués : 0";
+    statusEl.textContent="Position FEN chargée.";
+    renderBoard();
+  }catch(err){
+    statusEl.textContent="FEN invalide.";
+  }
 }
 
 function clearBoard(){
-  board=Array.from({length:8},()=>Array(8).fill(""));
+  board=createEmptyBoard();
   selectedSquare=null;
   legalTargets=[];
   moveCount=0;
@@ -742,9 +836,15 @@ bindTap(setupModeBtn,()=>setMode("setup"));
 bindTap(playModeBtn,()=>setMode("play"));
 bindTap(placeBtn,()=>setSetupAction("place"));
 bindTap(eraseBtn,()=>setSetupAction("erase"));
-bindTap(loadSampleBtn,()=>loadSamplePosition());
-bindTap(resetSampleBtn,()=>loadSamplePosition());
+bindTap(loadFenBtn,()=>loadFenPosition());
 bindTap(clearBoardBtn,()=>clearBoard());
+
+fenInput.addEventListener("keydown",e=>{
+  if(e.key==="Enter"){
+    e.preventDefault();
+    loadFenPosition();
+  }
+});
 
 imageInput.addEventListener("change",e=>{
   const file=e.target.files && e.target.files[0];
@@ -753,13 +853,15 @@ imageInput.addEventListener("change",e=>{
   reader.onload=()=>{
     imagePreview.src=reader.result;
     imagePreviewWrap.style.display="block";
-    statusEl.textContent="Image importée. Reproduis maintenant la position sur l’échiquier.";
+    createImageGrid();
+    statusEl.textContent="Image importée. Touche directement l’image pour placer les pièces.";
   };
   reader.readAsDataURL(file);
 });
 
 renderPalette();
-loadSamplePosition();
+createImageGrid();
+clearBoard();
 setMode("setup");
 setSetupAction("place");
 </script>
