@@ -290,12 +290,29 @@ h1{
 #imagePreviewWrap{
   display:none;
   margin-top:10px;
+  position:relative;
 }
 
 #imagePreview{
   width:100%;
   display:block;
   border:1px solid rgba(255,255,255,.12);
+}
+
+#imageGrid{
+  position:absolute;
+  inset:0;
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  grid-template-rows:repeat(8,1fr);
+}
+
+.image-cell{
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.image-cell:active{
+  background:rgba(255,215,0,.14);
 }
 
 .helper{
@@ -363,8 +380,9 @@ h1{
     <input id="imageInput" type="file" accept="image/*" />
     <div id="imagePreviewWrap">
       <img id="imagePreview" alt="Aperçu de l’image" />
+      <div id="imageGrid"></div>
     </div>
-    <div class="helper">Importe une capture d’échiquier, reproduis les pièces en mode Reproduction, puis passe en mode Déplacement pour jouer la position.</div>
+    <div class="helper">Importe une capture d’échiquier, choisis une pièce, puis touche directement la case correspondante sur l’image ou sur l’échiquier en mode Reproduction. Passe ensuite en mode Déplacement pour jouer la position.</div>
   </div>
 
   <div class="panel">
@@ -417,6 +435,7 @@ const clearBoardBtn=document.getElementById("clearBoardBtn");
 const imageInput=document.getElementById("imageInput");
 const imagePreview=document.getElementById("imagePreview");
 const imagePreviewWrap=document.getElementById("imagePreviewWrap");
+const imageGrid=document.getElementById("imageGrid");
 
 const FILES=["a","b","c","d","e","f","g","h"];
 const PIECES={
@@ -488,10 +507,6 @@ function fenToBoard(fen){
     }
   }
   return newBoard;
-}
-
-function cloneBoard(src){
-  return src.map(row=>row.slice());
 }
 
 function isWhite(piece){
@@ -610,8 +625,43 @@ function renderPalette(){
       selectedPalettePiece=code;
       renderPalette();
     });
+
     paletteEl.appendChild(btn);
   });
+}
+
+function createImageGrid(){
+  imageGrid.innerHTML="";
+  for(let r=0;r<8;r++){
+    for(let c=0;c<8;c++){
+      const cell=document.createElement("div");
+      cell.className="image-cell";
+      bindTap(cell,()=>onImageCellTap(r,c));
+      imageGrid.appendChild(cell);
+    }
+  }
+}
+
+function onImageCellTap(r,c){
+  if(mode!=="setup"){
+    statusEl.textContent="Passe en mode reproduction pour utiliser l’image.";
+    return;
+  }
+
+  const boardRow=7-r;
+  const squareName=coordsToSquare(c,boardRow);
+
+  if(setupAction==="erase"){
+    board[boardRow][c]="";
+    lastMove=null;
+    statusEl.textContent=squareName+" vidée depuis l’image.";
+  }else{
+    board[boardRow][c]=selectedPalettePiece;
+    lastMove=null;
+    statusEl.textContent=squareName+" mise à jour depuis l’image.";
+  }
+
+  renderBoard();
 }
 
 function renderBoard(){
@@ -785,12 +835,14 @@ imageInput.addEventListener("change",e=>{
   reader.onload=()=>{
     imagePreview.src=reader.result;
     imagePreviewWrap.style.display="block";
-    statusEl.textContent="Image importée. Reproduis maintenant la position sur l’échiquier.";
+    createImageGrid();
+    statusEl.textContent="Image importée. Touche directement l’image pour placer les pièces.";
   };
   reader.readAsDataURL(file);
 });
 
 renderPalette();
+createImageGrid();
 loadSamplePosition();
 setMode("setup");
 setSetupAction("place");
