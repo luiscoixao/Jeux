@@ -64,7 +64,8 @@ h1{
 .pieces-panel,
 .controls-panel,
 .image-panel,
-.fen-panel{
+.fen-panel,
+.analysis-panel{
   background:var(--panel);
   padding:14px;
   margin-bottom:12px;
@@ -277,7 +278,8 @@ h1{
 
 .palette-title,
 .image-title,
-.fen-title{
+.fen-title,
+.analysis-title{
   font-size:14px;
   font-weight:700;
   text-transform:uppercase;
@@ -355,6 +357,48 @@ h1{
   margin-top:10px;
 }
 
+.analysis-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+
+.analysis-box{
+  background:#4a4a4a;
+  padding:12px;
+  min-height:62px;
+}
+
+.analysis-label{
+  font-size:12px;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  margin-bottom:6px;
+}
+
+.analysis-value{
+  font-size:18px;
+  font-weight:700;
+  line-height:1.2;
+  word-break:break-word;
+}
+
+#engineLog{
+  width:100%;
+  min-height:90px;
+  margin-top:10px;
+  border:none;
+  background:#4a4a4a;
+  color:#fff;
+  padding:12px;
+  resize:none;
+  font-size:13px;
+  line-height:1.35;
+  outline:none;
+}
+
 @media (max-width:420px){
   .mode-btn,
   .action-btn,
@@ -366,6 +410,10 @@ h1{
 
   .palette{
     grid-template-columns:repeat(4,1fr);
+  }
+
+  .analysis-grid{
+    grid-template-columns:1fr;
   }
 
   .piece-N,.piece-B,.piece-R,.piece-Q,.piece-K,
@@ -404,7 +452,7 @@ h1{
   <div class="fen-panel">
     <div class="fen-title">Saisie FEN</div>
     <div class="small-row" style="margin-bottom:10px;">
-      <input id="fenInput" type="text" placeholder="Exemple : r5k1/2p2p1p/1p2pqp1/p2p4/2PBn3/1P6/2R2PPP/4QRK1" />
+      <input id="fenInput" type="text" placeholder="Exemple : rnbq1rk1/pp3ppp/1n1Pp3/4P3/2B2P1b/P1N2NP1/1P2Q2P/R1B1K2R" />
     </div>
     <div class="small-row">
       <button class="small-btn" id="loadFenBtn" type="button">Charger FEN</button>
@@ -445,9 +493,37 @@ h1{
     </div>
     <div class="small-row">
       <button class="small-btn" id="copyFenBtn" type="button">Copier FEN</button>
-      <button class="small-btn" id="analyzeBtn" type="button">Analyser la position</button>
     </div>
-    <div class="helper">Le bouton d’analyse ouvre la position dans Lichess à partir du FEN généré.  [oai_citation:1‡lichess.org](https://lichess.org/analysis)</div>
+  </div>
+
+  <div class="analysis-panel">
+    <div class="analysis-title">Analyse locale</div>
+    <div class="small-row">
+      <button class="small-btn" id="engineInitBtn" type="button">Initialiser le moteur</button>
+      <button class="small-btn" id="analyzeBtn" type="button">Analyser</button>
+    </div>
+
+    <div class="analysis-grid">
+      <div class="analysis-box">
+        <div class="analysis-label">Moteur</div>
+        <div class="analysis-value" id="engineStatus">Non initialisé</div>
+      </div>
+      <div class="analysis-box">
+        <div class="analysis-label">Profondeur</div>
+        <div class="analysis-value" id="engineDepth">-</div>
+      </div>
+      <div class="analysis-box">
+        <div class="analysis-label">Évaluation</div>
+        <div class="analysis-value" id="engineEval">-</div>
+      </div>
+      <div class="analysis-box">
+        <div class="analysis-label">Meilleur coup</div>
+        <div class="analysis-value" id="engineBestMove">-</div>
+      </div>
+    </div>
+
+    <textarea id="engineLog" readonly></textarea>
+    <div class="helper">Ajoute <strong>stockfish.js</strong> à la racine de ton dépôt. Si ta version du moteur utilise un fichier WASM, ajoute aussi le fichier associé.</div>
   </div>
 
   <div class="controls-panel">
@@ -476,7 +552,14 @@ const fenInput=document.getElementById("fenInput");
 const loadFenBtn=document.getElementById("loadFenBtn");
 const fenOutput=document.getElementById("fenOutput");
 const copyFenBtn=document.getElementById("copyFenBtn");
+
+const engineInitBtn=document.getElementById("engineInitBtn");
 const analyzeBtn=document.getElementById("analyzeBtn");
+const engineStatus=document.getElementById("engineStatus");
+const engineDepth=document.getElementById("engineDepth");
+const engineEval=document.getElementById("engineEval");
+const engineBestMove=document.getElementById("engineBestMove");
+const engineLog=document.getElementById("engineLog");
 
 const FILES=["a","b","c","d","e","f","g","h"];
 const PIECES={
@@ -493,6 +576,13 @@ let legalTargets=[];
 let moveCount=0;
 let turn="w";
 let lastMove=null;
+
+let engine=null;
+let engineReady=false;
+let currentBestMove="-";
+let currentDepth="-";
+let currentEval="-";
+let analysisRunning=false;
 
 function bindTap(el,handler){
   el.addEventListener("click",handler);
@@ -911,11 +1001,135 @@ async function copyFen(){
   }
 }
 
+function logEngine(text){
+  engineLog.value = text + "\n" + engineLog.value;
+}
+
+function resetAnalysisDisplay(){
+  currentBestMove="-";
+  currentDepth="-";
+  currentEval="-";
+  engineBestMove.textContent=currentBestMove;
+  engineDepth.textContent=currentDepth;
+  engineEval.textContent=currentEval;
+}
+
+function formatBestMove(move){
+  if(!move || move === "(none)") return "-";
+  return move;
+}
+
+function formatEval(type, value){
+  if(type === "mate"){
+    const sign = Number(value) > 0 ? "+" : "";
+    return "Mat " + sign + value;
+  }
+  if(type === "cp"){
+    const num = (Number(value) / 100).toFixed(2);
+    const sign = Number(num) > 0 ? "+" : "";
+    return sign + num;
+  }
+  return "-";
+}
+
+function initEngine(){
+  if(engine){
+    engineStatus.textContent = engineReady ? "Prêt" : "Initialisation…";
+    return;
+  }
+
+  try{
+    engine = new Worker("stockfish.js");
+  }catch(err){
+    engineStatus.textContent = "Erreur chargement";
+    logEngine("Impossible de charger stockfish.js");
+    return;
+  }
+
+  engineStatus.textContent = "Initialisation…";
+  logEngine("Chargement du moteur…");
+
+  engine.onmessage = function(e){
+    const line = String(e.data || "");
+    logEngine(line);
+
+    if(line === "readyok"){
+      engineReady = true;
+      engineStatus.textContent = "Prêt";
+      return;
+    }
+
+    if(line.startsWith("info ")){
+      const depthMatch = line.match(/\bdepth\s+(\d+)/);
+      if(depthMatch){
+        currentDepth = depthMatch[1];
+        engineDepth.textContent = currentDepth;
+      }
+
+      const mateMatch = line.match(/\bscore\s+mate\s+(-?\d+)/);
+      if(mateMatch){
+        currentEval = formatEval("mate", mateMatch[1]);
+        engineEval.textContent = currentEval;
+      }else{
+        const cpMatch = line.match(/\bscore\s+cp\s+(-?\d+)/);
+        if(cpMatch){
+          currentEval = formatEval("cp", cpMatch[1]);
+          engineEval.textContent = currentEval;
+        }
+      }
+
+      const pvMatch = line.match(/\bpv\s+([a-h][1-8][a-h][1-8][qrbn]?)/);
+      if(pvMatch){
+        currentBestMove = formatBestMove(pvMatch[1]);
+        engineBestMove.textContent = currentBestMove;
+      }
+      return;
+    }
+
+    if(line.startsWith("bestmove ")){
+      const best = line.split(/\s+/)[1] || "-";
+      currentBestMove = formatBestMove(best);
+      engineBestMove.textContent = currentBestMove;
+      analysisRunning = false;
+      engineStatus.textContent = "Prêt";
+      statusEl.textContent = "Analyse terminée.";
+      return;
+    }
+  };
+
+  engine.onerror = function(){
+    engineStatus.textContent = "Erreur moteur";
+    logEngine("Erreur du moteur.");
+  };
+
+  engine.postMessage("uci");
+  engine.postMessage("isready");
+}
+
 function analyzePosition(){
-  const fullFen=boardToFullFen();
-  const lichessFen=fullFen.replace(/ /g,"_");
-  const url="https://lichess.org/analysis/standard/"+lichessFen;
-  window.open(url,"_blank");
+  if(!engine){
+    statusEl.textContent = "Initialise d’abord le moteur.";
+    return;
+  }
+  if(!engineReady){
+    statusEl.textContent = "Le moteur n’est pas encore prêt.";
+    return;
+  }
+  if(analysisRunning){
+    statusEl.textContent = "Analyse déjà en cours.";
+    return;
+  }
+
+  resetAnalysisDisplay();
+  analysisRunning = true;
+  engineStatus.textContent = "Analyse…";
+  statusEl.textContent = "Analyse en cours…";
+
+  const fen = boardToFullFen();
+  engine.postMessage("stop");
+  engine.postMessage("ucinewgame");
+  engine.postMessage("position fen " + fen);
+  engine.postMessage("go depth 12");
 }
 
 bindTap(setupModeBtn,()=>setMode("setup"));
@@ -925,6 +1139,7 @@ bindTap(eraseBtn,()=>setSetupAction("erase"));
 bindTap(loadFenBtn,()=>loadFenPosition());
 bindTap(clearBoardBtn,()=>clearBoard());
 bindTap(copyFenBtn,()=>copyFen());
+bindTap(engineInitBtn,()=>initEngine());
 bindTap(analyzeBtn,()=>analyzePosition());
 
 fenInput.addEventListener("keydown",e=>{
@@ -952,6 +1167,7 @@ createImageGrid();
 clearBoard();
 setMode("setup");
 setSetupAction("place");
+engineLog.value="";
 </script>
 
 </body>
