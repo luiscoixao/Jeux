@@ -106,9 +106,9 @@ h1{
   color:#1d1d1d;
 }
 
-#fenInput{
+#fenInput,
+#fenOutput{
   width:100%;
-  min-height:46px;
   border:none;
   background:#4a4a4a;
   color:#fff;
@@ -117,6 +117,17 @@ h1{
   outline:none;
   appearance:none;
   -webkit-appearance:none;
+  border-radius:0;
+}
+
+#fenInput{
+  min-height:46px;
+}
+
+#fenOutput{
+  min-height:76px;
+  resize:none;
+  line-height:1.35;
 }
 
 #fenInput::placeholder{
@@ -398,7 +409,7 @@ h1{
     <div class="small-row">
       <button class="small-btn" id="loadFenBtn" type="button">Charger FEN</button>
     </div>
-    <div class="helper">Le FEN décrit la position des pièces. Colle une position puis appuie sur “Charger FEN”.</div>
+    <div class="helper">Tu peux coller seulement la partie position du FEN. Le trait sera remis aux blancs.</div>
   </div>
 
   <div class="panel">
@@ -427,6 +438,18 @@ h1{
     <div id="status">Mode reproduction : place les pièces sur l’échiquier.</div>
   </div>
 
+  <div class="fen-panel">
+    <div class="fen-title">FEN actuel</div>
+    <div class="small-row" style="margin-bottom:10px;">
+      <textarea id="fenOutput" readonly></textarea>
+    </div>
+    <div class="small-row">
+      <button class="small-btn" id="copyFenBtn" type="button">Copier FEN</button>
+      <button class="small-btn" id="analyzeBtn" type="button">Analyser la position</button>
+    </div>
+    <div class="helper">Le bouton d’analyse ouvre la position dans Lichess à partir du FEN généré.  [oai_citation:1‡lichess.org](https://lichess.org/analysis)</div>
+  </div>
+
   <div class="controls-panel">
     <div class="action-row">
       <button class="action-btn" id="clearBoardBtn" type="button">Vider l’échiquier</button>
@@ -451,6 +474,9 @@ const imagePreviewWrap=document.getElementById("imagePreviewWrap");
 const imageGrid=document.getElementById("imageGrid");
 const fenInput=document.getElementById("fenInput");
 const loadFenBtn=document.getElementById("loadFenBtn");
+const fenOutput=document.getElementById("fenOutput");
+const copyFenBtn=document.getElementById("copyFenBtn");
+const analyzeBtn=document.getElementById("analyzeBtn");
 
 const FILES=["a","b","c","d","e","f","g","h"];
 const PIECES={
@@ -488,7 +514,9 @@ function squareToCoords(square){
 }
 
 function fenToBoard(fen){
-  const rows=fen.trim().split("/");
+  const positionPart=fen.trim().split(" ")[0];
+  const rows=positionPart.split("/");
+
   if(rows.length!==8){
     throw new Error("FEN invalide");
   }
@@ -514,6 +542,40 @@ function fenToBoard(fen){
   }
 
   return newBoard;
+}
+
+function boardToPositionFen(){
+  const rows=[];
+  for(let r=7;r>=0;r--){
+    let row="";
+    let empty=0;
+
+    for(let f=0;f<8;f++){
+      const piece=board[r][f];
+      if(piece){
+        if(empty){
+          row+=String(empty);
+          empty=0;
+        }
+        row+=piece;
+      }else{
+        empty++;
+      }
+    }
+
+    if(empty) row+=String(empty);
+    rows.push(row);
+  }
+
+  return rows.join("/");
+}
+
+function boardToFullFen(){
+  return boardToPositionFen()+" "+turn+" - - 0 1";
+}
+
+function updateFenOutput(){
+  fenOutput.value=boardToFullFen();
 }
 
 function isWhite(piece){
@@ -606,6 +668,7 @@ function setMode(newMode){
   }
 
   renderBoard();
+  updateFenOutput();
 }
 
 function setSetupAction(action){
@@ -665,6 +728,7 @@ function onImageCellTap(r,c){
   }
 
   renderBoard();
+  updateFenOutput();
 }
 
 function renderBoard(){
@@ -729,6 +793,7 @@ function handleSquareTap(squareName){
       statusEl.textContent=squareName+" mise à jour.";
     }
     renderBoard();
+    updateFenOutput();
     return;
   }
 
@@ -796,6 +861,7 @@ function movePiece(fromSquare,toSquare){
   moveCounter.textContent="Coups joués : "+moveCount;
   statusEl.textContent=(capture?"Prise : ":"Coup joué : ")+fromSquare+" → "+toSquare+". "+(turn==="w"?"Aux blancs de jouer.":"Aux noirs de jouer.");
   renderBoard();
+  updateFenOutput();
 }
 
 function loadFenPosition(){
@@ -815,6 +881,7 @@ function loadFenPosition(){
     moveCounter.textContent="Coups joués : 0";
     statusEl.textContent="Position FEN chargée.";
     renderBoard();
+    updateFenOutput();
   }catch(err){
     statusEl.textContent="FEN invalide.";
   }
@@ -830,6 +897,25 @@ function clearBoard(){
   moveCounter.textContent="Coups joués : 0";
   statusEl.textContent="Échiquier vidé.";
   renderBoard();
+  updateFenOutput();
+}
+
+async function copyFen(){
+  try{
+    await navigator.clipboard.writeText(fenOutput.value);
+    statusEl.textContent="FEN copié.";
+  }catch(err){
+    fenOutput.select();
+    document.execCommand("copy");
+    statusEl.textContent="FEN copié.";
+  }
+}
+
+function analyzePosition(){
+  const fullFen=boardToFullFen();
+  const lichessFen=fullFen.replace(/ /g,"_");
+  const url="https://lichess.org/analysis/standard/"+lichessFen;
+  window.open(url,"_blank");
 }
 
 bindTap(setupModeBtn,()=>setMode("setup"));
@@ -838,6 +924,8 @@ bindTap(placeBtn,()=>setSetupAction("place"));
 bindTap(eraseBtn,()=>setSetupAction("erase"));
 bindTap(loadFenBtn,()=>loadFenPosition());
 bindTap(clearBoardBtn,()=>clearBoard());
+bindTap(copyFenBtn,()=>copyFen());
+bindTap(analyzeBtn,()=>analyzePosition());
 
 fenInput.addEventListener("keydown",e=>{
   if(e.key==="Enter"){
