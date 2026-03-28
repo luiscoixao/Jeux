@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>CHESSMEMORY</title>
+<title>CHESSMOVE</title>
 
-<link rel="apple-touch-icon" href="iconchessmemory.png" />
-<link rel="icon" href="iconchessmemory.png" />
+<link rel="apple-touch-icon" href="iconchessmove.png" />
+<link rel="icon" href="icon.png" />
 
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="CHESSMEMORY" />
+<meta name="apple-mobile-web-app-title" content="CHESSMOVE" />
 <meta name="theme-color" content="#2c2c2c" />
 
 <style>
@@ -20,7 +20,9 @@
   --light:#eeeed2;
   --dark:#769656;
   --text:#ffffff;
-  --gold:#d4af37;
+  --muted:#d7d7d7;
+  --accent:#d4af37;
+  --danger:#ff745e;
 }
 
 *{
@@ -57,11 +59,50 @@ h1{
   max-width:560px;
 }
 
-.controls-panel{
+.panel,
+.move-panel,
+.pieces-panel,
+.controls-panel,
+.image-panel{
   background:var(--panel);
   padding:14px;
   margin-bottom:12px;
   box-shadow:0 8px 20px rgba(0,0,0,.18);
+}
+
+.mode-toggle,
+.action-row,
+.small-row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.mode-btn,
+.action-btn,
+.small-btn,
+.file-label{
+  flex:1;
+  min-height:46px;
+  border:none;
+  background:#4a4a4a;
+  color:#fff;
+  font-size:15px;
+  font-weight:700;
+  padding:0 12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  cursor:pointer;
+  appearance:none;
+  -webkit-appearance:none;
+}
+
+.mode-btn.active,
+.small-btn.active{
+  background:var(--accent);
+  color:#1d1d1d;
 }
 
 #board-container{
@@ -85,9 +126,11 @@ h1{
   position:relative;
   width:100%;
   height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   user-select:none;
   overflow:hidden;
-  perspective:900px;
 }
 
 .white{ background:var(--light); }
@@ -99,7 +142,6 @@ h1{
   opacity:.65;
   font-weight:700;
   pointer-events:none;
-  z-index:4;
 }
 
 .coord.file{
@@ -112,58 +154,12 @@ h1{
   top:2px;
 }
 
-.card{
-  position:absolute;
-  inset:0;
+.piece-wrap{
   width:100%;
   height:100%;
-  border:none;
-  background:none;
-  padding:0;
-  margin:0;
-  cursor:pointer;
-  touch-action:manipulation;
-}
-
-.card-inner{
-  position:relative;
-  width:100%;
-  height:100%;
-  transition:transform .42s ease;
-  transform-style:preserve-3d;
-}
-
-.square.flipped .card-inner{
-  transform:rotateY(180deg);
-}
-
-.face{
-  position:absolute;
-  inset:0;
   display:flex;
   align-items:center;
   justify-content:center;
-  backface-visibility:hidden;
-  -webkit-backface-visibility:hidden;
-}
-
-.back{
-  background:transparent;
-}
-
-.back::before{
-  content:"";
-  width:44%;
-  height:44%;
-  border-radius:50%;
-  background:rgba(0,0,0,.10);
-  box-shadow:
-    inset 0 0 0 2px rgba(255,255,255,.08),
-    0 1px 3px rgba(0,0,0,.12);
-}
-
-.front{
-  transform:rotateY(180deg);
 }
 
 .piece{
@@ -176,11 +172,22 @@ h1{
   width:100%;
   height:100%;
   filter:drop-shadow(0 1px 0 rgba(0,0,0,.22));
+  transform-origin:center center;
 }
 
-.piece.N,.piece.B,.piece.R,.piece.Q,.piece.K,
-.piece.n,.piece.b,.piece.r,.piece.q,.piece.k{
-  font-size:clamp(30px, 6.2vw, 46px);
+.piece-N,.piece-B,.piece-R,.piece-Q,.piece-K,
+.piece-n,.piece-b,.piece-r,.piece-q,.piece-k{
+  font-size:clamp(42px, 8vw, 60px);
+}
+
+.piece-P{
+  font-size:clamp(34px, 6.4vw, 48px);
+}
+
+.piece-p{
+  font-size:clamp(29px, 5.4vw, 40px);
+  transform:scale(0.72);
+  transform-origin:center center;
 }
 
 .white-piece{
@@ -199,237 +206,412 @@ h1{
     0 1px 1px rgba(255,255,255,.06);
 }
 
-.square.matched{
-  box-shadow:inset 0 0 0 3px rgba(212,175,55,.95);
+.selected-square{
+  outline:4px solid rgba(255,215,0,.95);
+  outline-offset:-4px;
 }
 
-.controls{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:28px;
-  background:var(--panel);
+.legal-square{
+  box-shadow:inset 0 0 0 4px rgba(255,255,255,.5);
 }
 
-.control-btn{
-  width:52px;
-  height:52px;
+.from-square{
+  outline:3px solid rgba(255,215,0,.85);
+  outline-offset:-3px;
+}
+
+.to-square{
+  outline:3px solid rgba(169,209,142,.95);
+  outline-offset:-3px;
+}
+
+.capture-square{
+  box-shadow:inset 0 0 0 3px rgba(255,99,71,.95);
+}
+
+#move-counter{
+  text-align:center;
+  line-height:1.35;
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:8px;
+}
+
+#status{
+  text-align:center;
+  line-height:1.35;
+  font-size:15px;
+  color:var(--muted);
+  min-height:42px;
+}
+
+.palette-title,
+.image-title{
+  font-size:14px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  margin-bottom:10px;
+  color:var(--muted);
+}
+
+.palette{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:8px;
+}
+
+.palette-btn{
+  min-height:54px;
   border:none;
-  background:var(--bg);
+  background:#4a4a4a;
   color:#fff;
   display:flex;
   align-items:center;
   justify-content:center;
-  appearance:none;
-  -webkit-appearance:none;
+  font-size:34px;
   cursor:pointer;
-  touch-action:manipulation;
-  box-shadow:none;
   padding:0;
 }
 
-.control-btn span{
-  font-size:24px;
-  line-height:1;
-  display:block;
+.palette-btn.active{
+  outline:3px solid var(--accent);
+  outline-offset:-3px;
 }
 
-.control-btn:active{
-  transform:scale(.94);
+.palette-btn .mini{
+  transform:scale(.78);
 }
 
-.footer-note{
-  text-align:center;
-  color:#cfcfcf;
-  font-size:12px;
-  line-height:1.35;
-  margin-top:4px;
-  opacity:.82;
-}
-
-.win-overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.55);
+#imageInput{
   display:none;
-  align-items:center;
-  justify-content:center;
-  padding:24px;
-  z-index:9999;
 }
 
-.win-overlay.show{
-  display:flex;
+#imagePreviewWrap{
+  display:none;
+  margin-top:10px;
 }
 
-.win-box{
-  width:min(92vw, 360px);
-  background:#f7f7f7;
-  color:#111;
-  border-radius:18px;
-  padding:22px 18px 16px;
-  text-align:center;
-  box-shadow:0 18px 40px rgba(0,0,0,.35);
-}
-
-.win-title{
-  font-size:22px;
-  font-weight:700;
-  margin-bottom:10px;
-}
-
-.win-text{
-  font-size:17px;
-  line-height:1.4;
-  margin-bottom:16px;
-}
-
-.win-btn{
+#imagePreview{
   width:100%;
-  height:46px;
-  border:none;
-  border-radius:12px;
-  background:#2c2c2c;
-  color:#fff;
-  font-size:16px;
-  font-weight:700;
-  cursor:pointer;
+  display:block;
+  border:1px solid rgba(255,255,255,.12);
+}
+
+.helper{
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.35;
+  margin-top:10px;
+}
+
+.board-piece-img{
+  width:88%;
+  height:88%;
+  object-fit:contain;
+  display:block;
+  pointer-events:none;
+}
+
+.palette-piece-img{
+  width:76%;
+  height:76%;
+  object-fit:contain;
+  display:block;
+  pointer-events:none;
 }
 
 @media (max-width:420px){
-  .control-btn{
-    width:46px;
-    height:46px;
+  .mode-btn,
+  .action-btn,
+  .small-btn,
+  .file-label{
+    min-height:44px;
+    font-size:14px;
   }
 
-  .control-btn span{
-    font-size:22px;
+  .palette{
+    grid-template-columns:repeat(4,1fr);
   }
 
-  .piece.N,.piece.B,.piece.R,.piece.Q,.piece.K,
-  .piece.n,.piece.b,.piece.r,.piece.q,.piece.k{
-    font-size:clamp(26px, 6vw, 40px);
+  .piece-N,.piece-B,.piece-R,.piece-Q,.piece-K,
+  .piece-n,.piece-b,.piece-r,.piece.q,.piece-k{
+    font-size:clamp(38px, 8.4vw, 52px);
+  }
+
+  .piece-P{
+    font-size:clamp(31px, 6.7vw, 44px);
+  }
+
+  .piece-p{
+    font-size:clamp(27px, 5.7vw, 37px);
   }
 }
 </style>
 </head>
 <body>
 
-<h1>CHESSMEMORY</h1>
+<h1>CHESSMOVE</h1>
 
 <div class="app">
+  <div class="image-panel">
+    <div class="image-title">Image de référence</div>
+    <div class="small-row">
+      <label class="file-label" for="imageInput">Choisir une image</label>
+      <button class="small-btn" id="loadSampleBtn" type="button">Charger l’exemple</button>
+    </div>
+    <input id="imageInput" type="file" accept="image/*" />
+    <div id="imagePreviewWrap">
+      <img id="imagePreview" alt="Aperçu de l’image" />
+    </div>
+    <div class="helper">Importe une capture d’échiquier, reproduis les pièces en mode Reproduction, puis passe en mode Déplacement pour jouer la position.</div>
+  </div>
+
+  <div class="panel">
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="setupModeBtn" type="button">Reproduction</button>
+      <button class="mode-btn" id="playModeBtn" type="button">Déplacement</button>
+    </div>
+  </div>
+
   <div id="board-container">
     <div id="board"></div>
   </div>
 
-  <div class="controls-panel">
-    <div class="controls">
-      <button class="control-btn" id="restartBtn" type="button" aria-label="Rejouer"><span>🔄</span></button>
+  <div class="pieces-panel" id="setupPanel">
+    <div class="palette-title">Pièce à poser</div>
+    <div class="palette" id="palette"></div>
+    <div class="small-row" style="margin-top:10px;">
+      <button class="small-btn active" id="placeBtn" type="button">Poser</button>
+      <button class="small-btn" id="eraseBtn" type="button">Effacer</button>
     </div>
+    <div class="helper">Choisis une pièce puis touche une case pour la placer. Utilise Effacer pour vider une case. Le bouton “Charger l’exemple” place automatiquement la position de l’image fournie.</div>
   </div>
 
-  <div class="footer-note">Jeu imaginé par Luis et créé par ChatGPT</div>
-</div>
+  <div class="move-panel">
+    <div id="move-counter">Coups joués : 0</div>
+    <div id="status">Mode reproduction : place les pièces sur l’échiquier.</div>
+  </div>
 
-<div class="win-overlay" id="winOverlay">
-  <div class="win-box">
-    <div class="win-title">Bravo</div>
-    <div class="win-text" id="winText"></div>
-    <button class="win-btn" id="winBtn" type="button">OK</button>
+  <div class="controls-panel">
+    <div class="action-row">
+      <button class="action-btn" id="resetSampleBtn" type="button">Réinitialiser la position</button>
+      <button class="action-btn" id="clearBoardBtn" type="button">Vider l’échiquier</button>
+    </div>
   </div>
 </div>
 
 <script>
 const boardEl=document.getElementById("board");
-const restartBtn=document.getElementById("restartBtn");
-const winOverlay=document.getElementById("winOverlay");
-const winText=document.getElementById("winText");
-const winBtn=document.getElementById("winBtn");
+const statusEl=document.getElementById("status");
+const moveCounter=document.getElementById("move-counter");
+const setupModeBtn=document.getElementById("setupModeBtn");
+const playModeBtn=document.getElementById("playModeBtn");
+const setupPanel=document.getElementById("setupPanel");
+const paletteEl=document.getElementById("palette");
+const placeBtn=document.getElementById("placeBtn");
+const eraseBtn=document.getElementById("eraseBtn");
+const loadSampleBtn=document.getElementById("loadSampleBtn");
+const resetSampleBtn=document.getElementById("resetSampleBtn");
+const clearBoardBtn=document.getElementById("clearBoardBtn");
+const imageInput=document.getElementById("imageInput");
+const imagePreview=document.getElementById("imagePreview");
+const imagePreviewWrap=document.getElementById("imagePreviewWrap");
 
 const FILES=["a","b","c","d","e","f","g","h"];
 const PIECES={
-  "N":"♘","B":"♗","R":"♖","Q":"♕","K":"♔",
-  "n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
+  "P":"pieces/wp.svg",
+  "N":"pieces/wn.svg",
+  "B":"pieces/wb.svg",
+  "R":"pieces/wr.svg",
+  "Q":"pieces/wq.svg",
+  "K":"pieces/wk.svg",
+  "p":"pieces/bp.svg",
+  "n":"pieces/bn.svg",
+  "b":"pieces/bb.svg",
+  "r":"pieces/br.svg",
+  "q":"pieces/bq.svg",
+  "k":"pieces/bk.svg"
 };
 
-const BASE_DECK = [
-  {piece:"K", pairId:"K1"}, {piece:"K", pairId:"K1"},
-  {piece:"k", pairId:"k1"}, {piece:"k", pairId:"k1"},
+const SAMPLE_POSITION = "r5k1/2p2p1p/1p2pqp1/p2p4/2PBn3/1P6/2R2PPP/4QRK1";
 
-  {piece:"Q", pairId:"Q1"}, {piece:"Q", pairId:"Q1"},
-  {piece:"q", pairId:"q1"}, {piece:"q", pairId:"q1"},
+let board=fenToBoard(SAMPLE_POSITION);
+let mode="setup";
+let setupAction="place";
+let selectedPalettePiece="K";
+let selectedSquare=null;
+let legalTargets=[];
+let moveCount=0;
+let turn="w";
+let lastMove=null;
 
-  {piece:"R", pairId:"R1"}, {piece:"R", pairId:"R1"},
-  {piece:"R", pairId:"R2"}, {piece:"R", pairId:"R2"},
-  {piece:"r", pairId:"r1"}, {piece:"r", pairId:"r1"},
-  {piece:"r", pairId:"r2"}, {piece:"r", pairId:"r2"},
-
-  {piece:"B", pairId:"B1"}, {piece:"B", pairId:"B1"},
-  {piece:"B", pairId:"B2"}, {piece:"B", pairId:"B2"},
-  {piece:"b", pairId:"b1"}, {piece:"b", pairId:"b1"},
-  {piece:"b", pairId:"b2"}, {piece:"b", pairId:"b2"},
-
-  {piece:"N", pairId:"N1"}, {piece:"N", pairId:"N1"},
-  {piece:"N", pairId:"N2"}, {piece:"N", pairId:"N2"},
-  {piece:"n", pairId:"n1"}, {piece:"n", pairId:"n1"},
-  {piece:"n", pairId:"n2"}, {piece:"n", pairId:"n2"}
-];
-
-let squares=[];
-let picks=[];
-let lockBoard=false;
-let matchedPairs=0;
-let startTime=0;
-const totalPairs=32;
-
-function shuffle(array){
-  const arr=[...array];
-  for(let i=arr.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [arr[i],arr[j]]=[arr[j],arr[i]];
-  }
-  return arr;
-}
-
-function createDeck(){
-  const full=[...BASE_DECK,...BASE_DECK];
-  return shuffle(full.map((card,index)=>({
-    piece:card.piece,
-    pairId:card.pairId+"-"+Math.floor(index/2),
-    uid:"u"+index+"-"+Math.random().toString(36).slice(2,8),
-    state:"hidden"
-  })));
+function bindTap(el,handler){
+  let used=false;
+  el.addEventListener("pointerup",e=>{
+    e.preventDefault();
+    used=true;
+    handler(e);
+    setTimeout(()=>{used=false},60);
+  });
+  el.addEventListener("click",e=>{
+    if(used) return;
+    e.preventDefault();
+    handler(e);
+  });
 }
 
 function coordsToSquare(file,rank){
   return FILES[file]+String(rank+1);
 }
 
-function formatDuration(ms){
-  const totalSeconds=Math.max(0, Math.floor(ms/1000));
-  const minutes=Math.floor(totalSeconds/60);
-  const seconds=totalSeconds%60;
-  return `${minutes} minute${minutes>1?"s":""} ${seconds} seconde${seconds>1?"s":""}`;
+function squareToCoords(square){
+  return {
+    file:FILES.indexOf(square[0]),
+    rank:parseInt(square[1],10)-1
+  };
 }
 
-function showWinMessage(){
-  const elapsed=Date.now()-startTime;
-  winText.textContent=`Vous avez trouvé en ${formatDuration(elapsed)}.`;
-  winOverlay.classList.add("show");
+function fenToBoard(fen){
+  const rows=fen.split("/");
+  const newBoard=Array.from({length:8},()=>Array(8).fill(""));
+
+  for(let r=0;r<8;r++){
+    let f=0;
+    for(const ch of rows[r]){
+      if(/\d/.test(ch)){
+        f+=parseInt(ch,10);
+      }else{
+        newBoard[7-r][f]=ch;
+        f++;
+      }
+    }
+  }
+  return newBoard;
 }
 
-function hideWinMessage(){
-  winOverlay.classList.remove("show");
+function cloneBoard(src){
+  return src.map(row=>row.slice());
 }
 
-function createBoard(){
-  squares=createDeck();
-  picks=[];
-  lockBoard=false;
-  matchedPairs=0;
-  startTime=Date.now();
-  hideWinMessage();
+function isWhite(piece){
+  return piece && piece===piece.toUpperCase();
+}
+
+function sameColor(a,b){
+  return a && b && isWhite(a)===isWhite(b);
+}
+
+function pathClear(boardState,from,to){
+  const dx=Math.sign(to.file-from.file);
+  const dy=Math.sign(to.rank-from.rank);
+  let f=from.file+dx;
+  let r=from.rank+dy;
+
+  while(f!==to.file || r!==to.rank){
+    if(boardState[r][f]) return false;
+    f+=dx;
+    r+=dy;
+  }
+  return true;
+}
+
+function canPieceMove(boardState,piece,from,to){
+  const dx=to.file-from.file;
+  const dy=to.rank-from.rank;
+  const adx=Math.abs(dx);
+  const ady=Math.abs(dy);
+  const white=isWhite(piece);
+  const lower=piece.toLowerCase();
+  const target=boardState[to.rank][to.file];
+
+  if(from.file===to.file && from.rank===to.rank) return false;
+  if(target && sameColor(piece,target)) return false;
+
+  if(lower==="p"){
+    const dir=white?1:-1;
+    const startRank=white?1:6;
+
+    if(dx===0){
+      if(target) return false;
+      if(dy===dir) return true;
+      if(from.rank===startRank && dy===2*dir && !boardState[from.rank+dir][from.file]) return true;
+      return false;
+    }
+
+    if(adx===1 && dy===dir && target && !sameColor(piece,target)) return true;
+    return false;
+  }
+
+  if(lower==="n") return (adx===1&&ady===2)||(adx===2&&ady===1);
+  if(lower==="b") return adx===ady && pathClear(boardState,from,to);
+  if(lower==="r") return (dx===0||dy===0) && pathClear(boardState,from,to);
+  if(lower==="q") return ((dx===0||dy===0)||(adx===ady)) && pathClear(boardState,from,to);
+  if(lower==="k") return Math.max(adx,ady)===1;
+
+  return false;
+}
+
+function allLegalTargets(squareName){
+  const from=squareToCoords(squareName);
+  const piece=board[from.rank][from.file];
+  if(!piece) return [];
+  if((turn==="w" && !isWhite(piece)) || (turn==="b" && isWhite(piece))) return [];
+
+  const targets=[];
+  for(let rank=0;rank<8;rank++){
+    for(let file=0;file<8;file++){
+      if(canPieceMove(board,piece,from,{file,rank})){
+        targets.push(coordsToSquare(file,rank));
+      }
+    }
+  }
+  return targets;
+}
+
+function setMode(newMode){
+  mode=newMode;
+  selectedSquare=null;
+  legalTargets=[];
+  setupModeBtn.classList.toggle("active",mode==="setup");
+  playModeBtn.classList.toggle("active",mode==="play");
+  setupPanel.style.display=mode==="setup"?"block":"none";
+
+  if(mode==="setup"){
+    statusEl.textContent="Mode reproduction : place les pièces sur l’échiquier.";
+  }else{
+    statusEl.textContent=(turn==="w"?"Aux blancs de jouer.":"Aux noirs de jouer.");
+  }
+
   renderBoard();
+}
+
+function setSetupAction(action){
+  setupAction=action;
+  placeBtn.classList.toggle("active",action==="place");
+  eraseBtn.classList.toggle("active",action==="erase");
+}
+
+function renderPalette(){
+  paletteEl.innerHTML="";
+  Object.entries(PIECES).forEach(([code,src])=>{
+    const btn=document.createElement("button");
+    btn.type="button";
+    btn.className="palette-btn"+(selectedPalettePiece===code?" active":"");
+
+    const img=document.createElement("img");
+    img.src=src;
+    img.alt=code;
+    img.className="palette-piece-img";
+
+    btn.appendChild(img);
+
+    bindTap(btn,()=>{
+      selectedPalettePiece=code;
+      renderPalette();
+    });
+    paletteEl.appendChild(btn);
+  });
 }
 
 function renderBoard(){
@@ -437,39 +619,29 @@ function renderBoard(){
 
   for(let row=7;row>=0;row--){
     for(let col=0;col<8;col++){
-      const idx=row*8+col;
-      const data=squares[idx];
-
       const sq=document.createElement("div");
       sq.className="square "+(((row+col)%2===0)?"white":"black");
+      const squareName=coordsToSquare(col,row);
 
-      if(data.state==="revealed" || data.state==="matched") sq.classList.add("flipped");
-      if(data.state==="matched") sq.classList.add("matched");
+      if(selectedSquare===squareName) sq.classList.add("selected-square");
+      if(legalTargets.includes(squareName)) sq.classList.add("legal-square");
+      if(lastMove && lastMove.from===squareName) sq.classList.add("from-square");
+      if(lastMove && lastMove.to===squareName) sq.classList.add("to-square");
+      if(lastMove && lastMove.capture && lastMove.to===squareName) sq.classList.add("capture-square");
 
-      const button=document.createElement("button");
-      button.className="card";
-      button.type="button";
-      button.setAttribute("aria-label", coordsToSquare(col,row));
+      const piece=board[row][col];
+      if(piece){
+        const wrap=document.createElement("div");
+        wrap.className="piece-wrap";
 
-      const inner=document.createElement("div");
-      inner.className="card-inner";
+        const img=document.createElement("img");
+        img.src=PIECES[piece];
+        img.alt=piece;
+        img.className="board-piece-img";
 
-      const back=document.createElement("div");
-      back.className="face back";
-
-      const front=document.createElement("div");
-      front.className="face front";
-
-      const piece=document.createElement("span");
-      piece.className="piece "+(data.piece===data.piece.toUpperCase() ? "white-piece " : "black-piece ")+data.piece;
-      piece.textContent=PIECES[data.piece];
-
-      front.appendChild(piece);
-      inner.appendChild(back);
-      inner.appendChild(front);
-      button.appendChild(inner);
-      button.onclick=()=>handleSquare(idx);
-      sq.appendChild(button);
+        wrap.appendChild(img);
+        sq.appendChild(wrap);
+      }
 
       if(row===0){
         const file=document.createElement("span");
@@ -485,63 +657,143 @@ function renderBoard(){
         sq.appendChild(rank);
       }
 
+      bindTap(sq,()=>handleSquareTap(squareName));
       boardEl.appendChild(sq);
     }
   }
 }
 
-function isPair(a,b){
-  return a.pairId===b.pairId && a.uid!==b.uid;
-}
+function handleSquareTap(squareName){
+  const {file,rank}=squareToCoords(squareName);
 
-function handleSquare(index){
-  if(lockBoard) return;
-
-  const card=squares[index];
-  if(card.state!=="hidden") return;
-
-  card.state="revealed";
-  picks.push(index);
-  renderBoard();
-
-  if(picks.length<2) return;
-
-  lockBoard=true;
-
-  const [i1,i2]=picks;
-  const a=squares[i1];
-  const b=squares[i2];
-
-  if(isPair(a,b)){
-    a.state="matched";
-    b.state="matched";
-    matchedPairs++;
-    picks=[];
-    lockBoard=false;
-    renderBoard();
-
-    if(matchedPairs===totalPairs){
-      setTimeout(showWinMessage,160);
+  if(mode==="setup"){
+    if(setupAction==="erase"){
+      board[rank][file]="";
+      lastMove=null;
+      statusEl.textContent=squareName+" vidée.";
+    }else{
+      board[rank][file]=selectedPalettePiece;
+      lastMove=null;
+      statusEl.textContent=squareName+" mise à jour.";
     }
+    renderBoard();
     return;
   }
 
-  setTimeout(()=>{
-    a.state="hidden";
-    b.state="hidden";
-    picks=[];
-    lockBoard=false;
+  const piece=board[rank][file];
+
+  if(!selectedSquare){
+    if(!piece){
+      statusEl.textContent="Choisis d’abord une pièce à déplacer.";
+      return;
+    }
+    if((turn==="w" && !isWhite(piece)) || (turn==="b" && isWhite(piece))){
+      statusEl.textContent="Ce n’est pas le tour de cette couleur.";
+      return;
+    }
+
+    selectedSquare=squareName;
+    legalTargets=allLegalTargets(squareName);
+    statusEl.textContent="Pièce sélectionnée : "+squareName+".";
     renderBoard();
-  },700);
+    return;
+  }
+
+  if(squareName===selectedSquare){
+    selectedSquare=null;
+    legalTargets=[];
+    statusEl.textContent=(turn==="w"?"Aux blancs de jouer.":"Aux noirs de jouer.");
+    renderBoard();
+    return;
+  }
+
+  if(piece && ((turn==="w" && isWhite(piece)) || (turn==="b" && !isWhite(piece)))){
+    selectedSquare=squareName;
+    legalTargets=allLegalTargets(squareName);
+    statusEl.textContent="Pièce sélectionnée : "+squareName+".";
+    renderBoard();
+    return;
+  }
+
+  if(!legalTargets.includes(squareName)){
+    statusEl.textContent="Déplacement non autorisé pour cette pièce.";
+    return;
+  }
+
+  movePiece(selectedSquare,squareName);
 }
 
-restartBtn.addEventListener("click",createBoard);
-winBtn.addEventListener("click",hideWinMessage);
-winOverlay.addEventListener("click",e=>{
-  if(e.target===winOverlay) hideWinMessage();
+function movePiece(fromSquare,toSquare){
+  const from=squareToCoords(fromSquare);
+  const to=squareToCoords(toSquare);
+  const moving=board[from.rank][from.file];
+  const target=board[to.rank][to.file];
+  const capture=!!target;
+
+  board[to.rank][to.file]=moving;
+  board[from.rank][from.file]="";
+
+  if(moving==="P" && to.rank===7) board[to.rank][to.file]="Q";
+  if(moving==="p" && to.rank===0) board[to.rank][to.file]="q";
+
+  lastMove={from:fromSquare,to:toSquare,capture};
+  selectedSquare=null;
+  legalTargets=[];
+  moveCount++;
+  turn=turn==="w"?"b":"w";
+  moveCounter.textContent="Coups joués : "+moveCount;
+  statusEl.textContent=(capture?"Prise : ":"Coup joué : ")+fromSquare+" → "+toSquare+". "+(turn==="w"?"Aux blancs de jouer.":"Aux noirs de jouer.");
+  renderBoard();
+}
+
+function loadSamplePosition(){
+  board=fenToBoard(SAMPLE_POSITION);
+  selectedSquare=null;
+  legalTargets=[];
+  moveCount=0;
+  turn="w";
+  lastMove=null;
+  moveCounter.textContent="Coups joués : 0";
+  statusEl.textContent="Position de l’image chargée. Aux blancs de jouer.";
+  renderBoard();
+}
+
+function clearBoard(){
+  board=Array.from({length:8},()=>Array(8).fill(""));
+  selectedSquare=null;
+  legalTargets=[];
+  moveCount=0;
+  turn="w";
+  lastMove=null;
+  moveCounter.textContent="Coups joués : 0";
+  statusEl.textContent="Échiquier vidé.";
+  renderBoard();
+}
+
+bindTap(setupModeBtn,()=>setMode("setup"));
+bindTap(playModeBtn,()=>setMode("play"));
+bindTap(placeBtn,()=>setSetupAction("place"));
+bindTap(eraseBtn,()=>setSetupAction("erase"));
+bindTap(loadSampleBtn,()=>loadSamplePosition());
+bindTap(resetSampleBtn,()=>loadSamplePosition());
+bindTap(clearBoardBtn,()=>clearBoard());
+
+imageInput.addEventListener("change",e=>{
+  const file=e.target.files && e.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    imagePreview.src=reader.result;
+    imagePreviewWrap.style.display="block";
+    statusEl.textContent="Image importée. Reproduis maintenant la position sur l’échiquier.";
+  };
+  reader.readAsDataURL(file);
 });
 
-createBoard();
+renderPalette();
+loadSamplePosition();
+setMode("setup");
+setSetupAction("place");
 </script>
 
 </body>
