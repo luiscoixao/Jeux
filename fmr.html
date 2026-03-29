@@ -10,7 +10,6 @@
   --bg:linear-gradient(135deg,#4f46e5,#7c3aed);
   --card:#ffffff;
   --text:#0f172a;
-  --accent:#4f46e5;
   --good:#22c55e;
   --bad:#ef4444;
 }
@@ -26,20 +25,27 @@ body{
   padding:20px;
 }
 
-h1{
-  margin:10px 0 20px;
-  font-size:34px;
-  font-weight:900;
+h1{margin:10px 0;font-size:34px;font-weight:900}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  width:100%;
+  max-width:420px;
+  font-size:14px;
+  margin-bottom:10px;
+  opacity:0.9;
 }
 
 .controls{
   display:flex;
-  gap:8px;
-  margin-bottom:16px;
+  gap:6px;
+  margin-bottom:12px;
+  flex-wrap:wrap;
 }
 
 button{
-  padding:10px 14px;
+  padding:8px 12px;
   border:none;
   border-radius:12px;
   font-weight:800;
@@ -48,15 +54,8 @@ button{
   color:#111;
 }
 
-.active{
-  background:#111;
-  color:#fff;
-}
-
-.start{
-  background:#22c55e;
-  color:#fff;
-}
+.active{background:#111;color:#fff}
+.start{background:#22c55e;color:#fff}
 
 .grid{
   display:grid;
@@ -72,7 +71,7 @@ button{
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:22px;
+  font-size:20px;
   font-weight:900;
   color:var(--text);
   cursor:pointer;
@@ -82,6 +81,13 @@ button{
 .hidden{color:transparent}
 .correct{background:var(--good);color:#fff}
 .wrong{background:var(--bad);color:#fff}
+
+.footer{
+  margin-top:12px;
+  font-size:13px;
+  opacity:0.8;
+  text-align:center;
+}
 </style>
 </head>
 
@@ -89,21 +95,39 @@ button{
 
 <h1>FLASHGRID</h1>
 
+<div class="top">
+  <div id="timer">0.00s</div>
+  <div id="best">Best: —</div>
+</div>
+
 <div class="controls">
   <button data-mode="classic" class="active">Classique</button>
   <button data-mode="memory">Mémoire</button>
+  <button data-size="4" class="active">4×4</button>
+  <button data-size="5">4×5</button>
+  <button data-size="6">4×6</button>
   <button id="start" class="start">Start</button>
 </div>
 
 <div id="grid" class="grid"></div>
 
+<div class="footer">
+  Touchez les nombres dans l’ordre le plus vite possible
+</div>
+
 <script>
 let mode="classic";
-let size=4;
+let cols=4;
+let rows=4;
 let order=[];
 let next=0;
 
-// nombres aléatoires uniques
+let startTime=0;
+let timerInterval;
+
+const timerEl=document.getElementById("timer");
+const bestEl=document.getElementById("best");
+
 function randomNumbers(n){
   const set=new Set();
   while(set.size<n){
@@ -112,19 +136,52 @@ function randomNumbers(n){
   return Array.from(set);
 }
 
+function updateBest(time){
+  const key=`best-${rows}x${cols}-${mode}`;
+  const best=localStorage.getItem(key);
+  if(!best || time<best){
+    localStorage.setItem(key,time);
+    bestEl.textContent="Best: "+time.toFixed(2)+"s";
+  }
+}
+
+function loadBest(){
+  const key=`best-${rows}x${cols}-${mode}`;
+  const best=localStorage.getItem(key);
+  bestEl.textContent="Best: "+(best?Number(best).toFixed(2)+"s":"—");
+}
+
 document.querySelectorAll("[data-mode]").forEach(btn=>{
   btn.onclick=()=>{
     document.querySelectorAll("[data-mode]").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
     mode=btn.dataset.mode;
+    loadBest();
+  };
+});
+
+document.querySelectorAll("[data-size]").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll("[data-size]").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    cols=parseInt(btn.dataset.size);
+    rows=4;
+    loadBest();
   };
 });
 
 document.getElementById("start").onclick=start;
 
 function start(){
-  const total=size*size;
+  clearInterval(timerInterval);
+  startTime=performance.now();
 
+  timerInterval=setInterval(()=>{
+    const t=(performance.now()-startTime)/1000;
+    timerEl.textContent=t.toFixed(2)+"s";
+  },50);
+
+  const total=rows*cols;
   order=randomNumbers(total).sort((a,b)=>a-b);
   next=0;
 
@@ -132,7 +189,7 @@ function start(){
 
   const grid=document.getElementById("grid");
   grid.innerHTML="";
-  grid.style.gridTemplateColumns=`repeat(${size},1fr)`;
+  grid.style.gridTemplateColumns=`repeat(${cols},1fr)`;
 
   shuffled.forEach(n=>{
     const tile=document.createElement("div");
@@ -156,11 +213,19 @@ function clickTile(tile,n){
     tile.classList.remove("hidden");
     tile.classList.add("correct");
     next++;
+
+    if(next===order.length){
+      clearInterval(timerInterval);
+      const finalTime=(performance.now()-startTime)/1000;
+      updateBest(finalTime);
+    }
   }else{
     tile.classList.add("wrong");
     setTimeout(()=>tile.classList.remove("wrong"),300);
   }
 }
+
+loadBest();
 </script>
 
 </body>
