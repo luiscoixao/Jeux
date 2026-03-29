@@ -218,8 +218,10 @@ h1{
 .piece-p{
   display:inline-block;
   font-size:clamp(42px, 8.2vw, 60px);
-  transform:scale(0.78) translateY(6%);
+  transform:scale(0.78);
   transform-origin:center center;
+  position:relative;
+  top:2px;
 }
 
 .white-piece{
@@ -340,13 +342,15 @@ h1{
     font-size:clamp(42px, 9vw, 58px);
     transform:none;
   }
-
+  
   .piece-p{
-    display:inline-block;
-    font-size:clamp(38px, 8vw, 52px);
-    transform:scale(0.78);
-    transform-origin:center center;
-  }
+  display:inline-block;
+  font-size:clamp(38px, 8vw, 52px);
+  transform:scale(0.78);
+  transform-origin:center center;
+  position:relative;
+  top:2px;
+}
 }
 </style>
 </head>
