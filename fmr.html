@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>CHESSMOVE</title>
+<title>CHESSFEN</title>
 
 <link rel="apple-touch-icon" href="iconchessmove.png" />
 <link rel="icon" href="icon.png" />
@@ -63,7 +63,6 @@ h1{
 .move-panel,
 .pieces-panel,
 .controls-panel,
-.image-panel,
 .fen-panel{
   background:var(--panel);
   padding:14px;
@@ -81,8 +80,7 @@ h1{
 
 .mode-btn,
 .action-btn,
-.small-btn,
-.file-label{
+.small-btn{
   flex:1;
   min-height:46px;
   border:none;
@@ -208,16 +206,16 @@ h1{
 
 .piece-N,.piece-B,.piece-R,.piece-Q,.piece-K,
 .piece-n,.piece-b,.piece-r,.piece-q,.piece-k{
-  font-size:clamp(42px, 8vw, 60px);
+  font-size:clamp(52px, 10vw, 74px);
 }
 
 .piece-P{
-  font-size:clamp(34px, 6.4vw, 48px);
+  font-size:clamp(44px, 8vw, 60px);
 }
 
 .piece-p{
-  font-size:clamp(29px, 5.4vw, 40px);
-  transform:scale(0.72);
+  font-size:clamp(40px, 7.2vw, 54px);
+  transform:scale(0.92);
   transform-origin:center center;
 }
 
@@ -277,7 +275,6 @@ h1{
 }
 
 .palette-title,
-.image-title,
 .fen-title{
   font-size:14px;
   font-weight:700;
@@ -315,40 +312,6 @@ h1{
   transform:scale(.78);
 }
 
-#imageInput{
-  display:none;
-}
-
-#imagePreviewWrap{
-  display:none;
-  margin-top:10px;
-  position:relative;
-}
-
-#imagePreview{
-  width:100%;
-  display:block;
-  border:1px solid rgba(255,255,255,.12);
-}
-
-#imageGrid{
-  position:absolute;
-  inset:0;
-  display:grid;
-  grid-template-columns:repeat(8,1fr);
-  grid-template-rows:repeat(8,1fr);
-}
-
-.image-cell{
-  border:1px solid rgba(255,255,255,.08);
-  cursor:pointer;
-  touch-action:manipulation;
-}
-
-.image-cell:active{
-  background:rgba(255,215,0,.18);
-}
-
 .helper{
   display:none;
 }
@@ -356,8 +319,7 @@ h1{
 @media (max-width:420px){
   .mode-btn,
   .action-btn,
-  .small-btn,
-  .file-label{
+  .small-btn{
     min-height:44px;
     font-size:14px;
   }
@@ -368,37 +330,25 @@ h1{
 
   .piece-N,.piece-B,.piece-R,.piece-Q,.piece-K,
   .piece-n,.piece-b,.piece-r,.piece-q,.piece-k{
-    font-size:clamp(38px, 8.4vw, 52px);
+    font-size:clamp(46px, 10vw, 62px);
   }
 
   .piece-P{
-    font-size:clamp(31px, 6.7vw, 44px);
+    font-size:clamp(39px, 8.5vw, 52px);
   }
 
   .piece-p{
-    font-size:clamp(27px, 5.7vw, 37px);
+    font-size:clamp(35px, 7.5vw, 47px);
+    transform:scale(0.92);
   }
 }
 </style>
 </head>
 <body>
 
-<h1>CHESSMOVE</h1>
+<h1>CHESSFEN</h1>
 
 <div class="app">
-  <div class="image-panel">
-    <div class="image-title">Image de référence</div>
-    <div class="small-row">
-      <label class="file-label" for="imageInput">Choisir une image</label>
-    </div>
-    <input id="imageInput" type="file" accept="image/*" />
-    <div id="imagePreviewWrap">
-      <img id="imagePreview" alt="Aperçu de l’image" />
-      <div id="imageGrid"></div>
-    </div>
-    <div class="helper">.</div>
-  </div>
-
   <div class="fen-panel">
     <div class="fen-title">Saisie FEN</div>
     <div class="small-row" style="margin-bottom:10px;">
@@ -464,10 +414,6 @@ const paletteEl=document.getElementById("palette");
 const placeBtn=document.getElementById("placeBtn");
 const eraseBtn=document.getElementById("eraseBtn");
 const clearBoardBtn=document.getElementById("clearBoardBtn");
-const imageInput=document.getElementById("imageInput");
-const imagePreview=document.getElementById("imagePreview");
-const imagePreviewWrap=document.getElementById("imagePreviewWrap");
-const imageGrid=document.getElementById("imageGrid");
 const fenInput=document.getElementById("fenInput");
 const loadFenBtn=document.getElementById("loadFenBtn");
 const fenOutput=document.getElementById("fenOutput");
@@ -691,41 +637,6 @@ function renderPalette(){
   });
 }
 
-function createImageGrid(){
-  imageGrid.innerHTML="";
-  for(let r=0;r<8;r++){
-    for(let c=0;c<8;c++){
-      const cell=document.createElement("div");
-      cell.className="image-cell";
-      bindTap(cell,()=>onImageCellTap(r,c));
-      imageGrid.appendChild(cell);
-    }
-  }
-}
-
-function onImageCellTap(r,c){
-  if(mode!=="setup"){
-    statusEl.textContent="Passe en mode reproduction pour utiliser l’image.";
-    return;
-  }
-
-  const boardRow=7-r;
-  const squareName=coordsToSquare(c,boardRow);
-
-  if(setupAction==="erase"){
-    board[boardRow][c]="";
-    lastMove=null;
-    statusEl.textContent=squareName+" vidée depuis l’image.";
-  }else{
-    board[boardRow][c]=selectedPalettePiece;
-    lastMove=null;
-    statusEl.textContent=squareName+" mise à jour depuis l’image.";
-  }
-
-  renderBoard();
-  updateFenOutput();
-}
-
 function renderBoard(){
   boardEl.innerHTML="";
 
@@ -917,21 +828,7 @@ fenInput.addEventListener("keydown",e=>{
   }
 });
 
-imageInput.addEventListener("change",e=>{
-  const file=e.target.files && e.target.files[0];
-  if(!file) return;
-  const reader=new FileReader();
-  reader.onload=()=>{
-    imagePreview.src=reader.result;
-    imagePreviewWrap.style.display="block";
-    createImageGrid();
-    statusEl.textContent="Image importée.";
-  };
-  reader.readAsDataURL(file);
-});
-
 renderPalette();
-createImageGrid();
 clearBoard();
 setMode("setup");
 setSetupAction("place");
