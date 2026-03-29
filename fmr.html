@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>CHESSFEN</title>
+<title>CHESSMEMORY</title>
 
-<link rel="apple-touch-icon" href="iconchessmove.png" />
-<link rel="icon" href="icon.png" />
+<link rel="apple-touch-icon" href="iconchessmemory.png" />
+<link rel="icon" href="iconchessmemory.png" />
 
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="CHESSMOVE" />
+<meta name="apple-mobile-web-app-title" content="CHESSMEMORY" />
 <meta name="theme-color" content="#2c2c2c" />
 
 <style>
@@ -20,9 +20,7 @@
   --light:#eeeed2;
   --dark:#769656;
   --text:#ffffff;
-  --muted:#d7d7d7;
-  --accent:#d4af37;
-  --danger:#ff745e;
+  --gold:#d4af37;
 }
 
 *{
@@ -59,78 +57,11 @@ h1{
   max-width:560px;
 }
 
-.panel,
-.move-panel,
-.pieces-panel,
-.controls-panel,
-.fen-panel{
+.controls-panel{
   background:var(--panel);
   padding:14px;
   margin-bottom:12px;
   box-shadow:0 8px 20px rgba(0,0,0,.18);
-}
-
-.mode-toggle,
-.action-row,
-.small-row{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.mode-btn,
-.action-btn,
-.small-btn{
-  flex:1;
-  min-height:46px;
-  border:none;
-  background:#4a4a4a;
-  color:#fff;
-  font-size:15px;
-  font-weight:700;
-  padding:0 12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  cursor:pointer;
-  appearance:none;
-  -webkit-appearance:none;
-}
-
-.mode-btn.active,
-.small-btn.active{
-  background:var(--accent);
-  color:#1d1d1d;
-}
-
-#fenInput,
-#fenOutput{
-  width:100%;
-  border:none;
-  background:#4a4a4a;
-  color:#fff;
-  font-size:15px;
-  padding:12px;
-  outline:none;
-  appearance:none;
-  -webkit-appearance:none;
-  border-radius:0;
-}
-
-#fenInput{
-  min-height:46px;
-}
-
-#fenOutput{
-  min-height:76px;
-  resize:none;
-  line-height:1.35;
-  display:none;
-}
-
-#fenInput::placeholder{
-  color:#cfcfcf;
 }
 
 #board-container{
@@ -154,12 +85,9 @@ h1{
   position:relative;
   width:100%;
   height:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
   user-select:none;
   overflow:hidden;
-  cursor:pointer;
+  perspective:900px;
 }
 
 .white{ background:var(--light); }
@@ -171,6 +99,7 @@ h1{
   opacity:.65;
   font-weight:700;
   pointer-events:none;
+  z-index:4;
 }
 
 .coord.file{
@@ -183,12 +112,58 @@ h1{
   top:2px;
 }
 
-.piece-wrap{
+.card{
+  position:absolute;
+  inset:0;
   width:100%;
   height:100%;
+  border:none;
+  background:none;
+  padding:0;
+  margin:0;
+  cursor:pointer;
+  touch-action:manipulation;
+}
+
+.card-inner{
+  position:relative;
+  width:100%;
+  height:100%;
+  transition:transform .42s ease;
+  transform-style:preserve-3d;
+}
+
+.square.flipped .card-inner{
+  transform:rotateY(180deg);
+}
+
+.face{
+  position:absolute;
+  inset:0;
   display:flex;
   align-items:center;
   justify-content:center;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+
+.back{
+  background:transparent;
+}
+
+.back::before{
+  content:"";
+  width:44%;
+  height:44%;
+  border-radius:50%;
+  background:rgba(0,0,0,.10);
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,.08),
+    0 1px 3px rgba(0,0,0,.12);
+}
+
+.front{
+  transform:rotateY(180deg);
 }
 
 .piece{
@@ -204,24 +179,9 @@ h1{
   transform-origin:center center;
 }
 
-/* PIÈCES AGRANDIES ET HOMOGÈNES */
 .piece-N,.piece-B,.piece-R,.piece-Q,.piece-K,
 .piece-n,.piece-b,.piece-r,.piece-q,.piece-k{
   font-size:clamp(56px, 11vw, 82px);
-}
-
-.piece-P{
-  font-size:clamp(46px, 9vw, 66px);
-  transform:none;
-}
-
-.piece-p{
-  display:inline-block;
-  font-size:clamp(42px, 8.2vw, 60px);
-  transform:scale(0.78);
-  transform-origin:center center;
-  position:relative;
-  top:2px;
 }
 
 .white-piece{
@@ -240,413 +200,157 @@ h1{
     0 1px 1px rgba(255,255,255,.06);
 }
 
-.selected-square{
-  outline:4px solid rgba(255,215,0,.95);
-  outline-offset:-4px;
+.square.matched{
+  box-shadow:inset 0 0 0 3px rgba(212,175,55,.95);
 }
 
-.legal-square{
-  box-shadow:inset 0 0 0 4px rgba(255,255,255,.5);
+.controls{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:28px;
+  background:var(--panel);
 }
 
-.from-square{
-  outline:3px solid rgba(255,215,0,.85);
-  outline-offset:-3px;
-}
-
-.to-square{
-  outline:3px solid rgba(169,209,142,.95);
-  outline-offset:-3px;
-}
-
-.capture-square{
-  box-shadow:inset 0 0 0 3px rgba(255,99,71,.95);
-}
-
-#move-counter{
-  text-align:center;
-  line-height:1.35;
-  font-size:18px;
-  font-weight:700;
-  margin-bottom:8px;
-}
-
-#status{
-  text-align:center;
-  line-height:1.35;
-  font-size:15px;
-  color:var(--muted);
-  min-height:42px;
-}
-
-.palette-title,
-.fen-title{
-  font-size:14px;
-  font-weight:700;
-  text-transform:uppercase;
-  letter-spacing:.04em;
-  margin-bottom:10px;
-  color:var(--muted);
-}
-
-.palette{
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  gap:8px;
-}
-
-.palette-btn{
-  min-height:54px;
+.control-btn{
+  width:52px;
+  height:52px;
   border:none;
-  background:#4a4a4a;
+  background:var(--bg);
   color:#fff;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:34px;
+  appearance:none;
+  -webkit-appearance:none;
   cursor:pointer;
+  touch-action:manipulation;
+  box-shadow:none;
   padding:0;
 }
 
-.palette-btn.active{
-  outline:3px solid var(--accent);
-  outline-offset:-3px;
+.control-btn span{
+  font-size:24px;
+  line-height:1;
+  display:block;
 }
 
-.palette-btn .mini{
-  transform:scale(.78);
+.control-btn:active{
+  transform:scale(.94);
 }
 
-.helper{
-  display:none;
+.footer-note{
+  text-align:center;
+  color:#cfcfcf;
+  font-size:12px;
+  line-height:1.35;
+  margin-top:4px;
+  opacity:.82;
 }
 
 @media (max-width:420px){
-  .mode-btn,
-  .action-btn,
-  .small-btn{
-    min-height:44px;
-    font-size:14px;
+  .control-btn{
+    width:46px;
+    height:46px;
   }
 
-  .palette{
-    grid-template-columns:repeat(4,1fr);
+  .control-btn span{
+    font-size:22px;
   }
 
   .piece-N,.piece-B,.piece-R,.piece-Q,.piece-K,
-  .piece-n,.piece-b,.piece-r,.piece-q,.piece-k{
+  .piece-n,.piece.b,.piece-r,.piece-q,.piece-k{
     font-size:clamp(50px, 11vw, 70px);
-  }
-
-  .piece-P{
-    font-size:clamp(42px, 9vw, 58px);
-    transform:none;
-  }
-
-  .piece-p{
-    display:inline-block;
-    font-size:clamp(38px, 8vw, 52px);
-    transform:scale(0.78);
-    transform-origin:center center;
-    position:relative;
-    top:2px;
   }
 }
 </style>
 </head>
 <body>
 
-<h1>CHESSFEN</h1>
+<h1>CHESSMEMORY</h1>
 
 <div class="app">
-  <div class="fen-panel">
-    <div class="fen-title">Saisie FEN</div>
-    <div class="small-row" style="margin-bottom:10px;">
-      <input id="fenInput" type="text" placeholder="Exemple : r5k1/2p2p1p/1p2pqp1/p2p4/2PBn3/1P6/2R2PPP/4QRK1" />
-    </div>
-    <div class="small-row">
-      <button class="small-btn" id="loadFenBtn" type="button">Charger FEN</button>
-    </div>
-    <div class="helper">.</div>
-  </div>
-
-  <div class="panel">
-    <div class="mode-toggle">
-      <button class="mode-btn active" id="setupModeBtn" type="button">Reproduction</button>
-      <button class="mode-btn" id="playModeBtn" type="button">Déplacement</button>
-    </div>
-  </div>
-
   <div id="board-container">
     <div id="board"></div>
   </div>
 
-  <div class="pieces-panel" id="setupPanel">
-    <div class="palette-title">Pièce à poser</div>
-    <div class="palette" id="palette"></div>
-    <div class="small-row" style="margin-top:10px;">
-      <button class="small-btn active" id="placeBtn" type="button">Poser</button>
-      <button class="small-btn" id="eraseBtn" type="button">Effacer</button>
-    </div>
-    <div class="helper">.</div>
-  </div>
-
-  <div class="move-panel">
-    <div id="move-counter">Coups joués : 0</div>
-    <div id="status">Mode reproduction : place les pièces sur l’échiquier.</div>
-  </div>
-
-  <div class="fen-panel">
-    <div class="fen-title">Analyse</div>
-    <div class="small-row" style="margin-bottom:10px;">
-      <textarea id="fenOutput" readonly></textarea>
-    </div>
-    <div class="small-row">
-      <button class="small-btn" id="analyzeBtn" type="button">Analyser la position</button>
-    </div>
-  </div>
-
   <div class="controls-panel">
-    <div class="action-row">
-      <button class="action-btn" id="clearBoardBtn" type="button">Vider l’échiquier</button>
+    <div class="controls">
+      <button class="control-btn" id="restartBtn" type="button" aria-label="Rejouer"><span>🔄</span></button>
     </div>
   </div>
+
+  <div class="footer-note">Jeu imaginé par Luis et créé par ChatGPT</div>
 </div>
 
 <script>
 const boardEl=document.getElementById("board");
-const statusEl=document.getElementById("status");
-const moveCounter=document.getElementById("move-counter");
-const setupModeBtn=document.getElementById("setupModeBtn");
-const playModeBtn=document.getElementById("playModeBtn");
-const setupPanel=document.getElementById("setupPanel");
-const paletteEl=document.getElementById("palette");
-const placeBtn=document.getElementById("placeBtn");
-const eraseBtn=document.getElementById("eraseBtn");
-const clearBoardBtn=document.getElementById("clearBoardBtn");
-const fenInput=document.getElementById("fenInput");
-const loadFenBtn=document.getElementById("loadFenBtn");
-const fenOutput=document.getElementById("fenOutput");
-const analyzeBtn=document.getElementById("analyzeBtn");
+const restartBtn=document.getElementById("restartBtn");
 
 const FILES=["a","b","c","d","e","f","g","h"];
 const PIECES={
-  "P":"♙","N":"♘","B":"♗","R":"♖","Q":"♕","K":"♔",
-  "p":"♟","n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
+  "N":"♘","B":"♗","R":"♖","Q":"♕","K":"♔",
+  "n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
 };
 
-const FEN_STORAGE_KEY = "chessfen-last-fen";
+const BASE_DECK = [
+  {piece:"K", pairId:"K1"}, {piece:"K", pairId:"K1"},
+  {piece:"k", pairId:"k1"}, {piece:"k", pairId:"k1"},
 
-let board=createEmptyBoard();
-let mode="setup";
-let setupAction="place";
-let selectedPalettePiece="K";
-let selectedSquare=null;
-let legalTargets=[];
-let moveCount=0;
-let turn="w";
-let lastMove=null;
+  {piece:"Q", pairId:"Q1"}, {piece:"Q", pairId:"Q1"},
+  {piece:"q", pairId:"q1"}, {piece:"q", pairId:"q1"},
 
-function bindTap(el,handler){
-  el.addEventListener("click",handler);
+  {piece:"R", pairId:"R1"}, {piece:"R", pairId:"R1"},
+  {piece:"R", pairId:"R2"}, {piece:"R", pairId:"R2"},
+  {piece:"r", pairId:"r1"}, {piece:"r", pairId:"r1"},
+  {piece:"r", pairId:"r2"}, {piece:"r", pairId:"r2"},
+
+  {piece:"B", pairId:"B1"}, {piece:"B", pairId:"B1"},
+  {piece:"B", pairId:"B2"}, {piece:"B", pairId:"B2"},
+  {piece:"b", pairId:"b1"}, {piece:"b", pairId:"b1"},
+  {piece:"b", pairId:"b2"}, {piece:"b", pairId:"b2"},
+
+  {piece:"N", pairId:"N1"}, {piece:"N", pairId:"N1"},
+  {piece:"N", pairId:"N2"}, {piece:"N", pairId:"N2"},
+  {piece:"n", pairId:"n1"}, {piece:"n", pairId:"n1"},
+  {piece:"n", pairId:"n2"}, {piece:"n", pairId:"n2"}
+];
+
+let squares=[];
+let picks=[];
+let lockBoard=false;
+let matchedPairs=0;
+const totalPairs=32;
+
+function shuffle(array){
+  const arr=[...array];
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
 }
 
-function createEmptyBoard(){
-  return Array.from({length:8},()=>Array(8).fill(""));
+function createDeck(){
+  const full=[...BASE_DECK,...BASE_DECK];
+  return shuffle(full.map((card,index)=>({
+    piece:card.piece,
+    pairId:card.pairId+"-"+Math.floor(index/2),
+    uid:"u"+index+"-"+Math.random().toString(36).slice(2,8),
+    state:"hidden"
+  })));
 }
 
 function coordsToSquare(file,rank){
   return FILES[file]+String(rank+1);
 }
 
-function squareToCoords(square){
-  return {
-    file:FILES.indexOf(square[0]),
-    rank:parseInt(square[1],10)-1
-  };
-}
-
-function fenToBoard(fen){
-  const positionPart=fen.trim().split(" ")[0];
-  const rows=positionPart.split("/");
-
-  if(rows.length!==8){
-    throw new Error("FEN invalide");
-  }
-
-  const newBoard=Array.from({length:8},()=>Array(8).fill(""));
-
-  for(let r=0;r<8;r++){
-    let f=0;
-    for(const ch of rows[r]){
-      if(/\d/.test(ch)){
-        f+=parseInt(ch,10);
-      }else if("KQRBNPkqrbnp".includes(ch)){
-        if(f>7) throw new Error("FEN invalide");
-        newBoard[7-r][f]=ch;
-        f++;
-      }else{
-        throw new Error("FEN invalide");
-      }
-    }
-    if(f!==8){
-      throw new Error("FEN invalide");
-    }
-  }
-
-  return newBoard;
-}
-
-function boardToPositionFen(){
-  const rows=[];
-  for(let r=7;r>=0;r--){
-    let row="";
-    let empty=0;
-
-    for(let f=0;f<8;f++){
-      const piece=board[r][f];
-      if(piece){
-        if(empty){
-          row+=String(empty);
-          empty=0;
-        }
-        row+=piece;
-      }else{
-        empty++;
-      }
-    }
-
-    if(empty) row+=String(empty);
-    rows.push(row);
-  }
-
-  return rows.join("/");
-}
-
-function boardToFullFen(){
-  return boardToPositionFen()+" "+turn+" - - 0 1";
-}
-
-function updateFenOutput(){
-  fenOutput.value=boardToFullFen();
-}
-
-function isWhite(piece){
-  return piece && piece===piece.toUpperCase();
-}
-
-function sameColor(a,b){
-  return a && b && isWhite(a)===isWhite(b);
-}
-
-function pathClear(boardState,from,to){
-  const dx=Math.sign(to.file-from.file);
-  const dy=Math.sign(to.rank-from.rank);
-  let f=from.file+dx;
-  let r=from.rank+dy;
-
-  while(f!==to.file || r!==to.rank){
-    if(boardState[r][f]) return false;
-    f+=dx;
-    r+=dy;
-  }
-  return true;
-}
-
-function canPieceMove(boardState,piece,from,to){
-  const dx=to.file-from.file;
-  const dy=to.rank-from.rank;
-  const adx=Math.abs(dx);
-  const ady=Math.abs(dy);
-  const white=isWhite(piece);
-  const lower=piece.toLowerCase();
-  const target=boardState[to.rank][to.file];
-
-  if(from.file===to.file && from.rank===to.rank) return false;
-  if(target && sameColor(piece,target)) return false;
-
-  if(lower==="p"){
-    const dir=white?1:-1;
-    const startRank=white?1:6;
-
-    if(dx===0){
-      if(target) return false;
-      if(dy===dir) return true;
-      if(from.rank===startRank && dy===2*dir && !boardState[from.rank+dir][from.file]) return true;
-      return false;
-    }
-
-    if(adx===1 && dy===dir && target && !sameColor(piece,target)) return true;
-    return false;
-  }
-
-  if(lower==="n") return (adx===1&&ady===2)||(adx===2&&ady===1);
-  if(lower==="b") return adx===ady && pathClear(boardState,from,to);
-  if(lower==="r") return (dx===0||dy===0) && pathClear(boardState,from,to);
-  if(lower==="q") return ((dx===0||dy===0)||(adx===ady)) && pathClear(boardState,from,to);
-  if(lower==="k") return Math.max(adx,ady)===1;
-
-  return false;
-}
-
-function allLegalTargets(squareName){
-  const from=squareToCoords(squareName);
-  const piece=board[from.rank][from.file];
-  if(!piece) return [];
-  if((turn==="w" && !isWhite(piece)) || (turn==="b" && isWhite(piece))) return [];
-
-  const targets=[];
-  for(let rank=0;rank<8;rank++){
-    for(let file=0;file<8;file++){
-      if(canPieceMove(board,piece,from,{file,rank})){
-        targets.push(coordsToSquare(file,rank));
-      }
-    }
-  }
-  return targets;
-}
-
-function setMode(newMode){
-  mode=newMode;
-  selectedSquare=null;
-  legalTargets=[];
-  setupModeBtn.classList.toggle("active",mode==="setup");
-  playModeBtn.classList.toggle("active",mode==="play");
-  setupPanel.style.display=mode==="setup"?"block":"none";
-
-  if(mode==="setup"){
-    statusEl.textContent="Mode reproduction : place les pièces sur l’échiquier.";
-  }else{
-    statusEl.textContent=(turn==="w"?"Aux blancs de jouer.":"Aux noirs de jouer.");
-  }
-
+function createBoard(){
+  squares=createDeck();
+  picks=[];
+  lockBoard=false;
+  matchedPairs=0;
   renderBoard();
-  updateFenOutput();
-}
-
-function setSetupAction(action){
-  setupAction=action;
-  placeBtn.classList.toggle("active",action==="place");
-  eraseBtn.classList.toggle("active",action==="erase");
-}
-
-function renderPalette(){
-  paletteEl.innerHTML="";
-  Object.entries(PIECES).forEach(([code,symbol])=>{
-    const btn=document.createElement("button");
-    btn.type="button";
-    btn.className="palette-btn"+(selectedPalettePiece===code?" active":"");
-    const cls=isWhite(code)?"white-piece":"black-piece";
-    const pawnMini=(code==="p")?" mini":"";
-    btn.innerHTML='<span class="piece piece-'+code+' '+cls+pawnMini+'">'+symbol+'</span>';
-
-    bindTap(btn,()=>{
-      selectedPalettePiece=code;
-      renderPalette();
-    });
-
-    paletteEl.appendChild(btn);
-  });
 }
 
 function renderBoard(){
@@ -654,28 +358,39 @@ function renderBoard(){
 
   for(let row=7;row>=0;row--){
     for(let col=0;col<8;col++){
+      const idx=row*8+col;
+      const data=squares[idx];
+
       const sq=document.createElement("div");
       sq.className="square "+(((row+col)%2===0)?"white":"black");
-      const squareName=coordsToSquare(col,row);
 
-      if(selectedSquare===squareName) sq.classList.add("selected-square");
-      if(legalTargets.includes(squareName)) sq.classList.add("legal-square");
-      if(lastMove && lastMove.from===squareName) sq.classList.add("from-square");
-      if(lastMove && lastMove.to===squareName) sq.classList.add("to-square");
-      if(lastMove && lastMove.capture && lastMove.to===squareName) sq.classList.add("capture-square");
+      if(data.state==="revealed" || data.state==="matched") sq.classList.add("flipped");
+      if(data.state==="matched") sq.classList.add("matched");
 
-      const piece=board[row][col];
-      if(piece){
-        const wrap=document.createElement("div");
-        wrap.className="piece-wrap";
+      const button=document.createElement("button");
+      button.className="card";
+      button.type="button";
+      button.setAttribute("aria-label", coordsToSquare(col,row));
 
-        const span=document.createElement("span");
-        span.className="piece "+(isWhite(piece)?"white-piece ":"black-piece ")+"piece-"+piece;
-        span.textContent=PIECES[piece];
+      const inner=document.createElement("div");
+      inner.className="card-inner";
 
-        wrap.appendChild(span);
-        sq.appendChild(wrap);
-      }
+      const back=document.createElement("div");
+      back.className="face back";
+
+      const front=document.createElement("div");
+      front.className="face front";
+
+      const piece=document.createElement("span");
+      piece.className="piece "+(data.piece===data.piece.toUpperCase() ? "white-piece " : "black-piece ")+"piece-"+data.piece;
+      piece.textContent=PIECES[data.piece];
+
+      front.appendChild(piece);
+      inner.appendChild(back);
+      inner.appendChild(front);
+      button.appendChild(inner);
+      button.onclick=()=>handleSquare(idx);
+      sq.appendChild(button);
 
       if(row===0){
         const file=document.createElement("span");
@@ -691,170 +406,59 @@ function renderBoard(){
         sq.appendChild(rank);
       }
 
-      bindTap(sq,()=>handleSquareTap(squareName));
       boardEl.appendChild(sq);
     }
   }
 }
 
-function handleSquareTap(squareName){
-  const {file,rank}=squareToCoords(squareName);
-
-  if(mode==="setup"){
-    if(setupAction==="erase"){
-      board[rank][file]="";
-      lastMove=null;
-      statusEl.textContent=squareName+" vidée.";
-    }else{
-      board[rank][file]=selectedPalettePiece;
-      lastMove=null;
-      statusEl.textContent=squareName+" mise à jour.";
-    }
-    renderBoard();
-    updateFenOutput();
-    return;
-  }
-
-  const piece=board[rank][file];
-
-  if(!selectedSquare){
-    if(!piece){
-      statusEl.textContent="Choisis d’abord une pièce à déplacer.";
-      return;
-    }
-    if((turn==="w" && !isWhite(piece)) || (turn==="b" && isWhite(piece))){
-      statusEl.textContent="Ce n’est pas le tour de cette couleur.";
-      return;
-    }
-
-    selectedSquare=squareName;
-    legalTargets=allLegalTargets(squareName);
-    statusEl.textContent="Pièce sélectionnée : "+squareName+".";
-    renderBoard();
-    return;
-  }
-
-  if(squareName===selectedSquare){
-    selectedSquare=null;
-    legalTargets=[];
-    statusEl.textContent=(turn==="w"?"Aux blancs de jouer.":"Aux noirs de jouer.");
-    renderBoard();
-    return;
-  }
-
-  if(piece && ((turn==="w" && isWhite(piece)) || (turn==="b" && !isWhite(piece)))){
-    selectedSquare=squareName;
-    legalTargets=allLegalTargets(squareName);
-    statusEl.textContent="Pièce sélectionnée : "+squareName+".";
-    renderBoard();
-    return;
-  }
-
-  if(!legalTargets.includes(squareName)){
-    statusEl.textContent="Déplacement non autorisé pour cette pièce.";
-    return;
-  }
-
-  movePiece(selectedSquare,squareName);
+function isPair(a,b){
+  return a.pairId===b.pairId && a.uid!==b.uid;
 }
 
-function movePiece(fromSquare,toSquare){
-  const from=squareToCoords(fromSquare);
-  const to=squareToCoords(toSquare);
-  const moving=board[from.rank][from.file];
-  const target=board[to.rank][to.file];
-  const capture=!!target;
+function handleSquare(index){
+  if(lockBoard) return;
 
-  board[to.rank][to.file]=moving;
-  board[from.rank][from.file]="";
+  const card=squares[index];
+  if(card.state!=="hidden") return;
 
-  if(moving==="P" && to.rank===7) board[to.rank][to.file]="Q";
-  if(moving==="p" && to.rank===0) board[to.rank][to.file]="q";
-
-  lastMove={from:fromSquare,to:toSquare,capture};
-  selectedSquare=null;
-  legalTargets=[];
-  moveCount++;
-  turn=turn==="w"?"b":"w";
-  moveCounter.textContent="Coups joués : "+moveCount;
-  statusEl.textContent=(capture?"Prise : ":"Coup joué : ")+fromSquare+" → "+toSquare+". "+(turn==="w"?"Aux blancs de jouer.":"Aux noirs de jouer.");
+  card.state="revealed";
+  picks.push(index);
   renderBoard();
-  updateFenOutput();
-}
 
-function loadFenPosition(){
-  const value=fenInput.value.trim();
-  if(!value){
-    statusEl.textContent="Saisis une position FEN.";
+  if(picks.length<2) return;
+
+  lockBoard=true;
+
+  const [i1,i2]=picks;
+  const a=squares[i1];
+  const b=squares[i2];
+
+  if(isPair(a,b)){
+    a.state="matched";
+    b.state="matched";
+    matchedPairs++;
+    picks=[];
+    lockBoard=false;
+    renderBoard();
+
+    if(matchedPairs===totalPairs){
+      setTimeout(()=>alert("✓"),160);
+    }
     return;
   }
 
-  localStorage.setItem(FEN_STORAGE_KEY, value);
-
-  try{
-    board=fenToBoard(value);
-    selectedSquare=null;
-    legalTargets=[];
-    moveCount=0;
-    turn="w";
-    lastMove=null;
-    moveCounter.textContent="Coups joués : 0";
-    statusEl.textContent="Position FEN chargée.";
+  setTimeout(()=>{
+    a.state="hidden";
+    b.state="hidden";
+    picks=[];
+    lockBoard=false;
     renderBoard();
-    updateFenOutput();
-  }catch(err){
-    statusEl.textContent="FEN invalide.";
-  }
+  },700);
 }
 
-function clearBoard(){
-  board=createEmptyBoard();
-  selectedSquare=null;
-  legalTargets=[];
-  moveCount=0;
-  turn="w";
-  lastMove=null;
-  moveCounter.textContent="Coups joués : 0";
-  statusEl.textContent="Échiquier vidé.";
-  renderBoard();
-  updateFenOutput();
-}
+restartBtn.addEventListener("click",createBoard);
 
-function analyzePosition(){
-  const fullFen=boardToFullFen();
-  const lichessFen=fullFen.replace(/ /g,"_");
-  const url="https://lichess.org/analysis/standard/"+lichessFen;
-  window.location.href=url;
-}
-
-bindTap(setupModeBtn,()=>setMode("setup"));
-bindTap(playModeBtn,()=>setMode("play"));
-bindTap(placeBtn,()=>setSetupAction("place"));
-bindTap(eraseBtn,()=>setSetupAction("erase"));
-bindTap(loadFenBtn,()=>loadFenPosition());
-bindTap(clearBoardBtn,()=>clearBoard());
-bindTap(analyzeBtn,()=>analyzePosition());
-
-fenInput.addEventListener("keydown",e=>{
-  if(e.key==="Enter"){
-    e.preventDefault();
-    loadFenPosition();
-  }
-});
-
-fenInput.addEventListener("input",()=>{
-  localStorage.setItem(FEN_STORAGE_KEY, fenInput.value);
-});
-
-const savedFen = localStorage.getItem(FEN_STORAGE_KEY);
-if(savedFen){
-  fenInput.value = savedFen;
-}
-
-renderPalette();
-clearBoard();
-setMode("setup");
-setSetupAction("place");
+createBoard();
 </script>
 
 </body>
