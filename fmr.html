@@ -1,141 +1,166 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FLASHGRID</title>
 
-<meta name="theme-color" content="#eef2ff" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-
 <style>
-/* (CSS inchangé) */
 :root{
-  --bg:#eef2ff;
-  --card:rgba(255,255,255,.82);
+  --bg:linear-gradient(135deg,#4f46e5,#7c3aed);
+  --card:#ffffff;
   --text:#0f172a;
-  --line:rgba(148,163,184,.22);
   --accent:#4f46e5;
-  --good:#16a34a;
-  --bad:#dc2626;
-  --gold:#f59e0b;
+  --good:#22c55e;
+  --bad:#ef4444;
 }
-body{margin:0;font-family:-apple-system;background:#eef2ff;padding:10px}
-.controls{display:grid;gap:10px}
-.segmented{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.segmented button,.toolbar button{
-  border:none;border-radius:14px;padding:12px;font-weight:800
-}
-.segmented button{background:#fff}
-.segmented button.active{background:#111;color:#fff}
-.toolbar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.primary{background:#4f46e5;color:#fff}
-.secondary{background:#fff}
-.warning{background:#f59e0b;color:#fff}
 
-.grid{display:grid;gap:10px;margin-top:12px}
-.tile{
-  aspect-ratio:1;
-  border-radius:16px;
-  background:#fff;
-  font-size:22px;
+body{
+  margin:0;
+  font-family:-apple-system;
+  background:var(--bg);
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:20px;
+}
+
+h1{
+  margin:10px 0 20px;
+  font-size:34px;
   font-weight:900;
 }
-.tile.correct{background:#22c55e;color:#fff}
-.tile.wrong{background:#ef4444;color:#fff}
-.tile.hiddenNum{color:transparent}
+
+.controls{
+  display:flex;
+  gap:8px;
+  margin-bottom:16px;
+}
+
+button{
+  padding:10px 14px;
+  border:none;
+  border-radius:12px;
+  font-weight:800;
+  cursor:pointer;
+  background:#fff;
+  color:#111;
+}
+
+.active{
+  background:#111;
+  color:#fff;
+}
+
+.start{
+  background:#22c55e;
+  color:#fff;
+}
+
+.grid{
+  display:grid;
+  gap:10px;
+  width:90vw;
+  max-width:420px;
+}
+
+.tile{
+  aspect-ratio:1;
+  background:var(--card);
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  font-weight:900;
+  color:var(--text);
+  cursor:pointer;
+  box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
+
+.hidden{color:transparent}
+.correct{background:var(--good);color:#fff}
+.wrong{background:var(--bad);color:#fff}
 </style>
 </head>
 
 <body>
 
-<div class="controls">
-  <div class="segmented" id="modeButtons">
-    <button data-mode="classic" class="active">Classique</button>
-    <button data-mode="memory">Mémoire</button>
-    <button data-mode="flash">Flash</button>
-  </div>
+<h1>FLASHGRID</h1>
 
-  <div class="toolbar">
-    <button class="primary" id="startBtn">Start</button>
-    <button class="secondary" id="hintBtn">Hint</button>
-    <button class="warning" id="pauseBtn">Pause</button>
-  </div>
+<div class="controls">
+  <button data-mode="classic" class="active">Classique</button>
+  <button data-mode="memory">Mémoire</button>
+  <button id="start" class="start">Start</button>
 </div>
 
-<div class="grid" id="gameGrid"></div>
+<div id="grid" class="grid"></div>
 
 <script>
-const state = {
-  mode:"classic",
-  size:4,
-  order:[],
-  next:1,
-  running:false,
-  paused:false,
-};
+let mode="classic";
+let size=4;
+let order=[];
+let next=0;
 
-const $ = s => document.querySelector(s);
-const $$ = s => document.querySelectorAll(s);
-const gameGrid = $("#gameGrid");
-
-function shuffle(a){
-  return a.sort(()=>Math.random()-0.5);
+// nombres aléatoires uniques
+function randomNumbers(n){
+  const set=new Set();
+  while(set.size<n){
+    set.add(Math.floor(Math.random()*99)+1);
+  }
+  return Array.from(set);
 }
 
-function setMode(mode){
-  state.mode=mode;
-  $$("#modeButtons button").forEach(b=>b.classList.toggle("active",b.dataset.mode===mode));
-}
+document.querySelectorAll("[data-mode]").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll("[data-mode]").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    mode=btn.dataset.mode;
+  };
+});
 
-function makeTiles(){
-  const total=state.size*state.size;
-  state.order=shuffle([...Array(total)].map((_,i)=>i+1));
-  state.next=1;
+document.getElementById("start").onclick=start;
 
-  gameGrid.innerHTML="";
-  gameGrid.style.gridTemplateColumns=`repeat(${state.size},1fr)`;
+function start(){
+  const total=size*size;
 
-  state.order.forEach(n=>{
-    const btn=document.createElement("button");
-    btn.className="tile";
-    btn.textContent=n;
-    btn.onclick=()=>handleTile(btn,n);
-    gameGrid.appendChild(btn);
+  order=randomNumbers(total).sort((a,b)=>a-b);
+  next=0;
+
+  const shuffled=[...order].sort(()=>Math.random()-0.5);
+
+  const grid=document.getElementById("grid");
+  grid.innerHTML="";
+  grid.style.gridTemplateColumns=`repeat(${size},1fr)`;
+
+  shuffled.forEach(n=>{
+    const tile=document.createElement("div");
+    tile.className="tile";
+    tile.textContent=n;
+    tile.onclick=()=>clickTile(tile,n);
+    grid.appendChild(tile);
   });
-}
 
-function hideAll(){
-  document.querySelectorAll(".tile").forEach(t=>t.classList.add("hiddenNum"));
-}
-
-function startGame(){
-  state.running=true;
-  makeTiles();
-
-  if(state.mode==="memory") setTimeout(hideAll,2000);
-  if(state.mode==="flash") setTimeout(hideAll,800);
-}
-
-function handleTile(btn,n){
-  if(!state.running) return;
-
-  if(n===state.next){
-    btn.classList.remove("hiddenNum");
-    btn.classList.add("correct");
-    btn.disabled=true;
-    state.next++;
-  } else {
-    btn.classList.add("wrong");
-    setTimeout(()=>btn.classList.remove("wrong"),300);
+  if(mode==="memory"){
+    setTimeout(()=>hideAll(),2000);
   }
 }
 
-$("#startBtn").onclick=startGame;
+function hideAll(){
+  document.querySelectorAll(".tile").forEach(t=>t.classList.add("hidden"));
+}
 
-$$("#modeButtons button").forEach(btn=>{
-  btn.onclick=()=>setMode(btn.dataset.mode);
-});
+function clickTile(tile,n){
+  if(n===order[next]){
+    tile.classList.remove("hidden");
+    tile.classList.add("correct");
+    next++;
+  }else{
+    tile.classList.add("wrong");
+    setTimeout(()=>tile.classList.remove("wrong"),300);
+  }
+}
 </script>
 
 </body>
