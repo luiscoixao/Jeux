@@ -2,102 +2,123 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <title>FLASHGRID</title>
+
+<meta name="theme-color" content="#eef2ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
 
 <style>
 :root{
-  --bg:linear-gradient(135deg,#4f46e5,#7c3aed);
+  --bg1:#4f46e5;
+  --bg2:#7c3aed;
   --card:#ffffff;
   --text:#0f172a;
+  --line:rgba(255,255,255,.22);
   --good:#22c55e;
   --bad:#ef4444;
 }
-
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{
   margin:0;
+  min-height:100vh;
   font-family:-apple-system;
-  background:var(--bg);
+  background:linear-gradient(135deg,var(--bg1),var(--bg2));
   color:#fff;
   display:flex;
   flex-direction:column;
   align-items:center;
-  padding:20px;
+  padding:20px 18px 120px;
 }
-
-h1{margin:10px 0;font-size:34px;font-weight:900}
+.app{width:100%;max-width:460px}
+h1{text-align:center;font-size:38px;margin:10px 0;font-weight:900}
 
 .top{
-  display:flex;
-  justify-content:space-between;
-  width:100%;
-  max-width:420px;
-  font-size:14px;
-  margin-bottom:10px;
-  opacity:0.9;
+  display:flex;gap:10px;margin-bottom:12px
+}
+.top div{
+  flex:1;
+  text-align:center;
+  padding:10px;
+  background:rgba(255,255,255,.12);
+  border-radius:14px;
 }
 
 .controls{
   display:flex;
   gap:6px;
-  margin-bottom:12px;
   flex-wrap:wrap;
+  justify-content:center;
+  margin-bottom:12px;
 }
 
 button{
-  padding:8px 12px;
+  padding:10px 12px;
   border:none;
   border-radius:12px;
   font-weight:800;
   cursor:pointer;
-  background:#fff;
-  color:#111;
 }
 
 .active{background:#111;color:#fff}
-.start{background:#22c55e;color:#fff}
+button:not(.active){background:#fff}
 
 .grid{
   display:grid;
   gap:10px;
-  width:90vw;
-  max-width:420px;
+  width:100%;
 }
 
 .tile{
   aspect-ratio:1;
-  background:var(--card);
-  border-radius:18px;
+  background:#fff;
+  border-radius:16px;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:20px;
   font-weight:900;
-  color:var(--text);
-  cursor:pointer;
-  box-shadow:0 10px 25px rgba(0,0,0,0.15);
+  color:#111;
 }
 
 .hidden{color:transparent}
-.correct{background:var(--good);color:#fff}
-.wrong{background:var(--bad);color:#fff}
+.correct{background:#22c55e;color:#fff}
+.wrong{background:#ef4444;color:#fff}
 
-.footer{
-  margin-top:12px;
+.playbar{
+  position:fixed;
+  bottom:16px;
+  left:0;
+  right:0;
+  display:flex;
+  justify-content:center;
+}
+
+.play{
+  padding:16px 40px;
+  font-size:20px;
+  border-radius:20px;
+  background:#22c55e;
+  color:#fff;
+}
+
+.help{
+  margin-top:10px;
+  text-align:center;
   font-size:13px;
   opacity:0.8;
-  text-align:center;
 }
 </style>
 </head>
 
 <body>
 
+<div class="app">
+
 <h1>FLASHGRID</h1>
 
 <div class="top">
-  <div id="timer">0.00s</div>
-  <div id="best">Best: —</div>
+  <div id="timer">0.00 s</div>
+  <div id="best">Meilleur chrono : —</div>
 </div>
 
 <div class="controls">
@@ -106,13 +127,16 @@ button{
   <button data-size="4" class="active">4×4</button>
   <button data-size="5">4×5</button>
   <button data-size="6">4×6</button>
-  <button id="start" class="start">Start</button>
 </div>
 
 <div id="grid" class="grid"></div>
 
-<div class="footer">
-  Touchez les nombres dans l’ordre le plus vite possible
+<div id="help" class="help"></div>
+
+</div>
+
+<div class="playbar">
+  <button id="play" class="play">Jouer</button>
 </div>
 
 <script>
@@ -121,86 +145,62 @@ let cols=4;
 let rows=4;
 let order=[];
 let next=0;
+let startTime;
+let timer;
 
-let startTime=0;
-let timerInterval;
-
+const grid=document.getElementById("grid");
 const timerEl=document.getElementById("timer");
 const bestEl=document.getElementById("best");
+const help=document.getElementById("help");
 
 function randomNumbers(n){
-  const set=new Set();
-  while(set.size<n){
-    set.add(Math.floor(Math.random()*99)+1);
+  const s=new Set();
+  while(s.size<n){
+    s.add(Math.floor(Math.random()*99)+1);
   }
-  return Array.from(set);
+  return Array.from(s);
 }
 
-function updateBest(time){
-  const key=`best-${rows}x${cols}-${mode}`;
-  const best=localStorage.getItem(key);
-  if(!best || time<best){
-    localStorage.setItem(key,time);
-    bestEl.textContent="Best: "+time.toFixed(2)+"s";
-  }
+function shuffle(a){
+  return a.sort(()=>Math.random()-0.5);
 }
 
-function loadBest(){
-  const key=`best-${rows}x${cols}-${mode}`;
-  const best=localStorage.getItem(key);
-  bestEl.textContent="Best: "+(best?Number(best).toFixed(2)+"s":"—");
-}
-
-document.querySelectorAll("[data-mode]").forEach(btn=>{
-  btn.onclick=()=>{
-    document.querySelectorAll("[data-mode]").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    mode=btn.dataset.mode;
-    loadBest();
-  };
-});
-
-document.querySelectorAll("[data-size]").forEach(btn=>{
-  btn.onclick=()=>{
-    document.querySelectorAll("[data-size]").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    cols=parseInt(btn.dataset.size);
-    rows=4;
-    loadBest();
-  };
-});
-
-document.getElementById("start").onclick=start;
-
-function start(){
-  clearInterval(timerInterval);
-  startTime=performance.now();
-
-  timerInterval=setInterval(()=>{
-    const t=(performance.now()-startTime)/1000;
-    timerEl.textContent=t.toFixed(2)+"s";
-  },50);
-
-  const total=rows*cols;
-  order=randomNumbers(total).sort((a,b)=>a-b);
-  next=0;
-
-  const shuffled=[...order].sort(()=>Math.random()-0.5);
-
-  const grid=document.getElementById("grid");
+function buildGrid(numbers){
   grid.innerHTML="";
   grid.style.gridTemplateColumns=`repeat(${cols},1fr)`;
 
-  shuffled.forEach(n=>{
-    const tile=document.createElement("div");
-    tile.className="tile";
-    tile.textContent=n;
-    tile.onclick=()=>clickTile(tile,n);
-    grid.appendChild(tile);
+  numbers.forEach(n=>{
+    const d=document.createElement("div");
+    d.className="tile";
+    d.textContent=n;
+    d.onclick=()=>clickTile(d,n);
+    grid.appendChild(d);
   });
+}
+
+function initGrid(){
+  const total=rows*cols;
+  const nums=randomNumbers(total);
+  buildGrid(nums);
+}
+
+function start(){
+  clearInterval(timer);
+  startTime=performance.now();
+
+  timer=setInterval(()=>{
+    const t=(performance.now()-startTime)/1000;
+    timerEl.textContent=t.toFixed(2)+" s";
+  },50);
+
+  order=randomNumbers(rows*cols).sort((a,b)=>a-b);
+  next=0;
+
+  const shuffled=shuffle([...order]);
+  buildGrid(shuffled);
 
   if(mode==="memory"){
-    setTimeout(()=>hideAll(),2000);
+    setTimeout(()=>hideAll(),3000);
   }
 }
 
@@ -215,9 +215,9 @@ function clickTile(tile,n){
     next++;
 
     if(next===order.length){
-      clearInterval(timerInterval);
-      const finalTime=(performance.now()-startTime)/1000;
-      updateBest(finalTime);
+      clearInterval(timer);
+      const t=(performance.now()-startTime)/1000;
+      saveBest(t);
     }
   }else{
     tile.classList.add("wrong");
@@ -225,6 +225,47 @@ function clickTile(tile,n){
   }
 }
 
+function saveBest(t){
+  const key=`best-${rows}x${cols}-${mode}`;
+  const best=localStorage.getItem(key);
+  if(!best||t<best){
+    localStorage.setItem(key,t);
+  }
+  loadBest();
+}
+
+function loadBest(){
+  const key=`best-${rows}x${cols}-${mode}`;
+  const b=localStorage.getItem(key);
+  bestEl.textContent="Meilleur chrono : "+(b?Number(b).toFixed(2)+" s":"—");
+}
+
+document.querySelectorAll("[data-mode]").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll("[data-mode]").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    mode=btn.dataset.mode;
+    help.textContent=mode==="classic"?
+    "Touchez les nombres dans l’ordre":
+    "Mémorisez puis retrouvez l’ordre";
+    loadBest();
+  };
+});
+
+document.querySelectorAll("[data-size]").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll("[data-size]").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    cols=btn.dataset.size;
+    rows=4;
+    initGrid();
+    loadBest();
+  };
+});
+
+document.getElementById("play").onclick=start;
+
+initGrid();
 loadBest();
 </script>
 
