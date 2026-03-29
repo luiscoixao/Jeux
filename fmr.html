@@ -210,14 +210,16 @@ h1{
   font-size:clamp(56px, 11vw, 82px);
 }
 
-.piece-P,
-.piece-p{
+.piece-P{
   font-size:clamp(46px, 9vw, 66px);
+  transform:none;
 }
 
-/* ✅ correction spécifique pion noir */
 .piece-p{
-  transform:scale(0.82);
+  display:inline-block;
+  font-size:clamp(42px, 8.2vw, 60px);
+  transform:scale(0.78);
+  transform-origin:center center;
 }
 
 .white-piece{
@@ -330,14 +332,20 @@ h1{
   }
 
   .piece-N,.piece-B,.piece-R,.piece-Q,.piece-K,
-  .piece-n,.piece-b,.piece-r,.piece.q,.piece-k{
+  .piece-n,.piece-b,.piece-r,.piece-q,.piece-k{
     font-size:clamp(50px, 11vw, 70px);
   }
 
-  .piece-P,
-  .piece-p{
+  .piece-P{
     font-size:clamp(42px, 9vw, 58px);
     transform:none;
+  }
+
+  .piece-p{
+    display:inline-block;
+    font-size:clamp(38px, 8vw, 52px);
+    transform:scale(0.78);
+    transform-origin:center center;
   }
 }
 </style>
