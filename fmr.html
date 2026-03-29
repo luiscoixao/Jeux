@@ -342,15 +342,15 @@ h1{
     font-size:clamp(42px, 9vw, 58px);
     transform:none;
   }
-  
+
   .piece-p{
-  display:inline-block;
-  font-size:clamp(38px, 8vw, 52px);
-  transform:scale(0.78);
-  transform-origin:center center;
-  position:relative;
-  top:2px;
-}
+    display:inline-block;
+    font-size:clamp(38px, 8vw, 52px);
+    transform:scale(0.78);
+    transform-origin:center center;
+    position:relative;
+    top:2px;
+  }
 }
 </style>
 </head>
@@ -434,6 +434,8 @@ const PIECES={
   "P":"♙","N":"♘","B":"♗","R":"♖","Q":"♕","K":"♔",
   "p":"♟","n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
 };
+
+const FEN_STORAGE_KEY = "chessfen-last-fen";
 
 let board=createEmptyBoard();
 let mode="setup";
@@ -787,6 +789,8 @@ function loadFenPosition(){
     return;
   }
 
+  localStorage.setItem(FEN_STORAGE_KEY, value);
+
   try{
     board=fenToBoard(value);
     selectedSquare=null;
@@ -837,6 +841,15 @@ fenInput.addEventListener("keydown",e=>{
     loadFenPosition();
   }
 });
+
+fenInput.addEventListener("input",()=>{
+  localStorage.setItem(FEN_STORAGE_KEY, fenInput.value);
+});
+
+const savedFen = localStorage.getItem(FEN_STORAGE_KEY);
+if(savedFen){
+  fenInput.value = savedFen;
+}
 
 renderPalette();
 clearBoard();
