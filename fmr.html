@@ -213,7 +213,11 @@ h1{
 .piece-P,
 .piece-p{
   font-size:clamp(46px, 9vw, 66px);
-  transform:none;
+}
+
+/* ✅ correction spécifique pion noir */
+.piece-p{
+  transform:scale(0.82);
 }
 
 .white-piece{
