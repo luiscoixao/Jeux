@@ -3,10 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-<title>FLASHGRID</title>
+<title>FLASHGRID SANTÉ</title>
 
 <meta name="theme-color" content="#eef2ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FLASHGRID SANTÉ">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="iconflashgrid.png">
+<link rel="icon" type="image/png" href="iconflashgrid.png">
 
 <style>
 :root{
@@ -14,53 +18,58 @@
   --bg2:#7c3aed;
   --card:#ffffff;
   --text:#0f172a;
-  --line:rgba(255,255,255,.22);
-  --good:#22c55e;
+  --line:rgba(255,255,255,.24);
+  --good:#34c759;
   --bad:#ef4444;
+  --soft:#fde68a;
+  --glass:rgba(255,255,255,.12);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
 body{
-  margin:0;
   min-height:100vh;
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
   background:
-    radial-gradient(circle at top left, rgba(255,255,255,.12), transparent 28%),
-    radial-gradient(circle at top right, rgba(255,255,255,.08), transparent 30%),
+    radial-gradient(circle at top left, rgba(255,255,255,.10), transparent 30%),
+    radial-gradient(circle at top right, rgba(255,255,255,.07), transparent 28%),
     linear-gradient(135deg,var(--bg1),var(--bg2));
   color:#fff;
   display:flex;
-  flex-direction:column;
-  align-items:center;
+  justify-content:center;
   padding:20px 18px 120px;
 }
-.app{
-  width:100%;
-  max-width:460px;
-}
+.app{width:100%;max-width:480px}
 h1{
-  margin:6px 0 14px;
+  margin:6px 0 4px;
   text-align:center;
-  font-size:38px;
+  font-size:40px;
   font-weight:900;
-  letter-spacing:.4px;
+  letter-spacing:.3px;
+}
+.sub{
+  text-align:center;
+  margin:0 0 14px;
+  font-size:13px;
+  color:rgba(255,255,255,.82);
 }
 .top{
-  display:flex;
-  justify-content:space-between;
+  display:grid;
+  grid-template-columns:1fr 1fr;
   gap:12px;
-  width:100%;
-  font-size:14px;
   margin-bottom:12px;
 }
-.top-pill{
-  flex:1;
+.pill{
   border:1px solid var(--line);
-  background:rgba(255,255,255,.12);
+  background:var(--glass);
   backdrop-filter:blur(10px);
-  border-radius:16px;
-  padding:10px 12px;
+  border-radius:18px;
+  padding:12px;
   text-align:center;
-  font-weight:700;
+  font-weight:800;
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 .controls{
   display:flex;
@@ -70,21 +79,22 @@ h1{
   justify-content:center;
 }
 button{
-  padding:10px 14px;
+  padding:11px 14px;
   border:none;
-  border-radius:14px;
+  border-radius:15px;
   font-weight:800;
   cursor:pointer;
   background:#fff;
   color:#111827;
   box-shadow:0 10px 24px rgba(0,0,0,.12);
+  font:inherit;
 }
 button.active{
-  background:#111827;
+  background:#0f172a;
   color:#fff;
 }
 .grid-wrap{
-  background:rgba(255,255,255,.12);
+  background:var(--glass);
   border:1px solid var(--line);
   border-radius:28px;
   padding:14px;
@@ -92,23 +102,25 @@ button.active{
 }
 .grid{
   display:grid;
-  gap:10px;
+  gap:12px;
   width:100%;
 }
 .tile{
   aspect-ratio:1/1;
   background:var(--card);
-  border-radius:18px;
+  border-radius:20px;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:20px;
+  font-size:24px;
   font-weight:900;
-  color:var(--text);
+  color:#0f172a;
   cursor:pointer;
-  box-shadow:0 10px 24px rgba(0,0,0,.16);
-  transition:transform .12s ease, background .18s ease, color .18s ease;
+  box-shadow:0 12px 24px rgba(0,0,0,.16);
+  transition:transform .12s ease, background .18s ease, color .18s ease, opacity .18s ease;
+  user-select:none;
 }
+.tile.big{font-size:28px}
 .tile:active{transform:scale(.97)}
 .tile.placeholder{
   color:transparent;
@@ -125,18 +137,25 @@ button.active{
   background:var(--bad);
   color:#fff;
 }
+.tile.soft{
+  background:var(--soft);
+  color:#0f172a;
+}
+.message{
+  min-height:28px;
+  margin-top:12px;
+  text-align:center;
+  font-size:14px;
+  color:rgba(255,255,255,.92);
+  font-weight:700;
+}
 .help{
-  min-height:24px;
-  margin-top:14px;
+  min-height:32px;
+  margin-top:8px;
+  text-align:center;
   font-size:13px;
   line-height:1.35;
-  text-align:center;
-  color:rgba(255,255,255,.88);
-  opacity:0;
-  transition:opacity .18s ease;
-}
-.help.show{
-  opacity:1;
+  color:rgba(255,255,255,.84);
 }
 .playbar{
   position:fixed;
@@ -148,42 +167,52 @@ button.active{
   z-index:20;
 }
 .play-btn{
-  min-width:220px;
+  min-width:230px;
   max-width:460px;
-  width:min(100%, 320px);
-  padding:16px 22px;
-  border-radius:20px;
+  width:min(100%, 340px);
+  padding:17px 22px;
+  border-radius:22px;
   background:#22c55e;
-  color:#ffffff;
-  font-size:19px;
+  color:#fff;
+  font-size:20px;
   font-weight:900;
   text-align:center;
-  box-shadow:0 16px 34px rgba(0,0,0,.22);
+  box-shadow:0 18px 34px rgba(0,0,0,.24);
 }
+.note{
+  margin-top:8px;
+  text-align:center;
+  font-size:12px;
+  color:rgba(255,255,255,.72);
+}
+.hidden-ui{visibility:hidden}
 </style>
 </head>
 <body>
   <div class="app">
     <h1>FLASHGRID</h1>
+    <p class="sub">Version santé</p>
 
     <div class="top">
-      <div class="top-pill" id="timer">0.00 s</div>
-      <div class="top-pill" id="best">Meilleur chrono : —</div>
+      <div class="pill" id="timer">0.00 s</div>
+      <div class="pill" id="best">Meilleur chrono : —</div>
     </div>
 
     <div class="controls">
       <button data-mode="classic" class="active">Classique</button>
       <button data-mode="memory">Mémoire</button>
+      <button data-mode="serenity">Sérénité</button>
       <button data-size="4" class="active">4×4</button>
       <button data-size="5">5×4</button>
-    
     </div>
 
     <div class="grid-wrap">
       <div id="grid" class="grid"></div>
     </div>
 
+    <div id="message" class="message"></div>
     <div id="help" class="help"></div>
+    <div id="note" class="note"></div>
   </div>
 
   <div class="playbar">
@@ -199,11 +228,16 @@ let next = 0;
 let startTime = 0;
 let timerInterval = null;
 let playing = false;
+let memoryRevealMs = 4200;
+let serenitySuccessToday = 0;
 
 const timerEl = document.getElementById("timer");
 const bestEl = document.getElementById("best");
 const gridEl = document.getElementById("grid");
 const helpEl = document.getElementById("help");
+const messageEl = document.getElementById("message");
+const noteEl = document.getElementById("note");
+const playBtn = document.getElementById("playBtn");
 
 function randomNumbers(n){
   const set = new Set();
@@ -225,10 +259,30 @@ function shuffle(arr){
 function bestKey(){
   return `flashgrid-best-${rows}x${cols}-${mode}`;
 }
+function serenityCountKey(){
+  const d = new Date();
+  return `flashgrid-serenity-success-${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+}
+
+function loadSerenityCount(){
+  serenitySuccessToday = Number(localStorage.getItem(serenityCountKey()) || 0);
+}
+
+function incrementSerenityCount(){
+  serenitySuccessToday += 1;
+  localStorage.setItem(serenityCountKey(), String(serenitySuccessToday));
+}
 
 function loadBest(){
-  const best = localStorage.getItem(bestKey());
-  bestEl.textContent = "Meilleur chrono : " + (best ? Number(best).toFixed(2) + " s" : "—");
+  if(mode === "serenity"){
+    loadSerenityCount();
+    bestEl.textContent = "Réussites aujourd’hui : " + serenitySuccessToday;
+    timerEl.classList.add("hidden-ui");
+  } else {
+    timerEl.classList.remove("hidden-ui");
+    const best = localStorage.getItem(bestKey());
+    bestEl.textContent = "Meilleur chrono : " + (best ? Number(best).toFixed(2) + " s" : "—");
+  }
 }
 
 function updateBest(time){
@@ -242,11 +296,17 @@ function updateBest(time){
 
 function setHelpForMode(){
   if(mode === "classic"){
-    helpEl.textContent = "Classique : touchez les nombres dans l’ordre croissant.";
-    helpEl.classList.add("show");
+    helpEl.textContent = "Touchez les nombres dans l’ordre croissant le plus vite possible.";
+    noteEl.textContent = "";
+    messageEl.textContent = "";
+  } else if(mode === "memory"){
+    helpEl.textContent = "Mémorisez la grille, puis retrouvez les nombres dans l’ordre croissant.";
+    noteEl.textContent = "Affichage allongé pour plus de confort.";
+    messageEl.textContent = "";
   } else {
-    helpEl.textContent = "Mémoire : mémorisez la grille, puis retrouvez l’ordre croissant.";
-    helpEl.classList.add("show");
+    helpEl.textContent = "Mode doux : pas de pression, pas de chrono visible, correction apaisée.";
+    noteEl.textContent = "Objectif : stimuler l’attention et la mémoire sans stress.";
+    messageEl.textContent = "";
   }
 }
 
@@ -257,7 +317,7 @@ function buildPlaceholderGrid(){
 
   for(let i = 0; i < total; i++){
     const tile = document.createElement("div");
-    tile.className = "tile placeholder";
+    tile.className = "tile placeholder" + (rows >= 5 ? " big" : "");
     tile.textContent = "0";
     gridEl.appendChild(tile);
   }
@@ -279,33 +339,49 @@ function stopTimer(){
 
 function startGame(){
   playing = true;
-  timerEl.textContent = "0.00 s";
-  startTimer();
+  next = 0;
+  messageEl.textContent = mode === "serenity" ? "Prenez votre temps." : "";
+  if(mode !== "serenity"){
+    timerEl.textContent = "0.00 s";
+    startTimer();
+  } else {
+    stopTimer();
+    timerEl.textContent = "0.00 s";
+  }
 
   const total = rows * cols;
   order = randomNumbers(total).sort((a,b) => a - b);
-  next = 0;
-
   const shuffled = shuffle(order);
+
   gridEl.innerHTML = "";
   gridEl.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
 
   shuffled.forEach(n => {
     const tile = document.createElement("div");
-    tile.className = "tile";
+    tile.className = "tile" + (rows >= 5 ? " big" : "");
     tile.textContent = n;
     tile.addEventListener("click", () => clickTile(tile, n));
     gridEl.appendChild(tile);
   });
 
   if(mode === "memory"){
-    setTimeout(hideAll, 4200);
+    setTimeout(hideAll, memoryRevealMs);
+  }
+  if(mode === "serenity"){
+    setTimeout(hideAll, 5200);
   }
 }
 
 function hideAll(){
   if(!playing) return;
-  document.querySelectorAll("#grid .tile").forEach(t => t.classList.add("hidden"));
+  document.querySelectorAll("#grid .tile").forEach(t => {
+    if(!t.classList.contains("correct")) t.classList.add("hidden");
+  });
+}
+
+function positiveMessage(){
+  const messages = ["Bien", "Très bien", "Continuez", "Parfait", "Bravo"];
+  return messages[Math.floor(Math.random() * messages.length)];
 }
 
 function clickTile(tile, n){
@@ -313,26 +389,50 @@ function clickTile(tile, n){
 
   if(n === order[next]){
     tile.classList.remove("hidden");
+    tile.classList.remove("soft");
     tile.classList.add("correct");
     tile.style.pointerEvents = "none";
     next++;
 
+    if(mode === "serenity"){
+      messageEl.textContent = positiveMessage();
+    }
+
     if(next === order.length){
       playing = false;
       stopTimer();
-      const finalTime = (performance.now() - startTime) / 1000;
-      timerEl.textContent = finalTime.toFixed(2) + " s";
-      updateBest(finalTime);
+
+      if(mode === "serenity"){
+        incrementSerenityCount();
+        loadBest();
+        messageEl.textContent = "Très bien.";
+      } else {
+        const finalTime = (performance.now() - startTime) / 1000;
+        timerEl.textContent = finalTime.toFixed(2) + " s";
+        updateBest(finalTime);
+        messageEl.textContent = "Bravo.";
+      }
     }
   } else {
     tile.classList.remove("hidden");
-    tile.classList.add("wrong");
-    setTimeout(() => {
-      tile.classList.remove("wrong");
-      if(mode === "memory" && !tile.classList.contains("correct")){
-        tile.classList.add("hidden");
-      }
-    }, 300);
+
+    if(mode === "serenity"){
+      tile.classList.add("soft");
+      messageEl.textContent = "Essayez encore.";
+      setTimeout(() => {
+        tile.classList.remove("soft");
+        if(!tile.classList.contains("correct")) tile.classList.add("hidden");
+      }, 500);
+    } else {
+      tile.classList.add("wrong");
+      messageEl.textContent = "Pas celle-ci.";
+      setTimeout(() => {
+        tile.classList.remove("wrong");
+        if(mode === "memory" && !tile.classList.contains("correct")){
+          tile.classList.add("hidden");
+        }
+      }, 300);
+    }
   }
 }
 
@@ -343,6 +443,7 @@ document.querySelectorAll("[data-mode]").forEach(btn => {
     mode = btn.dataset.mode;
     loadBest();
     setHelpForMode();
+    buildPlaceholderGrid();
   });
 });
 
@@ -350,20 +451,19 @@ document.querySelectorAll("[data-size]").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll("[data-size]").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
-
-    const h = Number(btn.dataset.size);
-    rows = h;
+    rows = Number(btn.dataset.size);
     cols = 4;
-
     loadBest();
     buildPlaceholderGrid();
   });
 });
 
-document.getElementById("playBtn").addEventListener("click", startGame);
+playBtn.addEventListener("click", startGame);
 
 buildPlaceholderGrid();
+loadSerenityCount();
 loadBest();
+setHelpForMode();
 </script>
 </body>
 </html>
