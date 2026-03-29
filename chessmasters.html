@@ -147,19 +147,24 @@ select{
   transform-origin:center center;
 }
 
+/* PIÈCES AGRANDIES ET HOMOGÈNES */
 .piece-N,.piece-B,.piece-R,.piece-Q,.piece-K,
 .piece-n,.piece-b,.piece-r,.piece-q,.piece-k{
-  font-size:clamp(42px, 8vw, 60px);
+  font-size:clamp(56px, 11vw, 82px);
 }
 
 .piece-P{
-  font-size:clamp(34px, 6.4vw, 48px);
+  font-size:clamp(46px, 9vw, 66px);
+  transform:none;
 }
 
 .piece-p{
-  font-size:clamp(29px, 5.4vw, 40px);
-  transform:scale(0.72);
+  display:inline-block;
+  font-size:clamp(42px, 8.2vw, 60px);
+  transform:scale(0.78);
   transform-origin:center center;
+  position:relative;
+  top:2px;
 }
 
 .white-piece{
@@ -274,15 +279,21 @@ select{
 
   .piece-N,.piece-B,.piece-R,.piece-Q,.piece-K,
   .piece-n,.piece-b,.piece-r,.piece-q,.piece-k{
-    font-size:clamp(38px, 8.4vw, 52px);
+    font-size:clamp(50px, 11vw, 70px);
   }
 
   .piece-P{
-    font-size:clamp(31px, 6.7vw, 44px);
+    font-size:clamp(42px, 9vw, 58px);
+    transform:none;
   }
 
   .piece-p{
-    font-size:clamp(27px, 5.7vw, 37px);
+    display:inline-block;
+    font-size:clamp(38px, 8vw, 52px);
+    transform:scale(0.78);
+    transform-origin:center center;
+    position:relative;
+    top:2px;
   }
 }
 </style>
@@ -679,17 +690,17 @@ async function loadGames(){
   games=await response.json();
   
   games.sort((a, b) => {
-  const order = ["Ouverture", "Défense", "Piège", "Partie célèbre"];
+    const order = ["Ouverture", "Défense", "Piège", "Partie célèbre"];
 
-  const getCat = t => order.find(c => t.startsWith(c)) || "Z";
+    const getCat = t => order.find(c => t.startsWith(c)) || "Z";
 
-  const catA = getCat(a.title);
-  const catB = getCat(b.title);
+    const catA = getCat(a.title);
+    const catB = getCat(b.title);
 
-  if (catA !== catB) return order.indexOf(catA) - order.indexOf(catB);
+    if (catA !== catB) return order.indexOf(catA) - order.indexOf(catB);
 
-  return a.title.localeCompare(b.title, "fr", { sensitivity: "base" });
-});
+    return a.title.localeCompare(b.title, "fr", { sensitivity: "base" });
+  });
 
   games.forEach(game=>{
     game.states=computeStates(game);
