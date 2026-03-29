@@ -1,548 +1,372 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <title>FLASHGRID</title>
 
-<meta name="theme-color" content="#eef2ff" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="FLASHGRID" />
-<link rel="apple-touch-icon" href="iconflashgrid.png" />
-<link rel="icon" type="image/png" href="iconflashgrid.png" />
+<meta name="theme-color" content="#eef2ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FLASHGRID">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="iconflashgrid.png">
+<link rel="icon" type="image/png" href="iconflashgrid.png">
 
 <style>
 :root{
-  --bg:#eef2ff;
-  --card:rgba(255,255,255,.82);
-  --card-strong:#ffffff;
+  --bg1:#4f46e5;
+  --bg2:#7c3aed;
+  --card:#ffffff;
   --text:#0f172a;
-  --muted:#64748b;
-  --line:rgba(148,163,184,.22);
-  --accent:#4f46e5;
-  --accent2:#7c3aed;
-  --good:#16a34a;
-  --bad:#dc2626;
-  --gold:#f59e0b;
-  --shadow:0 20px 50px rgba(79,70,229,.16);
-  --radius:26px;
-  --tile-shadow:0 10px 24px rgba(15,23,42,.09);
+  --line:rgba(255,255,255,.22);
+  --good:#22c55e;
+  --bad:#ef4444;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;background:
-radial-gradient(circle at top left, rgba(124,58,237,.16), transparent 28%),
-radial-gradient(circle at top right, rgba(79,70,229,.14), transparent 30%),
-linear-gradient(180deg,#eef2ff,#f8fafc 58%,#eef2ff);
-color:var(--text)}
-body{padding:18px 14px 120px}
-.app{max-width:860px;margin:0 auto}
-.header{
-  position:sticky;top:0;z-index:20;margin:-18px -14px 14px;padding:16px 14px 12px;
-  backdrop-filter:blur(16px);background:rgba(238,242,255,.82);border-bottom:1px solid rgba(148,163,184,.18)
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(255,255,255,.12), transparent 28%),
+    radial-gradient(circle at top right, rgba(255,255,255,.08), transparent 30%),
+    linear-gradient(135deg,var(--bg1),var(--bg2));
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:20px 18px 120px;
 }
-h1{margin:0;font-size:34px;letter-spacing:.2px;line-height:1;font-weight:900}
-.sub{margin-top:6px;color:var(--muted);font-size:14px}
-.hero{
-  background:linear-gradient(135deg,#4f46e5,#7c3aed);
-  color:#fff;border-radius:30px;padding:18px 18px 16px;box-shadow:var(--shadow);margin-bottom:14px
+.app{
+  width:100%;
+  max-width:460px;
 }
-.hero-title{font-size:23px;font-weight:900;margin-bottom:6px}
-.hero p{margin:0;line-height:1.45;opacity:.95}
-.layout{display:grid;gap:14px}
-.card{
-  background:var(--card);backdrop-filter:blur(12px);border:1px solid var(--line);
-  box-shadow:var(--shadow);border-radius:var(--radius);padding:16px
+h1{
+  margin:6px 0 14px;
+  text-align:center;
+  font-size:38px;
+  font-weight:900;
+  letter-spacing:.4px;
 }
-.top-grid{display:grid;gap:14px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.stat{
-  background:rgba(255,255,255,.72);border:1px solid var(--line);border-radius:22px;padding:12px
+.top{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  width:100%;
+  font-size:14px;
+  margin-bottom:12px;
 }
-.stat .label{font-size:12px;color:var(--muted);margin-bottom:5px}
-.stat .value{font-size:27px;font-weight:900;line-height:1}
-.controls{display:grid;gap:10px}
-.segmented{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.segmented button,.toolbar button,.bottom-nav button,.size-grid button{
-  border:none;cursor:pointer;border-radius:18px;padding:13px 10px;font:inherit;font-weight:800
+.top-pill{
+  flex:1;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.12);
+  backdrop-filter:blur(10px);
+  border-radius:16px;
+  padding:10px 12px;
+  text-align:center;
+  font-weight:700;
 }
-.segmented button,.size-grid button{background:#fff;color:var(--text);border:1px solid var(--line)}
-.segmented button.active,.size-grid button.active{background:var(--text);color:#fff;border-color:var(--text)}
-.toolbar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.primary{background:var(--accent);color:#fff}
-.secondary{background:#fff;color:var(--text);border:1px solid var(--line)}
-.warning{background:var(--gold);color:#fff}
-.muted{color:var(--muted)}
-.section-title{font-size:18px;font-weight:900;margin:0 0 12px}
-.small{font-size:13px;color:var(--muted);line-height:1.45}
-.game-wrap{display:grid;gap:12px}
-.info-line{
-  display:flex;justify-content:space-between;gap:10px;align-items:center;
-  background:rgba(255,255,255,.72);border:1px solid var(--line);border-radius:20px;padding:12px 14px
+.controls{
+  display:flex;
+  gap:8px;
+  margin-bottom:12px;
+  flex-wrap:wrap;
+  justify-content:center;
 }
-.message{
-  min-height:48px;background:rgba(255,255,255,.75);border:1px solid var(--line);border-radius:20px;
-  padding:12px 14px;font-weight:700;display:flex;align-items:center
+button{
+  padding:10px 14px;
+  border:none;
+  border-radius:14px;
+  font-weight:800;
+  cursor:pointer;
+  background:#fff;
+  color:#111827;
+  box-shadow:0 10px 24px rgba(0,0,0,.12);
+}
+button.active{
+  background:#111827;
+  color:#fff;
+}
+.grid-wrap{
+  background:rgba(255,255,255,.12);
+  border:1px solid var(--line);
+  border-radius:28px;
+  padding:14px;
+  backdrop-filter:blur(14px);
 }
 .grid{
   display:grid;
   gap:10px;
+  width:100%;
 }
 .tile{
   aspect-ratio:1/1;
-  border:none;cursor:pointer;border-radius:20px;background:rgba(255,255,255,.92);
-  box-shadow:var(--tile-shadow);font-size:clamp(20px,4.6vw,32px);font-weight:900;color:var(--text);
-  transition:transform .08s ease, opacity .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease
+  background:var(--card);
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  font-weight:900;
+  color:var(--text);
+  cursor:pointer;
+  box-shadow:0 10px 24px rgba(0,0,0,.16);
+  transition:transform .12s ease, background .18s ease, color .18s ease;
 }
 .tile:active{transform:scale(.97)}
-.tile.correct{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff}
-.tile.wrong{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
-.tile.hiddenNum{color:transparent;text-shadow:none}
-.tile.hint{box-shadow:0 0 0 3px rgba(79,70,229,.18), var(--tile-shadow)}
-.tile.locked{opacity:.7}
-.leader{
-  display:grid;gap:8px
+.tile.placeholder{
+  color:transparent;
+  cursor:default;
 }
-.score-row{
-  display:flex;justify-content:space-between;gap:12px;align-items:center;
-  background:rgba(255,255,255,.72);border:1px solid var(--line);border-radius:18px;padding:11px 12px
+.tile.hidden{
+  color:transparent;
 }
-.badge{
-  font-size:12px;font-weight:900;padding:7px 10px;border-radius:999px;background:#fff;border:1px solid var(--line)
+.tile.correct{
+  background:var(--good);
+  color:#fff;
 }
-.bottom-nav{
-  position:fixed;left:12px;right:12px;bottom:12px;z-index:30
+.tile.wrong{
+  background:var(--bad);
+  color:#fff;
 }
-.bottom-inner{
-  max-width:860px;margin:0 auto;background:rgba(255,255,255,.86);backdrop-filter:blur(16px);
-  border:1px solid var(--line);box-shadow:var(--shadow);border-radius:24px;padding:9px;
-  display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px
+.help{
+  min-height:24px;
+  margin-top:14px;
+  font-size:13px;
+  line-height:1.35;
+  text-align:center;
+  color:rgba(255,255,255,.88);
+  opacity:0;
+  transition:opacity .18s ease;
 }
-.empty{color:var(--muted);font-size:13px;text-align:center;padding:8px 0 2px}
-.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:12px}
-.kbd{
-  display:inline-flex;align-items:center;justify-content:center;border-radius:10px;background:#fff;border:1px solid var(--line);
-  padding:4px 8px;font-size:12px;font-weight:800;color:var(--text)
+.help.show{
+  opacity:1;
 }
-@media (min-width:780px){
-  .top-grid{grid-template-columns:1.1fr .9fr}
+.playbar{
+  position:fixed;
+  left:18px;
+  right:18px;
+  bottom:16px;
+  display:flex;
+  justify-content:center;
+  z-index:20;
+}
+.play-btn{
+  min-width:220px;
+  max-width:460px;
+  width:min(100%, 320px);
+  padding:16px 22px;
+  border-radius:20px;
+  background:#22c55e;
+  color:#ffffff;
+  font-size:19px;
+  font-weight:900;
+  text-align:center;
+  box-shadow:0 16px 34px rgba(0,0,0,.22);
 }
 </style>
 </head>
 <body>
-<div class="app">
-  <div class="header">
+  <div class="app">
     <h1>FLASHGRID</h1>
-    <div class="sub">Jeu de vitesse, mémoire et concentration — parfait sur iPhone et GitHub Pages</div>
-  </div>
 
-  <div class="hero">
-    <div class="hero-title">Une vraie plus-value : fun + entraînement mental</div>
-    <p>Le but est simple : toucher les nombres dans l’ordre le plus vite possible. Mais chaque mode travaille une capacité différente : vitesse visuelle, mémoire de travail et concentration sous pression.</p>
-  </div>
-
-  <div class="layout">
-    <div class="top-grid">
-      <section class="card">
-        <h2 class="section-title">Partie</h2>
-
-        <div class="stats">
-          <div class="stat">
-            <div class="label">Temps</div>
-            <div class="value" id="timeValue">0.00</div>
-          </div>
-          <div class="stat">
-            <div class="label">À trouver</div>
-            <div class="value" id="nextValue">1</div>
-          </div>
-          <div class="stat">
-            <div class="label">Erreurs</div>
-            <div class="value" id="errorsValue">0</div>
-          </div>
-          <div class="stat">
-            <div class="label">Série</div>
-            <div class="value" id="streakValue">0</div>
-          </div>
-        </div>
-
-        <div class="controls" style="margin-top:12px">
-          <div>
-            <div class="small" style="margin-bottom:8px">Mode de jeu</div>
-            <div class="segmented" id="modeButtons">
-              <button data-mode="classic" class="active">Classique</button>
-              <button data-mode="memory">Mémoire</button>
-              <button data-mode="flash">Flash</button>
-            </div>
-          </div>
-
-          <div>
-            <div class="small" style="margin-bottom:8px">Taille de grille</div>
-            <div class="size-grid" id="sizeButtons" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-              <button data-size="4" class="active">4×4</button>
-              <button data-size="5">5×5</button>
-              <button data-size="6">6×6</button>
-            </div>
-          </div>
-
-          <div class="toolbar">
-            <button class="primary" id="startBtn">Nouvelle partie</button>
-            <button class="secondary" id="hintBtn">Indice</button>
-            <button class="warning" id="pauseBtn">Pause</button>
-          </div>
-        </div>
-
-        <div class="game-wrap" style="margin-top:12px">
-          <div class="info-line">
-            <div><strong id="modeLabel">Mode classique</strong></div>
-            <div class="muted">Record perso : <strong id="bestValue">—</strong></div>
-          </div>
-          <div class="message" id="messageBox">Touchez “Nouvelle partie” pour commencer.</div>
-          <div class="grid" id="gameGrid"></div>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2 class="section-title">Comment jouer</h2>
-        <div class="small">
-          <p><strong>Classique :</strong> les nombres restent visibles. Objectif : aller le plus vite possible.</p>
-          <p><strong>Mémoire :</strong> les nombres s’effacent après 2 secondes. Il faut retenir leur position.</p>
-          <p><strong>Flash :</strong> les nombres s’affichent très brièvement au début, puis disparaissent. C’est le mode le plus difficile.</p>
-          <p>Un indice révèle brièvement la prochaine case. Une erreur ajoute une pénalité.</p>
-        </div>
-
-        <h2 class="section-title" style="margin-top:18px">Meilleurs scores</h2>
-        <div class="leader" id="leaderboard"></div>
-        <div class="empty" id="emptyLeaderboard">Aucun record pour l’instant.</div>
-
-        <h2 class="section-title" style="margin-top:18px">Astuce</h2>
-        <div class="small">Commence en <span class="kbd">4×4</span> pour la vitesse, puis passe en <span class="kbd">5×5</span> ou <span class="kbd">6×6</span> pour le vrai défi. Ce jeu est excellent pour entraîner l’attention visuelle.</div>
-      </section>
+    <div class="top">
+      <div class="top-pill" id="timer">0.00 s</div>
+      <div class="top-pill" id="best">Meilleur chrono : —</div>
     </div>
 
-    <section class="card">
-      <h2 class="section-title">Pourquoi ce jeu est meilleur qu’un simple mini-jeu</h2>
-      <div class="small">
-        Il ne sert pas seulement à passer le temps. Il entraîne la lecture visuelle, la vitesse de traitement, la mémoire immédiate et la régularité. En plus, tous les records sont sauvegardés sur l’appareil, donc tu peux suivre ta progression dans le temps.
-      </div>
-      <div class="footer">Imaginé par Luis et créé avec ChatGPT</div>
-    </section>
-  </div>
-</div>
+    <div class="controls">
+      <button data-mode="classic" class="active">Classique</button>
+      <button data-mode="memory">Mémoire</button>
+      <button data-size="4" class="active">4×4</button>
+      <button data-size="5">5×4</button>
+    </div>
 
-<div class="bottom-nav">
-  <div class="bottom-inner">
-    <button class="primary" id="bottomStart">Jouer</button>
-    <button class="secondary" id="bottomMode">Changer mode</button>
-    <button class="warning" id="bottomHint">Indice</button>
+    <div class="grid-wrap">
+      <div id="grid" class="grid"></div>
+    </div>
+
+    <div id="help" class="help"></div>
   </div>
-</div>
+
+  <div class="playbar">
+    <button id="playBtn" class="play-btn">Jouer</button>
+  </div>
 
 <script>
-const STORAGE_KEY = "flashgrid-records-v1";
+let mode = "classic";
+let cols = 4;
+let rows = 4;
+let order = [];
+let next = 0;
+let startTime = 0;
+let timerInterval = null;
+let playing = false;
 
-const state = {
-  mode: "classic",
-  size: 4,
-  order: [],
-  next: 1,
-  running: false,
-  paused: false,
-  startTs: null,
-  elapsedMs: 0,
-  timerId: null,
-  errors: 0,
-  streak: 0,
-  hintUsed: false
-};
+const timerEl = document.getElementById("timer");
+const bestEl = document.getElementById("best");
+const gridEl = document.getElementById("grid");
+const helpEl = document.getElementById("help");
 
-const modeLabels = {
-  classic: "Mode classique",
-  memory: "Mode mémoire",
-  flash: "Mode flash"
-};
-
-const $ = s => document.querySelector(s);
-const $$ = s => Array.from(document.querySelectorAll(s));
-const gameGrid = $("#gameGrid");
-const timeValue = $("#timeValue");
-const nextValue = $("#nextValue");
-const errorsValue = $("#errorsValue");
-const streakValue = $("#streakValue");
-const bestValue = $("#bestValue");
-const messageBox = $("#messageBox");
-const modeLabel = $("#modeLabel");
-const leaderboard = $("#leaderboard");
-const emptyLeaderboard = $("#emptyLeaderboard");
-
-let records = loadRecords();
+function randomNumbers(n){
+  const set = new Set();
+  while(set.size < n){
+    set.add(Math.floor(Math.random() * 99) + 1);
+  }
+  return Array.from(set);
+}
 
 function shuffle(arr){
   const a = [...arr];
   for(let i=a.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
+    const j = Math.floor(Math.random() * (i+1));
     [a[i],a[j]] = [a[j],a[i]];
   }
   return a;
 }
-function formatSeconds(sec){
-  return Number(sec).toLocaleString("fr-FR",{
-    minimumFractionDigits:2,
-    maximumFractionDigits:2
-  }) + " s";
-}
-function loadRecords(){
-  try{
-    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-    return typeof raw === "object" && raw ? raw : {};
-  }catch{
-    return {};
-  }
-}
-function saveRecords(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
-}
-function recordKey(mode,size){ return `${mode}-${size}`; }
-function getBest(mode,size){
-  return records[recordKey(mode,size)] ?? null;
-}
-function setBest(mode,size,timeSec){
-  const key = recordKey(mode,size);
-  const prev = records[key];
-  if(prev == null || timeSec < prev) {
-    records[key] = timeSec;
-    saveRecords();
-    return true;
-  }
-  return false;
-}
-function updateBestDisplay(){
-  const best = getBest(state.mode, state.size);
-  bestValue.textContent = best == null ? "—" : formatSeconds(best);
-}
-function updateStats(){
-  const ms = state.running && !state.paused && state.startTs
-    ? state.elapsedMs + (performance.now() - state.startTs)
-    : state.elapsedMs;
-  timeValue.textContent = (ms/1000).toFixed(2);
-  nextValue.textContent = state.next;
-  errorsValue.textContent = state.errors;
-  streakValue.textContent = state.streak;
-  updateBestDisplay();
-}
-function setMessage(msg){
-  messageBox.textContent = msg;
-}
-function setMode(mode){
-  state.mode = mode;
-  state.running = false;
-  state.paused = false;
-  clearInterval(state.timerId);
-  state.timerId = null;
-  updateStats();
-  modeLabel.textContent = modeLabels[mode];
-  $$("#modeButtons button").forEach(b=>b.classList.toggle("active", b.dataset.mode===mode));
-  updateBestDisplay();
-  if(mode==="classic") setMessage("Touchez les nombres dans l’ordre le plus vite possible.");
-  if(mode==="memory") setMessage("Mémorisez la grille pendant 2 secondes, puis les nombres s’effacent.");
-  if(mode==="flash") setMessage("Les nombres s’affichent brièvement puis disparaissent presque tout de suite.");
-}
-function setSize(size){
-  state.size = size;
-  $$("#sizeButtons button").forEach(b=>b.classList.toggle("active", Number(b.dataset.size)===size));
-  updateBestDisplay();
-}
-function makeTiles(){
-  const total = state.size * state.size;
-  state.order = shuffle([...Array(total)].map((_,i)=>i+1));
-  state.next = 1;
-  state.errors = 0;
-  state.streak = 0;
-  state.hintUsed = false;
 
-  gameGrid.innerHTML = "";
-  gameGrid.style.gridTemplateColumns = `repeat(${state.size}, 1fr)`;
-
-  state.order.forEach(num=>{
-    const btn = document.createElement("button");
-    btn.className = "tile";
-    btn.textContent = num;
-    btn.dataset.num = num;
-    btn.addEventListener("click", () => handleTile(btn, num));
-    gameGrid.appendChild(btn);
-  });
+function bestKey(){
+  return `flashgrid-best-${rows}x${cols}-${mode}`;
 }
-function revealNumbersForPreview(){
-  const tiles = $$("#gameGrid .tile");
-  tiles.forEach(t => t.classList.remove("hiddenNum"));
-  const delay = state.mode === "memory" ? 2000 : state.mode === "flash" ? 900 : 0;
-  if(delay > 0){
-    setTimeout(()=>{
-      if(!state.running || state.paused) return;
-      tiles.forEach(t => t.classList.add("hiddenNum"));
-      hintNext(false);
-      setMessage("C’est parti : retrouve les nombres dans le bon ordre.");
-    }, delay);
+
+function loadBest(){
+  const best = localStorage.getItem(bestKey());
+  bestEl.textContent = "Meilleur chrono : " + (best ? Number(best).toFixed(2) + " s" : "—");
+}
+
+function updateBest(time){
+  const key = bestKey();
+  const current = localStorage.getItem(key);
+  if(!current || time < Number(current)){
+    localStorage.setItem(key, String(time));
+  }
+  loadBest();
+}
+
+function setHelpForMode(){
+  if(mode === "classic"){
+    helpEl.textContent = "Classique : touchez les nombres dans l’ordre croissant.";
+    helpEl.classList.add("show");
   } else {
-    setMessage("Top départ.");
+    helpEl.textContent = "Mémoire : mémorisez la grille, puis retrouvez l’ordre croissant.";
+    helpEl.classList.add("show");
   }
 }
+
+function buildPlaceholderGrid(){
+  const total = rows * cols;
+  gridEl.innerHTML = "";
+  gridEl.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+  for(let i = 0; i < total; i++){
+    const tile = document.createElement("div");
+    tile.className = "tile placeholder";
+    tile.textContent = "0";
+    gridEl.appendChild(tile);
+  }
+}
+
+function startTimer(){
+  clearInterval(timerInterval);
+  startTime = performance.now();
+  timerInterval = setInterval(() => {
+    const t = (performance.now() - startTime) / 1000;
+    timerEl.textContent = t.toFixed(2) + " s";
+  }, 50);
+}
+
+function stopTimer(){
+  clearInterval(timerInterval);
+  timerInterval = null;
+}
+
 function startGame(){
-  clearInterval(state.timerId);
-  state.paused = false;
-  state.elapsedMs = 0;
-  state.startTs = performance.now();
-  state.running = true;
+  playing = true;
+  timerEl.textContent = "0.00 s";
+  startTimer();
 
-  makeTiles();
-  updateStats();
-  revealNumbersForPreview();
+  const total = rows * cols;
+  order = randomNumbers(total).sort((a,b) => a - b);
+  next = 0;
 
-  state.timerId = setInterval(updateStats, 30);
+  const shuffled = shuffle(order);
+  gridEl.innerHTML = "";
+  gridEl.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+  shuffled.forEach(n => {
+    const tile = document.createElement("div");
+    tile.className = "tile";
+    tile.textContent = n;
+    tile.addEventListener("click", () => clickTile(tile, n));
+    gridEl.appendChild(tile);
+  });
+
+  if(mode === "memory"){
+    setTimeout(hideAll, 4200);
+  }
 }
-function pauseGame(){
-  if(!state.running) return;
-  if(!state.paused){
-    state.elapsedMs += performance.now() - state.startTs;
-    state.paused = true;
-    clearInterval(state.timerId);
-    state.timerId = null;
-    $$("#gameGrid .tile").forEach(t => t.classList.add("locked"));
-    setMessage("Pause. Touchez encore “Pause” pour reprendre.");
-    $("#pauseBtn").textContent = "Reprendre";
+
+function hideAll(){
+  if(!playing) return;
+  document.querySelectorAll("#grid .tile").forEach(t => t.classList.add("hidden"));
+}
+
+function clickTile(tile, n){
+  if(!playing) return;
+
+  if(n === order[next]){
+    tile.classList.remove("hidden");
+    tile.classList.add("correct");
+    tile.style.pointerEvents = "none";
+    next++;
+
+    if(next === order.length){
+      playing = false;
+      stopTimer();
+      const finalTime = (performance.now() - startTime) / 1000;
+      timerEl.textContent = finalTime.toFixed(2) + " s";
+      updateBest(finalTime);
+    }
   } else {
-    state.paused = false;
-    state.startTs = performance.now();
-    state.timerId = setInterval(updateStats, 30);
-    $$("#gameGrid .tile").forEach(t => t.classList.remove("locked"));
-    setMessage("Reprise.");
-    $("#pauseBtn").textContent = "Pause";
-  }
-}
-function hintNext(costPenalty=true){
-  if(!state.running || state.paused) return;
-  const tile = gameGrid.querySelector(`.tile[data-num="${state.next}"]`);
-  if(!tile) return;
-  tile.classList.add("hint");
-  setTimeout(()=>tile.classList.remove("hint"), 650);
-  if(costPenalty){
-    state.errors += 1;
-    updateStats();
-    setMessage("Indice utilisé : +1 erreur.");
-  }
-}
-function handleTile(btn, num){
-  if(!state.running || state.paused) return;
-
-  if(num === state.next){
-    btn.classList.remove("hiddenNum");
-    btn.classList.add("correct");
-    btn.disabled = true;
-    state.streak += 1;
-    state.next += 1;
-    updateStats();
-
-    const total = state.size * state.size;
-    if(state.next > total){
-      finishGame();
-    } else if(state.mode !== "classic"){
-      const nextTile = gameGrid.querySelector(`.tile[data-num="${state.next}"]`);
-      if(nextTile && state.mode === "memory" && state.streak % 5 === 0){
-        nextTile.classList.add("hint");
-        setTimeout(()=>nextTile.classList.remove("hint"), 260);
+    tile.classList.remove("hidden");
+    tile.classList.add("wrong");
+    setTimeout(() => {
+      tile.classList.remove("wrong");
+      if(mode === "memory" && !tile.classList.contains("correct")){
+        tile.classList.add("hidden");
       }
-    }
-  } else {
-    btn.classList.remove("hiddenNum");
-    btn.classList.add("wrong");
-    state.errors += 1;
-    state.streak = 0;
-    state.elapsedMs += 1200; // pénalité fixe
-    updateStats();
-    setMessage("Mauvaise case : +1,20 s de pénalité.");
-    setTimeout(()=>btn.classList.remove("wrong"), 350);
+    }, 300);
   }
 }
-function finishGame(){
-  state.elapsedMs += performance.now() - state.startTs;
-  state.running = false;
-  clearInterval(state.timerId);
-  state.timerId = null;
-  $("#pauseBtn").textContent = "Pause";
-  const finalTime = Number((state.elapsedMs/1000).toFixed(2));
-  const isBest = setBest(state.mode, state.size, finalTime);
-  renderLeaderboard();
-  updateStats();
 
-  let msg = `Bravo ! Temps final : ${formatSeconds(finalTime)} avec ${state.errors} erreur`;
-  if(state.errors > 1) msg += "s";
-  msg += ".";
-  if(isBest) msg += " Nouveau record personnel.";
-  setMessage(msg);
-}
-function renderLeaderboard(){
-  leaderboard.innerHTML = "";
-  const modes = ["classic","memory","flash"];
-  let count = 0;
-  for(const mode of modes){
-    for(const size of [4,5,6]){
-      const best = getBest(mode,size);
-      if(best == null) continue;
-      count++;
-      const row = document.createElement("div");
-      row.className = "score-row";
-      row.innerHTML = `
-        <div>
-          <strong>${modeLabels[mode]}</strong><br>
-          <span class="muted">${size}×${size}</span>
-        </div>
-        <div class="badge">${formatSeconds(best)}</div>
-      `;
-      leaderboard.appendChild(row);
-    }
-  }
-  emptyLeaderboard.style.display = count ? "none" : "block";
-}
-function cycleMode(){
-  const order = ["classic","memory","flash"];
-  const i = order.indexOf(state.mode);
-  setMode(order[(i+1)%order.length]);
-}
-function init(){
-  renderLeaderboard();
-  setMode("classic");
-  setSize(4);
-  updateStats();
-}
-
-$("#startBtn").addEventListener("click", startGame);
-$("#bottomStart").addEventListener("click", startGame);
-
-$("#hintBtn").addEventListener("click", ()=>hintNext(true));
-$("#bottomHint").addEventListener("click", ()=>hintNext(true));
-
-$("#pauseBtn").addEventListener("click", pauseGame);
-
-$("#bottomMode").addEventListener("click", cycleMode);
-
-$$("#modeButtons button").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    setMode(btn.dataset.mode);
+document.querySelectorAll("[data-mode]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("[data-mode]").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    mode = btn.dataset.mode;
+    loadBest();
+    setHelpForMode();
   });
 });
 
-$$("#sizeButtons button").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    setSize(Number(btn.dataset.size));
+document.querySelectorAll("[data-size]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("[data-size]").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    const h = Number(btn.dataset.size);
+    rows = h;
+    cols = 4;
+
+    loadBest();
+    buildPlaceholderGrid();
   });
 });
 
-document.addEventListener("keydown", e=>{
-  if(e.code==="Space"){ e.preventDefault(); pauseGame(); }
-  if(e.key==="h" || e.key==="H") hintNext(true);
-  if(e.key==="n" || e.key==="N") startGame();
-});
+document.getElementById("playBtn").addEventListener("click", startGame);
 
-init();
+buildPlaceholderGrid();
+loadBest();
 </script>
 </body>
 </html>
