@@ -51,18 +51,18 @@ h1{
 .top{
   display:flex;
   justify-content:space-between;
-  gap:12px;
+  gap:10px;
   width:100%;
-  font-size:14px;
-  margin-bottom:12px;
+  font-size:13px;
+  margin-bottom:10px;
 }
 .top-pill{
   flex:1;
   border:1px solid var(--line);
   background:rgba(255,255,255,.12);
   backdrop-filter:blur(10px);
-  border-radius:16px;
-  padding:10px 12px;
+  border-radius:14px;
+  padding:8px 10px;
   text-align:center;
   font-weight:700;
 }
@@ -100,7 +100,6 @@ button.active{
   width:100%;
 }
 .tile{
-  aspect-ratio:1/1;
   background:var(--card);
   border-radius:18px;
   display:flex;
@@ -113,8 +112,17 @@ button.active{
   box-shadow:0 10px 24px rgba(0,0,0,.16);
   transition:transform .12s ease, background .18s ease, color .18s ease;
   user-select:none;
+  min-height:86px;
 }
 .tile:active{transform:scale(.97)}
+.grid.grid-4 .tile{
+  aspect-ratio:1/1;
+}
+.grid.grid-5 .tile{
+  aspect-ratio:1/1;
+  min-height:72px;
+  font-size:18px;
+}
 .tile.placeholder{
   color:transparent;
   cursor:default;
@@ -185,7 +193,7 @@ button.active{
     </div>
 
     <div class="grid-wrap">
-      <div id="grid" class="grid"></div>
+      <div id="grid" class="grid grid-4"></div>
     </div>
 
     <div id="help" class="help"></div>
@@ -225,9 +233,9 @@ function randomNumbers(n){
 
 function shuffle(arr){
   const a = [...arr];
-  for(let i=a.length-1;i>0;i--){
-    const j = Math.floor(Math.random() * (i+1));
-    [a[i],a[j]] = [a[j],a[i]];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
 }
@@ -238,7 +246,7 @@ function bestKey(){
 
 function loadBest(){
   const best = localStorage.getItem(bestKey());
-  bestEl.textContent = "Meilleur chrono : " + (best ? Number(best).toFixed(2) + " s" : "—");
+  bestEl.textContent = "Record : " + (best ? Number(best).toFixed(2) + " s" : "—");
 }
 
 function updateBest(time){
@@ -252,19 +260,24 @@ function updateBest(time){
 
 function setHelpForMode(){
   if(mode === "classic"){
-    helpEl.textContent = "Classique : touchez les nombres dans l’ordre croissant.";
+    helpEl.textContent = "Touchez les nombres dans l’ordre croissant.";
   } else if(mode === "memory"){
-    helpEl.textContent = "Mémoire : mémorisez la grille, puis retrouvez l’ordre croissant.";
+    helpEl.textContent = "Mémorisez la grille, puis retrouvez l’ordre croissant.";
   } else {
-    helpEl.textContent = "Memory nombres : retrouvez les paires identiques.";
+    helpEl.textContent = "Retrouvez les paires de nombres identiques.";
   }
   helpEl.classList.add("show");
+}
+
+function setGridClass(){
+  gridEl.className = rows === 5 ? "grid grid-5" : "grid grid-4";
 }
 
 function buildPlaceholderGrid(){
   const total = rows * cols;
   gridEl.innerHTML = "";
   gridEl.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  setGridClass();
 
   for(let i = 0; i < total; i++){
     const tile = document.createElement("div");
@@ -296,6 +309,7 @@ function startClassicOrMemory(){
   const shuffled = shuffle(order);
   gridEl.innerHTML = "";
   gridEl.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  setGridClass();
 
   shuffled.forEach(n => {
     const tile = document.createElement("div");
@@ -323,6 +337,7 @@ function startPairs(){
 
   gridEl.innerHTML = "";
   gridEl.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  setGridClass();
 
   deck.forEach(n => {
     const tile = document.createElement("div");
@@ -458,8 +473,7 @@ document.querySelectorAll("[data-size]").forEach(btn => {
     document.querySelectorAll("[data-size]").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
 
-    const h = Number(btn.dataset.size);
-    rows = h;
+    rows = Number(btn.dataset.size);
     cols = 4;
 
     loadBest();
