@@ -16,7 +16,6 @@
 :root{
   --bg1:#4338ca;
   --bg2:#7c3aed;
-  --bg3:#06b6d4;
   --panel:rgba(255,255,255,.10);
   --panel-line:rgba(255,255,255,.22);
   --text:#ffffff;
@@ -28,7 +27,6 @@
   --yellow:#fde047;
   --violet:#8b5cf6;
   --shadow:0 18px 40px rgba(0,0,0,.22);
-  --radius:28px;
 }
 *{
   box-sizing:border-box;
@@ -239,9 +237,6 @@ button{
   background:linear-gradient(135deg,#ef4444,#dc2626);
   color:#fff;
 }
-.tile.revealed{
-  background:#f8fafc;
-}
 .tile.seq-green{background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff; box-shadow:0 0 24px rgba(34,197,94,.45);}
 .tile.seq-yellow{background:linear-gradient(135deg,#fde047,#facc15); color:#111827; box-shadow:0 0 24px rgba(253,224,71,.45);}
 .tile.seq-pink{background:linear-gradient(135deg,#ff4fb0,#ec4899); color:#fff; box-shadow:0 0 24px rgba(255,79,176,.45);}
@@ -284,7 +279,7 @@ button{
   box-shadow:0 18px 34px rgba(0,0,0,.26), 0 0 28px rgba(34,197,94,.28);
 }
 .hidden-section{
-  display:none;
+  display:none !important;
 }
 @media (max-width:420px){
   .game-title{font-size:21px}
@@ -297,7 +292,7 @@ button{
   <div class="app">
     <h1>MEMORY GAMES</h1>
 
-    <div class="top">
+    <div class="top hidden-section" id="topBar">
       <div class="top-pill" id="timer">0.00 s</div>
       <div class="top-pill" id="record">Record : —</div>
     </div>
@@ -333,7 +328,7 @@ button{
           <div class="mini-cell green"></div>
         </div>
         <div class="game-title">Grille<br>disparaissante</div>
-        <div class="game-sub">Mémorisez les cases allumées, puis retrouvez-les.</div>
+        <div class="game-sub">Mémorisez les cases colorées, puis retrouvez-les.</div>
         <button class="card-btn" type="button">Choisir</button>
       </div>
     </section>
@@ -346,7 +341,7 @@ button{
         <button class="pill-btn" id="btnHard" type="button">Difficile</button>
       </div>
 
-      <div id="sequenceSection">
+      <div id="sequenceSection" class="hidden-section">
         <div id="sequenceGrid" class="game-grid grid-3"></div>
       </div>
 
@@ -384,6 +379,7 @@ const state = {
   disappearRevealMs: 2200
 };
 
+const topBar = document.getElementById("topBar");
 const timerEl = document.getElementById("timer");
 const recordEl = document.getElementById("record");
 const helpEl = document.getElementById("help");
@@ -392,6 +388,11 @@ const gridSection = document.getElementById("gridSection");
 const sequenceGrid = document.getElementById("sequenceGrid");
 const disappearGrid = document.getElementById("disappearGrid");
 const playBtn = document.getElementById("playBtn");
+
+const btnSequence = document.getElementById("btnSequence");
+const btnGrid = document.getElementById("btnGrid");
+const btnEasy = document.getElementById("btnEasy");
+const btnHard = document.getElementById("btnHard");
 
 function shuffle(arr){
   const a = [...arr];
@@ -454,6 +455,11 @@ function showGameSection(){
     gridSection.classList.remove("hidden-section");
     sequenceSection.classList.add("hidden-section");
   }
+}
+
+function hideGameSections(){
+  sequenceSection.classList.add("hidden-section");
+  gridSection.classList.add("hidden-section");
 }
 
 function buildSequenceGrid(){
@@ -519,6 +525,7 @@ function startGame(){
   resetBoards();
   state.playing = true;
   startTimer();
+  showGameSection();
 
   if(state.game === "sequence"){
     state.sequenceLevel = state.difficulty === "easy" ? 3 : 5;
@@ -620,31 +627,36 @@ function wait(ms){
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-document.getElementById("btnSequence").addEventListener("click", ()=>{
+btnSequence.addEventListener("click", ()=>{
   state.game = "sequence";
   setActiveButton([btnSequence,btnGrid], "btnSequence");
   setActiveCard("sequence");
-  showGameSection();
   loadRecord();
   setHelp();
   resetBoards();
+  hideGameSections();
+  topBar.classList.remove("hidden-section");
 });
-document.getElementById("btnGrid").addEventListener("click", ()=>{
+
+btnGrid.addEventListener("click", ()=>{
   state.game = "grid";
   setActiveButton([btnSequence,btnGrid], "btnGrid");
   setActiveCard("grid");
-  showGameSection();
   loadRecord();
   setHelp();
   resetBoards();
+  hideGameSections();
+  topBar.classList.remove("hidden-section");
 });
-document.getElementById("btnEasy").addEventListener("click", ()=>{
+
+btnEasy.addEventListener("click", ()=>{
   state.difficulty = "easy";
   setActiveButton([btnEasy,btnHard], "btnEasy");
   loadRecord();
   setHelp();
 });
-document.getElementById("btnHard").addEventListener("click", ()=>{
+
+btnHard.addEventListener("click", ()=>{
   state.difficulty = "hard";
   setActiveButton([btnEasy,btnHard], "btnHard");
   loadRecord();
@@ -655,23 +667,19 @@ document.querySelectorAll("[data-game-card]").forEach(card=>{
   card.addEventListener("click", ()=>{
     const game = card.dataset.gameCard;
     if(game === "sequence"){
-      document.getElementById("btnSequence").click();
+      btnSequence.click();
     } else {
-      document.getElementById("btnGrid").click();
+      btnGrid.click();
     }
+    topBar.classList.remove("hidden-section");
   });
 });
 
 playBtn.addEventListener("click", startGame);
 
-const btnSequence = document.getElementById("btnSequence");
-const btnGrid = document.getElementById("btnGrid");
-const btnEasy = document.getElementById("btnEasy");
-const btnHard = document.getElementById("btnHard");
-
 buildSequenceGrid();
 buildDisappearGrid();
-showGameSection();
+hideGameSections();
 loadRecord();
 setHelp();
 </script>
