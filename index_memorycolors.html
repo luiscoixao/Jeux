@@ -206,9 +206,10 @@ h1{
 }
 
 .tile.correct{
+  outline:3px solid rgba(255,255,255,.7);
   transform:scale(0.96);
-  box-shadow:0 0 18px rgba(255,255,255,.35);
 }
+
 
 .tile.wrong{
   background:linear-gradient(135deg,#ef4444,#dc2626);
@@ -547,7 +548,7 @@ function handleClick(index){
   }, 180);
 
   if(index === state.pattern[state.step]){
-    tile.className = "tile correct";
+      tile.classList.add("correct");
     setTimeout(() => {
       if(state.playing) tile.className = "tile";
     }, 220);
