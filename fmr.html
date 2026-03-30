@@ -20,13 +20,7 @@
   --panel:rgba(255,255,255,.10);
   --panel-line:rgba(255,255,255,.22);
   --text:#ffffff;
-  --text-dark:#0f172a;
   --card:#ffffff;
-  --green:#22c55e;
-  --pink:#ff3cac;
-  --cyan:#38bdf8;
-  --yellow:#fde047;
-  --violet:#8b5cf6;
   --shadow:0 18px 40px rgba(0,0,0,.22);
 }
 *{
@@ -66,40 +60,17 @@ h1{
   display:none !important;
 }
 
-.menu{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-}
-.game-card{
+.home-card{
   border-radius:30px;
   padding:16px 14px 18px;
   min-height:280px;
-  position:relative;
   overflow:hidden;
   border:1px solid rgba(255,255,255,.22);
   background:rgba(10,16,40,.36);
   backdrop-filter:blur(10px);
-  box-shadow:var(--shadow);
-  cursor:pointer;
-  transition:transform .15s ease, box-shadow .2s ease, outline .2s ease;
-}
-.game-card:active{
-  transform:scale(.985);
-}
-.game-card.active{
-  outline:3px solid rgba(255,255,255,.28);
-}
-.game-card.cyan{
   box-shadow:
     0 0 0 1px rgba(255,255,255,.06) inset,
     0 0 26px rgba(56,189,248,.35),
-    0 18px 40px rgba(0,0,0,.22);
-}
-.game-card.pink{
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.06) inset,
-    0 0 26px rgba(255,60,172,.30),
     0 18px 40px rgba(0,0,0,.22);
 }
 .mini-grid{
@@ -119,32 +90,47 @@ h1{
 .mini-cell.pink{background:linear-gradient(135deg,#ff4fb0,#ec4899); box-shadow:0 0 18px rgba(255,79,176,.35);}
 .mini-cell.cyan{background:linear-gradient(135deg,#67e8f9,#38bdf8); box-shadow:0 0 18px rgba(56,189,248,.35);}
 .mini-cell.violet{background:linear-gradient(135deg,#a78bfa,#8b5cf6); box-shadow:0 0 18px rgba(139,92,246,.35);}
-.game-title{
-  font-size:24px;
+.home-title{
+  font-size:28px;
   line-height:1.05;
   font-weight:900;
   margin-bottom:10px;
 }
-.game-sub{
-  font-size:13px;
-  line-height:1.35;
+.home-sub{
+  font-size:16px;
+  line-height:1.4;
   color:rgba(255,255,255,.82);
 }
 
-.signature{
+.top{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:14px;
+}
+.top-pill{
+  min-height:60px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   text-align:center;
-  font-size:11px;
-  color:rgba(255,255,255,.62);
-  margin-top:14px;
+  border-radius:20px;
+  border:1px solid var(--panel-line);
+  background:var(--panel);
+  backdrop-filter:blur(12px);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+  font-size:16px;
+  font-weight:900;
+  padding:10px 12px;
 }
 
 .status{
   min-height:26px;
   text-align:center;
-  font-size:14px;
+  font-size:15px;
   font-weight:800;
   color:rgba(255,255,255,.94);
-  margin:12px 0 6px;
+  margin:10px 0 12px;
 }
 
 .game-wrap{
@@ -159,14 +145,9 @@ h1{
 
 .game-grid{
   display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
   gap:12px;
   width:100%;
-}
-.grid-3{
-  grid-template-columns:repeat(3,minmax(0,1fr));
-}
-.grid-4{
-  grid-template-columns:repeat(4,minmax(0,1fr));
 }
 .tile{
   width:100%;
@@ -177,7 +158,8 @@ h1{
   background:rgba(255,255,255,.18);
   color:transparent;
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.08), 0 12px 22px rgba(0,0,0,.16);
-  transition:transform .12s ease, opacity .18s ease, background .18s ease, box-shadow .18s ease;
+  transition:transform .12s ease, background .18s ease, box-shadow .18s ease;
+  cursor:pointer;
 }
 .tile:active{
   transform:scale(.97);
@@ -194,6 +176,13 @@ h1{
 .tile.wrong{
   background:linear-gradient(135deg,#ef4444,#dc2626);
   box-shadow:0 0 20px rgba(239,68,68,.35);
+}
+
+.signature{
+  text-align:center;
+  font-size:11px;
+  color:rgba(255,255,255,.62);
+  margin-top:14px;
 }
 
 .playbar{
@@ -221,7 +210,7 @@ h1{
   cursor:pointer;
 }
 @media (max-width:420px){
-  .game-title{font-size:21px}
+  .home-title{font-size:24px}
 }
 </style>
 </head>
@@ -229,51 +218,37 @@ h1{
   <div class="app">
     <h1>MEMORY GAMES</h1>
 
-    <section id="homeSection" class="menu">
-      <div class="game-card cyan active" data-game-card="sequence">
-        <div class="mini-grid">
-          <div class="mini-cell green"></div>
-          <div class="mini-cell"></div>
-          <div class="mini-cell pink"></div>
-          <div class="mini-cell yellow"></div>
-          <div class="mini-cell cyan"></div>
-          <div class="mini-cell"></div>
-          <div class="mini-cell"></div>
-          <div class="mini-cell violet"></div>
-          <div class="mini-cell"></div>
-        </div>
-        <div class="game-title">Séquence<br>à retenir</div>
-        <div class="game-sub">Mémorisez la séquence lumineuse, puis reproduisez-la.</div>
+    <section id="homeSection" class="home-card">
+      <div class="mini-grid">
+        <div class="mini-cell green"></div>
+        <div class="mini-cell"></div>
+        <div class="mini-cell pink"></div>
+        <div class="mini-cell yellow"></div>
+        <div class="mini-cell cyan"></div>
+        <div class="mini-cell"></div>
+        <div class="mini-cell"></div>
+        <div class="mini-cell violet"></div>
+        <div class="mini-cell"></div>
       </div>
-
-      <div class="game-card pink" data-game-card="grid">
-        <div class="mini-grid">
-          <div class="mini-cell"></div>
-          <div class="mini-cell cyan"></div>
-          <div class="mini-cell"></div>
-          <div class="mini-cell"></div>
-          <div class="mini-cell"></div>
-          <div class="mini-cell pink"></div>
-          <div class="mini-cell"></div>
-          <div class="mini-cell"></div>
-          <div class="mini-cell green"></div>
-        </div>
-        <div class="game-title">Grille<br>disparaissante</div>
-        <div class="game-sub">Mémorisez les cases colorées, puis retrouvez-les.</div>
-      </div>
+      <div class="home-title">Séquence<br>à retenir</div>
+      <div class="home-sub">Mémorisez une séquence de plus en plus longue. Certaines cases peuvent revenir deux ou trois fois.</div>
     </section>
+
+    <div id="topBar" class="top hidden">
+      <div class="top-pill" id="levelBox">Séquence : 1</div>
+      <div class="top-pill" id="scoreBox">Points : 0</div>
+    </div>
 
     <div id="status" class="status hidden"></div>
 
     <section id="gameWrap" class="game-wrap hidden">
-      <div id="sequenceGrid" class="game-grid grid-3 hidden"></div>
-      <div id="gridGame" class="game-grid grid-4 hidden"></div>
+      <div id="sequenceGrid" class="game-grid"></div>
     </section>
 
     <div class="signature">Jeu créé par Luis Coixao à l'aide de ChatGPT.</div>
   </div>
 
-  <div class="playbar hidden" id="playBar">
+  <div class="playbar" id="playBar">
     <button id="playBtn" class="play-btn" type="button">Jouer</button>
   </div>
 
@@ -281,103 +256,34 @@ h1{
 const COLORS = ["seq-green","seq-yellow","seq-pink","seq-cyan","seq-violet"];
 
 const state = {
-  game: null,
   playing: false,
-
-  // séquence
-  sequenceLevel: 1,
-  sequencePattern: [],
-  sequenceStep: 0,
-  sequenceShowing: false,
-
-  // grille
-  gridLevel: 1,
-  gridTargets: [],
-  gridFound: 0
+  level: 1,
+  score: 0,
+  pattern: [],
+  step: 0,
+  showing: false
 };
 
 const homeSection = document.getElementById("homeSection");
-const gameWrap = document.getElementById("gameWrap");
-const playBar = document.getElementById("playBar");
-const playBtn = document.getElementById("playBtn");
+const topBar = document.getElementById("topBar");
 const statusEl = document.getElementById("status");
+const gameWrap = document.getElementById("gameWrap");
 const sequenceGrid = document.getElementById("sequenceGrid");
-const gridGame = document.getElementById("gridGame");
-
-function shuffle(arr){
-  const a = [...arr];
-  for(let i=a.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [a[i],a[j]] = [a[j],a[i]];
-  }
-  return a;
-}
+const playBtn = document.getElementById("playBtn");
+const levelBox = document.getElementById("levelBox");
+const scoreBox = document.getElementById("scoreBox");
 
 function wait(ms){
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function randomUniqueIndices(count, max){
-  return shuffle([...Array(max)].map((_,i)=>i)).slice(0,count);
+function randomIndex(){
+  return Math.floor(Math.random() * 9);
 }
 
-function setActiveCard(game){
-  document.querySelectorAll("[data-game-card]").forEach(card=>{
-    card.classList.toggle("active", card.dataset.gameCard === game);
-  });
-}
-
-function showMenu(){
-  state.playing = false;
-  homeSection.classList.remove("hidden");
-  playBar.classList.remove("hidden");
-  gameWrap.classList.add("hidden");
-  sequenceGrid.classList.add("hidden");
-  gridGame.classList.add("hidden");
-  statusEl.classList.add("hidden");
-  statusEl.textContent = "";
-}
-
-function selectGame(game){
-  state.game = game;
-  setActiveCard(game);
-  playBar.classList.remove("hidden");
-}
-
-function buildSequenceGrid(){
-  sequenceGrid.innerHTML = "";
-  for(let i=0;i<9;i++){
-    const tile = document.createElement("button");
-    tile.type = "button";
-    tile.className = "tile";
-    tile.addEventListener("click", ()=>handleSequenceClick(i));
-    sequenceGrid.appendChild(tile);
-  }
-}
-
-function buildGridGame(){
-  gridGame.innerHTML = "";
-  for(let i=0;i<16;i++){
-    const tile = document.createElement("button");
-    tile.type = "button";
-    tile.className = "tile";
-    tile.addEventListener("click", ()=>handleGridClick(i, tile));
-    gridGame.appendChild(tile);
-  }
-}
-
-function resetSequenceBoard(){
-  [...sequenceGrid.children].forEach(tile => {
-    tile.className = "tile";
-    tile.disabled = false;
-  });
-}
-
-function resetGridBoard(){
-  [...gridGame.children].forEach(tile => {
-    tile.className = "tile";
-    tile.disabled = false;
-  });
+function updateTop(){
+  levelBox.textContent = "Séquence : " + state.level;
+  scoreBox.textContent = "Points : " + state.score;
 }
 
 function showStatus(text){
@@ -385,159 +291,147 @@ function showStatus(text){
   statusEl.classList.remove("hidden");
 }
 
-async function startGame(){
-  if(!state.game || state.playing) return;
+function hideStatus(){
+  statusEl.classList.add("hidden");
+}
 
-  state.playing = true;
-  homeSection.classList.add("hidden");
-  gameWrap.classList.remove("hidden");
-  playBar.classList.add("hidden");
-
-  showStatus("Prêt...");
-  await wait(1000);
-
-  if(state.game === "sequence"){
-    startSequenceMode();
-  } else {
-    startGridMode();
+function buildGrid(){
+  sequenceGrid.innerHTML = "";
+  for(let i = 0; i < 9; i++){
+    const tile = document.createElement("button");
+    tile.type = "button";
+    tile.className = "tile";
+    tile.addEventListener("click", () => handleClick(i));
+    sequenceGrid.appendChild(tile);
   }
 }
 
-async function startSequenceMode(){
-  state.sequenceLevel = 1;
-  sequenceGrid.classList.remove("hidden");
-  gridGame.classList.add("hidden");
-  resetSequenceBoard();
-  await playSequenceLevel();
+function resetBoard(){
+  [...sequenceGrid.children].forEach(tile => {
+    tile.className = "tile";
+    tile.disabled = false;
+  });
 }
 
-async function playSequenceLevel(){
-  resetSequenceBoard();
-  state.sequenceStep = 0;
-  state.sequenceShowing = true;
-  state.sequencePattern = shuffle([0,1,2,3,4,5,6,7,8]).slice(0, state.sequenceLevel);
+function lightTile(index, on){
+  const tile = sequenceGrid.children[index];
+  if(!tile) return;
+  tile.className = "tile" + (on ? " " + COLORS[index % COLORS.length] : "");
+}
 
-  showStatus(`Niveau ${state.sequenceLevel} / 9`);
-  await wait(700);
+function createPattern(length){
+  const arr = [];
+  for(let i = 0; i < length; i++){
+    arr.push(randomIndex());
+  }
+  return arr;
+}
 
-  for(const idx of state.sequencePattern){
-    const tile = sequenceGrid.children[idx];
-    const color = COLORS[idx % COLORS.length];
-    tile.className = "tile " + color;
+async function showPattern(){
+  state.showing = true;
+  showStatus("Mémorisez...");
+  await wait(400);
+
+  for(const idx of state.pattern){
+    lightTile(idx, true);
     await wait(520);
-    tile.className = "tile";
+    lightTile(idx, false);
     await wait(160);
   }
 
-  state.sequenceShowing = false;
-  showStatus(`Retrouvez ${state.sequenceLevel} case${state.sequenceLevel > 1 ? "s" : ""}`);
+  state.showing = false;
+  state.step = 0;
+  showStatus("À vous");
 }
 
-function handleSequenceClick(index){
-  if(!state.playing || state.game !== "sequence" || state.sequenceShowing) return;
+async function playLevel(){
+  resetBoard();
+  updateTop();
+  state.pattern = createPattern(state.level);
+  await showPattern();
+}
+
+async function startGame(){
+  if(state.playing) return;
+
+  state.playing = true;
+  state.level = 1;
+  state.score = 0;
+  updateTop();
+
+  homeSection.classList.add("hidden");
+  topBar.classList.remove("hidden");
+  statusEl.classList.remove("hidden");
+  gameWrap.classList.remove("hidden");
+
+  showStatus("Prêt...");
+  await wait(1000);
+  await playLevel();
+}
+
+async function finishGame(){
+  state.playing = false;
+  showStatus("Bravo !");
+  await wait(1200);
+
+  homeSection.classList.remove("hidden");
+  topBar.classList.add("hidden");
+  gameWrap.classList.add("hidden");
+  hideStatus();
+  resetBoard();
+}
+
+async function nextLevel(){
+  state.score += 1;
+  updateTop();
+
+  if(state.level >= 9){
+    await finishGame();
+    return;
+  }
+
+  state.level += 1;
+  showStatus("Bien");
+  await wait(700);
+  await playLevel();
+}
+
+function handleClick(index){
+  if(!state.playing || state.showing) return;
 
   const tile = sequenceGrid.children[index];
   const color = COLORS[index % COLORS.length];
   tile.className = "tile " + color;
 
-  setTimeout(()=>{
+  setTimeout(() => {
     if(state.playing && !tile.classList.contains("correct")){
       tile.className = "tile";
     }
   }, 180);
 
-  if(index === state.sequencePattern[state.sequenceStep]){
+  if(index === state.pattern[state.step]){
     tile.className = "tile correct";
-    tile.disabled = true;
-    state.sequenceStep++;
+    setTimeout(() => {
+      if(state.playing) tile.className = "tile";
+    }, 220);
 
-    if(state.sequenceStep === state.sequencePattern.length){
-      if(state.sequenceLevel === 9){
-        finishAndBackToMenu("Bravo !");
-      } else {
-        state.sequenceLevel++;
-        setTimeout(playSequenceLevel, 700);
-      }
+    state.step++;
+
+    if(state.step === state.pattern.length){
+      nextLevel();
     }
   } else {
     tile.className = "tile wrong";
-    setTimeout(()=>{ if(state.playing) tile.className = "tile"; }, 300);
-  }
-}
-
-async function startGridMode(){
-  state.gridLevel = 1;
-  sequenceGrid.classList.add("hidden");
-  gridGame.classList.remove("hidden");
-  resetGridBoard();
-  await playGridLevel();
-}
-
-async function playGridLevel(){
-  resetGridBoard();
-  state.gridFound = 0;
-  state.gridTargets = randomUniqueIndices(state.gridLevel, 16);
-
-  showStatus(`Niveau ${state.gridLevel} / 16`);
-  await wait(700);
-
-  state.gridTargets.forEach((idx, i)=>{
-    gridGame.children[idx].className = "tile " + COLORS[i % COLORS.length];
-  });
-
-  await wait(1100);
-
-  state.gridTargets.forEach(idx=>{
-    gridGame.children[idx].className = "tile";
-  });
-
-  showStatus(`Retrouvez ${state.gridLevel} case${state.gridLevel > 1 ? "s" : ""}`);
-}
-
-function handleGridClick(index, tile){
-  if(!state.playing || state.game !== "grid") return;
-  if(tile.disabled) return;
-
-  if(state.gridTargets.includes(index)){
-    const colorIndex = state.gridTargets.indexOf(index) % COLORS.length;
-    tile.className = "tile correct " + COLORS[colorIndex];
-    tile.disabled = true;
-    state.gridFound++;
-
-    if(state.gridFound === state.gridTargets.length){
-      if(state.gridLevel === 16){
-        finishAndBackToMenu("Bravo !");
-      } else {
-        state.gridLevel++;
-        setTimeout(playGridLevel, 700);
-      }
-    }
-  } else {
-    tile.className = "tile wrong";
-    setTimeout(()=>{
+    setTimeout(() => {
       if(state.playing) tile.className = "tile";
     }, 300);
   }
 }
 
-async function finishAndBackToMenu(message){
-  showStatus(message);
-  state.playing = false;
-  await wait(1200);
-  showMenu();
-}
-
-document.querySelectorAll("[data-game-card]").forEach(card=>{
-  card.addEventListener("click", ()=>{
-    selectGame(card.dataset.gameCard);
-  });
-});
-
 playBtn.addEventListener("click", startGame);
 
-buildSequenceGrid();
-buildGridGame();
-showMenu();
+buildGrid();
+updateTop();
 </script>
 </body>
 </html>
