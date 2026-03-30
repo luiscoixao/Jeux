@@ -62,30 +62,10 @@ h1{
   font-weight:900;
   letter-spacing:.4px;
 }
-.hidden-section{
+.hidden{
   display:none !important;
 }
-.top{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-bottom:14px;
-}
-.top-pill{
-  min-height:60px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  border-radius:20px;
-  border:1px solid var(--panel-line);
-  background:var(--panel);
-  backdrop-filter:blur(12px);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
-  font-size:14px;
-  font-weight:800;
-  padding:10px 12px;
-}
+
 .menu{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -150,7 +130,24 @@ h1{
   line-height:1.35;
   color:rgba(255,255,255,.82);
 }
-.panel{
+
+.signature{
+  text-align:center;
+  font-size:11px;
+  color:rgba(255,255,255,.62);
+  margin-top:14px;
+}
+
+.status{
+  min-height:26px;
+  text-align:center;
+  font-size:14px;
+  font-weight:800;
+  color:rgba(255,255,255,.94);
+  margin:12px 0 6px;
+}
+
+.game-wrap{
   margin-top:14px;
   border-radius:30px;
   border:1px solid var(--panel-line);
@@ -159,40 +156,16 @@ h1{
   padding:14px;
   box-shadow:var(--shadow);
 }
-.controls{
-  display:flex;
-  gap:8px;
-  justify-content:center;
-  flex-wrap:wrap;
-  margin-bottom:12px;
-}
-button{
-  border:none;
-  cursor:pointer;
-  font:inherit;
-}
-.pill-btn{
-  min-height:48px;
-  padding:0 16px;
-  border-radius:16px;
-  font-weight:900;
-  color:var(--text-dark);
-  background:#fff;
-  box-shadow:0 10px 24px rgba(0,0,0,.12);
-}
-.pill-btn.active{
-  background:#0f172a;
-  color:#fff;
-}
+
 .game-grid{
   display:grid;
-  gap:10px;
+  gap:12px;
   width:100%;
 }
-.game-grid.grid-3{
+.grid-3{
   grid-template-columns:repeat(3,minmax(0,1fr));
 }
-.game-grid.grid-4{
+.grid-4{
   grid-template-columns:repeat(4,minmax(0,1fr));
 }
 .tile{
@@ -201,53 +174,28 @@ button{
   min-width:0;
   border-radius:20px;
   border:none;
-  background:var(--card);
-  color:var(--text-dark);
-  font-size:24px;
-  font-weight:900;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  box-shadow:0 12px 22px rgba(0,0,0,.16);
-  transition:transform .12s ease, opacity .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease;
-  user-select:none;
-}
-.tile.small{
-  font-size:20px;
+  background:rgba(255,255,255,.18);
+  color:transparent;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08), 0 12px 22px rgba(0,0,0,.16);
+  transition:transform .12s ease, opacity .18s ease, background .18s ease, box-shadow .18s ease;
 }
 .tile:active{
   transform:scale(.97);
 }
-.tile.hidden{
-  color:transparent;
-}
+.tile.seq-green{background:linear-gradient(135deg,#22c55e,#16a34a); box-shadow:0 0 24px rgba(34,197,94,.45);}
+.tile.seq-yellow{background:linear-gradient(135deg,#fde047,#facc15); box-shadow:0 0 24px rgba(253,224,71,.45);}
+.tile.seq-pink{background:linear-gradient(135deg,#ff4fb0,#ec4899); box-shadow:0 0 24px rgba(255,79,176,.45);}
+.tile.seq-cyan{background:linear-gradient(135deg,#67e8f9,#38bdf8); box-shadow:0 0 24px rgba(56,189,248,.45);}
+.tile.seq-violet{background:linear-gradient(135deg,#a78bfa,#8b5cf6); box-shadow:0 0 24px rgba(139,92,246,.45);}
 .tile.correct{
   background:linear-gradient(135deg,#22c55e,#16a34a);
-  color:#fff;
+  box-shadow:0 0 24px rgba(34,197,94,.45);
 }
 .tile.wrong{
   background:linear-gradient(135deg,#ef4444,#dc2626);
-  color:#fff;
+  box-shadow:0 0 20px rgba(239,68,68,.35);
 }
-.tile.seq-green{background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff; box-shadow:0 0 24px rgba(34,197,94,.45);}
-.tile.seq-yellow{background:linear-gradient(135deg,#fde047,#facc15); color:#111827; box-shadow:0 0 24px rgba(253,224,71,.45);}
-.tile.seq-pink{background:linear-gradient(135deg,#ff4fb0,#ec4899); color:#fff; box-shadow:0 0 24px rgba(255,79,176,.45);}
-.tile.seq-cyan{background:linear-gradient(135deg,#67e8f9,#38bdf8); color:#fff; box-shadow:0 0 24px rgba(56,189,248,.45);}
-.tile.seq-violet{background:linear-gradient(135deg,#a78bfa,#8b5cf6); color:#fff; box-shadow:0 0 24px rgba(139,92,246,.45);}
-.help{
-  min-height:24px;
-  margin-top:14px;
-  text-align:center;
-  font-size:13px;
-  line-height:1.35;
-  color:rgba(255,255,255,.88);
-}
-.signature{
-  text-align:center;
-  font-size:11px;
-  color:rgba(255,255,255,.62);
-  margin-top:14px;
-}
+
 .playbar{
   position:fixed;
   left:16px;
@@ -262,6 +210,7 @@ button{
   max-width:460px;
   width:min(100%, 340px);
   min-height:64px;
+  border:none;
   border-radius:24px;
   background:linear-gradient(135deg,#22c55e,#10b981);
   color:#fff;
@@ -269,22 +218,16 @@ button{
   font-weight:900;
   text-align:center;
   box-shadow:0 18px 34px rgba(0,0,0,.26), 0 0 28px rgba(34,197,94,.28);
+  cursor:pointer;
 }
 @media (max-width:420px){
   .game-title{font-size:21px}
-  .tile{font-size:20px}
-  .tile.small{font-size:17px}
 }
 </style>
 </head>
 <body>
   <div class="app">
     <h1>MEMORY GAMES</h1>
-
-    <div class="top hidden-section" id="topBar">
-      <div class="top-pill" id="timer">0.00 s</div>
-      <div class="top-pill" id="record">Record : —</div>
-    </div>
 
     <section id="homeSection" class="menu">
       <div class="game-card cyan active" data-game-card="sequence">
@@ -320,29 +263,17 @@ button{
       </div>
     </section>
 
-    <div class="signature">Jeu créé par Luis Coixao à l'aide de ChatGPT.</div>
+    <div id="status" class="status hidden"></div>
 
-    <section class="panel hidden-section" id="controlPanel">
-      <div class="controls">
-        <button class="pill-btn active" id="btnSequence" type="button">Séquence</button>
-        <button class="pill-btn" id="btnGrid" type="button">Grille</button>
-        <button class="pill-btn active" id="btnEasy" type="button">Facile</button>
-        <button class="pill-btn" id="btnHard" type="button">Difficile</button>
-      </div>
-
-      <div id="sequenceSection" class="hidden-section">
-        <div id="sequenceGrid" class="game-grid grid-3"></div>
-      </div>
-
-      <div id="gridSection" class="hidden-section">
-        <div id="disappearGrid" class="game-grid grid-4"></div>
-      </div>
-
-      <div id="help" class="help"></div>
+    <section id="gameWrap" class="game-wrap hidden">
+      <div id="sequenceGrid" class="game-grid grid-3 hidden"></div>
+      <div id="gridGame" class="game-grid grid-4 hidden"></div>
     </section>
+
+    <div class="signature">Jeu créé par Luis Coixao à l'aide de ChatGPT.</div>
   </div>
 
-  <div class="playbar hidden-section" id="playBar">
+  <div class="playbar hidden" id="playBar">
     <button id="playBtn" class="play-btn" type="button">Jouer</button>
   </div>
 
@@ -350,41 +281,28 @@ button{
 const COLORS = ["seq-green","seq-yellow","seq-pink","seq-cyan","seq-violet"];
 
 const state = {
-  game: "sequence",
-  difficulty: "easy",
+  game: null,
   playing: false,
-  startTime: 0,
-  timerInterval: null,
 
+  // séquence
+  sequenceLevel: 1,
   sequencePattern: [],
   sequenceStep: 0,
   sequenceShowing: false,
-  sequenceLevel: 3,
 
-  disappearTargets: [],
-  disappearFound: 0,
-  disappearSize: 4,
-  disappearRevealMs: 2200
+  // grille
+  gridLevel: 1,
+  gridTargets: [],
+  gridFound: 0
 };
 
-const topBar = document.getElementById("topBar");
 const homeSection = document.getElementById("homeSection");
-const controlPanel = document.getElementById("controlPanel");
+const gameWrap = document.getElementById("gameWrap");
 const playBar = document.getElementById("playBar");
-
-const timerEl = document.getElementById("timer");
-const recordEl = document.getElementById("record");
-const helpEl = document.getElementById("help");
-const sequenceSection = document.getElementById("sequenceSection");
-const gridSection = document.getElementById("gridSection");
-const sequenceGrid = document.getElementById("sequenceGrid");
-const disappearGrid = document.getElementById("disappearGrid");
 const playBtn = document.getElementById("playBtn");
-
-const btnSequence = document.getElementById("btnSequence");
-const btnGrid = document.getElementById("btnGrid");
-const btnEasy = document.getElementById("btnEasy");
-const btnHard = document.getElementById("btnHard");
+const statusEl = document.getElementById("status");
+const sequenceGrid = document.getElementById("sequenceGrid");
+const gridGame = document.getElementById("gridGame");
 
 function shuffle(arr){
   const a = [...arr];
@@ -395,30 +313,12 @@ function shuffle(arr){
   return a;
 }
 
+function wait(ms){
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function randomUniqueIndices(count, max){
   return shuffle([...Array(max)].map((_,i)=>i)).slice(0,count);
-}
-
-function recordKey(){
-  return `memory-games-record-${state.game}-${state.difficulty}`;
-}
-
-function loadRecord(){
-  const val = localStorage.getItem(recordKey());
-  recordEl.textContent = "Record : " + (val ? Number(val).toFixed(2) + " s" : "—");
-}
-
-function updateRecord(time){
-  const key = recordKey();
-  const prev = localStorage.getItem(key);
-  if(!prev || time < Number(prev)){
-    localStorage.setItem(key, String(time));
-  }
-  loadRecord();
-}
-
-function setActiveButton(group, activeId){
-  group.forEach(btn => btn.classList.toggle("active", btn.id === activeId));
 }
 
 function setActiveCard(game){
@@ -427,31 +327,21 @@ function setActiveCard(game){
   });
 }
 
-function setHelp(){
-  if(state.game === "sequence"){
-    helpEl.textContent = state.difficulty === "easy"
-      ? "Mémorisez la séquence lumineuse puis reproduisez-la."
-      : "Séquence plus longue et plus rapide.";
-  } else {
-    helpEl.textContent = state.difficulty === "easy"
-      ? "Mémorisez les cases colorées puis touchez-les."
-      : "Plus de cases à retenir et affichage plus court.";
-  }
+function showMenu(){
+  state.playing = false;
+  homeSection.classList.remove("hidden");
+  playBar.classList.remove("hidden");
+  gameWrap.classList.add("hidden");
+  sequenceGrid.classList.add("hidden");
+  gridGame.classList.add("hidden");
+  statusEl.classList.add("hidden");
+  statusEl.textContent = "";
 }
 
-function showGameSection(){
-  if(state.game === "sequence"){
-    sequenceSection.classList.remove("hidden-section");
-    gridSection.classList.add("hidden-section");
-  } else {
-    gridSection.classList.remove("hidden-section");
-    sequenceSection.classList.add("hidden-section");
-  }
-}
-
-function hideGameSections(){
-  sequenceSection.classList.add("hidden-section");
-  gridSection.classList.add("hidden-section");
+function selectGame(game){
+  state.game = game;
+  setActiveCard(game);
+  playBar.classList.remove("hidden");
 }
 
 function buildSequenceGrid(){
@@ -460,230 +350,194 @@ function buildSequenceGrid(){
     const tile = document.createElement("button");
     tile.type = "button";
     tile.className = "tile";
-    tile.dataset.index = i;
     tile.addEventListener("click", ()=>handleSequenceClick(i));
     sequenceGrid.appendChild(tile);
   }
 }
 
-function buildDisappearGrid(){
-  disappearGrid.innerHTML = "";
-  const total = 16;
-  for(let i=0;i<total;i++){
+function buildGridGame(){
+  gridGame.innerHTML = "";
+  for(let i=0;i<16;i++){
     const tile = document.createElement("button");
     tile.type = "button";
-    tile.className = "tile small";
-    tile.dataset.index = i;
-    tile.addEventListener("click", ()=>handleDisappearClick(i, tile));
-    disappearGrid.appendChild(tile);
+    tile.className = "tile";
+    tile.addEventListener("click", ()=>handleGridClick(i, tile));
+    gridGame.appendChild(tile);
   }
 }
 
-function resetBoards(){
-  document.querySelectorAll("#sequenceGrid .tile").forEach(t=>{
-    t.className = "tile";
-  });
-  document.querySelectorAll("#disappearGrid .tile").forEach(t=>{
-    t.className = "tile small";
-    t.textContent = "";
-    t.disabled = false;
+function resetSequenceBoard(){
+  [...sequenceGrid.children].forEach(tile => {
+    tile.className = "tile";
+    tile.disabled = false;
   });
 }
 
-function startTimer(){
-  clearInterval(state.timerInterval);
-  state.startTime = performance.now();
-  timerEl.textContent = "0.00 s";
-  state.timerInterval = setInterval(()=>{
-    const t = (performance.now() - state.startTime)/1000;
-    timerEl.textContent = t.toFixed(2) + " s";
-  },50);
+function resetGridBoard(){
+  [...gridGame.children].forEach(tile => {
+    tile.className = "tile";
+    tile.disabled = false;
+  });
 }
 
-function stopTimer(){
-  clearInterval(state.timerInterval);
-  state.timerInterval = null;
+function showStatus(text){
+  statusEl.textContent = text;
+  statusEl.classList.remove("hidden");
 }
 
-function finishGame(){
-  state.playing = false;
-  stopTimer();
-  const time = (performance.now() - state.startTime)/1000;
-  timerEl.textContent = time.toFixed(2) + " s";
-  updateRecord(time);
+async function startGame(){
+  if(!state.game || state.playing) return;
 
-  homeSection.classList.remove("hidden-section");
-  hideGameSections();
-}
-
-function startGame(){
-  resetBoards();
   state.playing = true;
-  startTimer();
-  showGameSection();
+  homeSection.classList.add("hidden");
+  gameWrap.classList.remove("hidden");
+  playBar.classList.add("hidden");
 
-  homeSection.classList.add("hidden-section");
-  topBar.classList.remove("hidden-section");
+  showStatus("Prêt...");
+  await wait(1000);
 
   if(state.game === "sequence"){
-    state.sequenceLevel = state.difficulty === "easy" ? 3 : 5;
-    state.sequencePattern = shuffle([0,1,2,3,4,5,6,7,8]).slice(0, state.sequenceLevel);
-    state.sequenceStep = 0;
-    startSequenceShow();
+    startSequenceMode();
   } else {
-    state.disappearFound = 0;
-    state.disappearSize = state.difficulty === "easy" ? 4 : 6;
-    state.disappearRevealMs = state.difficulty === "easy" ? 2200 : 1500;
-    startDisappearShow();
+    startGridMode();
   }
 }
 
-function lightSequenceTile(index, on){
-  const tile = sequenceGrid.children[index];
-  if(!tile) return;
-  tile.className = "tile" + (on ? " " + COLORS[index % COLORS.length] : "");
+async function startSequenceMode(){
+  state.sequenceLevel = 1;
+  sequenceGrid.classList.remove("hidden");
+  gridGame.classList.add("hidden");
+  resetSequenceBoard();
+  await playSequenceLevel();
 }
 
-async function startSequenceShow(){
+async function playSequenceLevel(){
+  resetSequenceBoard();
+  state.sequenceStep = 0;
   state.sequenceShowing = true;
-  const onMs = state.difficulty === "easy" ? 520 : 360;
-  const offMs = state.difficulty === "easy" ? 180 : 120;
+  state.sequencePattern = shuffle([0,1,2,3,4,5,6,7,8]).slice(0, state.sequenceLevel);
+
+  showStatus(`Niveau ${state.sequenceLevel} / 9`);
+  await wait(700);
 
   for(const idx of state.sequencePattern){
-    lightSequenceTile(idx, true);
-    await wait(onMs);
-    lightSequenceTile(idx, false);
-    await wait(offMs);
+    const tile = sequenceGrid.children[idx];
+    const color = COLORS[idx % COLORS.length];
+    tile.className = "tile " + color;
+    await wait(520);
+    tile.className = "tile";
+    await wait(160);
   }
+
   state.sequenceShowing = false;
+  showStatus(`Retrouvez ${state.sequenceLevel} case${state.sequenceLevel > 1 ? "s" : ""}`);
 }
 
 function handleSequenceClick(index){
   if(!state.playing || state.game !== "sequence" || state.sequenceShowing) return;
 
-  lightSequenceTile(index, true);
+  const tile = sequenceGrid.children[index];
+  const color = COLORS[index % COLORS.length];
+  tile.className = "tile " + color;
+
   setTimeout(()=>{
-    if(state.playing) lightSequenceTile(index, false);
-  },180);
+    if(state.playing && !tile.classList.contains("correct")){
+      tile.className = "tile";
+    }
+  }, 180);
 
   if(index === state.sequencePattern[state.sequenceStep]){
+    tile.className = "tile correct";
+    tile.disabled = true;
     state.sequenceStep++;
+
     if(state.sequenceStep === state.sequencePattern.length){
-      finishGame();
+      if(state.sequenceLevel === 9){
+        finishAndBackToMenu("Bravo !");
+      } else {
+        state.sequenceLevel++;
+        setTimeout(playSequenceLevel, 700);
+      }
     }
   } else {
-    const tile = sequenceGrid.children[index];
-    tile.classList.add("wrong");
-    setTimeout(()=>tile.classList.remove("wrong"),300);
+    tile.className = "tile wrong";
+    setTimeout(()=>{ if(state.playing) tile.className = "tile"; }, 300);
   }
 }
 
-async function startDisappearShow(){
-  const total = 16;
-  state.disappearTargets = randomUniqueIndices(state.disappearSize, total);
-  state.disappearTargets.forEach((idx, i)=>{
-    const tile = disappearGrid.children[idx];
-    tile.classList.add(COLORS[i % COLORS.length]);
-  });
-
-  await wait(state.disappearRevealMs);
-  if(!state.playing) return;
-
-  state.disappearTargets.forEach(idx=>{
-    disappearGrid.children[idx].className = "tile small hidden";
-  });
-
-  [...disappearGrid.children].forEach((tile, idx)=>{
-    if(!state.disappearTargets.includes(idx)){
-      tile.className = "tile small hidden";
-    }
-  });
+async function startGridMode(){
+  state.gridLevel = 1;
+  sequenceGrid.classList.add("hidden");
+  gridGame.classList.remove("hidden");
+  resetGridBoard();
+  await playGridLevel();
 }
 
-function handleDisappearClick(index, tile){
+async function playGridLevel(){
+  resetGridBoard();
+  state.gridFound = 0;
+  state.gridTargets = randomUniqueIndices(state.gridLevel, 16);
+
+  showStatus(`Niveau ${state.gridLevel} / 16`);
+  await wait(700);
+
+  state.gridTargets.forEach((idx, i)=>{
+    gridGame.children[idx].className = "tile " + COLORS[i % COLORS.length];
+  });
+
+  await wait(1100);
+
+  state.gridTargets.forEach(idx=>{
+    gridGame.children[idx].className = "tile";
+  });
+
+  showStatus(`Retrouvez ${state.gridLevel} case${state.gridLevel > 1 ? "s" : ""}`);
+}
+
+function handleGridClick(index, tile){
   if(!state.playing || state.game !== "grid") return;
   if(tile.disabled) return;
 
-  if(state.disappearTargets.includes(index)){
-    const colorIndex = state.disappearTargets.indexOf(index) % COLORS.length;
-    tile.className = "tile small correct " + COLORS[colorIndex];
+  if(state.gridTargets.includes(index)){
+    const colorIndex = state.gridTargets.indexOf(index) % COLORS.length;
+    tile.className = "tile correct " + COLORS[colorIndex];
     tile.disabled = true;
-    state.disappearFound++;
-    if(state.disappearFound === state.disappearTargets.length){
-      finishGame();
+    state.gridFound++;
+
+    if(state.gridFound === state.gridTargets.length){
+      if(state.gridLevel === 16){
+        finishAndBackToMenu("Bravo !");
+      } else {
+        state.gridLevel++;
+        setTimeout(playGridLevel, 700);
+      }
     }
   } else {
-    tile.classList.remove("hidden");
-    tile.classList.add("wrong");
+    tile.className = "tile wrong";
     setTimeout(()=>{
-      if(state.playing){
-        tile.className = "tile small hidden";
-      }
-    },350);
+      if(state.playing) tile.className = "tile";
+    }, 300);
   }
 }
 
-function wait(ms){
-  return new Promise(resolve => setTimeout(resolve, ms));
+async function finishAndBackToMenu(message){
+  showStatus(message);
+  state.playing = false;
+  await wait(1200);
+  showMenu();
 }
-
-btnSequence.addEventListener("click", ()=>{
-  state.game = "sequence";
-  setActiveButton([btnSequence, btnGrid], "btnSequence");
-  setActiveCard("sequence");
-  loadRecord();
-  setHelp();
-  resetBoards();
-  hideGameSections();
-  controlPanel.classList.remove("hidden-section");
-  playBar.classList.remove("hidden-section");
-});
-
-btnGrid.addEventListener("click", ()=>{
-  state.game = "grid";
-  setActiveButton([btnSequence, btnGrid], "btnGrid");
-  setActiveCard("grid");
-  loadRecord();
-  setHelp();
-  resetBoards();
-  hideGameSections();
-  controlPanel.classList.remove("hidden-section");
-  playBar.classList.remove("hidden-section");
-});
-
-btnEasy.addEventListener("click", ()=>{
-  state.difficulty = "easy";
-  setActiveButton([btnEasy, btnHard], "btnEasy");
-  loadRecord();
-  setHelp();
-});
-
-btnHard.addEventListener("click", ()=>{
-  state.difficulty = "hard";
-  setActiveButton([btnEasy, btnHard], "btnHard");
-  loadRecord();
-  setHelp();
-});
 
 document.querySelectorAll("[data-game-card]").forEach(card=>{
   card.addEventListener("click", ()=>{
-    const game = card.dataset.gameCard;
-
-    if(game === "sequence"){
-      btnSequence.click();
-    } else {
-      btnGrid.click();
-    }
+    selectGame(card.dataset.gameCard);
   });
 });
 
 playBtn.addEventListener("click", startGame);
 
 buildSequenceGrid();
-buildDisappearGrid();
-hideGameSections();
-setHelp();
-loadRecord();
+buildGridGame();
+showMenu();
 </script>
 </body>
 </html>
