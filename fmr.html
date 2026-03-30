@@ -1,66 +1,27 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <title>Memory Games</title>
 
-<meta name="theme-color" content="#4f46e5" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-title" content="Memory Games" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<link rel="apple-touch-icon" href="iconmemorygames.png" />
-<link rel="icon" type="image/png" href="iconmemorygames.png" />
+<meta name="theme-color" content="#4f46e5">
+<meta name="apple-mobile-web-app-capable" content="yes">
 
 <style>
-:root{
-  --bg1:#4338ca;
-  --bg2:#7c3aed;
-  --panel:rgba(255,255,255,.10);
-  --panel-line:rgba(255,255,255,.22);
-  --text:#ffffff;
-  --text-dark:#0f172a;
-  --card:#ffffff;
-  --green:#22c55e;
-  --pink:#ff3cac;
-  --cyan:#38bdf8;
-  --yellow:#fde047;
-  --violet:#8b5cf6;
-  --shadow:0 18px 40px rgba(0,0,0,.22);
-}
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
-html,body{
-  margin:0;
-  padding:0;
-}
 body{
-  min-height:100vh;
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
-  color:var(--text);
-  background:
-    radial-gradient(circle at 10% 15%, rgba(56,189,248,.35), transparent 20%),
-    radial-gradient(circle at 90% 12%, rgba(255,60,172,.35), transparent 20%),
-    radial-gradient(circle at 20% 90%, rgba(34,197,94,.22), transparent 22%),
-    linear-gradient(135deg,var(--bg1),var(--bg2) 55%, #5b21b6 75%, #312e81);
-  padding:18px 16px 120px;
-  display:flex;
-  justify-content:center;
+  margin:0;
+  font-family:-apple-system;
+  background:linear-gradient(135deg,#4338ca,#7c3aed);
+  color:#fff;
+  padding:20px 16px 120px;
 }
-.app{
-  width:100%;
-  max-width:460px;
-}
-h1{
-  margin:8px 0 14px;
-  text-align:center;
-  font-size:40px;
-  line-height:1;
-  font-weight:900;
-  letter-spacing:.4px;
-}
+.app{max-width:460px;margin:auto}
+h1{text-align:center;font-size:40px;font-weight:900}
+
+.hidden-section{display:none !important}
+
+/* TOP */
 .top{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -68,620 +29,190 @@ h1{
   margin-bottom:14px;
 }
 .top-pill{
-  min-height:60px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  padding:12px;
+  border-radius:16px;
   text-align:center;
-  border-radius:20px;
-  border:1px solid var(--panel-line);
-  background:var(--panel);
-  backdrop-filter:blur(12px);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
-  font-size:14px;
-  font-weight:800;
-  padding:10px 12px;
+  background:rgba(255,255,255,.12);
 }
+
+/* MENU */
 .menu{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:14px;
-  margin-bottom:14px;
 }
 .game-card{
-  border-radius:30px;
-  padding:16px 14px 14px;
-  min-height:280px;
-  position:relative;
-  overflow:hidden;
-  border:1px solid rgba(255,255,255,.22);
-  background:rgba(10,16,40,.36);
-  backdrop-filter:blur(10px);
-  box-shadow:var(--shadow);
+  padding:18px;
+  border-radius:24px;
+  background:rgba(255,255,255,.12);
+  text-align:center;
   cursor:pointer;
 }
-.game-card.active{
-  outline:3px solid rgba(255,255,255,.28);
-  transform:translateY(-1px);
-}
-.game-card.cyan{
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.06) inset,
-    0 0 26px rgba(56,189,248,.35),
-    0 18px 40px rgba(0,0,0,.22);
-}
-.game-card.pink{
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.06) inset,
-    0 0 26px rgba(255,60,172,.30),
-    0 18px 40px rgba(0,0,0,.22);
-}
-.mini-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  margin-bottom:16px;
-}
-.mini-cell{
-  aspect-ratio:1/1;
-  border-radius:16px;
-  background:rgba(255,255,255,.15);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
-}
-.mini-cell.green{background:linear-gradient(135deg,#22c55e,#16a34a); box-shadow:0 0 18px rgba(34,197,94,.35);}
-.mini-cell.yellow{background:linear-gradient(135deg,#fde047,#facc15); box-shadow:0 0 18px rgba(253,224,71,.35);}
-.mini-cell.pink{background:linear-gradient(135deg,#ff4fb0,#ec4899); box-shadow:0 0 18px rgba(255,79,176,.35);}
-.mini-cell.cyan{background:linear-gradient(135deg,#67e8f9,#38bdf8); box-shadow:0 0 18px rgba(56,189,248,.35);}
-.mini-cell.violet{background:linear-gradient(135deg,#a78bfa,#8b5cf6); box-shadow:0 0 18px rgba(139,92,246,.35);}
-.game-title{
-  font-size:24px;
-  line-height:1.05;
-  font-weight:900;
-  margin-bottom:10px;
-}
-.game-sub{
-  font-size:13px;
-  line-height:1.35;
-  color:rgba(255,255,255,.82);
-  min-height:52px;
-}
-.card-btn{
-  position:absolute;
-  left:14px;
-  right:14px;
-  bottom:14px;
-  border:none;
-  border-radius:18px;
-  min-height:48px;
-  font-size:17px;
-  font-weight:900;
-  color:#fff;
-  background:rgba(0,0,0,.22);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);
-}
+
+/* PANEL */
 .panel{
-  border-radius:30px;
-  border:1px solid var(--panel-line);
-  background:var(--panel);
-  backdrop-filter:blur(12px);
+  margin-top:14px;
   padding:14px;
-  box-shadow:var(--shadow);
+  border-radius:24px;
+  background:rgba(255,255,255,.12);
 }
+
 .controls{
   display:flex;
   gap:8px;
-  justify-content:center;
   flex-wrap:wrap;
-  margin-bottom:12px;
+  justify-content:center;
 }
 button{
+  padding:10px 14px;
   border:none;
-  cursor:pointer;
-  font:inherit;
+  border-radius:14px;
+  font-weight:800;
 }
-.pill-btn{
-  min-height:48px;
-  padding:0 16px;
-  border-radius:16px;
-  font-weight:900;
-  color:var(--text-dark);
-  background:#fff;
-  box-shadow:0 10px 24px rgba(0,0,0,.12);
-}
-.pill-btn.active{
-  background:#0f172a;
-  color:#fff;
-}
-.game-grid{
+.active{background:#111;color:#fff}
+
+/* GRID */
+.grid{
   display:grid;
   gap:10px;
-  width:100%;
-}
-.game-grid.grid-3{
-  grid-template-columns:repeat(3,minmax(0,1fr));
-}
-.game-grid.grid-4{
-  grid-template-columns:repeat(4,minmax(0,1fr));
-}
-.tile{
-  width:100%;
-  aspect-ratio:1/1;
-  min-width:0;
-  border-radius:20px;
-  border:none;
-  background:var(--card);
-  color:var(--text-dark);
-  font-size:24px;
-  font-weight:900;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  box-shadow:0 12px 22px rgba(0,0,0,.16);
-  transition:transform .12s ease, opacity .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease;
-  user-select:none;
-}
-.tile.small{
-  font-size:20px;
-}
-.tile:active{
-  transform:scale(.97);
-}
-.tile.hidden{
-  color:transparent;
-}
-.tile.correct{
-  background:linear-gradient(135deg,#22c55e,#16a34a);
-  color:#fff;
-}
-.tile.wrong{
-  background:linear-gradient(135deg,#ef4444,#dc2626);
-  color:#fff;
-}
-.tile.seq-green{background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff; box-shadow:0 0 24px rgba(34,197,94,.45);}
-.tile.seq-yellow{background:linear-gradient(135deg,#fde047,#facc15); color:#111827; box-shadow:0 0 24px rgba(253,224,71,.45);}
-.tile.seq-pink{background:linear-gradient(135deg,#ff4fb0,#ec4899); color:#fff; box-shadow:0 0 24px rgba(255,79,176,.45);}
-.tile.seq-cyan{background:linear-gradient(135deg,#67e8f9,#38bdf8); color:#fff; box-shadow:0 0 24px rgba(56,189,248,.45);}
-.tile.seq-violet{background:linear-gradient(135deg,#a78bfa,#8b5cf6); color:#fff; box-shadow:0 0 24px rgba(139,92,246,.45);}
-.help{
-  min-height:24px;
   margin-top:14px;
-  text-align:center;
-  font-size:13px;
-  line-height:1.35;
-  color:rgba(255,255,255,.88);
 }
-.signature{
-  text-align:center;
-  font-size:11px;
-  color:rgba(255,255,255,.62);
-  margin-top:10px;
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+
+.tile{
+  aspect-ratio:1;
+  background:#fff;
+  border-radius:16px;
 }
+
+/* PLAY */
 .playbar{
   position:fixed;
   left:16px;
   right:16px;
   bottom:16px;
-  display:flex;
-  justify-content:center;
-  z-index:30;
 }
 .play-btn{
-  min-width:220px;
-  max-width:460px;
-  width:min(100%, 340px);
-  min-height:64px;
-  border-radius:24px;
-  background:linear-gradient(135deg,#22c55e,#10b981);
+  width:100%;
+  padding:16px;
+  border-radius:20px;
+  background:#22c55e;
   color:#fff;
-  font-size:20px;
   font-weight:900;
+  font-size:20px;
+}
+
+.signature{
   text-align:center;
-  box-shadow:0 18px 34px rgba(0,0,0,.26), 0 0 28px rgba(34,197,94,.28);
-}
-.hidden-section{
-  display:none !important;
-}
-@media (max-width:420px){
-  .game-title{font-size:21px}
-  .tile{font-size:20px}
-  .tile.small{font-size:17px}
+  font-size:11px;
+  margin-top:10px;
 }
 </style>
 </head>
+
 <body>
-  <div class="app">
-    <h1>MEMORY GAMES</h1>
 
-    <div class="top hidden-section" id="topBar">
-      <div class="top-pill" id="timer">0.00 s</div>
-      <div class="top-pill" id="record">Record : —</div>
-    </div>
+<div class="app">
 
-    <section id="homeSection" class="menu">
-      <div class="game-card cyan active" data-game-card="sequence">
-        <div class="mini-grid">
-          <div class="mini-cell green"></div>
-          <div class="mini-cell"></div>
-          <div class="mini-cell pink"></div>
-          <div class="mini-cell yellow"></div>
-          <div class="mini-cell cyan"></div>
-          <div class="mini-cell"></div>
-          <div class="mini-cell"></div>
-          <div class="mini-cell violet"></div>
-          <div class="mini-cell"></div>
-        </div>
-        <div class="game-title">Séquence<br>à retenir</div>
-        <div class="game-sub">Mémorisez la séquence lumineuse, puis reproduisez-la.</div>
-        <button class="card-btn" type="button">Choisir</button>
-      </div>
+<h1>MEMORY GAMES</h1>
 
-      <div class="game-card pink" data-game-card="grid">
-        <div class="mini-grid">
-          <div class="mini-cell"></div>
-          <div class="mini-cell cyan"></div>
-          <div class="mini-cell"></div>
-          <div class="mini-cell"></div>
-          <div class="mini-cell"></div>
-          <div class="mini-cell pink"></div>
-          <div class="mini-cell"></div>
-          <div class="mini-cell"></div>
-          <div class="mini-cell green"></div>
-        </div>
-        <div class="game-title">Grille<br>disparaissante</div>
-        <div class="game-sub">Mémorisez les cases colorées, puis retrouvez-les.</div>
-        <button class="card-btn" type="button">Choisir</button>
-      </div>
-    </section>
+<!-- TOP -->
+<div class="top hidden-section" id="topBar">
+  <div class="top-pill" id="timer">0.00 s</div>
+  <div class="top-pill" id="record">Record : —</div>
+</div>
 
-    <section class="panel">
-      <div class="controls">
-        <button class="pill-btn active" id="btnSequence" type="button">Séquence</button>
-        <button class="pill-btn" id="btnGrid" type="button">Grille</button>
-        <button class="pill-btn active" id="btnEasy" type="button">Facile</button>
-        <button class="pill-btn" id="btnHard" type="button">Difficile</button>
-      </div>
+<!-- MENU -->
+<section id="homeSection" class="menu">
+  <div class="game-card" data-game="sequence">Séquence</div>
+  <div class="game-card" data-game="grid">Grille</div>
+</section>
 
-      <div id="sequenceSection" class="hidden-section">
-        <div id="sequenceGrid" class="game-grid grid-3"></div>
-      </div>
+<!-- PANEL -->
+<section id="controlPanel" class="panel hidden-section">
 
-      <div id="gridSection" class="hidden-section">
-        <div id="disappearGrid" class="game-grid grid-4"></div>
-      </div>
+<div class="controls">
+  <button id="btnSequence" class="active">Séquence</button>
+  <button id="btnGrid">Grille</button>
+  <button id="btnEasy" class="active">Facile</button>
+  <button id="btnHard">Difficile</button>
+</div>
 
-      <div id="help" class="help"></div>
-      <div class="signature">Jeu créé par Luis Coixao à l'aide de ChatGPT.</div>
-    </section>
-  </div>
+<div id="sequenceSection" class="hidden-section">
+  <div id="sequenceGrid" class="grid grid-3"></div>
+</div>
 
-  <div class="playbar">
-    <button id="playBtn" class="play-btn" type="button">Jouer</button>
-  </div>
+<div id="gridSection" class="hidden-section">
+  <div id="disappearGrid" class="grid grid-4"></div>
+</div>
+
+<div class="signature">
+Jeu créé par Luis Coixao à l'aide de ChatGPT.
+</div>
+
+</section>
+
+</div>
+
+<div class="playbar">
+<button id="playBtn" class="play-btn">Jouer</button>
+</div>
 
 <script>
-const COLORS = ["seq-green","seq-yellow","seq-pink","seq-cyan","seq-violet"];
-
-const state = {
-  game: "sequence",
-  difficulty: "easy",
-  playing: false,
-  startTime: 0,
-  timerInterval: null,
-
-  sequencePattern: [],
-  sequenceStep: 0,
-  sequenceShowing: false,
-  sequenceLevel: 3,
-
-  disappearTargets: [],
-  disappearFound: 0,
-  disappearSize: 4,
-  disappearRevealMs: 2200
-};
+let game = "sequence";
+let playing = false;
 
 const topBar = document.getElementById("topBar");
-const timerEl = document.getElementById("timer");
-const recordEl = document.getElementById("record");
-const helpEl = document.getElementById("help");
+const homeSection = document.getElementById("homeSection");
+const controlPanel = document.getElementById("controlPanel");
+
 const sequenceSection = document.getElementById("sequenceSection");
 const gridSection = document.getElementById("gridSection");
-const sequenceGrid = document.getElementById("sequenceGrid");
-const disappearGrid = document.getElementById("disappearGrid");
-const playBtn = document.getElementById("playBtn");
 
-const btnSequence = document.getElementById("btnSequence");
-const btnGrid = document.getElementById("btnGrid");
-const btnEasy = document.getElementById("btnEasy");
-const btnHard = document.getElementById("btnHard");
+const timerEl = document.getElementById("timer");
 
-function shuffle(arr){
-  const a = [...arr];
-  for(let i=a.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [a[i],a[j]] = [a[j],a[i]];
-  }
-  return a;
-}
-
-function randomUniqueIndices(count, max){
-  return shuffle([...Array(max)].map((_,i)=>i)).slice(0,count);
-}
-
-function recordKey(){
-  return `memory-games-record-${state.game}-${state.difficulty}`;
-}
-
-function loadRecord(){
-  const val = localStorage.getItem(recordKey());
-  recordEl.textContent = "Record : " + (val ? Number(val).toFixed(2) + " s" : "—");
-}
-
-function updateRecord(time){
-  const key = recordKey();
-  const prev = localStorage.getItem(key);
-  if(!prev || time < Number(prev)){
-    localStorage.setItem(key, String(time));
-  }
-  loadRecord();
-}
-
-function setActiveButton(group, activeId){
-  group.forEach(btn => btn.classList.toggle("active", btn.id === activeId));
-}
-
-function setActiveCard(game){
-  document.querySelectorAll("[data-game-card]").forEach(card=>{
-    card.classList.toggle("active", card.dataset.gameCard === game);
-  });
-}
-
-function setHelp(){
-  if(state.game === "sequence"){
-    helpEl.textContent = state.difficulty === "easy"
-      ? "Mémorisez la séquence lumineuse puis reproduisez-la."
-      : "Séquence plus longue et plus rapide.";
-  } else {
-    helpEl.textContent = state.difficulty === "easy"
-      ? "Mémorisez les cases colorées puis touchez-les."
-      : "Plus de cases à retenir et affichage plus court.";
-  }
-}
-
-function showGameSection(){
-  if(state.game === "sequence"){
-    sequenceSection.classList.remove("hidden-section");
-    gridSection.classList.add("hidden-section");
-  } else {
-    gridSection.classList.remove("hidden-section");
-    sequenceSection.classList.add("hidden-section");
-  }
-}
-
-function hideGameSections(){
-  sequenceSection.classList.add("hidden-section");
-  gridSection.classList.add("hidden-section");
-}
-
-function buildSequenceGrid(){
-  sequenceGrid.innerHTML = "";
-  for(let i=0;i<9;i++){
-    const tile = document.createElement("button");
-    tile.type = "button";
-    tile.className = "tile";
-    tile.dataset.index = i;
-    tile.addEventListener("click", ()=>handleSequenceClick(i));
-    sequenceGrid.appendChild(tile);
-  }
-}
-
-function buildDisappearGrid(){
-  disappearGrid.innerHTML = "";
-  const total = 16;
-  for(let i=0;i<total;i++){
-    const tile = document.createElement("button");
-    tile.type = "button";
-    tile.className = "tile small";
-    tile.dataset.index = i;
-    tile.addEventListener("click", ()=>handleDisappearClick(i, tile));
-    disappearGrid.appendChild(tile);
-  }
-}
-
-function resetBoards(){
-  document.querySelectorAll("#sequenceGrid .tile").forEach(t=>{
-    t.className = "tile";
-  });
-  document.querySelectorAll("#disappearGrid .tile").forEach(t=>{
-    t.className = "tile small";
-    t.textContent = "";
-    t.disabled = false;
-  });
-}
+let startTime, timer;
 
 function startTimer(){
-  clearInterval(state.timerInterval);
-  state.startTime = performance.now();
-  timerEl.textContent = "0.00 s";
-  state.timerInterval = setInterval(()=>{
-    const t = (performance.now() - state.startTime)/1000;
-    timerEl.textContent = t.toFixed(2) + " s";
+  startTime = performance.now();
+  timer = setInterval(()=>{
+    timerEl.textContent = ((performance.now()-startTime)/1000).toFixed(2)+" s";
   },50);
 }
 
 function stopTimer(){
-  clearInterval(state.timerInterval);
-  state.timerInterval = null;
-}
-
-function finishGame(){
-  state.playing = false;
-  stopTimer();
-  const time = (performance.now() - state.startTime)/1000;
-  timerEl.textContent = time.toFixed(2) + " s";
-  updateRecord(time);
+  clearInterval(timer);
 }
 
 function startGame(){
-  resetBoards();
-  state.playing = true;
+  playing = true;
+
+  homeSection.classList.add("hidden-section");
+  sequenceSection.classList.remove("hidden-section");
+  gridSection.classList.add("hidden-section");
+
   startTimer();
-  showGameSection();
-
-  if(state.game === "sequence"){
-    state.sequenceLevel = state.difficulty === "easy" ? 3 : 5;
-    state.sequencePattern = shuffle([0,1,2,3,4,5,6,7,8]).slice(0, state.sequenceLevel);
-    state.sequenceStep = 0;
-    startSequenceShow();
-  } else {
-    state.disappearFound = 0;
-    state.disappearSize = state.difficulty === "easy" ? 4 : 6;
-    state.disappearRevealMs = state.difficulty === "easy" ? 2200 : 1500;
-    startDisappearShow();
-  }
 }
 
-function lightSequenceTile(index, on){
-  const tile = sequenceGrid.children[index];
-  if(!tile) return;
-  tile.className = "tile" + (on ? " " + COLORS[index % COLORS.length] : "");
+function finishGame(){
+  playing = false;
+  stopTimer();
+
+  homeSection.classList.remove("hidden-section");
 }
 
-async function startSequenceShow(){
-  state.sequenceShowing = true;
-  const onMs = state.difficulty === "easy" ? 520 : 360;
-  const offMs = state.difficulty === "easy" ? 180 : 120;
+document.getElementById("playBtn").onclick = startGame;
 
-  for(const idx of state.sequencePattern){
-    lightSequenceTile(idx, true);
-    await wait(onMs);
-    lightSequenceTile(idx, false);
-    await wait(offMs);
-  }
-  state.sequenceShowing = false;
-}
+document.querySelectorAll(".game-card").forEach(card=>{
+  card.onclick = ()=>{
+    game = card.dataset.game;
 
-function handleSequenceClick(index){
-  if(!state.playing || state.game !== "sequence" || state.sequenceShowing) return;
-
-  lightSequenceTile(index, true);
-  setTimeout(()=> {
-    if(state.playing) lightSequenceTile(index, false);
-  }, 180);
-
-  if(index === state.sequencePattern[state.sequenceStep]){
-    state.sequenceStep++;
-    if(state.sequenceStep === state.sequencePattern.length){
-      finishGame();
-    }
-  } else {
-    const tile = sequenceGrid.children[index];
-    tile.classList.add("wrong");
-    setTimeout(()=>tile.classList.remove("wrong"),300);
-  }
-}
-
-async function startDisappearShow(){
-  const total = 16;
-  state.disappearTargets = randomUniqueIndices(state.disappearSize, total);
-  state.disappearTargets.forEach((idx, i)=>{
-    const tile = disappearGrid.children[idx];
-    tile.classList.add(COLORS[i % COLORS.length]);
-  });
-  await wait(state.disappearRevealMs);
-  if(!state.playing) return;
-  state.disappearTargets.forEach(idx=>{
-    const tile = disappearGrid.children[idx];
-    tile.className = "tile small hidden";
-  });
-  [...disappearGrid.children].forEach((tile, idx)=>{
-    if(!state.disappearTargets.includes(idx)){
-      tile.className = "tile small hidden";
-    }
-  });
-}
-
-function handleDisappearClick(index, tile){
-  if(!state.playing || state.game !== "grid") return;
-  if(tile.disabled) return;
-
-  if(state.disappearTargets.includes(index)){
-    const colorIndex = state.disappearTargets.indexOf(index) % COLORS.length;
-    tile.className = "tile small correct " + COLORS[colorIndex];
-    tile.disabled = true;
-    state.disappearFound++;
-    if(state.disappearFound === state.disappearTargets.length){
-      finishGame();
-    }
-  } else {
-    tile.classList.remove("hidden");
-    tile.classList.add("wrong");
-    setTimeout(()=>{
-      if(state.playing){
-        tile.className = "tile small hidden";
-      }
-    }, 350);
-  }
-}
-
-function wait(ms){
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-btnSequence.addEventListener("click", ()=>{
-  state.game = "sequence";
-  setActiveButton([btnSequence,btnGrid], "btnSequence");
-  setActiveCard("sequence");
-  loadRecord();
-  setHelp();
-  resetBoards();
-  hideGameSections();
-  topBar.classList.remove("hidden-section");
-});
-
-btnGrid.addEventListener("click", ()=>{
-  state.game = "grid";
-  setActiveButton([btnSequence,btnGrid], "btnGrid");
-  setActiveCard("grid");
-  loadRecord();
-  setHelp();
-  resetBoards();
-  hideGameSections();
-  topBar.classList.remove("hidden-section");
-});
-
-btnEasy.addEventListener("click", ()=>{
-  state.difficulty = "easy";
-  setActiveButton([btnEasy,btnHard], "btnEasy");
-  loadRecord();
-  setHelp();
-});
-
-btnHard.addEventListener("click", ()=>{
-  state.difficulty = "hard";
-  setActiveButton([btnEasy,btnHard], "btnHard");
-  loadRecord();
-  setHelp();
-});
-
-document.querySelectorAll("[data-game-card]").forEach(card=>{
-  card.addEventListener("click", ()=>{
-    const game = card.dataset.gameCard;
-    if(game === "sequence"){
-      btnSequence.click();
-    } else {
-      btnGrid.click();
-    }
     topBar.classList.remove("hidden-section");
-  });
+    controlPanel.classList.remove("hidden-section");
+  }
 });
-
-playBtn.addEventListener("click", startGame);
-
-buildSequenceGrid();
-buildDisappearGrid();
-hideGameSections();
-loadRecord();
-setHelp();
 </script>
+
 </body>
 </html>
