@@ -3,435 +3,221 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-<title>Memory Games</title>
+<title>Memory Colors</title>
 
 <meta name="theme-color" content="#4f46e5" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-title" content="Memory Games" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <link rel="apple-touch-icon" href="iconmemorygames.png" />
-<link rel="icon" type="image/png" href="iconmemorygames.png" />
 
 <style>
-:root{
-  --bg1:#4338ca;
-  --bg2:#7c3aed;
-  --bg3:#312e81;
-  --panel:rgba(255,255,255,.10);
-  --panel-line:rgba(255,255,255,.22);
-  --text:#ffffff;
-  --card:#ffffff;
-  --shadow:0 18px 40px rgba(0,0,0,.22);
-}
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
-html,body{
-  margin:0;
-  padding:0;
-}
 body{
-  min-height:100vh;
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
-  color:var(--text);
-  background:
-    radial-gradient(circle at 10% 15%, rgba(56,189,248,.35), transparent 20%),
-    radial-gradient(circle at 90% 12%, rgba(255,60,172,.35), transparent 20%),
-    radial-gradient(circle at 20% 90%, rgba(34,197,94,.22), transparent 22%),
-    linear-gradient(135deg,var(--bg1),var(--bg2) 55%, #5b21b6 75%, var(--bg3));
-  padding:18px 16px 120px;
+  margin:0;
+  font-family:-apple-system;
+  background:linear-gradient(135deg,#4338ca,#7c3aed);
+  color:#fff;
   display:flex;
   justify-content:center;
+  padding:20px;
 }
-.app{
-  width:100%;
-  max-width:460px;
-}
-h1{
-  margin:8px 0 14px;
+.app{max-width:420px;width:100%}
+h1{text-align:center;font-size:38px;margin-bottom:10px}
+
+.top{display:flex;gap:10px;margin-bottom:10px}
+.box{
+  flex:1;
+  padding:12px;
   text-align:center;
-  font-size:40px;
-  line-height:1;
-  font-weight:900;
-  letter-spacing:.4px;
-}
-.hidden{
-  display:none !important;
+  border-radius:14px;
+  background:rgba(255,255,255,.15);
+  font-weight:800
 }
 
-.home-card{
-  border-radius:30px;
-  padding:16px 14px 18px;
-  min-height:280px;
-  overflow:hidden;
-  border:1px solid rgba(255,255,255,.22);
-  background:rgba(10,16,40,.36);
-  backdrop-filter:blur(10px);
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.06) inset,
-    0 0 26px rgba(56,189,248,.35),
-    0 18px 40px rgba(0,0,0,.22);
-}
-.mini-grid{
+.grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  margin-bottom:16px;
-}
-.mini-cell{
-  aspect-ratio:1/1;
-  border-radius:16px;
-  background:rgba(255,255,255,.15);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
-}
-.mini-cell.green{background:linear-gradient(135deg,#22c55e,#16a34a); box-shadow:0 0 18px rgba(34,197,94,.35);}
-.mini-cell.yellow{background:linear-gradient(135deg,#fde047,#facc15); box-shadow:0 0 18px rgba(253,224,71,.35);}
-.mini-cell.pink{background:linear-gradient(135deg,#ff4fb0,#ec4899); box-shadow:0 0 18px rgba(255,79,176,.35);}
-.mini-cell.cyan{background:linear-gradient(135deg,#67e8f9,#38bdf8); box-shadow:0 0 18px rgba(56,189,248,.35);}
-.mini-cell.violet{background:linear-gradient(135deg,#a78bfa,#8b5cf6); box-shadow:0 0 18px rgba(139,92,246,.35);}
-.home-title{
-  font-size:28px;
-  line-height:1.05;
-  font-weight:900;
-  margin-bottom:10px;
-}
-.home-sub{
-  font-size:16px;
-  line-height:1.4;
-  color:rgba(255,255,255,.82);
-}
-
-.top{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-bottom:14px;
-}
-.top-pill{
-  min-height:60px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  border-radius:20px;
-  border:1px solid var(--panel-line);
-  background:var(--panel);
-  backdrop-filter:blur(12px);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
-  font-size:16px;
-  font-weight:900;
-  padding:10px 12px;
-}
-
-.status{
-  min-height:26px;
-  text-align:center;
-  font-size:15px;
-  font-weight:800;
-  color:rgba(255,255,255,.94);
-  margin:10px 0 12px;
-}
-
-.game-wrap{
-  margin-top:14px;
-  border-radius:30px;
-  border:1px solid var(--panel-line);
-  background:var(--panel);
-  backdrop-filter:blur(12px);
-  padding:14px;
-  box-shadow:var(--shadow);
-}
-
-.game-grid{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
   gap:12px;
-  width:100%;
 }
 .tile{
-  width:100%;
   aspect-ratio:1/1;
-  min-width:0;
+  border-radius:16px;
+  background:rgba(255,255,255,.2);
+  border:none;
+}
+.green{background:#22c55e}
+.yellow{background:#fde047}
+.pink{background:#ec4899}
+.cyan{background:#38bdf8}
+.violet{background:#8b5cf6}
+
+.correct{background:#22c55e}
+.wrong{background:#ef4444}
+
+.btn{
+  margin-top:20px;
+  width:100%;
+  padding:16px;
   border-radius:20px;
-  border:none;
-  background:rgba(255,255,255,.18);
-  color:transparent;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08), 0 12px 22px rgba(0,0,0,.16);
-  transition:transform .12s ease, background .18s ease, box-shadow .18s ease;
-  cursor:pointer;
-}
-.tile:active{
-  transform:scale(.97);
-}
-.tile.seq-green{background:linear-gradient(135deg,#22c55e,#16a34a); box-shadow:0 0 24px rgba(34,197,94,.45);}
-.tile.seq-yellow{background:linear-gradient(135deg,#fde047,#facc15); box-shadow:0 0 24px rgba(253,224,71,.45);}
-.tile.seq-pink{background:linear-gradient(135deg,#ff4fb0,#ec4899); box-shadow:0 0 24px rgba(255,79,176,.45);}
-.tile.seq-cyan{background:linear-gradient(135deg,#67e8f9,#38bdf8); box-shadow:0 0 24px rgba(56,189,248,.45);}
-.tile.seq-violet{background:linear-gradient(135deg,#a78bfa,#8b5cf6); box-shadow:0 0 24px rgba(139,92,246,.45);}
-.tile.correct{
-  background:linear-gradient(135deg,#22c55e,#16a34a);
-  box-shadow:0 0 24px rgba(34,197,94,.45);
-}
-.tile.wrong{
-  background:linear-gradient(135deg,#ef4444,#dc2626);
-  box-shadow:0 0 20px rgba(239,68,68,.35);
-}
-
-.signature{
-  text-align:center;
-  font-size:11px;
-  color:rgba(255,255,255,.62);
-  margin-top:14px;
-}
-
-.playbar{
-  position:fixed;
-  left:16px;
-  right:16px;
-  bottom:16px;
-  display:flex;
-  justify-content:center;
-  z-index:30;
-}
-.play-btn{
-  min-width:220px;
-  max-width:460px;
-  width:min(100%, 340px);
-  min-height:64px;
-  border:none;
-  border-radius:24px;
-  background:linear-gradient(135deg,#22c55e,#10b981);
-  color:#fff;
+  background:#22c55e;
   font-size:20px;
   font-weight:900;
-  text-align:center;
-  box-shadow:0 18px 34px rgba(0,0,0,.26), 0 0 28px rgba(34,197,94,.28);
-  cursor:pointer;
+  border:none;
 }
-@media (max-width:420px){
-  .home-title{font-size:24px}
-}
+
+.status{text-align:center;margin:10px 0;font-weight:700}
 </style>
 </head>
+
 <body>
-  <div class="app">
-    <h1>MEMORY GAMES</h1>
+<div class="app">
 
-    <section id="homeSection" class="home-card">
-      <div class="mini-grid">
-        <div class="mini-cell green"></div>
-        <div class="mini-cell"></div>
-        <div class="mini-cell pink"></div>
-        <div class="mini-cell yellow"></div>
-        <div class="mini-cell cyan"></div>
-        <div class="mini-cell"></div>
-        <div class="mini-cell"></div>
-        <div class="mini-cell violet"></div>
-        <div class="mini-cell"></div>
-      </div>
-      <div class="home-title">Séquence<br>à retenir</div>
-      <div class="home-sub">Mémorisez une séquence de plus en plus longue. Certaines cases peuvent revenir deux ou trois fois.</div>
-    </section>
+<h1>MEMORY COLORS</h1>
 
-    <div id="topBar" class="top hidden">
-      <div class="top-pill" id="levelBox">Séquence : 1</div>
-      <div class="top-pill" id="scoreBox">Points : 0</div>
-    </div>
+<div class="top">
+  <div class="box" id="level">Séquence : 1</div>
+  <div class="box" id="score">Points : 0</div>
+</div>
 
-    <div id="status" class="status hidden"></div>
+<div id="status" class="status"></div>
 
-    <section id="gameWrap" class="game-wrap hidden">
-      <div id="sequenceGrid" class="game-grid"></div>
-    </section>
+<div id="grid" class="grid"></div>
 
-    <div class="signature">Jeu créé par Luis Coixao à l'aide de ChatGPT.</div>
-  </div>
+<button id="play" class="btn">Jouer</button>
 
-  <div class="playbar" id="playBar">
-    <button id="playBtn" class="play-btn" type="button">Jouer</button>
-  </div>
+</div>
 
 <script>
-const COLORS = ["seq-green","seq-yellow","seq-pink","seq-cyan","seq-violet"];
+const COLORS = ["green","yellow","pink","cyan","violet"];
 
-const state = {
-  playing: false,
-  level: 1,
-  score: 0,
-  pattern: [],
-  step: 0,
-  showing: false
-};
+let level = 1;
+let score = 0;
+let pattern = [];
+let step = 0;
+let playing = false;
+let showing = false;
 
-const homeSection = document.getElementById("homeSection");
-const topBar = document.getElementById("topBar");
-const statusEl = document.getElementById("status");
-const gameWrap = document.getElementById("gameWrap");
-const sequenceGrid = document.getElementById("sequenceGrid");
-const playBtn = document.getElementById("playBtn");
-const levelBox = document.getElementById("levelBox");
-const scoreBox = document.getElementById("scoreBox");
+const grid = document.getElementById("grid");
+const status = document.getElementById("status");
 
 function wait(ms){
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise(r=>setTimeout(r,ms));
 }
 
-function randomIndex(){
-  return Math.floor(Math.random() * 9);
+function shuffle(a){
+  return a.sort(()=>Math.random()-0.5);
 }
 
-function updateTop(){
-  levelBox.textContent = "Séquence : " + state.level;
-  scoreBox.textContent = "Points : " + state.score;
-}
-
-function showStatus(text){
-  statusEl.textContent = text;
-  statusEl.classList.remove("hidden");
-}
-
-function hideStatus(){
-  statusEl.classList.add("hidden");
+function updateUI(){
+  document.getElementById("level").textContent="Séquence : "+level;
+  document.getElementById("score").textContent="Points : "+score;
 }
 
 function buildGrid(){
-  sequenceGrid.innerHTML = "";
-  for(let i = 0; i < 9; i++){
-    const tile = document.createElement("button");
-    tile.type = "button";
-    tile.className = "tile";
-    tile.addEventListener("click", () => handleClick(i));
-    sequenceGrid.appendChild(tile);
+  grid.innerHTML="";
+  for(let i=0;i<9;i++){
+    const t=document.createElement("button");
+    t.className="tile";
+    t.onclick=()=>clickTile(i);
+    grid.appendChild(t);
   }
 }
 
-function resetBoard(){
-  [...sequenceGrid.children].forEach(tile => {
-    tile.className = "tile";
-    tile.disabled = false;
-  });
+function resetGrid(){
+  [...grid.children].forEach(t=>t.className="tile");
 }
 
-function lightTile(index, on){
-  const tile = sequenceGrid.children[index];
-  if(!tile) return;
-  tile.className = "tile" + (on ? " " + COLORS[index % COLORS.length] : "");
+function flash(i){
+  const t=grid.children[i];
+  t.classList.add(COLORS[i%5]);
+  setTimeout(()=>t.className="tile",400);
 }
 
 function createPattern(length){
-  const arr = [];
-  for(let i = 0; i < length; i++){
-    arr.push(randomIndex());
+  const available=[0,1,2,3,4,5,6,7,8];
+  let pattern=[];
+
+  if(length<=3){
+    return shuffle(available).slice(0,length);
   }
-  return arr;
+
+  if(length<=6){
+    let base=shuffle(available).slice(0,length-1);
+    let rep=base[Math.floor(Math.random()*base.length)];
+    pattern=[...base,rep];
+    return shuffle(pattern);
+  }
+
+  let base=shuffle(available).slice(0,length-2);
+  let rep=base[Math.floor(Math.random()*base.length)];
+  pattern=[...base,rep,rep];
+  return shuffle(pattern);
 }
 
 async function showPattern(){
-  state.showing = true;
-  showStatus("Mémorisez...");
+  showing=true;
+  status.textContent="Mémorisez...";
   await wait(400);
 
-  for(const idx of state.pattern){
-    lightTile(idx, true);
-    await wait(520);
-    lightTile(idx, false);
-    await wait(160);
+  for(let i of pattern){
+    flash(i);
+    await wait(600);
   }
 
-  state.showing = false;
-  state.step = 0;
-  showStatus("À vous");
+  showing=false;
+  step=0;
+  status.textContent="À vous";
 }
 
-async function playLevel(){
-  resetBoard();
-  updateTop();
-  state.pattern = createPattern(state.level);
-  await showPattern();
-}
+async function start(){
+  playing=true;
+  level=1;
+  score=0;
+  updateUI();
 
-async function startGame(){
-  if(state.playing) return;
-
-  state.playing = true;
-  state.level = 1;
-  state.score = 0;
-  updateTop();
-
-  homeSection.classList.add("hidden");
-  topBar.classList.remove("hidden");
-  statusEl.classList.remove("hidden");
-  gameWrap.classList.remove("hidden");
-
-  showStatus("Prêt...");
-  await wait(1000);
-  await playLevel();
-}
-
-async function finishGame(){
-  state.playing = false;
-  showStatus("Bravo !");
-  await wait(1200);
-
-  homeSection.classList.remove("hidden");
-  topBar.classList.add("hidden");
-  gameWrap.classList.add("hidden");
-  hideStatus();
-  resetBoard();
+  await wait(800);
+  nextLevel();
 }
 
 async function nextLevel(){
-  state.score += 1;
-  updateTop();
-
-  if(state.level >= 9){
-    await finishGame();
-    return;
-  }
-
-  state.level += 1;
-  showStatus("Bien");
-  await wait(700);
-  await playLevel();
+  resetGrid();
+  pattern=createPattern(level);
+  updateUI();
+  await showPattern();
 }
 
-function handleClick(index){
-  if(!state.playing || state.showing) return;
+function clickTile(i){
+  if(!playing || showing) return;
 
-  const tile = sequenceGrid.children[index];
-  const color = COLORS[index % COLORS.length];
-  tile.className = "tile " + color;
+  const t=grid.children[i];
+  t.classList.add(COLORS[i%5]);
 
-  setTimeout(() => {
-    if(state.playing && !tile.classList.contains("correct")){
-      tile.className = "tile";
+  if(i===pattern[step]){
+    t.classList.add("correct");
+    step++;
+
+    if(step===pattern.length){
+      score++;
+      level++;
+
+      if(level>9){
+        status.textContent="Bravo !";
+        playing=false;
+        return;
+      }
+
+      setTimeout(nextLevel,800);
     }
-  }, 180);
 
-  if(index === state.pattern[state.step]){
-    tile.className = "tile correct";
-    setTimeout(() => {
-      if(state.playing) tile.className = "tile";
-    }, 220);
-
-    state.step++;
-
-    if(state.step === state.pattern.length){
-      nextLevel();
-    }
-  } else {
-    tile.className = "tile wrong";
-    setTimeout(() => {
-      if(state.playing) tile.className = "tile";
-    }, 300);
+  }else{
+    t.classList.add("wrong");
   }
+
+  setTimeout(()=>t.className="tile",300);
 }
 
-playBtn.addEventListener("click", startGame);
+document.getElementById("play").onclick=start;
 
 buildGrid();
-updateTop();
+updateUI();
 </script>
+
 </body>
 </html>
