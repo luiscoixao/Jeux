@@ -20,8 +20,24 @@
   --panel:rgba(255,255,255,.10);
   --panel-line:rgba(255,255,255,.22);
   --text:#ffffff;
-  --card:#ffffff;
   --shadow:0 18px 40px rgba(0,0,0,.22);
+
+  --tile-base:rgba(255,255,255,.16);
+
+  --green1:#22c55e;
+  --green2:#16a34a;
+
+  --yellow1:#fde047;
+  --yellow2:#facc15;
+
+  --pink1:#ff4fb0;
+  --pink2:#ec4899;
+
+  --cyan1:#22d3ee;
+  --cyan2:#0ea5e9;
+
+  --orange1:#fb923c;
+  --orange2:#f97316;
 }
 *{
   box-sizing:border-box;
@@ -85,11 +101,12 @@ h1{
   background:rgba(255,255,255,.15);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
 }
-.mini-cell.green{background:linear-gradient(135deg,#22c55e,#16a34a); box-shadow:0 0 18px rgba(34,197,94,.35);}
-.mini-cell.yellow{background:linear-gradient(135deg,#fde047,#facc15); box-shadow:0 0 18px rgba(253,224,71,.35);}
-.mini-cell.pink{background:linear-gradient(135deg,#ff4fb0,#ec4899); box-shadow:0 0 18px rgba(255,79,176,.35);}
-.mini-cell.cyan{background:linear-gradient(135deg,#67e8f9,#38bdf8); box-shadow:0 0 18px rgba(56,189,248,.35);}
-.mini-cell.violet{background:linear-gradient(135deg,#a78bfa,#8b5cf6); box-shadow:0 0 18px rgba(139,92,246,.35);}
+.mini-cell.green{background:linear-gradient(135deg,var(--green1),var(--green2)); box-shadow:0 0 18px rgba(34,197,94,.35);}
+.mini-cell.yellow{background:linear-gradient(135deg,var(--yellow1),var(--yellow2)); box-shadow:0 0 18px rgba(253,224,71,.35);}
+.mini-cell.pink{background:linear-gradient(135deg,var(--pink1),var(--pink2)); box-shadow:0 0 18px rgba(255,79,176,.35);}
+.mini-cell.cyan{background:linear-gradient(135deg,var(--cyan1),var(--cyan2)); box-shadow:0 0 18px rgba(34,211,238,.35);}
+.mini-cell.orange{background:linear-gradient(135deg,var(--orange1),var(--orange2)); box-shadow:0 0 18px rgba(251,146,60,.35);}
+
 .home-title{
   font-size:28px;
   line-height:1.05;
@@ -124,24 +141,6 @@ h1{
   padding:10px 12px;
 }
 
-.controls{
-  display:flex;
-  justify-content:center;
-  margin-bottom:12px;
-}
-.ctrl-btn{
-  min-height:46px;
-  padding:0 18px;
-  border:none;
-  border-radius:16px;
-  font:inherit;
-  font-weight:900;
-  color:#fff;
-  background:linear-gradient(135deg,#ef4444,#dc2626);
-  cursor:pointer;
-  box-shadow:0 10px 24px rgba(0,0,0,.16);
-}
-
 .status{
   min-height:26px;
   text-align:center;
@@ -173,22 +172,41 @@ h1{
   min-width:0;
   border-radius:20px;
   border:none;
-  background:rgba(255,255,255,.18);
+  background:var(--tile-base);
   color:transparent;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08), 0 12px 22px rgba(0,0,0,.16);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.10),
+    0 12px 22px rgba(0,0,0,.16);
   transition:transform .12s ease, background .18s ease, box-shadow .18s ease;
   cursor:pointer;
 }
 .tile:active{
   transform:scale(.97);
 }
-.tile.seq-green{background:linear-gradient(135deg,#22c55e,#16a34a); box-shadow:0 0 24px rgba(34,197,94,.45);}
-.tile.seq-yellow{background:linear-gradient(135deg,#fde047,#facc15); box-shadow:0 0 24px rgba(253,224,71,.45);}
-.tile.seq-pink{background:linear-gradient(135deg,#ff4fb0,#ec4899); box-shadow:0 0 24px rgba(255,79,176,.45);}
-.tile.seq-cyan{background:linear-gradient(135deg,#67e8f9,#38bdf8); box-shadow:0 0 24px rgba(56,189,248,.45);}
-.tile.seq-violet{background:linear-gradient(135deg,#a78bfa,#8b5cf6); box-shadow:0 0 24px rgba(139,92,246,.45);}
+
+.tile.seq-green{
+  background:linear-gradient(135deg,var(--green1),var(--green2));
+  box-shadow:0 0 24px rgba(34,197,94,.45);
+}
+.tile.seq-yellow{
+  background:linear-gradient(135deg,var(--yellow1),var(--yellow2));
+  box-shadow:0 0 24px rgba(253,224,71,.45);
+}
+.tile.seq-pink{
+  background:linear-gradient(135deg,var(--pink1),var(--pink2));
+  box-shadow:0 0 24px rgba(255,79,176,.45);
+}
+.tile.seq-cyan{
+  background:linear-gradient(135deg,var(--cyan1),var(--cyan2));
+  box-shadow:0 0 24px rgba(34,211,238,.45);
+}
+.tile.seq-orange{
+  background:linear-gradient(135deg,var(--orange1),var(--orange2));
+  box-shadow:0 0 24px rgba(251,146,60,.45);
+}
+
 .tile.correct{
-  background:linear-gradient(135deg,#22c55e,#16a34a);
+  background:linear-gradient(135deg,var(--green1),var(--green2));
   box-shadow:0 0 24px rgba(34,197,94,.45);
 }
 .tile.wrong{
@@ -212,21 +230,28 @@ h1{
   justify-content:center;
   z-index:30;
 }
-.play-btn{
+.action-btn{
   min-width:220px;
   max-width:460px;
   width:min(100%, 340px);
   min-height:64px;
   border:none;
   border-radius:24px;
-  background:linear-gradient(135deg,#22c55e,#10b981);
   color:#fff;
   font-size:20px;
   font-weight:900;
   text-align:center;
-  box-shadow:0 18px 34px rgba(0,0,0,.26), 0 0 28px rgba(34,197,94,.28);
   cursor:pointer;
 }
+.action-btn.play{
+  background:linear-gradient(135deg,#22c55e,#10b981);
+  box-shadow:0 18px 34px rgba(0,0,0,.26), 0 0 28px rgba(34,197,94,.28);
+}
+.action-btn.stop{
+  background:linear-gradient(135deg,#ef4444,#dc2626);
+  box-shadow:0 18px 34px rgba(0,0,0,.26), 0 0 22px rgba(239,68,68,.24);
+}
+
 @media (max-width:420px){
   .home-title{font-size:24px}
 }
@@ -245,20 +270,16 @@ h1{
         <div class="mini-cell cyan"></div>
         <div class="mini-cell"></div>
         <div class="mini-cell"></div>
-        <div class="mini-cell violet"></div>
+        <div class="mini-cell orange"></div>
         <div class="mini-cell"></div>
       </div>
       <div class="home-title">Séquence<br>à retenir</div>
-      <div class="home-sub">Retrouvez la séquence. Elle devient de plus en plus difficile.</div>
+      <div class="home-sub">Mémorisez la séquence de couleurs et reproduisez-la. Le jeu devient progressivement plus difficile.</div>
     </section>
 
     <div id="topBar" class="top hidden">
-      <div class="top-pill" id="levelBox">Séquence : 1</div>
+      <div class="top-pill" id="pointsBox">Points : 0</div>
       <div class="top-pill" id="bestBox">Meilleur : 0</div>
-    </div>
-
-    <div id="controls" class="controls hidden">
-      <button id="stopBtn" class="ctrl-btn" type="button">Arrêter</button>
     </div>
 
     <div id="status" class="status hidden"></div>
@@ -271,11 +292,11 @@ h1{
   </div>
 
   <div class="playbar" id="playBar">
-    <button id="playBtn" class="play-btn" type="button">Jouer</button>
+    <button id="actionBtn" class="action-btn play" type="button">Jouer</button>
   </div>
 
 <script>
-const COLORS = ["seq-green","seq-yellow","seq-pink","seq-cyan","seq-violet"];
+const COLORS = ["seq-green","seq-yellow","seq-pink","seq-cyan","seq-orange"];
 const BEST_KEY = "memory-colors-best-score";
 
 const state = {
@@ -291,14 +312,12 @@ const state = {
 
 const homeSection = document.getElementById("homeSection");
 const topBar = document.getElementById("topBar");
-const controls = document.getElementById("controls");
 const statusEl = document.getElementById("status");
 const gameWrap = document.getElementById("gameWrap");
 const sequenceGrid = document.getElementById("sequenceGrid");
-const playBtn = document.getElementById("playBtn");
-const stopBtn = document.getElementById("stopBtn");
+const actionBtn = document.getElementById("actionBtn");
 
-const levelBox = document.getElementById("levelBox");
+const pointsBox = document.getElementById("pointsBox");
 const bestBox = document.getElementById("bestBox");
 
 function wait(ms){
@@ -328,7 +347,7 @@ function saveBest(){
 }
 
 function updateTop(){
-  levelBox.textContent = "Séquence : " + state.level;
+  pointsBox.textContent = "Points : " + state.score;
   loadBest();
 }
 
@@ -339,6 +358,16 @@ function showStatus(text){
 
 function hideStatus(){
   statusEl.classList.add("hidden");
+}
+
+function setActionButton(mode){
+  if(mode === "play"){
+    actionBtn.textContent = "Jouer";
+    actionBtn.className = "action-btn play";
+  } else {
+    actionBtn.textContent = "Arrêter";
+    actionBtn.className = "action-btn stop";
+  }
 }
 
 function buildGrid(){
@@ -425,9 +454,9 @@ async function startGame(){
 
   homeSection.classList.add("hidden");
   topBar.classList.remove("hidden");
-  controls.classList.remove("hidden");
   statusEl.classList.remove("hidden");
   gameWrap.classList.remove("hidden");
+  setActionButton("stop");
 
   showStatus("Prêt...");
   await wait(1000);
@@ -445,10 +474,10 @@ async function finishGame(message = "Bravo !"){
 
   homeSection.classList.remove("hidden");
   topBar.classList.add("hidden");
-  controls.classList.add("hidden");
   gameWrap.classList.add("hidden");
   hideStatus();
   resetBoard();
+  setActionButton("play");
 }
 
 async function stopGame(){
@@ -461,10 +490,10 @@ async function stopGame(){
 
   homeSection.classList.remove("hidden");
   topBar.classList.add("hidden");
-  controls.classList.add("hidden");
   gameWrap.classList.add("hidden");
   hideStatus();
   resetBoard();
+  setActionButton("play");
 }
 
 async function nextLevel(){
@@ -536,11 +565,17 @@ function handleClick(index){
   }
 }
 
-playBtn.addEventListener("click", startGame);
-stopBtn.addEventListener("click", stopGame);
+actionBtn.addEventListener("click", () => {
+  if(state.playing){
+    stopGame();
+  } else {
+    startGame();
+  }
+});
 
 buildGrid();
 updateTop();
+setActionButton("play");
 </script>
 </body>
 </html>
