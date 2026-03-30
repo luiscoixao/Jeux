@@ -126,30 +126,20 @@ h1{
 
 .controls{
   display:flex;
-  gap:8px;
   justify-content:center;
-  flex-wrap:wrap;
   margin-bottom:12px;
 }
 .ctrl-btn{
   min-height:46px;
-  padding:0 16px;
+  padding:0 18px;
   border:none;
   border-radius:16px;
   font:inherit;
   font-weight:900;
-  background:#fff;
-  color:#111827;
-  cursor:pointer;
-  box-shadow:0 10px 24px rgba(0,0,0,.12);
-}
-.ctrl-btn.active{
-  background:#0f172a;
   color:#fff;
-}
-.ctrl-btn.stop{
   background:linear-gradient(135deg,#ef4444,#dc2626);
-  color:#fff;
+  cursor:pointer;
+  box-shadow:0 10px 24px rgba(0,0,0,.16);
 }
 
 .status{
@@ -260,20 +250,17 @@ h1{
         <div class="mini-cell"></div>
       </div>
       <div class="home-title">Séquence<br>à retenir</div>
-      <div class="home-sub">Niveau 1 : sans répétition. Niveau 2 : avec doubles. Niveau 3 : avec triples.</div>
+      <div class="home-sub">Phase 1 : sans répétition. Phase 2 : doubles. Phase 3 : triples.</div>
     </section>
 
     <div id="topBar" class="top hidden">
-      <div class="top-pill" id="modeBox">Niveau 1</div>
+      <div class="top-pill" id="phaseBox">Phase 1</div>
       <div class="top-pill" id="levelBox">Séquence : 1</div>
       <div class="top-pill" id="bestBox">Meilleur : 0</div>
     </div>
 
     <div id="controls" class="controls hidden">
-      <button id="mode1Btn" class="ctrl-btn active" type="button">Niveau 1</button>
-      <button id="mode2Btn" class="ctrl-btn" type="button">Niveau 2</button>
-      <button id="mode3Btn" class="ctrl-btn" type="button">Niveau 3</button>
-      <button id="stopBtn" class="ctrl-btn stop hidden" type="button">Arrêter</button>
+      <button id="stopBtn" class="ctrl-btn" type="button">Arrêter</button>
     </div>
 
     <div id="status" class="status hidden"></div>
@@ -291,11 +278,11 @@ h1{
 
 <script>
 const COLORS = ["seq-green","seq-yellow","seq-pink","seq-cyan","seq-violet"];
-const BEST_KEY_PREFIX = "memory-colors-best-mode-";
+const BEST_KEY = "memory-colors-best-score";
 
 const state = {
   playing: false,
-  mode: 1,
+  phase: 1,
   level: 1,
   score: 0,
   pattern: [],
@@ -313,20 +300,12 @@ const sequenceGrid = document.getElementById("sequenceGrid");
 const playBtn = document.getElementById("playBtn");
 const stopBtn = document.getElementById("stopBtn");
 
-const modeBox = document.getElementById("modeBox");
+const phaseBox = document.getElementById("phaseBox");
 const levelBox = document.getElementById("levelBox");
 const bestBox = document.getElementById("bestBox");
 
-const mode1Btn = document.getElementById("mode1Btn");
-const mode2Btn = document.getElementById("mode2Btn");
-const mode3Btn = document.getElementById("mode3Btn");
-
 function wait(ms){
   return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-function randomIndex(){
-  return Math.floor(Math.random() * 9);
 }
 
 function shuffle(arr){
@@ -338,29 +317,21 @@ function shuffle(arr){
   return a;
 }
 
-function setActiveModeButton(){
-  [mode1Btn, mode2Btn, mode3Btn].forEach(btn => btn.classList.remove("active"));
-  if(state.mode === 1) mode1Btn.classList.add("active");
-  if(state.mode === 2) mode2Btn.classList.add("active");
-  if(state.mode === 3) mode3Btn.classList.add("active");
-}
-
 function loadBest(){
-  const best = Number(localStorage.getItem(BEST_KEY_PREFIX + state.mode) || 0);
+  const best = Number(localStorage.getItem(BEST_KEY) || 0);
   bestBox.textContent = "Meilleur : " + best;
 }
 
 function saveBest(){
-  const key = BEST_KEY_PREFIX + state.mode;
-  const currentBest = Number(localStorage.getItem(key) || 0);
+  const currentBest = Number(localStorage.getItem(BEST_KEY) || 0);
   if(state.score > currentBest){
-    localStorage.setItem(key, String(state.score));
+    localStorage.setItem(BEST_KEY, String(state.score));
   }
   loadBest();
 }
 
 function updateTop(){
-  modeBox.textContent = "Niveau " + state.mode;
+  phaseBox.textContent = "Phase " + state.phase;
   levelBox.textContent = "Séquence : " + state.level;
   loadBest();
 }
@@ -401,11 +372,11 @@ function lightTile(index, on){
 function createPattern(length){
   const available = [0,1,2,3,4,5,6,7,8];
 
-  if(state.mode === 1){
+  if(state.phase === 1){
     return shuffle([...available]).slice(0, length);
   }
 
-  if(state.mode === 2){
+  if(state.phase === 2){
     if(length <= 1) return shuffle([...available]).slice(0, 1);
     const base = shuffle([...available]).slice(0, length - 1);
     const repeated = base[Math.floor(Math.random() * base.length)];
@@ -451,6 +422,7 @@ async function startGame(){
 
   state.playing = true;
   state.stopped = false;
+  state.phase = 1;
   state.level = 1;
   state.score = 0;
   updateTop();
@@ -460,7 +432,6 @@ async function startGame(){
   controls.classList.remove("hidden");
   statusEl.classList.remove("hidden");
   gameWrap.classList.remove("hidden");
-  stopBtn.classList.remove("hidden");
 
   showStatus("Prêt...");
   await wait(1000);
@@ -480,7 +451,6 @@ async function finishGame(message = "Bravo !"){
   topBar.classList.add("hidden");
   controls.classList.add("hidden");
   gameWrap.classList.add("hidden");
-  stopBtn.classList.add("hidden");
   hideStatus();
   resetBoard();
 }
@@ -489,6 +459,7 @@ async function stopGame(){
   state.stopped = true;
   state.playing = false;
   state.showing = false;
+  saveBest();
   showStatus("Partie arrêtée");
   await wait(700);
 
@@ -496,21 +467,40 @@ async function stopGame(){
   topBar.classList.add("hidden");
   controls.classList.add("hidden");
   gameWrap.classList.add("hidden");
-  stopBtn.classList.add("hidden");
   hideStatus();
   resetBoard();
 }
 
 async function nextLevel(){
   state.score += 1;
-  updateTop();
 
-  if(state.level >= 9){
+  if(state.phase === 1 && state.level === 9){
+    state.phase = 2;
+    state.level = 1;
+    showStatus("Phase 2");
+    updateTop();
+    await wait(900);
+    await playLevel();
+    return;
+  }
+
+  if(state.phase === 2 && state.level === 9){
+    state.phase = 3;
+    state.level = 1;
+    showStatus("Phase 3");
+    updateTop();
+    await wait(900);
+    await playLevel();
+    return;
+  }
+
+  if(state.phase === 3 && state.level === 9){
     await finishGame("Bravo !");
     return;
   }
 
   state.level += 1;
+  updateTop();
   showStatus("Bien");
   await wait(700);
 
@@ -550,32 +540,10 @@ function handleClick(index){
   }
 }
 
-mode1Btn.addEventListener("click", ()=>{
-  if(state.playing) return;
-  state.mode = 1;
-  setActiveModeButton();
-  updateTop();
-});
-
-mode2Btn.addEventListener("click", ()=>{
-  if(state.playing) return;
-  state.mode = 2;
-  setActiveModeButton();
-  updateTop();
-});
-
-mode3Btn.addEventListener("click", ()=>{
-  if(state.playing) return;
-  state.mode = 3;
-  setActiveModeButton();
-  updateTop();
-});
-
 playBtn.addEventListener("click", startGame);
 stopBtn.addEventListener("click", stopGame);
 
 buildGrid();
-setActiveModeButton();
 updateTop();
 </script>
 </body>
