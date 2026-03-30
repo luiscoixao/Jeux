@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-<title>Memory Games</title>
+<title>MEMORY COLORS</title>
 
 <meta name="theme-color" content="#4f46e5" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-title" content="Memory Games" />
+<meta name="apple-mobile-web-app-title" content="MEMORY COLORS" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <link rel="apple-touch-icon" href="iconmemorycolors.png" />
 <link rel="icon" type="image/png" href="iconmemorycolors.png" />
@@ -40,7 +40,7 @@ body{
     radial-gradient(circle at 90% 12%, rgba(255,60,172,.35), transparent 20%),
     radial-gradient(circle at 20% 90%, rgba(34,197,94,.22), transparent 22%),
     linear-gradient(135deg,var(--bg1),var(--bg2) 55%, #5b21b6 75%, var(--bg3));
-  padding:18px 16px 120px;
+  padding:18px 16px 140px;
   display:flex;
   justify-content:center;
 }
@@ -104,7 +104,7 @@ h1{
 
 .top{
   display:grid;
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:1fr 1fr 1fr;
   gap:10px;
   margin-bottom:14px;
 }
@@ -119,9 +119,37 @@ h1{
   background:var(--panel);
   backdrop-filter:blur(12px);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
-  font-size:16px;
+  font-size:15px;
   font-weight:900;
   padding:10px 12px;
+}
+
+.controls{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-bottom:12px;
+}
+.ctrl-btn{
+  min-height:46px;
+  padding:0 16px;
+  border:none;
+  border-radius:16px;
+  font:inherit;
+  font-weight:900;
+  background:#fff;
+  color:#111827;
+  cursor:pointer;
+  box-shadow:0 10px 24px rgba(0,0,0,.12);
+}
+.ctrl-btn.active{
+  background:#0f172a;
+  color:#fff;
+}
+.ctrl-btn.stop{
+  background:linear-gradient(135deg,#ef4444,#dc2626);
+  color:#fff;
 }
 
 .status{
@@ -211,12 +239,13 @@ h1{
 }
 @media (max-width:420px){
   .home-title{font-size:24px}
+  .top{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
   <div class="app">
-    <h1>MEMORY GAMES</h1>
+    <h1>MEMORY COLORS</h1>
 
     <section id="homeSection" class="home-card">
       <div class="mini-grid">
@@ -231,12 +260,20 @@ h1{
         <div class="mini-cell"></div>
       </div>
       <div class="home-title">Séquence<br>à retenir</div>
-      <div class="home-sub">Mémorisez une séquence de plus en plus longue. Certaines cases peuvent revenir deux ou trois fois.</div>
+      <div class="home-sub">Niveau 1 : sans répétition. Niveau 2 : avec doubles. Niveau 3 : avec triples.</div>
     </section>
 
     <div id="topBar" class="top hidden">
+      <div class="top-pill" id="modeBox">Niveau 1</div>
       <div class="top-pill" id="levelBox">Séquence : 1</div>
-      <div class="top-pill" id="scoreBox">Points : 0</div>
+      <div class="top-pill" id="bestBox">Meilleur : 0</div>
+    </div>
+
+    <div id="controls" class="controls hidden">
+      <button id="mode1Btn" class="ctrl-btn active" type="button">Niveau 1</button>
+      <button id="mode2Btn" class="ctrl-btn" type="button">Niveau 2</button>
+      <button id="mode3Btn" class="ctrl-btn" type="button">Niveau 3</button>
+      <button id="stopBtn" class="ctrl-btn stop hidden" type="button">Arrêter</button>
     </div>
 
     <div id="status" class="status hidden"></div>
@@ -254,24 +291,35 @@ h1{
 
 <script>
 const COLORS = ["seq-green","seq-yellow","seq-pink","seq-cyan","seq-violet"];
+const BEST_KEY_PREFIX = "memory-colors-best-mode-";
 
 const state = {
   playing: false,
+  mode: 1,
   level: 1,
   score: 0,
   pattern: [],
   step: 0,
-  showing: false
+  showing: false,
+  stopped: false
 };
 
 const homeSection = document.getElementById("homeSection");
 const topBar = document.getElementById("topBar");
+const controls = document.getElementById("controls");
 const statusEl = document.getElementById("status");
 const gameWrap = document.getElementById("gameWrap");
 const sequenceGrid = document.getElementById("sequenceGrid");
 const playBtn = document.getElementById("playBtn");
+const stopBtn = document.getElementById("stopBtn");
+
+const modeBox = document.getElementById("modeBox");
 const levelBox = document.getElementById("levelBox");
-const scoreBox = document.getElementById("scoreBox");
+const bestBox = document.getElementById("bestBox");
+
+const mode1Btn = document.getElementById("mode1Btn");
+const mode2Btn = document.getElementById("mode2Btn");
+const mode3Btn = document.getElementById("mode3Btn");
 
 function wait(ms){
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -290,9 +338,31 @@ function shuffle(arr){
   return a;
 }
 
+function setActiveModeButton(){
+  [mode1Btn, mode2Btn, mode3Btn].forEach(btn => btn.classList.remove("active"));
+  if(state.mode === 1) mode1Btn.classList.add("active");
+  if(state.mode === 2) mode2Btn.classList.add("active");
+  if(state.mode === 3) mode3Btn.classList.add("active");
+}
+
+function loadBest(){
+  const best = Number(localStorage.getItem(BEST_KEY_PREFIX + state.mode) || 0);
+  bestBox.textContent = "Meilleur : " + best;
+}
+
+function saveBest(){
+  const key = BEST_KEY_PREFIX + state.mode;
+  const currentBest = Number(localStorage.getItem(key) || 0);
+  if(state.score > currentBest){
+    localStorage.setItem(key, String(state.score));
+  }
+  loadBest();
+}
+
 function updateTop(){
+  modeBox.textContent = "Niveau " + state.mode;
   levelBox.textContent = "Séquence : " + state.level;
-  scoreBox.textContent = "Points : " + state.score;
+  loadBest();
 }
 
 function showStatus(text){
@@ -330,23 +400,24 @@ function lightTile(index, on){
 
 function createPattern(length){
   const available = [0,1,2,3,4,5,6,7,8];
-  let pattern = [];
 
-  if(length <= 3){
+  if(state.mode === 1){
     return shuffle([...available]).slice(0, length);
   }
 
-  if(length <= 6){
+  if(state.mode === 2){
+    if(length <= 1) return shuffle([...available]).slice(0, 1);
     const base = shuffle([...available]).slice(0, length - 1);
     const repeated = base[Math.floor(Math.random() * base.length)];
-    pattern = [...base, repeated];
-    return shuffle(pattern);
+    return shuffle([...base, repeated]);
   }
 
+  if(length <= 2){
+    return shuffle([...available]).slice(0, length);
+  }
   const base = shuffle([...available]).slice(0, length - 2);
   const repeated = base[Math.floor(Math.random() * base.length)];
-  pattern = [...base, repeated, repeated];
-  return shuffle(pattern);
+  return shuffle([...base, repeated, repeated]);
 }
 
 async function showPattern(){
@@ -355,6 +426,7 @@ async function showPattern(){
   await wait(400);
 
   for(const idx of state.pattern){
+    if(state.stopped) return;
     lightTile(idx, true);
     await wait(520);
     lightTile(idx, false);
@@ -367,6 +439,7 @@ async function showPattern(){
 }
 
 async function playLevel(){
+  if(state.stopped) return;
   resetBoard();
   updateTop();
   state.pattern = createPattern(state.level);
@@ -377,28 +450,53 @@ async function startGame(){
   if(state.playing) return;
 
   state.playing = true;
+  state.stopped = false;
   state.level = 1;
   state.score = 0;
   updateTop();
 
   homeSection.classList.add("hidden");
   topBar.classList.remove("hidden");
+  controls.classList.remove("hidden");
   statusEl.classList.remove("hidden");
   gameWrap.classList.remove("hidden");
+  stopBtn.classList.remove("hidden");
 
   showStatus("Prêt...");
   await wait(1000);
+
+  if(state.stopped) return;
   await playLevel();
 }
 
-async function finishGame(){
+async function finishGame(message = "Bravo !"){
   state.playing = false;
-  showStatus("Bravo !");
+  state.showing = false;
+  saveBest();
+  showStatus(message);
   await wait(1200);
 
   homeSection.classList.remove("hidden");
   topBar.classList.add("hidden");
+  controls.classList.add("hidden");
   gameWrap.classList.add("hidden");
+  stopBtn.classList.add("hidden");
+  hideStatus();
+  resetBoard();
+}
+
+async function stopGame(){
+  state.stopped = true;
+  state.playing = false;
+  state.showing = false;
+  showStatus("Partie arrêtée");
+  await wait(700);
+
+  homeSection.classList.remove("hidden");
+  topBar.classList.add("hidden");
+  controls.classList.add("hidden");
+  gameWrap.classList.add("hidden");
+  stopBtn.classList.add("hidden");
   hideStatus();
   resetBoard();
 }
@@ -408,18 +506,20 @@ async function nextLevel(){
   updateTop();
 
   if(state.level >= 9){
-    await finishGame();
+    await finishGame("Bravo !");
     return;
   }
 
   state.level += 1;
   showStatus("Bien");
   await wait(700);
+
+  if(state.stopped) return;
   await playLevel();
 }
 
 function handleClick(index){
-  if(!state.playing || state.showing) return;
+  if(!state.playing || state.showing || state.stopped) return;
 
   const tile = sequenceGrid.children[index];
   const color = COLORS[index % COLORS.length];
@@ -450,9 +550,32 @@ function handleClick(index){
   }
 }
 
+mode1Btn.addEventListener("click", ()=>{
+  if(state.playing) return;
+  state.mode = 1;
+  setActiveModeButton();
+  updateTop();
+});
+
+mode2Btn.addEventListener("click", ()=>{
+  if(state.playing) return;
+  state.mode = 2;
+  setActiveModeButton();
+  updateTop();
+});
+
+mode3Btn.addEventListener("click", ()=>{
+  if(state.playing) return;
+  state.mode = 3;
+  setActiveModeButton();
+  updateTop();
+});
+
 playBtn.addEventListener("click", startGame);
+stopBtn.addEventListener("click", stopGame);
 
 buildGrid();
+setActiveModeButton();
 updateTop();
 </script>
 </body>
