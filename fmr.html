@@ -246,7 +246,7 @@ button{
   text-align:center;
   font-size:11px;
   color:rgba(255,255,255,.62);
-  margin-top:10px;
+  margin-top:14px;
 }
 .playbar{
   position:fixed;
@@ -320,6 +320,8 @@ button{
       </div>
     </section>
 
+    <div class="signature">Jeu créé par Luis Coixao à l'aide de ChatGPT.</div>
+
     <section class="panel hidden-section" id="controlPanel">
       <div class="controls">
         <button class="pill-btn active" id="btnSequence" type="button">Séquence</button>
@@ -337,7 +339,6 @@ button{
       </div>
 
       <div id="help" class="help"></div>
-      <div class="signature">Jeu créé par Luis Coixao à l'aide de ChatGPT.</div>
     </section>
   </div>
 
@@ -511,9 +512,6 @@ function finishGame(){
   timerEl.textContent = time.toFixed(2) + " s";
   updateRecord(time);
 
-  topBar.classList.remove("hidden-section");
-  controlPanel.classList.remove("hidden-section");
-  playBar.classList.remove("hidden-section");
   homeSection.classList.remove("hidden-section");
   hideGameSections();
 }
@@ -526,8 +524,6 @@ function startGame(){
 
   homeSection.classList.add("hidden-section");
   topBar.classList.remove("hidden-section");
-  controlPanel.classList.remove("hidden-section");
-  playBar.classList.remove("hidden-section");
 
   if(state.game === "sequence"){
     state.sequenceLevel = state.difficulty === "easy" ? 3 : 5;
@@ -639,7 +635,6 @@ btnSequence.addEventListener("click", ()=>{
   setHelp();
   resetBoards();
   hideGameSections();
-  topBar.classList.remove("hidden-section");
   controlPanel.classList.remove("hidden-section");
   playBar.classList.remove("hidden-section");
 });
@@ -652,7 +647,6 @@ btnGrid.addEventListener("click", ()=>{
   setHelp();
   resetBoards();
   hideGameSections();
-  topBar.classList.remove("hidden-section");
   controlPanel.classList.remove("hidden-section");
   playBar.classList.remove("hidden-section");
 });
@@ -680,10 +674,6 @@ document.querySelectorAll("[data-game-card]").forEach(card=>{
     } else {
       btnGrid.click();
     }
-
-    topBar.classList.remove("hidden-section");
-    controlPanel.classList.remove("hidden-section");
-    playBar.classList.remove("hidden-section");
   });
 });
 
