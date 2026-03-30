@@ -22,7 +22,10 @@
   --good:#22c55e;
   --bad:#ef4444;
 }
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
 body{
   margin:0;
   min-height:100vh;
@@ -51,18 +54,18 @@ h1{
 .top{
   display:flex;
   justify-content:space-between;
-  gap:12px;
+  gap:10px;
   width:100%;
-  font-size:14px;
-  margin-bottom:12px;
+  font-size:13px;
+  margin-bottom:10px;
 }
 .top-pill{
   flex:1;
   border:1px solid var(--line);
   background:rgba(255,255,255,.12);
   backdrop-filter:blur(10px);
-  border-radius:16px;
-  padding:10px 12px;
+  border-radius:14px;
+  padding:8px 10px;
   text-align:center;
   font-weight:700;
 }
@@ -88,32 +91,52 @@ button.active{
   color:#fff;
 }
 .grid-wrap{
+  width:100%;
   background:rgba(255,255,255,.12);
   border:1px solid var(--line);
   border-radius:28px;
   padding:14px;
   backdrop-filter:blur(14px);
+  overflow:hidden;
 }
 .grid{
   display:grid;
   gap:10px;
   width:100%;
+  max-width:100%;
 }
 .tile{
-  aspect-ratio:1/1;
+  width:100%;
+  min-width:0;
   background:var(--card);
   border-radius:18px;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:20px;
   font-weight:900;
   color:var(--text);
   cursor:pointer;
   box-shadow:0 10px 24px rgba(0,0,0,.16);
   transition:transform .12s ease, background .18s ease, color .18s ease;
+  user-select:none;
 }
-.tile:active{transform:scale(.97)}
+.tile:active{
+  transform:scale(.97);
+}
+.grid.grid-4{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+}
+.grid.grid-4 .tile{
+  aspect-ratio:1/1;
+  font-size:20px;
+}
+.grid.grid-5{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+}
+.grid.grid-5 .tile{
+  aspect-ratio:1/1;
+  font-size:18px;
+}
 .tile.placeholder{
   color:transparent;
   cursor:default;
@@ -154,7 +177,7 @@ button.active{
 .play-btn{
   min-width:220px;
   max-width:460px;
-  width:min(100%, 320px);
+  width:min(100%,320px);
   padding:16px 22px;
   border-radius:20px;
   background:#22c55e;
@@ -164,6 +187,14 @@ button.active{
   text-align:center;
   box-shadow:0 16px 34px rgba(0,0,0,.22);
 }
+
+.signature{
+  text-align:center;
+  font-size:11px;
+  color:rgba(255,255,255,.6);
+  margin-top:12px;
+}
+
 </style>
 </head>
 <body>
@@ -172,21 +203,25 @@ button.active{
 
     <div class="top">
       <div class="top-pill" id="timer">0.00 s</div>
-      <div class="top-pill" id="best">Meilleur chrono : —</div>
+      <div class="top-pill" id="best">Record : —</div>
     </div>
 
     <div class="controls">
-      <button data-mode="classic" class="active">Classique</button>
-      <button data-mode="memory">Mémoire</button>
+      <button data-mode="classic" class="active">Ordre</button>
+      <button data-mode="memory">Flash</button>
+      <button data-mode="pairs">Memory</button>
       <button data-size="4" class="active">4×4</button>
       <button data-size="5">5×4</button>
     </div>
 
     <div class="grid-wrap">
-      <div id="grid" class="grid"></div>
+      <div id="grid" class="grid grid-4"></div>
     </div>
 
     <div id="help" class="help"></div>
+    <div class="signature">
+  Jeu créé par Luis Coixao à l'aide de ChatGPT.
+</div>
   </div>
 
   <div class="playbar">
@@ -203,6 +238,11 @@ let startTime = 0;
 let timerInterval = null;
 let playing = false;
 
+let firstPairTile = null;
+let secondPairTile = null;
+let lockBoard = false;
+let pairsFound = 0;
+
 const timerEl = document.getElementById("timer");
 const bestEl = document.getElementById("best");
 const gridEl = document.getElementById("grid");
@@ -218,9 +258,9 @@ function randomNumbers(n){
 
 function shuffle(arr){
   const a = [...arr];
-  for(let i=a.length-1;i>0;i--){
-    const j = Math.floor(Math.random() * (i+1));
-    [a[i],a[j]] = [a[j],a[i]];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
 }
@@ -231,7 +271,7 @@ function bestKey(){
 
 function loadBest(){
   const best = localStorage.getItem(bestKey());
-  bestEl.textContent = "Meilleur chrono : " + (best ? Number(best).toFixed(2) + " s" : "—");
+  bestEl.textContent = "Record : " + (best ? Number(best).toFixed(2) + " s" : "—");
 }
 
 function updateBest(time){
@@ -245,18 +285,23 @@ function updateBest(time){
 
 function setHelpForMode(){
   if(mode === "classic"){
-    helpEl.textContent = "Classique : touchez les nombres dans l’ordre croissant.";
-    helpEl.classList.add("show");
+    helpEl.textContent = "Touchez les nombres dans l’ordre croissant.";
+  } else if(mode === "memory"){
+    helpEl.textContent = "Mémorisez la grille, puis retrouvez l’ordre croissant.";
   } else {
-    helpEl.textContent = "Mémoire : mémorisez la grille, puis retrouvez l’ordre croissant.";
-    helpEl.classList.add("show");
+    helpEl.textContent = "Retrouvez les paires de nombres identiques.";
   }
+  helpEl.classList.add("show");
+}
+
+function setGridClass(){
+  gridEl.className = rows === 5 ? "grid grid-5" : "grid grid-4";
 }
 
 function buildPlaceholderGrid(){
   const total = rows * cols;
   gridEl.innerHTML = "";
-  gridEl.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  setGridClass();
 
   for(let i = 0; i < total; i++){
     const tile = document.createElement("div");
@@ -280,24 +325,20 @@ function stopTimer(){
   timerInterval = null;
 }
 
-function startGame(){
-  playing = true;
-  timerEl.textContent = "0.00 s";
-  startTimer();
-
+function startClassicOrMemory(){
   const total = rows * cols;
   order = randomNumbers(total).sort((a,b) => a - b);
   next = 0;
 
   const shuffled = shuffle(order);
   gridEl.innerHTML = "";
-  gridEl.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  setGridClass();
 
   shuffled.forEach(n => {
     const tile = document.createElement("div");
     tile.className = "tile";
     tile.textContent = n;
-    tile.addEventListener("click", () => clickTile(tile, n));
+    tile.addEventListener("click", () => clickClassicTile(tile, n));
     gridEl.appendChild(tile);
   });
 
@@ -306,12 +347,55 @@ function startGame(){
   }
 }
 
-function hideAll(){
-  if(!playing) return;
-  document.querySelectorAll("#grid .tile").forEach(t => t.classList.add("hidden"));
+function startPairs(){
+  const total = rows * cols;
+  const pairCount = total / 2;
+  const nums = randomNumbers(pairCount);
+  const deck = shuffle([...nums, ...nums]);
+
+  firstPairTile = null;
+  secondPairTile = null;
+  lockBoard = false;
+  pairsFound = 0;
+
+  gridEl.innerHTML = "";
+  setGridClass();
+
+  deck.forEach(n => {
+    const tile = document.createElement("div");
+    tile.className = "tile";
+    tile.textContent = n;
+    tile.dataset.value = n;
+    tile.dataset.matched = "false";
+    tile.addEventListener("click", () => clickPairTile(tile));
+    gridEl.appendChild(tile);
+  });
+
+  setTimeout(hideAll, 2500);
 }
 
-function clickTile(tile, n){
+function startGame(){
+  playing = true;
+  timerEl.textContent = "0.00 s";
+  startTimer();
+
+  if(mode === "pairs"){
+    startPairs();
+  } else {
+    startClassicOrMemory();
+  }
+}
+
+function hideAll(){
+  if(!playing) return;
+  document.querySelectorAll("#grid .tile").forEach(t => {
+    if(!t.classList.contains("correct")){
+      t.classList.add("hidden");
+    }
+  });
+}
+
+function clickClassicTile(tile, n){
   if(!playing) return;
 
   if(n === order[next]){
@@ -339,6 +423,62 @@ function clickTile(tile, n){
   }
 }
 
+function clickPairTile(tile){
+  if(!playing || lockBoard) return;
+  if(tile.dataset.matched === "true") return;
+  if(tile === firstPairTile) return;
+
+  tile.classList.remove("hidden");
+
+  if(!firstPairTile){
+    firstPairTile = tile;
+    return;
+  }
+
+  secondPairTile = tile;
+  lockBoard = true;
+
+  const v1 = firstPairTile.dataset.value;
+  const v2 = secondPairTile.dataset.value;
+
+  if(v1 === v2){
+    firstPairTile.classList.add("correct");
+    secondPairTile.classList.add("correct");
+    firstPairTile.dataset.matched = "true";
+    secondPairTile.dataset.matched = "true";
+    firstPairTile.style.pointerEvents = "none";
+    secondPairTile.style.pointerEvents = "none";
+
+    pairsFound++;
+    resetPairTurn();
+
+    if(pairsFound === (rows * cols) / 2){
+      playing = false;
+      stopTimer();
+      const finalTime = (performance.now() - startTime) / 1000;
+      timerEl.textContent = finalTime.toFixed(2) + " s";
+      updateBest(finalTime);
+    }
+  } else {
+    firstPairTile.classList.add("wrong");
+    secondPairTile.classList.add("wrong");
+
+    setTimeout(() => {
+      firstPairTile.classList.remove("wrong");
+      secondPairTile.classList.remove("wrong");
+      firstPairTile.classList.add("hidden");
+      secondPairTile.classList.add("hidden");
+      resetPairTurn();
+    }, 700);
+  }
+}
+
+function resetPairTurn(){
+  firstPairTile = null;
+  secondPairTile = null;
+  lockBoard = false;
+}
+
 document.querySelectorAll("[data-mode]").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll("[data-mode]").forEach(b => b.classList.remove("active"));
@@ -346,6 +486,7 @@ document.querySelectorAll("[data-mode]").forEach(btn => {
     mode = btn.dataset.mode;
     loadBest();
     setHelpForMode();
+    buildPlaceholderGrid();
   });
 });
 
@@ -354,8 +495,7 @@ document.querySelectorAll("[data-size]").forEach(btn => {
     document.querySelectorAll("[data-size]").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
 
-    const h = Number(btn.dataset.size);
-    rows = h;
+    rows = Number(btn.dataset.size);
     cols = 4;
 
     loadBest();
@@ -367,6 +507,7 @@ document.getElementById("playBtn").addEventListener("click", startGame);
 
 buildPlaceholderGrid();
 loadBest();
+setHelpForMode();
 </script>
 </body>
 </html>
