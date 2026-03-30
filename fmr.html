@@ -104,7 +104,7 @@ h1{
 
 .top{
   display:grid;
-  grid-template-columns:1fr 1fr 1fr;
+  grid-template-columns:1fr 1fr;
   gap:10px;
   margin-bottom:14px;
 }
@@ -229,7 +229,6 @@ h1{
 }
 @media (max-width:420px){
   .home-title{font-size:24px}
-  .top{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -250,11 +249,10 @@ h1{
         <div class="mini-cell"></div>
       </div>
       <div class="home-title">Séquence<br>à retenir</div>
-      <div class="home-sub">Phase 1 : sans répétition. Phase 2 : doubles. Phase 3 : triples.</div>
+      <div class="home-sub">Retrouvez la séquence. Elle devient de plus en plus difficile.</div>
     </section>
 
     <div id="topBar" class="top hidden">
-      <div class="top-pill" id="phaseBox">Phase 1</div>
       <div class="top-pill" id="levelBox">Séquence : 1</div>
       <div class="top-pill" id="bestBox">Meilleur : 0</div>
     </div>
@@ -300,7 +298,6 @@ const sequenceGrid = document.getElementById("sequenceGrid");
 const playBtn = document.getElementById("playBtn");
 const stopBtn = document.getElementById("stopBtn");
 
-const phaseBox = document.getElementById("phaseBox");
 const levelBox = document.getElementById("levelBox");
 const bestBox = document.getElementById("bestBox");
 
@@ -331,7 +328,6 @@ function saveBest(){
 }
 
 function updateTop(){
-  phaseBox.textContent = "Phase " + state.phase;
   levelBox.textContent = "Séquence : " + state.level;
   loadBest();
 }
@@ -477,7 +473,7 @@ async function nextLevel(){
   if(state.phase === 1 && state.level === 9){
     state.phase = 2;
     state.level = 1;
-    showStatus("Phase 2");
+    showStatus("Bien");
     updateTop();
     await wait(900);
     await playLevel();
@@ -487,7 +483,7 @@ async function nextLevel(){
   if(state.phase === 2 && state.level === 9){
     state.phase = 3;
     state.level = 1;
-    showStatus("Phase 3");
+    showStatus("Bien");
     updateTop();
     await wait(900);
     await playLevel();
