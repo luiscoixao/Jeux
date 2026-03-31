@@ -20,7 +20,6 @@
   --panel:rgba(10,16,40,.36);
   --panel-line:rgba(255,255,255,.22);
   --text:#ffffff;
-  --shadow:0 18px 40px rgba(0,0,0,.22);
 
   --green1:#34d399;
   --green2:#059669;
@@ -37,8 +36,8 @@
   --orange1:#fb923c;
   --orange2:#c2410c;
 
-  --blue1:#60a5fa;
-  --blue2:#1e40af;
+  --blue1:#fff700;
+  --blue2:#ffcc00;
 
   --red1:#f43f5e;
   --red2:#9f1239;
@@ -82,7 +81,6 @@ h1{
   font-weight:900;
   letter-spacing:.4px;
 }
-
 .game-wrap{
   border-radius:30px;
   padding:16px 14px 18px;
@@ -96,7 +94,6 @@ h1{
     0 0 26px rgba(56,189,248,.35),
     0 18px 40px rgba(0,0,0,.22);
 }
-
 .game-grid{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
@@ -118,27 +115,23 @@ h1{
 .tile:active{
   transform:scale(.97);
 }
-
 .tile.seq-green{background:linear-gradient(135deg,var(--green1),var(--green2));box-shadow:0 0 18px rgba(34,197,94,.35);}
 .tile.seq-yellow{background:linear-gradient(135deg,var(--yellow1),var(--yellow2));box-shadow:0 0 18px rgba(253,224,71,.35);}
 .tile.seq-pink{background:linear-gradient(135deg,var(--pink1),var(--pink2));box-shadow:0 0 18px rgba(255,79,176,.35);}
 .tile.seq-cyan{background:linear-gradient(135deg,var(--cyan1),var(--cyan2));box-shadow:0 0 18px rgba(34,211,238,.35);}
 .tile.seq-orange{background:linear-gradient(135deg,var(--orange1),var(--orange2));box-shadow:0 0 18px rgba(251,146,60,.35);}
-.tile.seq-blue{background:linear-gradient(135deg,var(--blue1),var(--blue2));box-shadow:0 0 18px rgba(59,130,246,.35);}
-.tile.seq-red{background:linear-gradient(135deg,var(--red1),var(--red2));box-shadow:0 0 18px rgba(255,59,48,.35);}
+.tile.seq-blue{background:linear-gradient(135deg,var(--blue1),var(--blue2));box-shadow:0 0 18px rgba(255,215,0,.45);}
+.tile.seq-red{background:linear-gradient(135deg,var(--red1),var(--red2));box-shadow:0 0 18px rgba(244,63,94,.35);}
 .tile.seq-lime{background:linear-gradient(135deg,var(--lime1),var(--lime2));box-shadow:0 0 18px rgba(163,230,53,.35);}
 .tile.seq-purple{background:linear-gradient(135deg,var(--purple1),var(--purple2));box-shadow:0 0 18px rgba(192,132,252,.35);}
-
 .tile.correct{
   outline:3px solid rgba(255,255,255,.7);
   transform:scale(0.96);
 }
-
 .tile.wrong{
   background:inherit !important;
   box-shadow:none !important;
 }
-
 .top{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -160,7 +153,6 @@ h1{
   font-weight:900;
   padding:10px 12px;
 }
-
 .status{
   min-height:26px;
   text-align:center;
@@ -169,7 +161,6 @@ h1{
   color:rgba(255,255,255,.94);
   margin:10px 0 0;
 }
-
 .playbar{
   position:fixed;
   left:0;
@@ -179,7 +170,6 @@ h1{
   justify-content:center;
   z-index:30;
 }
-
 .signature{
   position:fixed;
   left:0;
@@ -190,7 +180,6 @@ h1{
   color:rgba(255,255,255,.6);
   pointer-events:none;
 }
-
 .action-btn{
   min-width:220px;
   max-width:460px;
@@ -233,21 +222,34 @@ h1{
   </div>
 
   <div class="playbar">
-    <button id="actionBtn" class="action-btn play">Jouer</button>
+    <button id="actionBtn" class="action-btn play" type="button">Jouer</button>
   </div>
 
 <script>
-const COLORS = ["seq-green","seq-yellow","seq-pink","seq-cyan","seq-orange","seq-blue","seq-red","seq-lime","seq-purple"];
+const COLORS = [
+  "seq-green",
+  "seq-yellow",
+  "seq-pink",
+  "seq-cyan",
+  "seq-orange",
+  "seq-blue",
+  "seq-red",
+  "seq-lime",
+  "seq-purple"
+];
+
 const BEST_KEY = "memory-colors-best-score";
 
-state.playing = true;
-state.stopped = false;
-state.phase = 1;
-state.level = 1;
-state.score = 0;
-state.pattern = [];
-state.step = 0;
-state.showing = false;
+const state = {
+  playing: false,
+  phase: 1,
+  level: 1,
+  score: 0,
+  pattern: [],
+  step: 0,
+  showing: false,
+  stopped: false
+};
 
 const sequenceGrid = document.getElementById("sequenceGrid");
 const actionBtn = document.getElementById("actionBtn");
@@ -255,125 +257,246 @@ const pointsBox = document.getElementById("pointsBox");
 const bestBox = document.getElementById("bestBox");
 const statusEl = document.getElementById("status");
 
-function wait(ms){return new Promise(r=>setTimeout(r,ms));}
-function shuffle(a){let b=[...a];for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function wait(ms){
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-function loadBest(){bestBox.textContent="Meilleur : "+(localStorage.getItem(BEST_KEY)||0);}
-function saveBest(){let b=+localStorage.getItem(BEST_KEY)||0;if(state.score>b)localStorage.setItem(BEST_KEY,state.score);loadBest();}
-function updateTop(){pointsBox.textContent="Points : "+state.score;loadBest();}
+function shuffle(arr){
+  const a = [...arr];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function loadBest(){
+  const best = Number(localStorage.getItem(BEST_KEY) || 0);
+  bestBox.textContent = "Meilleur : " + best;
+}
+
+function saveBest(){
+  const currentBest = Number(localStorage.getItem(BEST_KEY) || 0);
+  if(state.score > currentBest){
+    localStorage.setItem(BEST_KEY, String(state.score));
+  }
+  loadBest();
+}
+
+function updateTop(){
+  pointsBox.textContent = "Points : " + state.score;
+  loadBest();
+}
+
+function showStatus(text){
+  statusEl.textContent = text;
+}
+
+function hideStatus(){
+  statusEl.textContent = "";
+}
+
+function setActionButton(mode){
+  if(mode === "play"){
+    actionBtn.textContent = "Jouer";
+    actionBtn.className = "action-btn play";
+  } else {
+    actionBtn.textContent = "Arrêter";
+    actionBtn.className = "action-btn stop";
+  }
+}
 
 function buildGrid(){
-  sequenceGrid.innerHTML="";
-  for(let i=0;i<9;i++){
-    let t=document.createElement("button");
-    t.className="tile "+COLORS[i];
-    t.onclick=()=>handleClick(i);
-    sequenceGrid.appendChild(t);
+  sequenceGrid.innerHTML = "";
+  for(let i = 0; i < 9; i++){
+    const tile = document.createElement("button");
+    tile.type = "button";
+    tile.className = "tile " + COLORS[i];
+    tile.addEventListener("click", () => handleClick(i));
+    sequenceGrid.appendChild(tile);
   }
 }
 
-function clearBoard(){[...sequenceGrid.children].forEach(t=>t.className="tile");}
-function resetBoard(){[...sequenceGrid.children].forEach((t,i)=>t.className="tile "+COLORS[i]);}
-
-function lightTile(i,on){
-  let t=sequenceGrid.children[i];
-  t.className=on?"tile "+COLORS[i]:"tile";
+function clearBoard(){
+  [...sequenceGrid.children].forEach(tile => {
+    tile.className = "tile";
+    tile.disabled = false;
+  });
 }
 
-function createPattern(l){
-  let a=[0,1,2,3,4,5,6,7,8];
-  if(state.phase===1)return shuffle(a).slice(0,l);
-  if(state.phase===2){
-    let b=shuffle(a).slice(0,l-1);
-    let r=b[Math.random()*b.length|0];
-    return shuffle([...b,r]);
+function resetBoard(){
+  [...sequenceGrid.children].forEach((tile, i) => {
+    tile.className = "tile " + COLORS[i];
+    tile.disabled = false;
+  });
+}
+
+function lightTile(index, on){
+  const tile = sequenceGrid.children[index];
+  if(!tile) return;
+  tile.className = on ? "tile " + COLORS[index] : "tile";
+}
+
+function createPattern(length){
+  const available = [0,1,2,3,4,5,6,7,8];
+
+  if(state.phase === 1){
+    return shuffle([...available]).slice(0, length);
   }
-  let b=shuffle(a).slice(0,l-2);
-  let r=b[Math.random()*b.length|0];
-  return shuffle([...b,r,r]);
+
+  if(state.phase === 2){
+    if(length <= 1) return shuffle([...available]).slice(0, 1);
+    const base = shuffle([...available]).slice(0, length - 1);
+    const repeated = base[Math.floor(Math.random() * base.length)];
+    return shuffle([...base, repeated]);
+  }
+
+  if(length <= 2){
+    return shuffle([...available]).slice(0, length);
+  }
+
+  const base = shuffle([...available]).slice(0, length - 2);
+  const repeated = base[Math.floor(Math.random() * base.length)];
+  return shuffle([...base, repeated, repeated]);
 }
 
 async function showPattern(){
-  state.showing=true;
+  state.showing = true;
   await wait(200);
-  for(let i of state.pattern){
-    if(state.stopped)return;
-    lightTile(i,true); await wait(520);
-    lightTile(i,false); await wait(160);
+
+  for(const idx of state.pattern){
+    if(state.stopped) return;
+    lightTile(idx, true);
+    await wait(520);
+    lightTile(idx, false);
+    await wait(160);
   }
-  state.showing=false;
-  state.step=0;
+
+  state.showing = false;
+  state.step = 0;
 }
 
 async function playLevel(){
+  if(state.stopped) return;
   clearBoard();
   updateTop();
-  state.pattern=createPattern(state.level);
+  state.pattern = createPattern(state.level);
   await showPattern();
 }
 
 async function startGame(){
-  if(state.playing)return;
-  state={...state,playing:true,stopped:false,phase:1,level:1,score:0};
+  if(state.playing) return;
+
+  state.playing = true;
+  state.stopped = false;
+  state.phase = 1;
+  state.level = 1;
+  state.score = 0;
+  state.pattern = [];
+  state.step = 0;
+  state.showing = false;
+
   updateTop();
-  actionBtn.textContent="Arrêter";
-  actionBtn.className="action-btn stop";
+  hideStatus();
+  setActionButton("stop");
   clearBoard();
+
   await wait(1000);
-  if(!state.stopped)await playLevel();
-}
 
-async function finishGame(){
-  state.playing=false;
-  saveBest();
-  await wait(1000);
-  resetBoard();
-  actionBtn.textContent="Jouer";
-  actionBtn.className="action-btn play";
-}
-
-async function stopGame(){
-  state.playing=false;
-  state.stopped=true;
-  saveBest();
-  await wait(500);
-  resetBoard();
-  actionBtn.textContent="Jouer";
-  actionBtn.className="action-btn play";
-}
-
-async function nextLevel(){
-  state.score++;
-  if(state.phase===1&&state.level===9){state.phase=2;state.level=1;}
-  else if(state.phase===2&&state.level===9){state.phase=3;state.level=1;}
-  else if(state.phase===3&&state.level===9){return finishGame();}
-  else state.level++;
-  updateTop();
-  await wait(600);
-  if(!state.stopped)await playLevel();
-}
-
-function handleClick(i){
-  if(!state.playing||state.showing||state.stopped)return;
-
-  let t=sequenceGrid.children[i];
-  t.className="tile "+COLORS[i];
-
-  if(i===state.pattern[state.step]){
-    t.classList.add("correct");
-    setTimeout(()=>t.className="tile",200);
-    state.step++;
-    if(state.step===state.pattern.length)nextLevel();
-  }else{
-    if(navigator.vibrate)navigator.vibrate(100);
-    setTimeout(()=>t.className="tile",200);
+  if(!state.stopped){
+    await playLevel();
   }
 }
 
-actionBtn.onclick=()=>state.playing?stopGame():startGame();
+async function finishGame(message = "Bravo !"){
+  state.playing = false;
+  state.showing = false;
+  saveBest();
+  showStatus(message);
+  await wait(1000);
+  hideStatus();
+  resetBoard();
+  setActionButton("play");
+}
+
+async function stopGame(){
+  state.stopped = true;
+  state.playing = false;
+  state.showing = false;
+  saveBest();
+  await wait(500);
+  hideStatus();
+  resetBoard();
+  setActionButton("play");
+}
+
+async function nextLevel(){
+  state.score += 1;
+
+  if(state.phase === 1 && state.level === 9){
+    state.phase = 2;
+    state.level = 1;
+  } else if(state.phase === 2 && state.level === 9){
+    state.phase = 3;
+    state.level = 1;
+  } else if(state.phase === 3 && state.level === 9){
+    await finishGame("Bravo !");
+    return;
+  } else {
+    state.level += 1;
+  }
+
+  updateTop();
+  await wait(600);
+
+  if(!state.stopped){
+    await playLevel();
+  }
+}
+
+function handleClick(index){
+  if(!state.playing || state.showing || state.stopped) return;
+
+  const tile = sequenceGrid.children[index];
+  tile.className = "tile " + COLORS[index];
+
+  if(index === state.pattern[state.step]){
+    tile.classList.add("correct");
+    setTimeout(() => {
+      if(state.playing){
+        tile.className = "tile";
+      }
+    }, 200);
+
+    state.step++;
+
+    if(state.step === state.pattern.length){
+      nextLevel();
+    }
+  } else {
+    if (navigator.vibrate) navigator.vibrate(100);
+    tile.className = "tile " + COLORS[index];
+    tile.classList.add("wrong");
+    setTimeout(() => {
+      if(state.playing){
+        tile.className = "tile";
+      }
+    }, 200);
+  }
+}
+
+actionBtn.addEventListener("click", () => {
+  if(state.playing){
+    stopGame();
+  } else {
+    startGame();
+  }
+});
 
 buildGrid();
 updateTop();
+hideStatus();
+setActionButton("play");
 </script>
 </body>
 </html>
