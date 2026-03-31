@@ -525,12 +525,10 @@ function handleClick(index){
       nextLevel();
     }
   } else {
-    tile.className = "tile wrong";
-    setTimeout(() => {
-      if(state.playing){
-        tile.className = "tile";
-      }
-    }, 300);
+    tile.classList.add("wrong");
+setTimeout(() => {
+  if(state.playing) tile.className = "tile";
+}, 300);
   }
 }
 
