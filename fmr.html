@@ -534,7 +534,7 @@ async function nextLevel(){
   if(state.phase === 2 && state.level === 9){
     state.phase = 3;
     state.level = 1;
-    showStatus("Bien");
+    
     updateTop();
     await wait(900);
     await playLevel();
@@ -548,7 +548,7 @@ async function nextLevel(){
 
   state.level += 1;
   updateTop();
-  showStatus("Bien");
+  
   await wait(700);
 
   if(state.stopped) return;
