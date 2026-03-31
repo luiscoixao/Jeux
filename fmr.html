@@ -17,12 +17,10 @@
   --bg1:#4338ca;
   --bg2:#7c3aed;
   --bg3:#312e81;
-  --panel:rgba(255,255,255,.10);
+  --panel:rgba(10,16,40,.36);
   --panel-line:rgba(255,255,255,.22);
   --text:#ffffff;
   --shadow:0 18px 40px rgba(0,0,0,.22);
-
-  --tile-base:rgba(255,255,255,.16);
 
   --green1:#34d399;
   --green2:#059669;
@@ -84,73 +82,6 @@ h1{
   font-weight:900;
   letter-spacing:.4px;
 }
-.hidden{
-  display:none !important;
-}
-
-.home-card{
-  display:none !important;
-}
-.mini-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  margin-bottom:16px;
-}
-.mini-cell{
-  aspect-ratio:1/1;
-  border-radius:16px;
-  background:rgba(255,255,255,.15);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
-  transition:transform .18s ease, background .18s ease, box-shadow .18s ease, opacity .18s ease;
-}
-.mini-cell.glow{
-  transform:scale(0.97);
-}
-.mini-cell.green{background:linear-gradient(135deg,var(--green1),var(--green2)); box-shadow:0 0 18px rgba(34,197,94,.35);}
-.mini-cell.yellow{background:linear-gradient(135deg,var(--yellow1),var(--yellow2)); box-shadow:0 0 18px rgba(253,224,71,.35);}
-.mini-cell.pink{background:linear-gradient(135deg,var(--pink1),var(--pink2)); box-shadow:0 0 18px rgba(255,79,176,.35);}
-.mini-cell.cyan{background:linear-gradient(135deg,var(--cyan1),var(--cyan2)); box-shadow:0 0 18px rgba(34,211,238,.35);}
-.mini-cell.orange{background:linear-gradient(135deg,var(--orange1),var(--orange2)); box-shadow:0 0 18px rgba(251,146,60,.35);}
-.mini-cell.blue{background:linear-gradient(135deg,var(--blue1),var(--blue2)); box-shadow:0 0 18px rgba(59,130,246,.35);}
-.mini-cell.red{background:linear-gradient(135deg,var(--red1),var(--red2)); box-shadow:0 0 18px rgba(255,59,48,.35);}
-.mini-cell.lime{background:linear-gradient(135deg,var(--lime1),var(--lime2)); box-shadow:0 0 18px rgba(163,230,53,.35);}
-.mini-cell.purple{background:linear-gradient(135deg,var(--purple1),var(--purple2)); box-shadow:0 0 18px rgba(192,132,252,.35);}
-
-.home-sub{
-  display:none !important;
-}
-
-.top{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:14px;
-}
-.top-pill{
-  min-height:60px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  border-radius:20px;
-  border:1px solid var(--panel-line);
-  background:rgba(10,16,40,.36);
-  backdrop-filter:blur(12px);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
-  font-size:15px;
-  font-weight:900;
-  padding:10px 12px;
-}
-
-.status{
-  min-height:26px;
-  text-align:center;
-  font-size:15px;
-  font-weight:800;
-  color:rgba(255,255,255,.94);
-  margin:10px 0 0;
-}
 
 .game-wrap{
   border-radius:30px;
@@ -158,7 +89,7 @@ h1{
   min-height:280px;
   overflow:hidden;
   border:1px solid rgba(255,255,255,.22);
-  background:rgba(10,16,40,.36);
+  background:var(--panel);
   backdrop-filter:blur(10px);
   box-shadow:
     0 0 0 1px rgba(255,255,255,.06) inset,
@@ -235,11 +166,42 @@ h1{
   box-shadow:0 0 20px rgba(239,68,68,.35);
 }
 
+.top{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:14px;
+}
+.top-pill{
+  min-height:60px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  border-radius:20px;
+  border:1px solid var(--panel-line);
+  background:var(--panel);
+  backdrop-filter:blur(12px);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+  font-size:15px;
+  font-weight:900;
+  padding:10px 12px;
+}
+
+.status{
+  min-height:26px;
+  text-align:center;
+  font-size:15px;
+  font-weight:800;
+  color:rgba(255,255,255,.94);
+  margin:10px 0 0;
+}
+
 .playbar{
   position:fixed;
   left:0;
   right:0;
-  bottom:100px; 
+  bottom:100px;
   display:flex;
   justify-content:center;
   z-index:30;
@@ -277,30 +239,11 @@ h1{
   background:linear-gradient(135deg,#ef4444,#dc2626);
   box-shadow:0 18px 34px rgba(0,0,0,.26), 0 0 22px rgba(239,68,68,.24);
 }
-
-@media (max-width:420px){
-  .home-title{font-size:24px}
-}
 </style>
 </head>
 <body>
   <div class="app">
     <h1>MEMORY COLORS</h1>
-
-    <section id="homeSection" class="home-card">
-      <div id="miniGrid" class="mini-grid">
-        <div class="mini-cell" data-mini="0"></div>
-        <div class="mini-cell" data-mini="1"></div>
-        <div class="mini-cell" data-mini="2"></div>
-        <div class="mini-cell" data-mini="3"></div>
-        <div class="mini-cell" data-mini="4"></div>
-        <div class="mini-cell" data-mini="5"></div>
-        <div class="mini-cell" data-mini="6"></div>
-        <div class="mini-cell" data-mini="7"></div>
-        <div class="mini-cell" data-mini="8"></div>
-      </div>
-      <div class="home-sub">Mémorisez la séquence de couleurs et reproduisez-la. Le jeu devient progressivement plus difficile.</div>
-    </section>
 
     <section id="gameWrap" class="game-wrap">
       <div id="sequenceGrid" class="game-grid"></div>
@@ -346,12 +289,9 @@ const state = {
   stopped: false
 };
 
-const topBar = document.getElementById("topBar");
 const statusEl = document.getElementById("status");
-const gameWrap = document.getElementById("gameWrap");
 const sequenceGrid = document.getElementById("sequenceGrid");
 const actionBtn = document.getElementById("actionBtn");
-
 const pointsBox = document.getElementById("pointsBox");
 const bestBox = document.getElementById("bestBox");
 
@@ -409,13 +349,20 @@ function buildGrid(){
   for(let i = 0; i < 9; i++){
     const tile = document.createElement("button");
     tile.type = "button";
-    tile.className = "tile";
+    tile.className = "tile " + COLORS[i];
     tile.addEventListener("click", () => handleClick(i));
     sequenceGrid.appendChild(tile);
   }
 }
 
 function resetBoard(){
+  [...sequenceGrid.children].forEach((tile, i) => {
+    tile.className = "tile " + COLORS[i];
+    tile.disabled = false;
+  });
+}
+
+function clearBoard(){
   [...sequenceGrid.children].forEach(tile => {
     tile.className = "tile";
     tile.disabled = false;
@@ -425,7 +372,7 @@ function resetBoard(){
 function lightTile(index, on){
   const tile = sequenceGrid.children[index];
   if(!tile) return;
-  tile.className = "tile" + (on ? " " + COLORS[index] : "");
+  tile.className = on ? "tile " + COLORS[index] : "tile";
 }
 
 function createPattern(length){
@@ -464,12 +411,11 @@ async function showPattern(){
 
   state.showing = false;
   state.step = 0;
-  
 }
 
 async function playLevel(){
   if(state.stopped) return;
-  resetBoard();
+  clearBoard();
   updateTop();
   state.pattern = createPattern(state.level);
   await showPattern();
@@ -486,6 +432,7 @@ async function startGame(){
   updateTop();
   hideStatus();
   setActionButton("stop");
+  clearBoard();
 
   await wait(1000);
 
@@ -510,7 +457,7 @@ async function stopGame(){
   state.playing = false;
   state.showing = false;
   saveBest();
-  
+
   await wait(700);
 
   hideStatus();
@@ -524,7 +471,6 @@ async function nextLevel(){
   if(state.phase === 1 && state.level === 9){
     state.phase = 2;
     state.level = 1;
-    
     updateTop();
     await wait(900);
     await playLevel();
@@ -534,7 +480,6 @@ async function nextLevel(){
   if(state.phase === 2 && state.level === 9){
     state.phase = 3;
     state.level = 1;
-    
     updateTop();
     await wait(900);
     await playLevel();
@@ -548,7 +493,6 @@ async function nextLevel(){
 
   state.level += 1;
   updateTop();
-  
   await wait(700);
 
   if(state.stopped) return;
@@ -581,7 +525,9 @@ function handleClick(index){
   } else {
     tile.className = "tile wrong";
     setTimeout(() => {
-      if(state.playing) tile.className = "tile";
+      if(state.playing){
+        tile.className = "tile";
+      }
     }, 300);
   }
 }
