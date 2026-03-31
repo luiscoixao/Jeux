@@ -216,22 +216,29 @@ h1{
   box-shadow:0 0 20px rgba(239,68,68,.35);
 }
 
+
+
 .signature{
+  position:fixed;
+  bottom:90px; /* ⬅️ au-dessus du bouton */
+  left:0;
+  right:0;
   text-align:center;
   font-size:11px;
-  color:rgba(255,255,255,.62);
-  margin-top:60px;
+  color:rgba(255,255,255,.6);
+  pointer-events:none;
 }
 
 .playbar{
   position:fixed;
-  left:16px;
-  right:16px;
-  bottom:20px;
+  left:0;
+  right:0;
+  bottom:28px; /* ⬅️ remonte le bouton */
   display:flex;
   justify-content:center;
   z-index:30;
 }
+
 .action-btn{
   min-width:220px;
   max-width:460px;
