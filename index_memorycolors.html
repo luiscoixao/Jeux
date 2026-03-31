@@ -20,7 +20,6 @@
   --panel:rgba(10,16,40,.36);
   --panel-line:rgba(255,255,255,.22);
   --text:#ffffff;
-  --shadow:0 18px 40px rgba(0,0,0,.22);
 
   --green1:#34d399;
   --green2:#059669;
@@ -30,15 +29,15 @@
 
   --pink1:#f472b6;
   --pink2:#be185d;
-  
-  --cyan1:#fff700;
-  --cyan2:#ffcc00;
+
+  --cyan1:#22d3ee;
+  --cyan2:#0369a1;
 
   --orange1:#fb923c;
   --orange2:#c2410c;
 
-  --blue1:#60a5fa;
-  --blue2:#1e40af;
+  --blue1:#fff700;
+  --blue2:#ffcc00;
 
   --red1:#f43f5e;
   --red2:#9f1239;
@@ -82,7 +81,6 @@ h1{
   font-weight:900;
   letter-spacing:.4px;
 }
-
 .game-wrap{
   border-radius:30px;
   padding:16px 14px 18px;
@@ -96,7 +94,6 @@ h1{
     0 0 26px rgba(56,189,248,.35),
     0 18px 40px rgba(0,0,0,.22);
 }
-
 .game-grid{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
@@ -118,56 +115,23 @@ h1{
 .tile:active{
   transform:scale(.97);
 }
-
-.tile.seq-green{
-  background:linear-gradient(135deg,var(--green1),var(--green2));
-  box-shadow:0 0 18px rgba(34,197,94,.35);
-}
-.tile.seq-yellow{
-  background:linear-gradient(135deg,var(--yellow1),var(--yellow2));
-  box-shadow:0 0 18px rgba(253,224,71,.35);
-}
-.tile.seq-pink{
-  background:linear-gradient(135deg,var(--pink1),var(--pink2));
-  box-shadow:0 0 18px rgba(255,79,176,.35);
-}
-
-.tile.seq-cyan{
-  background:linear-gradient(135deg,#fff700,#ffcc00);
-  box-shadow:0 0 18px rgba(255,215,0,.45);
-}
-
-.tile.seq-orange{
-  background:linear-gradient(135deg,var(--orange1),var(--orange2));
-  box-shadow:0 0 18px rgba(251,146,60,.35);
-}
-.tile.seq-blue{
-  background:linear-gradient(135deg,var(--blue1),var(--blue2));
-  box-shadow:0 0 18px rgba(59,130,246,.35);
-}
-.tile.seq-red{
-  background:linear-gradient(135deg,var(--red1),var(--red2));
-  box-shadow:0 0 18px rgba(255,59,48,.35);
-}
-.tile.seq-lime{
-  background:linear-gradient(135deg,var(--lime1),var(--lime2));
-  box-shadow:0 0 18px rgba(163,230,53,.35);
-}
-.tile.seq-purple{
-  background:linear-gradient(135deg,var(--purple1),var(--purple2));
-  box-shadow:0 0 18px rgba(192,132,252,.35);
-}
-
+.tile.seq-green{background:linear-gradient(135deg,var(--green1),var(--green2));box-shadow:0 0 18px rgba(34,197,94,.35);}
+.tile.seq-yellow{background:linear-gradient(135deg,var(--yellow1),var(--yellow2));box-shadow:0 0 18px rgba(253,224,71,.35);}
+.tile.seq-pink{background:linear-gradient(135deg,var(--pink1),var(--pink2));box-shadow:0 0 18px rgba(255,79,176,.35);}
+.tile.seq-cyan{background:linear-gradient(135deg,var(--cyan1),var(--cyan2));box-shadow:0 0 18px rgba(34,211,238,.35);}
+.tile.seq-orange{background:linear-gradient(135deg,var(--orange1),var(--orange2));box-shadow:0 0 18px rgba(251,146,60,.35);}
+.tile.seq-blue{background:linear-gradient(135deg,var(--blue1),var(--blue2));box-shadow:0 0 18px rgba(255,215,0,.45);}
+.tile.seq-red{background:linear-gradient(135deg,var(--red1),var(--red2));box-shadow:0 0 18px rgba(244,63,94,.35);}
+.tile.seq-lime{background:linear-gradient(135deg,var(--lime1),var(--lime2));box-shadow:0 0 18px rgba(163,230,53,.35);}
+.tile.seq-purple{background:linear-gradient(135deg,var(--purple1),var(--purple2));box-shadow:0 0 18px rgba(192,132,252,.35);}
 .tile.correct{
   outline:3px solid rgba(255,255,255,.7);
   transform:scale(0.96);
 }
-
 .tile.wrong{
-  transform:scale(0.96);
-  box-shadow:0 0 12px rgba(255,255,255,.4);
+  background:inherit !important;
+  box-shadow:none !important;
 }
-
 .top{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -189,7 +153,6 @@ h1{
   font-weight:900;
   padding:10px 12px;
 }
-
 .status{
   min-height:26px;
   text-align:center;
@@ -198,7 +161,6 @@ h1{
   color:rgba(255,255,255,.94);
   margin:10px 0 0;
 }
-
 .playbar{
   position:fixed;
   left:0;
@@ -208,7 +170,6 @@ h1{
   justify-content:center;
   z-index:30;
 }
-
 .signature{
   position:fixed;
   left:0;
@@ -219,7 +180,6 @@ h1{
   color:rgba(255,255,255,.6);
   pointer-events:none;
 }
-
 .action-btn{
   min-width:220px;
   max-width:460px;
@@ -261,7 +221,7 @@ h1{
     <div class="signature">Jeu créé par Luis Coixao à l'aide de ChatGPT.</div>
   </div>
 
-  <div class="playbar" id="playBar">
+  <div class="playbar">
     <button id="actionBtn" class="action-btn play" type="button">Jouer</button>
   </div>
 
@@ -291,11 +251,11 @@ const state = {
   stopped: false
 };
 
-const statusEl = document.getElementById("status");
 const sequenceGrid = document.getElementById("sequenceGrid");
 const actionBtn = document.getElementById("actionBtn");
 const pointsBox = document.getElementById("pointsBox");
 const bestBox = document.getElementById("bestBox");
+const statusEl = document.getElementById("status");
 
 function wait(ms){
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -357,16 +317,16 @@ function buildGrid(){
   }
 }
 
-function resetBoard(){
-  [...sequenceGrid.children].forEach((tile, i) => {
-    tile.className = "tile " + COLORS[i];
+function clearBoard(){
+  [...sequenceGrid.children].forEach(tile => {
+    tile.className = "tile";
     tile.disabled = false;
   });
 }
 
-function clearBoard(){
-  [...sequenceGrid.children].forEach(tile => {
-    tile.className = "tile";
+function resetBoard(){
+  [...sequenceGrid.children].forEach((tile, i) => {
+    tile.className = "tile " + COLORS[i];
     tile.disabled = false;
   });
 }
@@ -394,6 +354,7 @@ function createPattern(length){
   if(length <= 2){
     return shuffle([...available]).slice(0, length);
   }
+
   const base = shuffle([...available]).slice(0, length - 2);
   const repeated = base[Math.floor(Math.random() * base.length)];
   return shuffle([...base, repeated, repeated]);
@@ -431,6 +392,10 @@ async function startGame(){
   state.phase = 1;
   state.level = 1;
   state.score = 0;
+  state.pattern = [];
+  state.step = 0;
+  state.showing = false;
+
   updateTop();
   hideStatus();
   setActionButton("stop");
@@ -438,8 +403,9 @@ async function startGame(){
 
   await wait(1000);
 
-  if(state.stopped) return;
-  await playLevel();
+  if(!state.stopped){
+    await playLevel();
+  }
 }
 
 async function finishGame(message = "Bravo !"){
@@ -447,8 +413,7 @@ async function finishGame(message = "Bravo !"){
   state.showing = false;
   saveBest();
   showStatus(message);
-  await wait(1200);
-
+  await wait(1000);
   hideStatus();
   resetBoard();
   setActionButton("play");
@@ -459,9 +424,7 @@ async function stopGame(){
   state.playing = false;
   state.showing = false;
   saveBest();
-
-  await wait(700);
-
+  await wait(500);
   hideStatus();
   resetBoard();
   setActionButton("play");
@@ -473,32 +436,22 @@ async function nextLevel(){
   if(state.phase === 1 && state.level === 9){
     state.phase = 2;
     state.level = 1;
-    updateTop();
-    await wait(900);
-    await playLevel();
-    return;
-  }
-
-  if(state.phase === 2 && state.level === 9){
+  } else if(state.phase === 2 && state.level === 9){
     state.phase = 3;
     state.level = 1;
-    updateTop();
-    await wait(900);
-    await playLevel();
-    return;
-  }
-
-  if(state.phase === 3 && state.level === 9){
+  } else if(state.phase === 3 && state.level === 9){
     await finishGame("Bravo !");
     return;
+  } else {
+    state.level += 1;
   }
 
-  state.level += 1;
   updateTop();
-  await wait(700);
+  await wait(600);
 
-  if(state.stopped) return;
-  await playLevel();
+  if(!state.stopped){
+    await playLevel();
+  }
 }
 
 function handleClick(index){
@@ -507,17 +460,13 @@ function handleClick(index){
   const tile = sequenceGrid.children[index];
   tile.className = "tile " + COLORS[index];
 
-  setTimeout(() => {
-    if(state.playing && !tile.classList.contains("correct")){
-      tile.className = "tile";
-    }
-  }, 180);
-
   if(index === state.pattern[state.step]){
     tile.classList.add("correct");
     setTimeout(() => {
-      if(state.playing) tile.className = "tile";
-    }, 220);
+      if(state.playing){
+        tile.className = "tile";
+      }
+    }, 200);
 
     state.step++;
 
@@ -525,12 +474,15 @@ function handleClick(index){
       nextLevel();
     }
   } else {
-  tile.className = "tile " + COLORS[index];
-  tile.classList.add("wrong");
-  setTimeout(() => {
-    if(state.playing) tile.className = "tile";
-  }, 300);
-}
+    if (navigator.vibrate) navigator.vibrate(100);
+    tile.className = "tile " + COLORS[index];
+    tile.classList.add("wrong");
+    setTimeout(() => {
+      if(state.playing){
+        tile.className = "tile";
+      }
+    }, 200);
+  }
 }
 
 actionBtn.addEventListener("click", () => {
@@ -543,8 +495,8 @@ actionBtn.addEventListener("click", () => {
 
 buildGrid();
 updateTop();
-setActionButton("play");
 hideStatus();
+setActionButton("play");
 </script>
 </body>
 </html>
