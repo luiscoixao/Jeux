@@ -24,20 +24,32 @@
 
   --tile-base:rgba(255,255,255,.16);
 
-  --green1:#22c55e;
-  --green2:#16a34a;
+  --green1:#34d399;
+  --green2:#059669;
 
-  --yellow1:#fde047;
-  --yellow2:#facc15;
+  --yellow1:#facc15;
+  --yellow2:#a16207;
 
-  --pink1:#ff4fb0;
-  --pink2:#ec4899;
+  --pink1:#f472b6;
+  --pink2:#be185d;
 
   --cyan1:#22d3ee;
-  --cyan2:#0ea5e9;
+  --cyan2:#0369a1;
 
   --orange1:#fb923c;
-  --orange2:#f97316;
+  --orange2:#c2410c;
+
+  --blue1:#60a5fa;
+  --blue2:#1e40af;
+
+  --red1:#f43f5e;
+  --red2:#9f1239;
+
+  --lime1:#a3e635;
+  --lime2:#4d7c0f;
+
+  --purple1:#c084fc;
+  --purple2:#6d28d9;
 }
 *{
   box-sizing:border-box;
@@ -100,19 +112,57 @@ h1{
   border-radius:16px;
   background:rgba(255,255,255,.15);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+  transition:transform .18s ease, background .18s ease, box-shadow .18s ease, opacity .18s ease;
 }
-.mini-cell.green{background:linear-gradient(135deg,var(--green1),var(--green2)); box-shadow:0 0 18px rgba(34,197,94,.35);}
-.mini-cell.yellow{background:linear-gradient(135deg,var(--yellow1),var(--yellow2)); box-shadow:0 0 18px rgba(253,224,71,.35);}
-.mini-cell.pink{background:linear-gradient(135deg,var(--pink1),var(--pink2)); box-shadow:0 0 18px rgba(255,79,176,.35);}
-.mini-cell.cyan{background:linear-gradient(135deg,var(--cyan1),var(--cyan2)); box-shadow:0 0 18px rgba(34,211,238,.35);}
-.mini-cell.orange{background:linear-gradient(135deg,var(--orange1),var(--orange2)); box-shadow:0 0 18px rgba(251,146,60,.35);}
+.mini-cell.glow{
+  transform:scale(0.97);
+}
+.mini-cell.green,
+.tile.seq-green{
+  background:linear-gradient(135deg,var(--green1),var(--green2));
+  box-shadow:0 0 18px rgba(34,197,94,.35);
+}
+.mini-cell.yellow,
+.tile.seq-yellow{
+  background:linear-gradient(135deg,var(--yellow1),var(--yellow2));
+  box-shadow:0 0 18px rgba(253,224,71,.35);
+}
+.mini-cell.pink,
+.tile.seq-pink{
+  background:linear-gradient(135deg,var(--pink1),var(--pink2));
+  box-shadow:0 0 18px rgba(255,79,176,.35);
+}
+.mini-cell.cyan,
+.tile.seq-cyan{
+  background:linear-gradient(135deg,var(--cyan1),var(--cyan2));
+  box-shadow:0 0 18px rgba(34,211,238,.35);
+}
+.mini-cell.orange,
+.tile.seq-orange{
+  background:linear-gradient(135deg,var(--orange1),var(--orange2));
+  box-shadow:0 0 18px rgba(251,146,60,.35);
+}
+.mini-cell.blue,
+.tile.seq-blue{
+  background:linear-gradient(135deg,var(--blue1),var(--blue2));
+  box-shadow:0 0 18px rgba(59,130,246,.35);
+}
+.mini-cell.red,
+.tile.seq-red{
+  background:linear-gradient(135deg,var(--red1),var(--red2));
+  box-shadow:0 0 18px rgba(255,59,48,.35);
+}
+.mini-cell.lime,
+.tile.seq-lime{
+  background:linear-gradient(135deg,var(--lime1),var(--lime2));
+  box-shadow:0 0 18px rgba(163,230,53,.35);
+}
+.mini-cell.purple,
+.tile.seq-purple{
+  background:linear-gradient(135deg,var(--purple1),var(--purple2));
+  box-shadow:0 0 18px rgba(192,132,252,.35);
+}
 
-.home-title{
-  font-size:28px;
-  line-height:1.05;
-  font-weight:900;
-  margin-bottom:10px;
-}
 .home-sub{
   font-size:16px;
   line-height:1.4;
@@ -123,7 +173,7 @@ h1{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
-  margin-bottom:14px;
+  margin-top:14px;
 }
 .top-pill{
   min-height:60px;
@@ -147,69 +197,49 @@ h1{
   font-size:15px;
   font-weight:800;
   color:rgba(255,255,255,.94);
-  margin:10px 0 12px;
+  margin:10px 0 0;
 }
 
 .game-wrap{
-  margin-top:14px;
   border-radius:30px;
-  border:1px solid var(--panel-line);
-  background:var(--panel);
-  backdrop-filter:blur(12px);
-  padding:14px;
-  box-shadow:var(--shadow);
+  padding:16px 14px 18px;
+  min-height:280px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.22);
+  background:rgba(10,16,40,.36);
+  backdrop-filter:blur(10px);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.06) inset,
+    0 0 26px rgba(56,189,248,.35),
+    0 18px 40px rgba(0,0,0,.22);
 }
 
 .game-grid{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:12px;
+  gap:10px;
   width:100%;
 }
 .tile{
   width:100%;
   aspect-ratio:1/1;
   min-width:0;
-  border-radius:20px;
+  border-radius:16px;
   border:none;
-  background:var(--tile-base);
+  background:rgba(255,255,255,.15);
   color:transparent;
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.10),
-    0 12px 22px rgba(0,0,0,.16);
-  transition:transform .12s ease, background .18s ease, box-shadow .18s ease;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+  transition:transform .18s ease, background .18s ease, box-shadow .18s ease, opacity .18s ease;
   cursor:pointer;
 }
 .tile:active{
   transform:scale(.97);
 }
 
-.tile.seq-green{
-  background:linear-gradient(135deg,var(--green1),var(--green2));
-  box-shadow:0 0 24px rgba(34,197,94,.45);
-}
-.tile.seq-yellow{
-  background:linear-gradient(135deg,var(--yellow1),var(--yellow2));
-  box-shadow:0 0 24px rgba(253,224,71,.45);
-}
-.tile.seq-pink{
-  background:linear-gradient(135deg,var(--pink1),var(--pink2));
-  box-shadow:0 0 24px rgba(255,79,176,.45);
-}
-.tile.seq-cyan{
-  background:linear-gradient(135deg,var(--cyan1),var(--cyan2));
-  box-shadow:0 0 24px rgba(34,211,238,.45);
-}
-.tile.seq-orange{
-  background:linear-gradient(135deg,var(--orange1),var(--orange2));
-  box-shadow:0 0 24px rgba(251,146,60,.45);
-}
-
 .tile.correct{
   outline:3px solid rgba(255,255,255,.7);
   transform:scale(0.96);
 }
-
 
 .tile.wrong{
   background:linear-gradient(135deg,#ef4444,#dc2626);
@@ -230,7 +260,7 @@ h1{
   position:fixed;
   left:0;
   right:0;
-  bottom:30px; /* ⬅️ signature en dessous */
+  bottom:30px;
   text-align:center;
   font-size:11px;
   color:rgba(255,255,255,.6);
@@ -269,18 +299,22 @@ h1{
     <h1>MEMORY COLORS</h1>
 
     <section id="homeSection" class="home-card">
-      <div class="mini-grid">
-        <div class="mini-cell green"></div>
-        <div class="mini-cell"></div>
-        <div class="mini-cell pink"></div>
-        <div class="mini-cell yellow"></div>
-        <div class="mini-cell cyan"></div>
-        <div class="mini-cell"></div>
-        <div class="mini-cell"></div>
-        <div class="mini-cell orange"></div>
-        <div class="mini-cell"></div>
+      <div id="miniGrid" class="mini-grid">
+        <div class="mini-cell" data-mini="0"></div>
+        <div class="mini-cell" data-mini="1"></div>
+        <div class="mini-cell" data-mini="2"></div>
+        <div class="mini-cell" data-mini="3"></div>
+        <div class="mini-cell" data-mini="4"></div>
+        <div class="mini-cell" data-mini="5"></div>
+        <div class="mini-cell" data-mini="6"></div>
+        <div class="mini-cell" data-mini="7"></div>
+        <div class="mini-cell" data-mini="8"></div>
       </div>
       <div class="home-sub">Mémorisez la séquence de couleurs et reproduisez-la. Le jeu devient progressivement plus difficile.</div>
+    </section>
+
+    <section id="gameWrap" class="game-wrap hidden">
+      <div id="sequenceGrid" class="game-grid"></div>
     </section>
 
     <div id="topBar" class="top hidden">
@@ -290,10 +324,6 @@ h1{
 
     <div id="status" class="status hidden"></div>
 
-    <section id="gameWrap" class="game-wrap hidden">
-      <div id="sequenceGrid" class="game-grid"></div>
-    </section>
-
     <div class="signature">Jeu créé par Luis Coixao à l'aide de ChatGPT.</div>
   </div>
 
@@ -302,7 +332,30 @@ h1{
   </div>
 
 <script>
-const COLORS = ["seq-green","seq-yellow","seq-pink","seq-cyan","seq-orange"];
+const COLORS = [
+  "seq-green",
+  "seq-yellow",
+  "seq-pink",
+  "seq-cyan",
+  "seq-orange",
+  "seq-blue",
+  "seq-red",
+  "seq-lime",
+  "seq-purple"
+];
+
+const MINI_COLORS = [
+  "green",
+  "yellow",
+  "pink",
+  "cyan",
+  "orange",
+  "blue",
+  "red",
+  "lime",
+  "purple"
+];
+
 const BEST_KEY = "memory-colors-best-score";
 
 const state = {
@@ -322,9 +375,12 @@ const statusEl = document.getElementById("status");
 const gameWrap = document.getElementById("gameWrap");
 const sequenceGrid = document.getElementById("sequenceGrid");
 const actionBtn = document.getElementById("actionBtn");
+const miniCells = Array.from(document.querySelectorAll("[data-mini]"));
 
 const pointsBox = document.getElementById("pointsBox");
 const bestBox = document.getElementById("bestBox");
+
+let idleTimer = null;
 
 function wait(ms){
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -337,6 +393,10 @@ function shuffle(arr){
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+function randomInt(max){
+  return Math.floor(Math.random() * max);
 }
 
 function loadBest(){
@@ -397,7 +457,49 @@ function resetBoard(){
 function lightTile(index, on){
   const tile = sequenceGrid.children[index];
   if(!tile) return;
-  tile.className = "tile" + (on ? " " + COLORS[index % COLORS.length] : "");
+  tile.className = "tile" + (on ? " " + COLORS[index] : "");
+}
+
+function resetMiniGrid(){
+  miniCells.forEach(cell => {
+    cell.className = "mini-cell";
+  });
+}
+
+function flashMiniCell(index){
+  const cell = miniCells[index];
+  if(!cell || state.playing) return;
+
+  cell.className = "mini-cell " + MINI_COLORS[index] + " glow";
+
+  const duration = 450 + randomInt(400);
+  setTimeout(() => {
+    if(!state.playing){
+      cell.className = "mini-cell";
+    }
+  }, duration);
+}
+
+function startIdleAnimation(){
+  stopIdleAnimation();
+  resetMiniGrid();
+
+  const loop = () => {
+    if(state.playing) return;
+    flashMiniCell(randomInt(9));
+    const nextDelay = 400 + randomInt(600);
+    idleTimer = setTimeout(loop, nextDelay);
+  };
+
+  loop();
+}
+
+function stopIdleAnimation(){
+  if(idleTimer){
+    clearTimeout(idleTimer);
+    idleTimer = null;
+  }
+  resetMiniGrid();
 }
 
 function createPattern(length){
@@ -457,11 +559,12 @@ async function startGame(){
   state.level = 1;
   state.score = 0;
   updateTop();
+  stopIdleAnimation();
 
   homeSection.classList.add("hidden");
+  gameWrap.classList.remove("hidden");
   topBar.classList.remove("hidden");
   statusEl.classList.remove("hidden");
-  gameWrap.classList.remove("hidden");
   setActionButton("stop");
 
   showStatus("Prêt...");
@@ -479,11 +582,12 @@ async function finishGame(message = "Bravo !"){
   await wait(1200);
 
   homeSection.classList.remove("hidden");
-  topBar.classList.add("hidden");
   gameWrap.classList.add("hidden");
+  topBar.classList.add("hidden");
   hideStatus();
   resetBoard();
   setActionButton("play");
+  startIdleAnimation();
 }
 
 async function stopGame(){
@@ -495,11 +599,12 @@ async function stopGame(){
   await wait(700);
 
   homeSection.classList.remove("hidden");
-  topBar.classList.add("hidden");
   gameWrap.classList.add("hidden");
+  topBar.classList.add("hidden");
   hideStatus();
   resetBoard();
   setActionButton("play");
+  startIdleAnimation();
 }
 
 async function nextLevel(){
@@ -543,8 +648,7 @@ function handleClick(index){
   if(!state.playing || state.showing || state.stopped) return;
 
   const tile = sequenceGrid.children[index];
-  const color = COLORS[index % COLORS.length];
-  tile.className = "tile " + color;
+  tile.className = "tile " + COLORS[index];
 
   setTimeout(() => {
     if(state.playing && !tile.classList.contains("correct")){
@@ -553,7 +657,7 @@ function handleClick(index){
   }, 180);
 
   if(index === state.pattern[state.step]){
-      tile.classList.add("correct");
+    tile.classList.add("correct");
     setTimeout(() => {
       if(state.playing) tile.className = "tile";
     }, 220);
@@ -582,6 +686,7 @@ actionBtn.addEventListener("click", () => {
 buildGrid();
 updateTop();
 setActionButton("play");
+startIdleAnimation();
 </script>
 </body>
 </html>
