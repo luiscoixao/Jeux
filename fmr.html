@@ -25,31 +25,31 @@
   --tile-base:rgba(255,255,255,.16);
 
   --green1:#22c55e;
-  --green2:#16a34a;
+  --green2:#15803d;
 
   --yellow1:#fde047;
-  --yellow2:#facc15;
+  --yellow2:#eab308;
 
   --pink1:#ff4fb0;
-  --pink2:#ec4899;
+  --pink2:#db2777;
 
   --cyan1:#22d3ee;
-  --cyan2:#0ea5e9;
+  --cyan2:#0284c7;
 
   --orange1:#fb923c;
-  --orange2:#f97316;
+  --orange2:#ea580c;
 
   --blue1:#3b82f6;
-  --blue2:#2563eb;
+  --blue2:#1d4ed8;
 
-  --red1:#f87171;
-  --red2:#ef4444;
+  --red1:#ff3b30;
+  --red2:#b91c1c;
 
   --lime1:#a3e635;
-  --lime2:#84cc16;
+  --lime2:#65a30d;
 
-  --purple1:#c084fc;
-  --purple2:#a855f7;
+  --purple1:#a78bfa;
+  --purple2:#7c3aed;
 }
 *{
   box-sizing:border-box;
@@ -123,16 +123,10 @@ h1{
 .mini-cell.cyan{background:linear-gradient(135deg,var(--cyan1),var(--cyan2)); box-shadow:0 0 18px rgba(34,211,238,.35);}
 .mini-cell.orange{background:linear-gradient(135deg,var(--orange1),var(--orange2)); box-shadow:0 0 18px rgba(251,146,60,.35);}
 .mini-cell.blue{background:linear-gradient(135deg,var(--blue1),var(--blue2)); box-shadow:0 0 18px rgba(59,130,246,.35);}
-.mini-cell.red{background:linear-gradient(135deg,var(--red1),var(--red2)); box-shadow:0 0 18px rgba(248,113,113,.35);}
+.mini-cell.red{background:linear-gradient(135deg,var(--red1),var(--red2)); box-shadow:0 0 18px rgba(255,59,48,.35);}
 .mini-cell.lime{background:linear-gradient(135deg,var(--lime1),var(--lime2)); box-shadow:0 0 18px rgba(163,230,53,.35);}
 .mini-cell.purple{background:linear-gradient(135deg,var(--purple1),var(--purple2)); box-shadow:0 0 18px rgba(192,132,252,.35);}
 
-.home-title{
-  font-size:28px;
-  line-height:1.05;
-  font-weight:900;
-  margin-bottom:10px;
-}
 .home-sub{
   font-size:16px;
   line-height:1.4;
@@ -230,7 +224,7 @@ h1{
 }
 .tile.seq-red{
   background:linear-gradient(135deg,var(--red1),var(--red2));
-  box-shadow:0 0 24px rgba(248,113,113,.45);
+  box-shadow:0 0 24px rgba(255,59,48,.45);
 }
 .tile.seq-lime{
   background:linear-gradient(135deg,var(--lime1),var(--lime2));
@@ -477,7 +471,7 @@ function flashMiniCell(index){
 
   cell.className = "mini-cell " + MINI_COLORS[index] + " glow";
 
-  const duration = 220 + randomInt(260);
+  const duration = 450 + randomInt(400);
   setTimeout(() => {
     if(!state.playing){
       cell.className = "mini-cell";
@@ -492,7 +486,7 @@ function startIdleAnimation(){
   const loop = () => {
     if(state.playing) return;
     flashMiniCell(randomInt(9));
-    const nextDelay = 140 + randomInt(260);
+    const nextDelay = 400 + randomInt(600);
     idleTimer = setTimeout(loop, nextDelay);
   };
 
