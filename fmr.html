@@ -25,31 +25,31 @@
   --tile-base:rgba(255,255,255,.16);
 
   --green1:#34d399;
---green2:#059669;
+  --green2:#059669;
 
---yellow1:#facc15;
---yellow2:#a16207;
+  --yellow1:#facc15;
+  --yellow2:#a16207;
 
---pink1:#f472b6;
---pink2:#be185d;
+  --pink1:#f472b6;
+  --pink2:#be185d;
 
---cyan1:#22d3ee;
---cyan2:#0369a1;
+  --cyan1:#22d3ee;
+  --cyan2:#0369a1;
 
---orange1:#fb923c;
---orange2:#c2410c;
+  --orange1:#fb923c;
+  --orange2:#c2410c;
 
---blue1:#60a5fa;
---blue2:#1e40af;
+  --blue1:#60a5fa;
+  --blue2:#1e40af;
 
---red1:#f43f5e;
---red2:#9f1239;
+  --red1:#f43f5e;
+  --red2:#9f1239;
 
---lime1:#a3e635;
---lime2:#4d7c0f;
+  --lime1:#a3e635;
+  --lime2:#4d7c0f;
 
---purple1:#c084fc;
---purple2:#6d28d9;
+  --purple1:#c084fc;
+  --purple2:#6d28d9;
 }
 *{
   box-sizing:border-box;
@@ -89,17 +89,7 @@ h1{
 }
 
 .home-card{
-  border-radius:30px;
-  padding:16px 14px 18px;
-  min-height:280px;
-  overflow:hidden;
-  border:1px solid rgba(255,255,255,.22);
-  background:rgba(10,16,40,.36);
-  backdrop-filter:blur(10px);
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.06) inset,
-    0 0 26px rgba(56,189,248,.35),
-    0 18px 40px rgba(0,0,0,.22);
+  display:none !important;
 }
 .mini-grid{
   display:grid;
@@ -128,16 +118,14 @@ h1{
 .mini-cell.purple{background:linear-gradient(135deg,var(--purple1),var(--purple2)); box-shadow:0 0 18px rgba(192,132,252,.35);}
 
 .home-sub{
-  font-size:16px;
-  line-height:1.4;
-  color:rgba(255,255,255,.82);
+  display:none !important;
 }
 
 .top{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
-  margin-bottom:14px;
+  margin-top:14px;
 }
 .top-pill{
   min-height:60px;
@@ -147,7 +135,7 @@ h1{
   text-align:center;
   border-radius:20px;
   border:1px solid var(--panel-line);
-  background:var(--panel);
+  background:rgba(10,16,40,.36);
   backdrop-filter:blur(12px);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
   font-size:15px;
@@ -161,37 +149,39 @@ h1{
   font-size:15px;
   font-weight:800;
   color:rgba(255,255,255,.94);
-  margin:10px 0 12px;
+  margin:10px 0 0;
 }
 
 .game-wrap{
-  margin-top:14px;
   border-radius:30px;
-  border:1px solid var(--panel-line);
-  background:var(--panel);
-  backdrop-filter:blur(12px);
-  padding:14px;
-  box-shadow:var(--shadow);
+  padding:16px 14px 18px;
+  min-height:280px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.22);
+  background:rgba(10,16,40,.36);
+  backdrop-filter:blur(10px);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.06) inset,
+    0 0 26px rgba(56,189,248,.35),
+    0 18px 40px rgba(0,0,0,.22);
 }
 
 .game-grid{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:12px;
+  gap:10px;
   width:100%;
 }
 .tile{
   width:100%;
   aspect-ratio:1/1;
   min-width:0;
-  border-radius:20px;
+  border-radius:16px;
   border:none;
-  background:var(--tile-base);
+  background:rgba(255,255,255,.15);
   color:transparent;
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.10),
-    0 12px 22px rgba(0,0,0,.16);
-  transition:transform .12s ease, background .18s ease, box-shadow .18s ease;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+  transition:transform .18s ease, background .18s ease, box-shadow .18s ease, opacity .18s ease;
   cursor:pointer;
 }
 .tile:active{
@@ -200,39 +190,39 @@ h1{
 
 .tile.seq-green{
   background:linear-gradient(135deg,var(--green1),var(--green2));
-  box-shadow:0 0 24px rgba(34,197,94,.45);
+  box-shadow:0 0 18px rgba(34,197,94,.35);
 }
 .tile.seq-yellow{
   background:linear-gradient(135deg,var(--yellow1),var(--yellow2));
-  box-shadow:0 0 24px rgba(253,224,71,.45);
+  box-shadow:0 0 18px rgba(253,224,71,.35);
 }
 .tile.seq-pink{
   background:linear-gradient(135deg,var(--pink1),var(--pink2));
-  box-shadow:0 0 24px rgba(255,79,176,.45);
+  box-shadow:0 0 18px rgba(255,79,176,.35);
 }
 .tile.seq-cyan{
   background:linear-gradient(135deg,var(--cyan1),var(--cyan2));
-  box-shadow:0 0 24px rgba(34,211,238,.45);
+  box-shadow:0 0 18px rgba(34,211,238,.35);
 }
 .tile.seq-orange{
   background:linear-gradient(135deg,var(--orange1),var(--orange2));
-  box-shadow:0 0 24px rgba(251,146,60,.45);
+  box-shadow:0 0 18px rgba(251,146,60,.35);
 }
 .tile.seq-blue{
   background:linear-gradient(135deg,var(--blue1),var(--blue2));
-  box-shadow:0 0 24px rgba(59,130,246,.45);
+  box-shadow:0 0 18px rgba(59,130,246,.35);
 }
 .tile.seq-red{
   background:linear-gradient(135deg,var(--red1),var(--red2));
-  box-shadow:0 0 24px rgba(255,59,48,.45);
+  box-shadow:0 0 18px rgba(255,59,48,.35);
 }
 .tile.seq-lime{
   background:linear-gradient(135deg,var(--lime1),var(--lime2));
-  box-shadow:0 0 24px rgba(163,230,53,.45);
+  box-shadow:0 0 18px rgba(163,230,53,.35);
 }
 .tile.seq-purple{
   background:linear-gradient(135deg,var(--purple1),var(--purple2));
-  box-shadow:0 0 24px rgba(192,132,252,.45);
+  box-shadow:0 0 18px rgba(192,132,252,.35);
 }
 
 .tile.correct{
@@ -312,16 +302,16 @@ h1{
       <div class="home-sub">Mémorisez la séquence de couleurs et reproduisez-la. Le jeu devient progressivement plus difficile.</div>
     </section>
 
-    <div id="topBar" class="top hidden">
+    <section id="gameWrap" class="game-wrap">
+      <div id="sequenceGrid" class="game-grid"></div>
+    </section>
+
+    <div id="topBar" class="top">
       <div class="top-pill" id="pointsBox">Points : 0</div>
       <div class="top-pill" id="bestBox">Meilleur : 0</div>
     </div>
 
-    <div id="status" class="status hidden"></div>
-
-    <section id="gameWrap" class="game-wrap hidden">
-      <div id="sequenceGrid" class="game-grid"></div>
-    </section>
+    <div id="status" class="status"></div>
 
     <div class="signature">Jeu créé par Luis Coixao à l'aide de ChatGPT.</div>
   </div>
@@ -343,18 +333,6 @@ const COLORS = [
   "seq-purple"
 ];
 
-const MINI_COLORS = [
-  "green",
-  "yellow",
-  "pink",
-  "cyan",
-  "orange",
-  "blue",
-  "red",
-  "lime",
-  "purple"
-];
-
 const BEST_KEY = "memory-colors-best-score";
 
 const state = {
@@ -368,18 +346,14 @@ const state = {
   stopped: false
 };
 
-const homeSection = document.getElementById("homeSection");
 const topBar = document.getElementById("topBar");
 const statusEl = document.getElementById("status");
 const gameWrap = document.getElementById("gameWrap");
 const sequenceGrid = document.getElementById("sequenceGrid");
 const actionBtn = document.getElementById("actionBtn");
-const miniCells = Array.from(document.querySelectorAll("[data-mini]"));
 
 const pointsBox = document.getElementById("pointsBox");
 const bestBox = document.getElementById("bestBox");
-
-let idleTimer = null;
 
 function wait(ms){
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -392,10 +366,6 @@ function shuffle(arr){
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
-}
-
-function randomInt(max){
-  return Math.floor(Math.random() * max);
 }
 
 function loadBest(){
@@ -418,11 +388,10 @@ function updateTop(){
 
 function showStatus(text){
   statusEl.textContent = text;
-  statusEl.classList.remove("hidden");
 }
 
 function hideStatus(){
-  statusEl.classList.add("hidden");
+  statusEl.textContent = "";
 }
 
 function setActionButton(mode){
@@ -459,48 +428,6 @@ function lightTile(index, on){
   tile.className = "tile" + (on ? " " + COLORS[index] : "");
 }
 
-function resetMiniGrid(){
-  miniCells.forEach(cell => {
-    cell.className = "mini-cell";
-  });
-}
-
-function flashMiniCell(index){
-  const cell = miniCells[index];
-  if(!cell || state.playing) return;
-
-  cell.className = "mini-cell " + MINI_COLORS[index] + " glow";
-
-  const duration = 450 + randomInt(400);
-  setTimeout(() => {
-    if(!state.playing){
-      cell.className = "mini-cell";
-    }
-  }, duration);
-}
-
-function startIdleAnimation(){
-  stopIdleAnimation();
-  resetMiniGrid();
-
-  const loop = () => {
-    if(state.playing) return;
-    flashMiniCell(randomInt(9));
-    const nextDelay = 400 + randomInt(600);
-    idleTimer = setTimeout(loop, nextDelay);
-  };
-
-  loop();
-}
-
-function stopIdleAnimation(){
-  if(idleTimer){
-    clearTimeout(idleTimer);
-    idleTimer = null;
-  }
-  resetMiniGrid();
-}
-
 function createPattern(length){
   const available = [0,1,2,3,4,5,6,7,8];
 
@@ -525,8 +452,7 @@ function createPattern(length){
 
 async function showPattern(){
   state.showing = true;
-  showStatus("Mémorisez...");
-  await wait(400);
+  await wait(200);
 
   for(const idx of state.pattern){
     if(state.stopped) return;
@@ -558,15 +484,9 @@ async function startGame(){
   state.level = 1;
   state.score = 0;
   updateTop();
-  stopIdleAnimation();
-
-  homeSection.classList.add("hidden");
-  topBar.classList.remove("hidden");
-  statusEl.classList.remove("hidden");
-  gameWrap.classList.remove("hidden");
+  hideStatus();
   setActionButton("stop");
 
-  showStatus("Prêt...");
   await wait(1000);
 
   if(state.stopped) return;
@@ -580,13 +500,9 @@ async function finishGame(message = "Bravo !"){
   showStatus(message);
   await wait(1200);
 
-  homeSection.classList.remove("hidden");
-  topBar.classList.add("hidden");
-  gameWrap.classList.add("hidden");
   hideStatus();
   resetBoard();
   setActionButton("play");
-  startIdleAnimation();
 }
 
 async function stopGame(){
@@ -597,13 +513,9 @@ async function stopGame(){
   showStatus("Partie arrêtée");
   await wait(700);
 
-  homeSection.classList.remove("hidden");
-  topBar.classList.add("hidden");
-  gameWrap.classList.add("hidden");
   hideStatus();
   resetBoard();
   setActionButton("play");
-  startIdleAnimation();
 }
 
 async function nextLevel(){
@@ -685,7 +597,7 @@ actionBtn.addEventListener("click", () => {
 buildGrid();
 updateTop();
 setActionButton("play");
-startIdleAnimation();
+hideStatus();
 </script>
 </body>
 </html>
