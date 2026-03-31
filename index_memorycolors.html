@@ -310,7 +310,7 @@ h1{
         <div class="mini-cell" data-mini="7"></div>
         <div class="mini-cell" data-mini="8"></div>
       </div>
-      <div class="home-sub">Mémorisez la séquence de couleurs et reproduisez-la. Le jeu devient progressivement plus difficile.</div>
+      <div class="home-sub">Mémorisez la séquence de couleurs et reproduisez-la. </div>
     </section>
 
     <section id="gameWrap" class="game-wrap hidden">
@@ -526,7 +526,7 @@ function createPattern(length){
 
 async function showPattern(){
   state.showing = true;
-  showStatus("Mémorisez...");
+  
   await wait(400);
 
   for(const idx of state.pattern){
@@ -567,8 +567,8 @@ async function startGame(){
   statusEl.classList.remove("hidden");
   setActionButton("stop");
 
-  showStatus("Prêt...");
-  await wait(1000);
+  hideStatus();
+await wait(1000);
 
   if(state.stopped) return;
   await playLevel();
