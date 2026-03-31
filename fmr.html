@@ -240,7 +240,14 @@ h1{
 const COLORS = ["seq-green","seq-yellow","seq-pink","seq-cyan","seq-orange","seq-blue","seq-red","seq-lime","seq-purple"];
 const BEST_KEY = "memory-colors-best-score";
 
-const state = {playing:false,phase:1,level:1,score:0,pattern:[],step:0,showing:false,stopped:false};
+state.playing = true;
+state.stopped = false;
+state.phase = 1;
+state.level = 1;
+state.score = 0;
+state.pattern = [];
+state.step = 0;
+state.showing = false;
 
 const sequenceGrid = document.getElementById("sequenceGrid");
 const actionBtn = document.getElementById("actionBtn");
