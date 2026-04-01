@@ -474,15 +474,9 @@ function handleClick(index){
       nextLevel();
     }
   } else {
-    if (navigator.vibrate) navigator.vibrate(100);
-    tile.className = "tile " + COLORS[index];
-    tile.classList.add("wrong");
-    setTimeout(() => {
-      if(state.playing){
-        tile.className = "tile";
-      }
-    }, 200);
-  }
+  finishGame("Perdu");
+  return;
+}
 }
 
 actionBtn.addEventListener("click", () => {
