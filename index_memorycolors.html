@@ -474,7 +474,18 @@ function handleClick(index){
       nextLevel();
     }
   } else {
-  finishGame("Perdu");
+  state.playing = false;
+
+  [...sequenceGrid.children].forEach(tile => {
+    tile.className = "tile seq-red";
+  });
+
+  setTimeout(() => {
+    finishGame("Perdu");
+  }, 700);
+
+  return;
+}
   return;
 }
 }
