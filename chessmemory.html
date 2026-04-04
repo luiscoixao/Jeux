@@ -47,6 +47,7 @@ body{
 h1{
   margin:calc(env(safe-area-inset-top) + 18px) 0 12px;
   font-size:28px;
+  line-height:1.08;
   font-weight:700;
   text-align:center;
 }
@@ -56,10 +57,18 @@ h1{
   max-width:560px;
 }
 
+.controls-panel,
+.timer-panel{
+  background:var(--panel);
+  padding:14px;
+  margin-bottom:12px;
+  box-shadow:0 8px 20px rgba(0,0,0,.18);
+}
+
 #board-container{
   width:95vw;
   max-width:500px;
-  aspect-ratio:1;
+  aspect-ratio:1 / 1;
   overflow:hidden;
   margin-bottom:12px;
   box-shadow:0 10px 25px rgba(0,0,0,0.35);
@@ -85,15 +94,40 @@ h1{
 .white{ background:var(--light); }
 .black{ background:var(--dark); }
 
+.coord{
+  position:absolute;
+  font-size:10px;
+  opacity:.65;
+  font-weight:700;
+  pointer-events:none;
+  z-index:4;
+}
+
+.coord.file{
+  left:5px;
+  bottom:3px;
+}
+
+.coord.rank{
+  right:4px;
+  top:2px;
+}
+
 .card{
   position:absolute;
   inset:0;
+  width:100%;
+  height:100%;
   border:none;
   background:none;
+  padding:0;
+  margin:0;
   cursor:pointer;
+  touch-action:manipulation;
 }
 
 .card-inner{
+  position:relative;
   width:100%;
   height:100%;
   transition:transform .42s ease;
@@ -111,56 +145,76 @@ h1{
   align-items:center;
   justify-content:center;
   backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+
+.back{
+  background:transparent;
+}
+
+.back::before{
+  content:"";
+  width:44%;
+  height:44%;
+  border-radius:50%;
+  background:rgba(0,0,0,.10);
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,.08),
+    0 1px 3px rgba(0,0,0,.12);
 }
 
 .front{
   transform:rotateY(180deg);
 }
 
-/* ===== PIÈCES AGRANDIES (CORRECTION RÉELLE) ===== */
+/* ===== CORRECTION RÉELLE ICI ===== */
 .piece{
+  line-height:1;
+  position:relative;
+  z-index:2;
   display:flex;
   align-items:center;
   justify-content:center;
   width:100%;
   height:100%;
-  line-height:1;
+  filter:drop-shadow(0 1px 0 rgba(0,0,0,.22));
 
-  /* taille basée sur la case réelle */
+  /* taille basée sur la case */
   font-size:calc(min(100vw, 500px) / 8 * 0.88);
 }
 
 /* uniformité totale */
-.piece-K,.piece-Q,.piece-R,.piece-B,.piece-N,
-.piece-k,.piece-q,.piece-r,.piece-b,.piece-n{
+.piece-N,.piece-B,.piece-R,.piece-Q,.piece-K,
+.piece-n,.piece-b,.piece-r,.piece-q,.piece-k{
   font-size:inherit;
 }
 
 .white-piece{
-  color:#fff;
+  color:#ffffff;
   text-shadow:
+    0 0 1px #000,
     0 0 2px #000,
-    0 2px 4px rgba(0,0,0,.5);
+    0 1px 2px rgba(0,0,0,.55),
+    0 0 6px rgba(255,255,255,.16);
 }
 
 .black-piece{
-  color:#111;
+  color:#141414;
   text-shadow:
-    0 1px 2px rgba(255,255,255,.2);
+    0 0 1px rgba(255,255,255,.18),
+    0 1px 1px rgba(255,255,255,.06);
 }
 
 .square.matched{
-  box-shadow:inset 0 0 0 3px gold;
-}
-
-.controls-panel{
-  background:var(--panel);
-  padding:14px;
+  box-shadow:inset 0 0 0 3px rgba(212,175,55,.95);
 }
 
 .controls{
   display:flex;
   justify-content:center;
+  align-items:center;
+  gap:28px;
+  background:var(--panel);
 }
 
 .control-btn{
@@ -169,14 +223,33 @@ h1{
   border:none;
   background:var(--bg);
   color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+.control-btn span{
+  font-size:24px;
+}
+
+#memoryStatus{
+  text-align:center;
+  font-size:16px;
+  font-weight:700;
+}
+
+#memoryTimer{
+  text-align:center;
   font-size:22px;
+  font-weight:700;
+  color:var(--gold);
 }
 
 .footer-note{
   text-align:center;
   font-size:12px;
-  margin-top:6px;
-  opacity:.7;
+  margin-top:4px;
 }
 </style>
 </head>
@@ -190,9 +263,14 @@ h1{
     <div id="board"></div>
   </div>
 
+  <div class="timer-panel">
+    <div id="memoryStatus">Mémorisation</div>
+    <div id="memoryTimer">30</div>
+  </div>
+
   <div class="controls-panel">
     <div class="controls">
-      <button class="control-btn" id="restartBtn">🔄</button>
+      <button class="control-btn" id="restartBtn"><span>🔄</span></button>
     </div>
   </div>
 
@@ -200,19 +278,23 @@ h1{
 </div>
 
 <script>
-const board=document.getElementById("board");
+const boardEl=document.getElementById("board");
 const restartBtn=document.getElementById("restartBtn");
 
 const PIECES={
-  K:"♔",Q:"♕",R:"♖",B:"♗",N:"♘",
-  k:"♚",q:"♛",r:"♜",b:"♝",n:"♞"
+  "N":"♘","B":"♗","R":"♖","Q":"♕","K":"♔",
+  "n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
 };
 
-const BASE=[
-  "K","K","k","k","Q","Q","q","q",
-  "R","R","R","R","r","r","r","r",
-  "B","B","B","B","b","b","b","b",
-  "N","N","N","N","n","n","n","n"
+const BASE_DECK = [
+  {piece:"K"},{piece:"K"},{piece:"k"},{piece:"k"},
+  {piece:"Q"},{piece:"Q"},{piece:"q"},{piece:"q"},
+  {piece:"R"},{piece:"R"},{piece:"R"},{piece:"R"},
+  {piece:"r"},{piece:"r"},{piece:"r"},{piece:"r"},
+  {piece:"B"},{piece:"B"},{piece:"B"},{piece:"B"},
+  {piece:"b"},{piece:"b"},{piece:"b"},{piece:"b"},
+  {piece:"N"},{piece:"N"},{piece:"N"},{piece:"N"},
+  {piece:"n"},{piece:"n"},{piece:"n"},{piece:"n"}
 ];
 
 let cards=[];
@@ -220,24 +302,19 @@ let picks=[];
 let lock=false;
 let matched=0;
 
-function shuffle(a){
-  return a.sort(()=>Math.random()-0.5);
-}
+function shuffle(a){ return a.sort(()=>Math.random()-0.5); }
 
 function init(){
-  const deck=shuffle([...BASE,...BASE]);
-  cards=deck.map((p,i)=>({p,id:i,state:"hidden"}));
-  picks=[];
-  matched=0;
-  lock=false;
+  const deck=shuffle([...BASE_DECK,...BASE_DECK]);
+  cards=deck.map((p,i)=>({p:p.piece,id:i,state:"hidden"}));
+  picks=[]; matched=0; lock=false;
   draw();
 }
 
 function draw(){
-  board.innerHTML="";
+  boardEl.innerHTML="";
   for(let i=0;i<64;i++){
     const c=cards[i];
-
     const sq=document.createElement("div");
     sq.className="square "+((Math.floor(i/8)+i%8)%2?"black":"white");
 
@@ -255,7 +332,7 @@ function draw(){
     front.className="face front";
 
     const back=document.createElement("div");
-    back.className="face";
+    back.className="face back";
 
     const span=document.createElement("span");
     span.className="piece "+(c.p===c.p.toUpperCase()?"white-piece ":"black-piece ")+"piece-"+c.p;
@@ -266,7 +343,7 @@ function draw(){
     inner.appendChild(front);
     btn.appendChild(inner);
     sq.appendChild(btn);
-    board.appendChild(sq);
+    boardEl.appendChild(sq);
   }
 }
 
@@ -288,8 +365,7 @@ function click(i){
     cards[a].state="matched";
     cards[b].state="matched";
     matched++;
-    picks=[];
-    lock=false;
+    picks=[]; lock=false;
     draw();
 
     if(matched===32){
@@ -299,15 +375,13 @@ function click(i){
     setTimeout(()=>{
       cards[a].state="hidden";
       cards[b].state="hidden";
-      picks=[];
-      lock=false;
+      picks=[]; lock=false;
       draw();
     },600);
   }
 }
 
 restartBtn.onclick=init;
-
 init();
 </script>
 
