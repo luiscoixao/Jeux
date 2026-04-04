@@ -57,7 +57,8 @@ h1{
   max-width:560px;
 }
 
-.controls-panel{
+.controls-panel,
+.timer-panel{
   background:var(--panel);
   padding:14px;
   margin-bottom:12px;
@@ -180,7 +181,15 @@ h1{
 }
 
 .piece-N,.piece-B,.piece-R,.piece-Q,.piece-K,
-.piece-n,.piece-b,.piece-r,.piece-q,.piece-k{
+.piece-n,.piece-b,.piece-r,.piece-q,.piece.k{
+  font-size:clamp(56px, 11vw, 82px);
+}
+
+/* correction volontaire pour q et k */
+.piece-k{
+  font-size:clamp(56px, 11vw, 82px);
+}
+.piece-q{
   font-size:clamp(56px, 11vw, 82px);
 }
 
@@ -239,6 +248,21 @@ h1{
   transform:scale(.94);
 }
 
+#memoryStatus{
+  text-align:center;
+  font-size:16px;
+  font-weight:700;
+  margin-bottom:6px;
+}
+
+#memoryTimer{
+  text-align:center;
+  font-size:22px;
+  font-weight:700;
+  color:var(--gold);
+  min-height:28px;
+}
+
 .footer-note{
   text-align:center;
   color:#cfcfcf;
@@ -259,7 +283,7 @@ h1{
   }
 
   .piece-N,.piece-B,.piece-R,.piece-Q,.piece-K,
-  .piece-n,.piece-b,.piece-r,.piece.q,.piece-k{
+  .piece-n,.piece-b,.piece-r,.piece-q,.piece-k{
     font-size:clamp(50px, 11vw, 70px);
   }
 }
@@ -274,6 +298,11 @@ h1{
     <div id="board"></div>
   </div>
 
+  <div class="timer-panel">
+    <div id="memoryStatus">Mémorisation</div>
+    <div id="memoryTimer">30</div>
+  </div>
+
   <div class="controls-panel">
     <div class="controls">
       <button class="control-btn" id="restartBtn" type="button" aria-label="Rejouer"><span>🔄</span></button>
@@ -286,6 +315,8 @@ h1{
 <script>
 const boardEl=document.getElementById("board");
 const restartBtn=document.getElementById("restartBtn");
+const memoryStatusEl=document.getElementById("memoryStatus");
+const memoryTimerEl=document.getElementById("memoryTimer");
 
 const FILES=["a","b","c","d","e","f","g","h"];
 const PIECES={
@@ -320,6 +351,9 @@ let squares=[];
 let picks=[];
 let lockBoard=false;
 let matchedPairs=0;
+let memorizationMode=true;
+let memorizationSeconds=30;
+let memorizationInterval=null;
 const totalPairs=32;
 
 function shuffle(array){
@@ -345,12 +379,52 @@ function coordsToSquare(file,rank){
   return FILES[file]+String(rank+1);
 }
 
+function stopMemorizationTimer(){
+  if(memorizationInterval){
+    clearInterval(memorizationInterval);
+    memorizationInterval=null;
+  }
+}
+
+function startMemorizationPhase(){
+  memorizationMode=true;
+  memorizationSeconds=30;
+  memoryStatusEl.textContent="Mémorisation";
+  memoryTimerEl.textContent=memorizationSeconds;
+
+  squares.forEach(card=>{
+    card.state="revealed";
+  });
+  renderBoard();
+
+  stopMemorizationTimer();
+  memorizationInterval=setInterval(()=>{
+    memorizationSeconds--;
+    memoryTimerEl.textContent=memorizationSeconds;
+
+    if(memorizationSeconds<=0){
+      stopMemorizationTimer();
+      memorizationMode=false;
+      memoryStatusEl.textContent="À vous de jouer";
+      memoryTimerEl.textContent="";
+
+      squares.forEach(card=>{
+        if(card.state!=="matched"){
+          card.state="hidden";
+        }
+      });
+      renderBoard();
+    }
+  },1000);
+}
+
 function createBoard(){
+  stopMemorizationTimer();
   squares=createDeck();
   picks=[];
   lockBoard=false;
   matchedPairs=0;
-  renderBoard();
+  startMemorizationPhase();
 }
 
 function renderBoard(){
@@ -416,7 +490,7 @@ function isPair(a,b){
 }
 
 function handleSquare(index){
-  if(lockBoard) return;
+  if(lockBoard || memorizationMode) return;
 
   const card=squares[index];
   if(card.state!=="hidden") return;
@@ -442,7 +516,8 @@ function handleSquare(index){
     renderBoard();
 
     if(matchedPairs===totalPairs){
-      setTimeout(()=>alert("✓"),160);
+      memoryStatusEl.textContent="Bravo";
+      memoryTimerEl.textContent="Toutes les paires trouvées";
     }
     return;
   }
