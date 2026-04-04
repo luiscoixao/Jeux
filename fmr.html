@@ -2,495 +2,733 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-<title>MEMORY COLORS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>CHESSMASTERS</title>
 
-<meta name="theme-color" content="#4f46e5" />
+<link rel="apple-touch-icon" href="iconchessmasters.png" />
+<link rel="icon" href="icon.png" />
+
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-title" content="MEMORY COLORS" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<link rel="apple-touch-icon" href="iconmemorycolors.png" />
-<link rel="icon" type="image/png" href="iconmemorycolors.png" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="CHESSMASTERS" />
+<meta name="theme-color" content="#2c2c2c" />
 
 <style>
 :root{
-  --bg1:#4338ca;
-  --bg2:#7c3aed;
-  --bg3:#312e81;
-  --panel:rgba(10,16,40,.36);
-  --panel-line:rgba(255,255,255,.22);
+  --bg:#2c2c2c;
+  --panel:#3a3a3a;
+  --light:#eeeed2;
+  --dark:#769656;
   --text:#ffffff;
-
-  --green1:#34d399;
-  --green2:#059669;
-
-  --yellow1:#facc15;
-  --yellow2:#a16207;
-
-  --pink1:#f472b6;
-  --pink2:#be185d;
-
-  --cyan1:#22d3ee;
-  --cyan2:#0369a1;
-
-  --orange1:#fb923c;
-  --orange2:#c2410c;
-
-  --blue1:#fff700;
-  --blue2:#ffcc00;
-
-  --red1:#f43f5e;
-  --red2:#9f1239;
-
-  --lime1:#a3e635;
-  --lime2:#4d7c0f;
-
-  --purple1:#c084fc;
-  --purple2:#6d28d9;
+  --muted:#d7d7d7;
 }
+
 *{
   box-sizing:border-box;
   -webkit-tap-highlight-color:transparent;
 }
+
 html,body{
   margin:0;
   padding:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
 }
+
 body{
   min-height:100vh;
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
-  color:var(--text);
-  background:
-    radial-gradient(circle at 10% 15%, rgba(56,189,248,.35), transparent 20%),
-    radial-gradient(circle at 90% 12%, rgba(255,60,172,.35), transparent 20%),
-    radial-gradient(circle at 20% 90%, rgba(34,197,94,.22), transparent 22%),
-    linear-gradient(135deg,var(--bg1),var(--bg2) 55%, #5b21b6 75%, var(--bg3));
-  padding:18px 16px 140px;
   display:flex;
-  justify-content:center;
+  flex-direction:column;
+  align-items:center;
+  padding:0 12px calc(18px + env(safe-area-inset-bottom));
 }
+
+h1{
+  margin:calc(env(safe-area-inset-top) + 18px) 0 12px;
+  font-size:28px;
+  line-height:1.08;
+  font-weight:700;
+  text-align:center;
+}
+
 .app{
   width:100%;
-  max-width:460px;
+  max-width:560px;
 }
-h1{
-  margin:8px 0 14px;
-  text-align:center;
-  font-size:40px;
-  line-height:1;
-  font-weight:900;
-  letter-spacing:.4px;
-}
-.game-wrap{
-  border-radius:30px;
-  padding:16px 14px 18px;
-  min-height:280px;
-  overflow:hidden;
-  border:1px solid rgba(255,255,255,.22);
+
+.top-panel,
+.move-panel{
   background:var(--panel);
-  backdrop-filter:blur(10px);
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.06) inset,
-    0 0 26px rgba(56,189,248,.35),
-    0 18px 40px rgba(0,0,0,.22);
+  padding:14px;
+  margin-bottom:12px;
+  box-shadow:0 8px 20px rgba(0,0,0,.18);
 }
-.game-grid{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:10px;
+
+select{
   width:100%;
-}
-.tile{
-  width:100%;
-  aspect-ratio:1/1;
-  min-width:0;
-  border-radius:16px;
+  height:48px;
   border:none;
-  background:rgba(255,255,255,.15);
-  color:transparent;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
-  transition:transform .18s ease, background .18s ease, box-shadow .18s ease, opacity .18s ease;
-  cursor:pointer;
+  background:#4a4a4a;
+  color:#fff;
+  font-size:16px;
+  padding:0 14px;
+  appearance:none;
+  -webkit-appearance:none;
 }
-.tile:active{
-  transform:scale(.97);
+
+#board-container{
+  width:95vw;
+  max-width:500px;
+  aspect-ratio:1 / 1;
+  overflow:hidden;
+  margin-bottom:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.35);
 }
-.tile.seq-green{background:linear-gradient(135deg,var(--green1),var(--green2));box-shadow:0 0 18px rgba(34,197,94,.35);}
-.tile.seq-yellow{background:linear-gradient(135deg,var(--yellow1),var(--yellow2));box-shadow:0 0 18px rgba(253,224,71,.35);}
-.tile.seq-pink{background:linear-gradient(135deg,var(--pink1),var(--pink2));box-shadow:0 0 18px rgba(255,79,176,.35);}
-.tile.seq-cyan{background:linear-gradient(135deg,var(--cyan1),var(--cyan2));box-shadow:0 0 18px rgba(34,211,238,.35);}
-.tile.seq-orange{background:linear-gradient(135deg,var(--orange1),var(--orange2));box-shadow:0 0 18px rgba(251,146,60,.35);}
-.tile.seq-blue{background:linear-gradient(135deg,var(--blue1),var(--blue2));box-shadow:0 0 18px rgba(255,215,0,.45);}
-.tile.seq-red{background:linear-gradient(135deg,var(--red1),var(--red2));box-shadow:0 0 18px rgba(244,63,94,.35);}
-.tile.seq-lime{background:linear-gradient(135deg,var(--lime1),var(--lime2));box-shadow:0 0 18px rgba(163,230,53,.35);}
-.tile.seq-purple{background:linear-gradient(135deg,var(--purple1),var(--purple2));box-shadow:0 0 18px rgba(192,132,252,.35);}
-.tile.correct{
-  outline:3px solid rgba(255,255,255,.7);
-  transform:scale(0.96);
-}
-.tile.wrong{
-  background:inherit !important;
-  box-shadow:none !important;
-}
-.top{
+
+#board{
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:14px;
+  grid-template-columns:repeat(8,1fr);
+  grid-template-rows:repeat(8,1fr);
+  width:100%;
+  height:100%;
 }
-.top-pill{
-  min-height:60px;
+
+.square{
+  position:relative;
+  width:100%;
+  height:100%;
   display:flex;
   align-items:center;
   justify-content:center;
-  text-align:center;
-  border-radius:20px;
-  border:1px solid var(--panel-line);
-  background:var(--panel);
-  backdrop-filter:blur(12px);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
-  font-size:15px;
-  font-weight:900;
-  padding:10px 12px;
+  user-select:none;
+  overflow:hidden;
 }
-.status{
-  min-height:26px;
-  text-align:center;
-  font-size:15px;
-  font-weight:800;
-  color:rgba(255,255,255,.94);
-  margin:10px 0 0;
-}
-.playbar{
-  position:fixed;
-  left:0;
-  right:0;
-  bottom:100px;
-  display:flex;
-  justify-content:center;
-  z-index:30;
-}
-.signature{
-  position:fixed;
-  left:0;
-  right:0;
-  bottom:30px;
-  text-align:center;
-  font-size:11px;
-  color:rgba(255,255,255,.6);
+
+.white{ background:var(--light); }
+.black{ background:var(--dark); }
+
+.coord{
+  position:absolute;
+  font-size:10px;
+  opacity:.65;
+  font-weight:700;
   pointer-events:none;
 }
-.action-btn{
-  min-width:220px;
-  max-width:460px;
-  width:min(100%, 340px);
-  min-height:64px;
-  border:none;
-  border-radius:24px;
-  color:#fff;
-  font-size:20px;
-  font-weight:900;
+
+.coord.file{
+  left:5px;
+  bottom:3px;
+}
+
+.coord.rank{
+  right:4px;
+  top:2px;
+}
+
+.piece-wrap{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.piece{
+  line-height:1;
+  position:relative;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  height:100%;
+  filter:drop-shadow(0 1px 0 rgba(0,0,0,.22));
+  transform-origin:center center;
+}
+
+/* PIÈCES AGRANDIES ET HOMOGÈNES */
+.piece-N,.piece-B,.piece-R,.piece-Q,.piece-K,
+.piece-n,.piece-b,.piece-r,.piece-q,.piece-k{
+  font-size:clamp(56px, 11vw, 82px);
+}
+
+.piece-P{
+  font-size:clamp(46px, 9vw, 66px);
+  transform:none;
+}
+
+.piece-p{
+  display:inline-block;
+  font-size:clamp(42px, 8.2vw, 60px);
+  transform:scale(0.78);
+  transform-origin:center center;
+  position:relative;
+  top:2px;
+}
+
+.white-piece{
+  color:#ffffff;
+  text-shadow:
+    0 0 1px #000,
+    0 0 2px #000,
+    0 1px 2px rgba(0,0,0,.55),
+    0 0 6px rgba(255,255,255,.16);
+}
+
+.black-piece{
+  color:#141414;
+  text-shadow:
+    0 0 1px rgba(255,255,255,.18),
+    0 1px 1px rgba(255,255,255,.06);
+}
+
+.from-square{
+  outline:3px solid rgba(255,215,0,.85);
+  outline-offset:-3px;
+}
+
+.to-square{
+  outline:3px solid rgba(169,209,142,.95);
+  outline-offset:-3px;
+}
+
+.capture-square{
+  box-shadow:inset 0 0 0 3px rgba(255,99,71,.95);
+}
+
+#move-counter{
   text-align:center;
+  line-height:1.35;
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:8px;
+}
+
+#status{
+  text-align:center;
+  line-height:1.35;
+  font-size:15px;
+  color:var(--muted);
+  min-height:42px;
+}
+
+#status .san{
+  display:block;
+}
+
+#status .note{
+  display:block;
+  margin-top:6px;
+  font-size:12px;
+  line-height:1.25;
+  color:#cfcfcf;
+}
+
+.controls-panel{
+  background:var(--bg);
+  padding:14px;
+  margin-bottom:12px;
+  box-shadow:0 8px 20px rgba(0,0,0,.18);
+}
+
+.controls{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:28px;
+  background:var(--bg);
+}
+
+.control-btn{
+  width:52px;
+  height:52px;
+  border:none;
+  background:var(--bg);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  appearance:none;
+  -webkit-appearance:none;
   cursor:pointer;
+  touch-action:manipulation;
+  box-shadow:none;
+  padding:0;
 }
-.action-btn.play{
-  background:linear-gradient(135deg,#22c55e,#10b981);
-  box-shadow:0 18px 34px rgba(0,0,0,.26), 0 0 28px rgba(34,197,94,.28);
+
+.control-btn span{
+  font-size:24px;
+  line-height:1;
+  display:block;
 }
-.action-btn.stop{
-  background:linear-gradient(135deg,#ef4444,#dc2626);
-  box-shadow:0 18px 34px rgba(0,0,0,.26), 0 0 22px rgba(239,68,68,.24);
+
+.control-btn:active{
+  transform:scale(.94);
+}
+
+@media (max-width:420px){
+  .control-btn{
+    width:46px;
+    height:46px;
+  }
+
+  .control-btn span{
+    font-size:22px;
+  }
+
+  .piece-N,.piece-B,.piece-R,.piece-Q,.piece-K,
+  .piece-n,.piece-b,.piece-r,.piece-q,.piece-k{
+    font-size:clamp(50px, 11vw, 70px);
+  }
+
+  .piece-P{
+    font-size:clamp(42px, 9vw, 58px);
+    transform:none;
+  }
+
+  .piece-p{
+    display:inline-block;
+    font-size:clamp(38px, 8vw, 52px);
+    transform:scale(0.78);
+    transform-origin:center center;
+    position:relative;
+    top:2px;
+  }
 }
 </style>
 </head>
 <body>
-  <div class="app">
-    <h1>MEMORY COLORS</h1>
 
-    <section id="gameWrap" class="game-wrap">
-      <div id="sequenceGrid" class="game-grid"></div>
-    </section>
+<h1>CHESSMASTERS</h1>
 
-    <div id="topBar" class="top">
-      <div class="top-pill" id="pointsBox">Points : 0</div>
-      <div class="top-pill" id="bestBox">Meilleur : 0</div>
+<div class="app">
+  <div class="top-panel">
+    <select id="gameSelect"></select>
+  </div>
+
+  <div id="board-container">
+    <div id="board"></div>
+  </div>
+
+  <div class="move-panel">
+    <div id="move-counter">Coup 0 / 0</div>
+    <div id="status">Position initiale.</div>
+  </div>
+
+  <div class="controls-panel">
+    <div class="controls">
+      <button class="control-btn" id="prevBtn" type="button" aria-label="Coup précédent"><span>◀️</span></button>
+      <button class="control-btn" id="nextBtn" type="button" aria-label="Coup suivant"><span>▶️</span></button>
     </div>
-
-    <div id="status" class="status"></div>
-
-    <div class="signature">Jeu créé par Luis Coixao à l'aide de ChatGPT.</div>
   </div>
-
-  <div class="playbar">
-    <button id="actionBtn" class="action-btn play" type="button">Jouer</button>
-  </div>
+</div>
 
 <script>
-const COLORS = [
-  "seq-green",
-  "seq-yellow",
-  "seq-pink",
-  "seq-cyan",
-  "seq-orange",
-  "seq-blue",
-  "seq-red",
-  "seq-lime",
-  "seq-purple"
-];
+const boardEl=document.getElementById("board");
+const gameSelect=document.getElementById("gameSelect");
+const moveCounter=document.getElementById("move-counter");
+const statusEl=document.getElementById("status");
+const prevBtn=document.getElementById("prevBtn");
+const nextBtn=document.getElementById("nextBtn");
 
-const BEST_KEY = "memory-colors-best-score";
-
-const state = {
-  playing: false,
-  phase: 1,
-  level: 1,
-  score: 0,
-  pattern: [],
-  step: 0,
-  showing: false,
-  stopped: false
+const FILES=["a","b","c","d","e","f","g","h"];
+const START_FEN="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+const PIECES={
+  "P":"♙","N":"♘","B":"♗","R":"♖","Q":"♕","K":"♔",
+  "p":"♟","n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
 };
 
-const sequenceGrid = document.getElementById("sequenceGrid");
-const actionBtn = document.getElementById("actionBtn");
-const pointsBox = document.getElementById("pointsBox");
-const bestBox = document.getElementById("bestBox");
-const statusEl = document.getElementById("status");
+let games=[];
 
-function wait(ms){
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-function shuffle(arr){
-  const a = [...arr];
-  for(let i = a.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function loadBest(){
-  const best = Number(localStorage.getItem(BEST_KEY) || 0);
-  bestBox.textContent = "Meilleur : " + best;
-}
-
-function saveBest(){
-  const currentBest = Number(localStorage.getItem(BEST_KEY) || 0);
-  if(state.score > currentBest){
-    localStorage.setItem(BEST_KEY, String(state.score));
-  }
-  loadBest();
-}
-
-function updateTop(){
-  pointsBox.textContent = "Points : " + state.score;
-  loadBest();
-}
-
-function showStatus(text){
-  statusEl.textContent = text;
-}
-
-function hideStatus(){
-  statusEl.textContent = "";
-}
-
-function setActionButton(mode){
-  if(mode === "play"){
-    actionBtn.textContent = "Jouer";
-    actionBtn.className = "action-btn play";
-  } else {
-    actionBtn.textContent = "Arrêter";
-    actionBtn.className = "action-btn stop";
-  }
-}
-
-function buildGrid(){
-  sequenceGrid.innerHTML = "";
-  for(let i = 0; i < 9; i++){
-    const tile = document.createElement("button");
-    tile.type = "button";
-    tile.className = "tile " + COLORS[i];
-    tile.addEventListener("click", () => handleClick(i));
-    sequenceGrid.appendChild(tile);
-  }
-}
-
-function clearBoard(){
-  [...sequenceGrid.children].forEach(tile => {
-    tile.className = "tile";
-    tile.disabled = false;
+function bindTap(el,handler){
+  let used=false;
+  el.addEventListener("pointerup",e=>{
+    e.preventDefault();
+    used=true;
+    handler(e);
+    setTimeout(()=>{used=false},60);
+  });
+  el.addEventListener("click",e=>{
+    if(used) return;
+    e.preventDefault();
+    handler(e);
   });
 }
 
-function resetBoard(){
-  [...sequenceGrid.children].forEach((tile, i) => {
-    tile.className = "tile " + COLORS[i];
-    tile.disabled = false;
-  });
+function coordsToSquare(file,rank){
+  return FILES[file]+String(rank+1);
 }
 
-function lightTile(index, on){
-  const tile = sequenceGrid.children[index];
-  if(!tile) return;
-  tile.className = on ? "tile " + COLORS[index] : "tile";
+function squareToCoords(square){
+  return {
+    file:FILES.indexOf(square[0]),
+    rank:parseInt(square[1],10)-1
+  };
 }
 
-function createPattern(length){
-  const available = [0,1,2,3,4,5,6,7,8];
+function fenToBoard(fen){
+  const rows=fen.split("/");
+  const board=Array.from({length:8},()=>Array(8).fill(""));
 
-  if(state.phase === 1){
-    return shuffle([...available]).slice(0, length);
-  }
-
-  if(state.phase === 2){
-    if(length <= 1) return shuffle([...available]).slice(0, 1);
-    const base = shuffle([...available]).slice(0, length - 1);
-    const repeated = base[Math.floor(Math.random() * base.length)];
-    return shuffle([...base, repeated]);
-  }
-
-  if(length <= 2){
-    return shuffle([...available]).slice(0, length);
-  }
-
-  const base = shuffle([...available]).slice(0, length - 2);
-  const repeated = base[Math.floor(Math.random() * base.length)];
-  return shuffle([...base, repeated, repeated]);
-}
-
-async function showPattern(){
-  state.showing = true;
-  await wait(200);
-
-  for(const idx of state.pattern){
-    if(state.stopped) return;
-    lightTile(idx, true);
-    await wait(520);
-    lightTile(idx, false);
-    await wait(160);
-  }
-
-  state.showing = false;
-  state.step = 0;
-}
-
-async function playLevel(){
-  if(state.stopped) return;
-  clearBoard();
-  updateTop();
-  state.pattern = createPattern(state.level);
-  await showPattern();
-}
-
-async function startGame(){
-  if(state.playing) return;
-
-  state.playing = true;
-  state.stopped = false;
-  state.phase = 1;
-  state.level = 1;
-  state.score = 0;
-  state.pattern = [];
-  state.step = 0;
-  state.showing = false;
-
-  updateTop();
-  hideStatus();
-  setActionButton("stop");
-  clearBoard();
-
-  await wait(1000);
-
-  if(!state.stopped){
-    await playLevel();
-  }
-}
-
-async function finishGame(message = "Bravo !"){
-  state.playing = false;
-  state.showing = false;
-  saveBest();
-  showStatus(message);
-  await wait(1000);
-  hideStatus();
-  resetBoard();
-  setActionButton("play");
-}
-
-async function stopGame(){
-  state.stopped = true;
-  state.playing = false;
-  state.showing = false;
-  saveBest();
-  await wait(500);
-  hideStatus();
-  resetBoard();
-  setActionButton("play");
-}
-
-async function nextLevel(){
-  state.score += 1;
-
-  if(state.phase === 1 && state.level === 9){
-    state.phase = 2;
-    state.level = 1;
-  } else if(state.phase === 2 && state.level === 9){
-    state.phase = 3;
-    state.level = 1;
-  } else if(state.phase === 3 && state.level === 9){
-    await finishGame("Bravo !");
-    return;
-  } else {
-    state.level += 1;
-  }
-
-  updateTop();
-  await wait(600);
-
-  if(!state.stopped){
-    await playLevel();
-  }
-}
-
-function handleClick(index){
-  if(!state.playing || state.showing || state.stopped) return;
-
-  const tile = sequenceGrid.children[index];
-  tile.className = "tile " + COLORS[index];
-
-  if(index === state.pattern[state.step]){
-    tile.classList.add("correct");
-    setTimeout(() => {
-      if(state.playing){
-        tile.className = "tile";
+  for(let r=0;r<8;r++){
+    let f=0;
+    for(const ch of rows[r]){
+      if(/\d/.test(ch)){
+        f+=parseInt(ch,10);
+      }else{
+        board[7-r][f]=ch;
+        f++;
       }
-    }, 200);
-
-    state.step++;
-
-    if(state.step === state.pattern.length){
-      nextLevel();
     }
-  } else {
-  finishGame("Perdu");
-  return;
-}
+  }
+  return board;
 }
 
-actionBtn.addEventListener("click", () => {
-  if(state.playing){
-    stopGame();
-  } else {
-    startGame();
+function cloneBoard(board){
+  return board.map(row=>row.slice());
+}
+
+function isWhite(piece){
+  return piece && piece===piece.toUpperCase();
+}
+
+function sameColor(a,b){
+  return a && b && isWhite(a)===isWhite(b);
+}
+
+function pathClear(board,from,to){
+  const dx=Math.sign(to.file-from.file);
+  const dy=Math.sign(to.rank-from.rank);
+  let f=from.file+dx;
+  let r=from.rank+dy;
+
+  while(f!==to.file || r!==to.rank){
+    if(board[r][f]) return false;
+    f+=dx;
+    r+=dy;
   }
+  return true;
+}
+
+function canPieceMove(board,piece,from,to,capture,enPassantTarget){
+  const dx=to.file-from.file;
+  const dy=to.rank-from.rank;
+  const adx=Math.abs(dx);
+  const ady=Math.abs(dy);
+  const white=isWhite(piece);
+  const lower=piece.toLowerCase();
+
+  if(from.file===to.file && from.rank===to.rank) return false;
+  if(board[to.rank][to.file] && sameColor(piece,board[to.rank][to.file])) return false;
+
+  if(lower==="p"){
+    const dir=white?1:-1;
+    const startRank=white?1:6;
+
+    if(capture){
+      if(adx===1 && dy===dir){
+        if(board[to.rank][to.file]) return true;
+        if(enPassantTarget && coordsToSquare(to.file,to.rank)===enPassantTarget) return true;
+      }
+      return false;
+    }else{
+      if(dx!==0) return false;
+      if(dy===dir && !board[to.rank][to.file]) return true;
+      if(from.rank===startRank && dy===2*dir && !board[to.rank][to.file] && !board[from.rank+dir][from.file]) return true;
+      return false;
+    }
+  }
+
+  if(lower==="n") return (adx===1&&ady===2)||(adx===2&&ady===1);
+  if(lower==="b") return adx===ady && pathClear(board,from,to);
+  if(lower==="r") return (dx===0||dy===0) && pathClear(board,from,to);
+  if(lower==="q") return ((dx===0||dy===0)||(adx===ady)) && pathClear(board,from,to);
+  if(lower==="k") return Math.max(adx,ady)===1;
+
+  return false;
+}
+
+function parseSAN(san){
+  let move=san.trim().replace(/[!?+#]+$/g,"");
+
+  if(move==="O-O" || move==="0-0") return {castle:"K"};
+  if(move==="O-O-O" || move==="0-0-0") return {castle:"Q"};
+
+  let promotion=null;
+  const promoMatch=move.match(/=([QRBN])/);
+  if(promoMatch){
+    promotion=promoMatch[1];
+    move=move.replace(/=([QRBN])/,"");
+  }
+
+  const capture=move.includes("x");
+  move=move.replace("x","");
+
+  let piece="P";
+  if(/^[KQRBN]/.test(move)){
+    piece=move[0];
+    move=move.slice(1);
+  }
+
+  const toSquare=move.slice(-2);
+  const prefix=move.slice(0,-2);
+
+  let fromFile=null;
+  let fromRank=null;
+
+  if(piece==="P"){
+    if(prefix.length===1) fromFile=prefix[0];
+  }else{
+    if(prefix.length===2){
+      fromFile=prefix[0];
+      fromRank=prefix[1];
+    }else if(prefix.length===1){
+      if(/[a-h]/.test(prefix)) fromFile=prefix;
+      else fromRank=prefix;
+    }
+  }
+
+  return {piece,toSquare,capture,promotion,fromFile,fromRank};
+}
+
+function applyMoveToState(state,san){
+  const board=cloneBoard(state.board);
+  const parsed=parseSAN(san);
+  let fromSquare=null;
+  let toSquare=null;
+  let capture=false;
+
+  if(parsed.castle){
+    const white=state.turn==="w";
+    if(white && parsed.castle==="K"){
+      board[0][4]=""; board[0][6]="K"; board[0][7]=""; board[0][5]="R";
+      fromSquare="e1"; toSquare="g1";
+    }else if(white && parsed.castle==="Q"){
+      board[0][4]=""; board[0][2]="K"; board[0][0]=""; board[0][3]="R";
+      fromSquare="e1"; toSquare="c1";
+    }else if(!white && parsed.castle==="K"){
+      board[7][4]=""; board[7][6]="k"; board[7][7]=""; board[7][5]="r";
+      fromSquare="e8"; toSquare="g8";
+    }else{
+      board[7][4]=""; board[7][2]="k"; board[7][0]=""; board[7][3]="r";
+      fromSquare="e8"; toSquare="c8";
+    }
+
+    return {
+      board,
+      turn:state.turn==="w"?"b":"w",
+      enPassantTarget:null,
+      lastMove:{from:fromSquare,to:toSquare,capture:false,san}
+    };
+  }
+
+  const dest=squareToCoords(parsed.toSquare);
+  const wantedWhite=state.turn==="w";
+  const targetPieceChar=wantedWhite ? parsed.piece.toUpperCase() : parsed.piece.toLowerCase();
+
+  const candidates=[];
+
+  for(let rank=0;rank<8;rank++){
+    for(let file=0;file<8;file++){
+      const p=board[rank][file];
+      if(p!==targetPieceChar) continue;
+
+      if(parsed.fromFile!==null && FILES[file]!==parsed.fromFile) continue;
+      if(parsed.fromRank!==null && String(rank+1)!==parsed.fromRank) continue;
+
+      if(canPieceMove(board,p,{file,rank},dest,parsed.capture,state.enPassantTarget)){
+        candidates.push(coordsToSquare(file,rank));
+      }
+    }
+  }
+
+  if(!candidates.length){
+    throw new Error("Impossible d'appliquer le coup "+san);
+  }
+
+  fromSquare=candidates[0];
+  toSquare=parsed.toSquare;
+
+  const from=squareToCoords(fromSquare);
+  const to=squareToCoords(toSquare);
+  const moving=board[from.rank][from.file];
+
+  capture=!!board[to.rank][to.file];
+
+  if(moving.toLowerCase()==="p" && parsed.capture && !capture && state.enPassantTarget===toSquare){
+    const victimRank=state.turn==="w" ? to.rank-1 : to.rank+1;
+    board[victimRank][to.file]="";
+    capture=true;
+  }
+
+  board[from.rank][from.file]="";
+  board[to.rank][to.file]=moving;
+
+  if(parsed.promotion){
+    board[to.rank][to.file]=state.turn==="w" ? parsed.promotion : parsed.promotion.toLowerCase();
+  }
+
+  let enPassantTarget=null;
+  if(moving.toLowerCase()==="p" && Math.abs(to.rank-from.rank)===2){
+    const midRank=(to.rank+from.rank)/2;
+    enPassantTarget=coordsToSquare(from.file,midRank);
+  }
+
+  return {
+    board,
+    turn:state.turn==="w"?"b":"w",
+    enPassantTarget,
+    lastMove:{from:fromSquare,to:toSquare,capture,san}
+  };
+}
+
+function computeStates(game){
+  const states=[{
+    board:fenToBoard(START_FEN),
+    turn:"w",
+    enPassantTarget:null,
+    lastMove:null
+  }];
+
+  for(const mv of game.moves){
+    states.push(applyMoveToState(states[states.length-1],mv.san));
+  }
+
+  return states;
+}
+
+function renderSelect(){
+  gameSelect.innerHTML="";
+  games.forEach((g,i)=>{
+    const opt=document.createElement("option");
+    opt.value=String(i);
+    opt.textContent=g.title;
+    gameSelect.appendChild(opt);
+  });
+}
+
+function renderBoard(state){
+  boardEl.innerHTML="";
+  const last=state.lastMove||{};
+
+  for(let row=7;row>=0;row--){
+    for(let col=0;col<8;col++){
+      const sq=document.createElement("div");
+      sq.className="square "+(((row+col)%2===0)?"white":"black");
+      const squareName=coordsToSquare(col,row);
+
+      if(last.from===squareName) sq.classList.add("from-square");
+      if(last.to===squareName) sq.classList.add("to-square");
+      if(last.capture && last.to===squareName) sq.classList.add("capture-square");
+
+      const piece=state.board[row][col];
+      if(piece){
+        const wrap=document.createElement("div");
+        wrap.className="piece-wrap";
+
+        const span=document.createElement("span");
+        span.className="piece "+(isWhite(piece)?"white-piece ":"black-piece ")+"piece-"+piece;
+        span.textContent=PIECES[piece];
+
+        wrap.appendChild(span);
+        sq.appendChild(wrap);
+      }
+
+      if(row===0){
+        const file=document.createElement("span");
+        file.className="coord file";
+        file.textContent=FILES[col];
+        sq.appendChild(file);
+      }
+
+      if(col===7){
+        const rank=document.createElement("span");
+        rank.className="coord rank";
+        rank.textContent=String(row+1);
+        sq.appendChild(rank);
+      }
+
+      boardEl.appendChild(sq);
+    }
+  }
+}
+
+let currentGameIndex=0;
+let moveIndex=0;
+
+function currentGame(){
+  return games[currentGameIndex];
+}
+
+function updateView(){
+  const game=currentGame();
+  const state=game.states[moveIndex];
+  renderBoard(state);
+
+  moveCounter.textContent="Coup "+moveIndex+" / "+game.moves.length;
+
+  if(moveIndex===0){
+    statusEl.innerHTML='<span class="san">Position initiale.</span>';
+  }else{
+    const mv=game.moves[moveIndex-1];
+    const num=Math.ceil(moveIndex/2);
+    const prefix=moveIndex%2===1 ? num+". " : num+"... ";
+    const noteHtml=mv.note ? '<span class="note">'+mv.note+'</span>' : '';
+    statusEl.innerHTML='<span class="san">'+prefix+mv.san+'</span>'+noteHtml;
+  }
+}
+
+function loadGame(index){
+  currentGameIndex=index;
+  moveIndex=0;
+  updateView();
+}
+
+async function loadGames(){
+  const response=await fetch("games.json");
+  games=await response.json();
+  
+  games.sort((a, b) => {
+    const order = ["Ouverture", "Défense", "Piège", "Partie célèbre"];
+
+    const getCat = t => order.find(c => t.startsWith(c)) || "Z";
+
+    const catA = getCat(a.title);
+    const catB = getCat(b.title);
+
+    if (catA !== catB) return order.indexOf(catA) - order.indexOf(catB);
+
+    return a.title.localeCompare(b.title, "fr", { sensitivity: "base" });
+  });
+
+  games.forEach(game=>{
+    game.states=computeStates(game);
+  });
+
+  renderSelect();
+  loadGame(0);
+}
+
+bindTap(prevBtn,()=>{
+  if(moveIndex>0) moveIndex--;
+  updateView();
 });
 
-buildGrid();
-updateTop();
-hideStatus();
-setActionButton("play");
+bindTap(nextBtn,()=>{
+  if(moveIndex<currentGame().moves.length) moveIndex++;
+  updateView();
+});
+
+gameSelect.addEventListener("change",e=>{
+  loadGame(parseInt(e.target.value,10));
+});
+
+loadGames().catch(err=>{
+  console.error(err);
+  statusEl.innerHTML='<span class="san">Erreur de chargement</span><span class="note">Vérifie la présence de games.json</span>';
+});
 </script>
+
 </body>
 </html>
