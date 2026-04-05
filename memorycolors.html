@@ -19,18 +19,18 @@
   --bg3:#312e81;
   --text:#ffffff;
 
-  --green1:#9bdc1f;  --green2:#6ea80f;
-  --yellow1:#ffe34a; --yellow2:#f3cf00;
-  --pink1:#f56db2;   --pink2:#df2d85;
-  --cyan1:#32cfff;   --cyan2:#1697df;
-  --orange1:#ff9a2f; --orange2:#ff6a00;
-  --blue1:#6d7cff;   --blue2:#4e58e8;
-  --red1:#ff4f74;    --red2:#e2184a;
-  --lime1:#2fd6bf;   --lime2:#0ea885;
-  --purple1:#b66dff; --purple2:#8a3ffc;
-  --teal1:#2ed8d3;   --teal2:#0e9e99;
-  --indigo1:#56c7ff; --indigo2:#18a7f2;
-  --rose1:#ff7ca8;   --rose2:#f1467f;
+  --green1:#34d399;  --green2:#059669;
+  --yellow1:#facc15; --yellow2:#ca8a04;
+  --pink1:#f472b6;   --pink2:#db2777;
+  --cyan1:#22d3ee;   --cyan2:#0284c7;
+  --orange1:#fb923c; --orange2:#ea580c;
+  --blue1:#fde047;   --blue2:#facc15;
+  --red1:#f43f5e;    --red2:#be123c;
+  --lime1:#a3e635;   --lime2:#65a30d;
+  --purple1:#c084fc; --purple2:#7c3aed;
+  --teal1:#2dd4bf;   --teal2:#0f766e;
+  --indigo1:#818cf8; --indigo2:#4f46e5;
+  --rose1:#fb7185;   --rose2:#e11d48;
 }
 *{
   box-sizing:border-box;
@@ -156,20 +156,17 @@ h1{
   justify-content:center;
   background:rgba(10,12,28,.42);
   backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
   opacity:0;
   pointer-events:none;
   transition:opacity .22s ease;
   z-index:50;
 }
-
 .end-message.show{
   opacity:1;
   pointer-events:auto;
 }
-
 .end-box{
-  width:min(88vw, 380px);
+  min-width:min(88vw, 360px);
   padding:24px 22px;
   text-align:center;
   background:rgba(12,18,40,.58);
@@ -178,23 +175,20 @@ h1{
     0 24px 60px rgba(0,0,0,.28),
     inset 0 0 0 1px rgba(255,255,255,.04);
 }
-
 .end-text{
   font-size:16px;
-  font-weight:800;
-  color:rgba(255,255,255,.96);
-  line-height:1.45;
+  font-weight:700;
+  color:rgba(255,255,255,.92);
+  line-height:1.4;
 }
-
 .end-hint{
-  margin-top:12px;
+  margin-top:10px;
   font-size:12px;
   font-weight:700;
   letter-spacing:.06em;
   text-transform:uppercase;
-  color:rgba(255,255,255,.62);
+  color:rgba(255,255,255,.65);
 }
-
 .signature{
   position:fixed;
   left:0;
@@ -219,7 +213,7 @@ h1{
     </section>
   </div>
 
-  <div id="endMessage" class="end-message" role="button" tabindex="0" aria-label="Fermer et recommencer">
+  <div id="endMessage" class="end-message">
     <div class="end-box">
       <div id="endText" class="end-text"></div>
       <div class="end-hint">Touchez pour recommencer</div>
@@ -274,18 +268,17 @@ function shuffle(arr){
 }
 
 function getBestScore(){
-  const raw = localStorage.getItem(BEST_KEY);
-  const value = Number(raw || 0);
-  return Number.isFinite(value) ? value : 0;
+  const best = Number(localStorage.getItem(BEST_KEY) || 0);
+  return Number.isFinite(best) ? best : 0;
 }
 
 function saveBestScore(score){
-  const best = getBestScore();
-  if(best === 0 || score < best){
+  const currentBest = getBestScore();
+  if(currentBest === 0 || score < currentBest){
     localStorage.setItem(BEST_KEY, String(score));
     return score;
   }
-  return best;
+  return currentBest;
 }
 
 function buildBoard(){
@@ -309,7 +302,6 @@ function renderBoard(){
       card.open ? card.color + " open" :
       "hidden"
     );
-    btn.disabled = state.finished || state.locked && !card.open && !card.matched;
     btn.addEventListener("click", () => handleTileClick(index));
     boardEl.appendChild(btn);
   });
@@ -334,26 +326,11 @@ async function startGame(){
   state.first = null;
   state.second = null;
   state.finished = false;
-
   endMessage.classList.remove("show");
 
   buildBoard();
   renderBoard();
   await previewBoard();
-}
-
-function showEndMessage(){
-  const best = saveBestScore(state.moves);
-  endText.textContent = `Terminé en ${state.moves} coups • Meilleur score : ${best}`;
-  endMessage.classList.add("show");
-}
-
-async function finishGame(){
-  state.finished = true;
-  state.locked = true;
-  renderBoard();
-  await wait(180);
-  showEndMessage();
 }
 
 async function handleTileClick(index){
@@ -387,7 +364,11 @@ async function handleTileClick(index){
     renderBoard();
 
     if(state.matched === state.board.length){
-      await finishGame();
+      state.finished = true;
+      const best = saveBestScore(state.moves);
+      await wait(250);
+      endText.textContent = "Partie terminée en " + state.moves + " coups. Meilleur score : " + best + ".";
+      endMessage.classList.add("show");
       return;
     }
 
@@ -405,20 +386,14 @@ async function handleTileClick(index){
   state.locked = false;
 }
 
-async function closeMessageAndRestart(){
+async function restartGame(){
   if(!endMessage.classList.contains("show")) return;
   endMessage.classList.remove("show");
   await wait(180);
   startGame();
 }
 
-endMessage.addEventListener("click", closeMessageAndRestart);
-endMessage.addEventListener("keydown", (e) => {
-  if(e.key === "Enter" || e.key === " "){
-    e.preventDefault();
-    closeMessageAndRestart();
-  }
-});
+endMessage.addEventListener("click", restartGame);
 
 startGame();
 </script>
