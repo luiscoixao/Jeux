@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
 <title>MEMORY COLORS</title>
 
-<meta name="theme-color" content="#4f46e5" />
+<meta name="theme-color" content="#5b3df5" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-title" content="MEMORY COLORS" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -19,29 +19,18 @@
   --bg3:#312e81;
   --text:#ffffff;
 
-  --green1:#34d399;
-  --green2:#059669;
-
-  --yellow1:#facc15;
-  --yellow2:#a16207;
-
-  --pink1:#f472b6;
-  --pink2:#be185d;
-
-  --cyan1:#22d3ee;
-  --cyan2:#0369a1;
-
-  --orange1:#fb923c;
-  --orange2:#c2410c;
-
-  --blue1:#fff700;
-  --blue2:#ffcc00;
-
-  --red1:#f43f5e;
-  --red2:#9f1239;
-
-  --lime1:#a3e635;
-  --lime2:#4d7c0f;
+  --green1:#34d399;  --green2:#059669;
+  --yellow1:#facc15; --yellow2:#a16207;
+  --pink1:#f472b6;   --pink2:#be185d;
+  --cyan1:#22d3ee;   --cyan2:#0369a1;
+  --orange1:#fb923c; --orange2:#c2410c;
+  --blue1:#fff700;   --blue2:#ffcc00;
+  --red1:#f43f5e;    --red2:#9f1239;
+  --lime1:#a3e635;   --lime2:#4d7c0f;
+  --purple1:#c084fc; --purple2:#6d28d9;
+  --teal1:#2dd4bf;   --teal2:#0f766e;
+  --indigo1:#818cf8; --indigo2:#4338ca;
+  --rose1:#fb7185;   --rose2:#be123c;
 }
 *{
   box-sizing:border-box;
@@ -58,9 +47,9 @@ body{
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",sans-serif;
   color:var(--text);
   background:
-    radial-gradient(circle at 12% 14%, rgba(56,189,248,.30), transparent 22%),
-    radial-gradient(circle at 88% 10%, rgba(255,60,172,.28), transparent 20%),
-    radial-gradient(circle at 18% 88%, rgba(34,197,94,.18), transparent 22%),
+    radial-gradient(circle at 10% 15%, rgba(56,189,248,.35), transparent 20%),
+    radial-gradient(circle at 90% 12%, rgba(255,60,172,.28), transparent 20%),
+    radial-gradient(circle at 20% 90%, rgba(34,197,94,.18), transparent 22%),
     linear-gradient(135deg,var(--bg1),var(--bg2) 55%, #5b21b6 75%, var(--bg3));
 }
 .app{
@@ -69,78 +58,49 @@ body{
   padding:
     calc(env(safe-area-inset-top) + 10px)
     10px
-    calc(env(safe-area-inset-bottom) + 14px)
+    calc(env(safe-area-inset-bottom) + 10px)
     10px;
   display:flex;
-  flex-direction:column;
+  justify-content:center;
+  align-items:center;
 }
-.header{
-  flex:0 0 auto;
-  text-align:center;
-  padding:4px 0 10px;
-}
-h1{
-  margin:0;
-  font-size:clamp(28px, 7vw, 42px);
-  line-height:1;
-  font-weight:1000;
-  letter-spacing:.10em;
-  text-transform:uppercase;
-  color:#ffffff;
-  text-shadow:
-    0 2px 10px rgba(0,0,0,.18),
-    0 0 24px rgba(255,255,255,.10);
-}
-.subtitle{
-  margin-top:6px;
-  font-size:13px;
-  font-weight:700;
-  letter-spacing:.08em;
-  color:rgba(255,255,255,.72);
-  text-transform:uppercase;
-}
-.game-wrap{
-  flex:1;
-  min-height:0;
-  display:flex;
-}
-.game-grid{
-  width:100%;
-  height:100%;
+.board-shell{
+  width:min(100vw - 20px, calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px) * 0.6666667));
+  height:min(calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px), calc((100vw - 20px) * 1.5));
   display:grid;
   grid-template-columns:repeat(4, 1fr);
+  grid-template-rows:repeat(6, 1fr);
   gap:8px;
-  align-content:stretch;
 }
 .tile{
   width:100%;
-  aspect-ratio:1/1;
+  height:100%;
+  min-width:0;
+  min-height:0;
   border:none;
   border-radius:0;
-  background:rgba(255,255,255,.12);
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.08),
-    0 6px 16px rgba(0,0,0,.14);
-  transition:
-    transform .16s ease,
-    box-shadow .16s ease,
-    filter .16s ease,
-    opacity .16s ease;
   cursor:pointer;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.16),
+    0 4px 14px rgba(0,0,0,.12);
+  transition:transform .16s ease, box-shadow .16s ease, opacity .16s ease, filter .16s ease;
 }
 .tile:active{
   transform:scale(.97);
 }
 .tile.hidden{
-  background:rgba(255,255,255,.12);
+  background:rgba(255,255,255,.09);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.10),
+    0 3px 10px rgba(0,0,0,.10);
 }
 .tile.open{
-  transform:scale(.98);
+  transform:scale(.985);
 }
 .tile.matched{
   box-shadow:
-    inset 0 0 0 3px rgba(255,255,255,.75),
-    0 0 18px rgba(255,255,255,.12);
+    inset 0 0 0 4px rgba(255,255,255,.72),
+    0 0 16px rgba(255,255,255,.10);
 }
 .seq-green{background:linear-gradient(135deg,var(--green1),var(--green2));}
 .seq-yellow{background:linear-gradient(135deg,var(--yellow1),var(--yellow2));}
@@ -150,7 +110,33 @@ h1{
 .seq-blue{background:linear-gradient(135deg,var(--blue1),var(--blue2));}
 .seq-red{background:linear-gradient(135deg,var(--red1),var(--red2));}
 .seq-lime{background:linear-gradient(135deg,var(--lime1),var(--lime2));}
+.seq-purple{background:linear-gradient(135deg,var(--purple1),var(--purple2));}
+.seq-teal{background:linear-gradient(135deg,var(--teal1),var(--teal2));}
+.seq-indigo{background:linear-gradient(135deg,var(--indigo1),var(--indigo2));}
+.seq-rose{background:linear-gradient(135deg,var(--rose1),var(--rose2));}
 
+.title-tile{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:8px;
+  background:rgba(255,255,255,.08);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.14),
+    0 4px 14px rgba(0,0,0,.12);
+}
+.title-text{
+  font-size:clamp(16px, 3.5vw, 28px);
+  line-height:.95;
+  font-weight:1000;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+  color:#fff;
+  text-shadow:
+    0 2px 10px rgba(0,0,0,.18),
+    0 0 20px rgba(255,255,255,.08);
+}
 .end-message{
   position:fixed;
   inset:0;
@@ -162,7 +148,7 @@ h1{
   opacity:0;
   pointer-events:none;
   transition:opacity .22s ease;
-  z-index:40;
+  z-index:50;
 }
 .end-message.show{
   opacity:1;
@@ -172,7 +158,7 @@ h1{
   min-width:min(88vw, 360px);
   padding:24px 22px;
   text-align:center;
-  background:rgba(12,18,40,.50);
+  background:rgba(12,18,40,.58);
   border:1px solid rgba(255,255,255,.18);
   box-shadow:
     0 24px 60px rgba(0,0,0,.28),
@@ -195,28 +181,21 @@ h1{
   position:fixed;
   left:0;
   right:0;
-  bottom:calc(env(safe-area-inset-bottom) + 8px);
+  bottom:calc(env(safe-area-inset-bottom) + 4px);
   text-align:center;
-  font-size:11px;
-  color:rgba(255,255,255,.55);
+  font-size:10px;
+  color:rgba(255,255,255,.42);
   pointer-events:none;
-  z-index:10;
+  z-index:12;
 }
-@media (max-width:390px){
-  .game-grid{ gap:7px; }
+@media (max-width:420px){
+  .board-shell{ gap:7px; }
 }
 </style>
 </head>
 <body>
   <div class="app">
-    <header class="header">
-      <h1>MEMORY COLORS</h1>
-      <div class="subtitle">Retrouve les paires de couleurs</div>
-    </header>
-
-    <section class="game-wrap">
-      <div id="gameGrid" class="game-grid"></div>
-    </section>
+    <div id="boardShell" class="board-shell"></div>
   </div>
 
   <div id="endMessage" class="end-message">
@@ -237,8 +216,15 @@ const COLORS = [
   "seq-orange",
   "seq-blue",
   "seq-red",
-  "seq-lime"
+  "seq-lime",
+  "seq-purple",
+  "seq-teal",
+  "seq-indigo",
+  "seq-rose"
 ];
+
+const TOTAL_TILES = 24; // 24 cases = 12 paires
+const TITLE_INDEX = 13; // case centrale visuelle dans une grille 4x6
 
 const state = {
   locked: true,
@@ -250,7 +236,7 @@ const state = {
   finished: false
 };
 
-const gameGrid = document.getElementById("gameGrid");
+const boardShell = document.getElementById("boardShell");
 const endMessage = document.getElementById("endMessage");
 const endText = document.getElementById("endText");
 
@@ -277,10 +263,22 @@ function buildBoard(){
   }));
 }
 
+function createTitleTile(){
+  const tile = document.createElement("div");
+  tile.className = "title-tile";
+  tile.innerHTML = '<div class="title-text">MEMORY<br>COLORS</div>';
+  return tile;
+}
+
 function renderBoard(){
-  gameGrid.innerHTML = "";
+  boardShell.innerHTML = "";
 
   state.board.forEach((card, index) => {
+    if(index === TITLE_INDEX){
+      boardShell.appendChild(createTitleTile());
+      return;
+    }
+
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "tile " + (
@@ -289,7 +287,7 @@ function renderBoard(){
       "hidden"
     );
     btn.addEventListener("click", () => handleTileClick(index));
-    gameGrid.appendChild(btn);
+    boardShell.appendChild(btn);
   });
 }
 
@@ -321,6 +319,7 @@ async function startGame(){
 
 async function handleTileClick(index){
   if(state.locked || state.finished) return;
+  if(index === TITLE_INDEX) return;
 
   const card = state.board[index];
   if(!card || card.open || card.matched) return;
