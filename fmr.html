@@ -19,7 +19,6 @@
   --bg3:#312e81;
   --text:#ffffff;
 
-  /* Couleurs volontairement plus distinctes et éloignées du fond violet/bleu */
   --green1:#4ade80;  --green2:#15803d;
   --yellow1:#fde047; --yellow2:#ca8a04;
   --pink1:#f9a8d4;   --pink2:#db2777;
@@ -28,10 +27,10 @@
   --red1:#fb7185;    --red2:#be123c;
   --lime1:#bef264;   --lime2:#65a30d;
   --teal1:#5eead4;   --teal2:#0f766e;
-  --amber1:#fcd34d;  --amber2:#d97706;
+  --brown1:#d6a46b;  --brown2:#8b5e34;
+  --white1:#f8fafc;  --white2:#cbd5e1;
+  --black1:#4b5563;  --black2:#111827;
   --coral1:#fda4af;  --coral2:#e11d48;
-  --mint1:#86efac;   --mint2:#16a34a;
-  --gold1:#fef08a;   --gold2:#eab308;
 }
 *{
   box-sizing:border-box;
@@ -48,9 +47,9 @@ body{
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",sans-serif;
   color:var(--text);
   background:
-    radial-gradient(circle at 10% 15%, rgba(56,189,248,.35), transparent 20%),
-    radial-gradient(circle at 90% 12%, rgba(255,60,172,.28), transparent 20%),
-    radial-gradient(circle at 20% 90%, rgba(34,197,94,.18), transparent 22%),
+    radial-gradient(circle at 10% 15%, rgba(56,189,248,.22), transparent 20%),
+    radial-gradient(circle at 90% 12%, rgba(255,60,172,.18), transparent 20%),
+    radial-gradient(circle at 20% 90%, rgba(34,197,94,.10), transparent 22%),
     linear-gradient(135deg,var(--bg1),var(--bg2) 55%, #5b21b6 75%, var(--bg3));
 }
 
@@ -60,7 +59,7 @@ body{
   padding:
     calc(env(safe-area-inset-top) + 8px)
     0
-    calc(env(safe-area-inset-bottom) + 0px)
+    calc(env(safe-area-inset-bottom) + 10px)
     0;
   display:flex;
   flex-direction:column;
@@ -69,7 +68,9 @@ body{
 .header{
   flex:0 0 auto;
   text-align:center;
-  padding:6px 8px 8px;
+  padding:10px 8px 12px;
+  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+  box-shadow:inset 0 -1px 0 rgba(255,255,255,.10);
 }
 
 h1{
@@ -81,26 +82,32 @@ h1{
   text-transform:uppercase;
   color:#ffffff;
   text-shadow:
-    0 2px 14px rgba(0,0,0,.18),
-    0 0 26px rgba(255,255,255,.14);
+    0 2px 14px rgba(0,0,0,.22),
+    0 0 22px rgba(255,255,255,.08);
 }
 
 .board-wrap{
   flex:1;
   min-height:0;
   display:flex;
-  align-items:stretch;
-  justify-content:center;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
   overflow:hidden;
+  padding-bottom:18px;
 }
 
 .board{
-  width:min(100vw, calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 70px) * 0.6666667));
-  height:min(calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 70px), calc(100vw * 1.5));
+  width:min(100vw, calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 130px) * 0.6666667));
+  height:min(calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 130px), calc(100vw * 1.5));
   display:grid;
   grid-template-columns:repeat(4, 1fr);
   grid-template-rows:repeat(6, 1fr);
   gap:0;
+  background:rgba(8,10,26,.22);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.10),
+    0 10px 28px rgba(0,0,0,.12);
 }
 
 .tile{
@@ -114,7 +121,7 @@ h1{
   margin:0;
   cursor:pointer;
   transition:transform .14s ease, filter .18s ease, opacity .18s ease, box-shadow .18s ease;
-  box-shadow:inset 0 0 0 3px rgba(255,255,255,.45);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.14);
 }
 
 .tile:active{
@@ -122,17 +129,17 @@ h1{
 }
 
 .tile.hidden{
-  background:rgba(255,255,255,.08);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.10);
+  background:rgba(7,9,24,.22);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.10);
 }
 
 .tile.open{
   transform:scale(.99);
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.58);
 }
 
-/* Plus aucune bordure spéciale pour les paires trouvées */
 .tile.matched{
-  box-shadow:none;
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.58);
 }
 
 .seq-green{background:linear-gradient(135deg,var(--green1),var(--green2));}
@@ -143,10 +150,10 @@ h1{
 .seq-red{background:linear-gradient(135deg,var(--red1),var(--red2));}
 .seq-lime{background:linear-gradient(135deg,var(--lime1),var(--lime2));}
 .seq-teal{background:linear-gradient(135deg,var(--teal1),var(--teal2));}
-.seq-amber{background:linear-gradient(135deg,var(--amber1),var(--amber2));}
+.seq-brown{background:linear-gradient(135deg,var(--brown1),var(--brown2));}
+.seq-white{background:linear-gradient(135deg,var(--white1),var(--white2));}
+.seq-black{background:linear-gradient(135deg,var(--black1),var(--black2));}
 .seq-coral{background:linear-gradient(135deg,var(--coral1),var(--coral2));}
-.seq-mint{background:linear-gradient(135deg,var(--mint1),var(--mint2));}
-.seq-gold{background:linear-gradient(135deg,var(--gold1),var(--gold2));}
 
 .end-message{
   position:fixed;
@@ -156,6 +163,7 @@ h1{
   justify-content:center;
   background:rgba(10,12,28,.42);
   backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
   opacity:0;
   pointer-events:none;
   transition:opacity .22s ease;
@@ -169,11 +177,11 @@ h1{
   min-width:min(88vw, 360px);
   padding:24px 22px;
   text-align:center;
-  background:rgba(12,18,40,.58);
-  border:1px solid rgba(255,255,255,.18);
+  background:rgba(12,18,40,.62);
+  border:1px solid rgba(255,255,255,.16);
   box-shadow:
     0 24px 60px rgba(0,0,0,.28),
-    inset 0 0 0 1px rgba(255,255,255,.04);
+    inset 0 0 0 1px rgba(255,255,255,.03);
 }
 .end-text{
   font-size:16px;
@@ -189,16 +197,21 @@ h1{
   text-transform:uppercase;
   color:rgba(255,255,255,.65);
 }
+
 .signature{
-  position:fixed;
-  left:0;
-  right:0;
-  bottom:calc(env(safe-area-inset-bottom) + 4px);
+  flex:0 0 auto;
+  margin-top:14px;
   text-align:center;
   font-size:10px;
   color:rgba(255,255,255,.42);
   pointer-events:none;
-  z-index:12;
+  width:100%;
+}
+
+@media (max-height:700px){
+  .signature{
+    margin-top:8px;
+  }
 }
 </style>
 </head>
@@ -210,6 +223,7 @@ h1{
 
     <section class="board-wrap">
       <div id="board" class="board"></div>
+      <div class="signature">Jeu créé par Luis Coixao à l'aide de ChatGPT.</div>
     </section>
   </div>
 
@@ -219,8 +233,6 @@ h1{
       <div class="end-hint">Touchez pour recommencer</div>
     </div>
   </div>
-
-  <div class="signature">Jeu créé par Luis Coixao à l'aide de ChatGPT.</div>
 
 <script>
 const COLORS = [
@@ -232,10 +244,10 @@ const COLORS = [
   "seq-red",
   "seq-lime",
   "seq-teal",
-  "seq-amber",
-  "seq-coral",
-  "seq-mint",
-  "seq-gold"
+  "seq-brown",
+  "seq-white",
+  "seq-black",
+  "seq-coral"
 ];
 
 const BEST_KEY = "memory-colors-best-score";
