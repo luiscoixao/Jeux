@@ -18,8 +18,6 @@
   --bg2:#7c3aed;
   --bg3:#312e81;
   --text:#ffffff;
-  --panel:rgba(255,255,255,.08);
-  --line:rgba(255,255,255,.18);
 
   --green1:#34d399;
   --green2:#059669;
@@ -57,79 +55,53 @@ html,body{
   overflow:hidden;
 }
 body{
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",sans-serif;
   color:var(--text);
   background:
-    radial-gradient(circle at 10% 15%, rgba(56,189,248,.35), transparent 20%),
-    radial-gradient(circle at 90% 12%, rgba(255,60,172,.35), transparent 20%),
-    radial-gradient(circle at 20% 90%, rgba(34,197,94,.22), transparent 22%),
+    radial-gradient(circle at 12% 14%, rgba(56,189,248,.30), transparent 22%),
+    radial-gradient(circle at 88% 10%, rgba(255,60,172,.28), transparent 20%),
+    radial-gradient(circle at 18% 88%, rgba(34,197,94,.18), transparent 22%),
     linear-gradient(135deg,var(--bg1),var(--bg2) 55%, #5b21b6 75%, var(--bg3));
 }
 .app{
-  position:relative;
   width:100vw;
   height:100dvh;
   padding:
     calc(env(safe-area-inset-top) + 10px)
     10px
-    calc(env(safe-area-inset-bottom) + 92px)
+    calc(env(safe-area-inset-bottom) + 14px)
     10px;
   display:flex;
   flex-direction:column;
 }
-.bg-title{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:clamp(44px, 14vw, 108px);
-  font-weight:900;
-  letter-spacing:.08em;
-  color:rgba(255,255,255,.10);
+.header{
+  flex:0 0 auto;
   text-align:center;
-  pointer-events:none;
-  user-select:none;
-  z-index:0;
+  padding:4px 0 10px;
+}
+h1{
+  margin:0;
+  font-size:clamp(28px, 7vw, 42px);
+  line-height:1;
+  font-weight:1000;
+  letter-spacing:.10em;
   text-transform:uppercase;
-  line-height:.9;
+  color:#ffffff;
+  text-shadow:
+    0 2px 10px rgba(0,0,0,.18),
+    0 0 24px rgba(255,255,255,.10);
 }
-.top{
-  position:relative;
-  z-index:2;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-bottom:10px;
-}
-.top-pill{
-  min-height:52px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  border-radius:18px;
-  border:1px solid var(--line);
-  background:rgba(8,12,30,.28);
-  backdrop-filter:blur(12px);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);
-  font-size:15px;
-  font-weight:900;
-  padding:10px 12px;
+.subtitle{
+  margin-top:6px;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.08em;
+  color:rgba(255,255,255,.72);
+  text-transform:uppercase;
 }
 .game-wrap{
-  position:relative;
-  z-index:2;
   flex:1;
   min-height:0;
-  border-radius:28px;
-  border:1px solid rgba(255,255,255,.16);
-  background:rgba(7,10,28,.18);
-  backdrop-filter:blur(6px);
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.04),
-    0 18px 40px rgba(0,0,0,.22);
-  padding:10px;
   display:flex;
 }
 .game-grid{
@@ -137,23 +109,23 @@ body{
   height:100%;
   display:grid;
   grid-template-columns:repeat(4, 1fr);
-  gap:10px;
+  gap:8px;
+  align-content:stretch;
 }
 .tile{
-  position:relative;
   width:100%;
   aspect-ratio:1/1;
   border:none;
-  border-radius:18px;
+  border-radius:0;
   background:rgba(255,255,255,.12);
   box-shadow:
     inset 0 0 0 1px rgba(255,255,255,.08),
-    0 8px 20px rgba(0,0,0,.14);
+    0 6px 16px rgba(0,0,0,.14);
   transition:
-    transform .18s ease,
-    opacity .18s ease,
-    box-shadow .18s ease,
-    filter .18s ease;
+    transform .16s ease,
+    box-shadow .16s ease,
+    filter .16s ease,
+    opacity .16s ease;
   cursor:pointer;
 }
 .tile:active{
@@ -161,18 +133,14 @@ body{
 }
 .tile.hidden{
   background:rgba(255,255,255,.12);
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.08),
-    0 8px 20px rgba(0,0,0,.14);
 }
 .tile.open{
   transform:scale(.98);
 }
 .tile.matched{
-  outline:3px solid rgba(255,255,255,.78);
   box-shadow:
-    0 0 0 1px rgba(255,255,255,.08) inset,
-    0 0 18px rgba(255,255,255,.16);
+    inset 0 0 0 3px rgba(255,255,255,.75),
+    0 0 18px rgba(255,255,255,.12);
 }
 .seq-green{background:linear-gradient(135deg,var(--green1),var(--green2));}
 .seq-yellow{background:linear-gradient(135deg,var(--yellow1),var(--yellow2));}
@@ -183,77 +151,82 @@ body{
 .seq-red{background:linear-gradient(135deg,var(--red1),var(--red2));}
 .seq-lime{background:linear-gradient(135deg,var(--lime1),var(--lime2));}
 
-.status{
-  position:relative;
-  z-index:2;
-  min-height:24px;
-  text-align:center;
-  font-size:15px;
-  font-weight:900;
-  color:rgba(255,255,255,.96);
-  margin-top:10px;
-}
-.playbar{
+.end-message{
   position:fixed;
-  left:10px;
-  right:10px;
-  bottom:calc(env(safe-area-inset-bottom) + 12px);
+  inset:0;
   display:flex;
+  align-items:center;
   justify-content:center;
-  z-index:30;
+  background:rgba(10,12,28,.42);
+  backdrop-filter:blur(8px);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .22s ease;
+  z-index:40;
 }
-.action-btn{
-  width:min(100%, 420px);
-  min-height:64px;
-  border:none;
-  border-radius:24px;
-  color:#fff;
-  font-size:20px;
-  font-weight:900;
+.end-message.show{
+  opacity:1;
+  pointer-events:auto;
+}
+.end-box{
+  min-width:min(88vw, 360px);
+  padding:24px 22px;
   text-align:center;
-  cursor:pointer;
-  background:linear-gradient(135deg,#22c55e,#10b981);
-  box-shadow:0 18px 34px rgba(0,0,0,.26), 0 0 28px rgba(34,197,94,.22);
+  background:rgba(12,18,40,.50);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.28),
+    inset 0 0 0 1px rgba(255,255,255,.04);
+}
+.end-title{
+  font-size:28px;
+  font-weight:1000;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+.end-text{
+  font-size:16px;
+  font-weight:700;
+  color:rgba(255,255,255,.92);
+  line-height:1.4;
 }
 .signature{
   position:fixed;
   left:0;
   right:0;
-  bottom:calc(env(safe-area-inset-bottom) + 84px);
+  bottom:calc(env(safe-area-inset-bottom) + 8px);
   text-align:center;
   font-size:11px;
-  color:rgba(255,255,255,.54);
+  color:rgba(255,255,255,.55);
   pointer-events:none;
-  z-index:20;
+  z-index:10;
 }
 @media (max-width:390px){
-  .game-grid{ gap:8px; }
-  .game-wrap{ padding:8px; }
-  .tile{ border-radius:15px; }
+  .game-grid{ gap:7px; }
 }
 </style>
 </head>
 <body>
   <div class="app">
-    <div class="bg-title">MEMORY<br>COLORS</div>
-
-    <div class="top">
-      <div class="top-pill" id="movesBox">Coups : 0</div>
-      <div class="top-pill" id="bestBox">Meilleur : 0</div>
-    </div>
+    <header class="header">
+      <h1>MEMORY COLORS</h1>
+      <div class="subtitle">Retrouve les paires de couleurs</div>
+    </header>
 
     <section class="game-wrap">
       <div id="gameGrid" class="game-grid"></div>
     </section>
-
-    <div id="status" class="status"></div>
-
-    <div class="signature">Jeu créé par Luis Coixao à l'aide de ChatGPT.</div>
   </div>
 
-  <div class="playbar">
-    <button id="actionBtn" class="action-btn" type="button">Nouvelle partie</button>
+  <div id="endMessage" class="end-message">
+    <div class="end-box">
+      <div class="end-title">Bravo</div>
+      <div id="endText" class="end-text"></div>
+    </div>
   </div>
+
+  <div class="signature">Jeu créé par Luis Coixao à l'aide de ChatGPT.</div>
 
 <script>
 const COLORS = [
@@ -267,22 +240,19 @@ const COLORS = [
   "seq-lime"
 ];
 
-const BEST_KEY = "memory-colors-best-moves";
-
 const state = {
-  locked: false,
+  locked: true,
   moves: 0,
   matched: 0,
   first: null,
   second: null,
-  board: []
+  board: [],
+  finished: false
 };
 
 const gameGrid = document.getElementById("gameGrid");
-const actionBtn = document.getElementById("actionBtn");
-const movesBox = document.getElementById("movesBox");
-const bestBox = document.getElementById("bestBox");
-const statusEl = document.getElementById("status");
+const endMessage = document.getElementById("endMessage");
+const endText = document.getElementById("endText");
 
 function wait(ms){
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -295,31 +265,6 @@ function shuffle(arr){
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
-}
-
-function loadBest(){
-  const best = Number(localStorage.getItem(BEST_KEY) || 0);
-  bestBox.textContent = "Meilleur : " + (best ? best : 0);
-}
-
-function saveBest(){
-  const best = Number(localStorage.getItem(BEST_KEY) || 0);
-  if(best === 0 || state.moves < best){
-    localStorage.setItem(BEST_KEY, String(state.moves));
-  }
-  loadBest();
-}
-
-function updateTop(){
-  movesBox.textContent = "Coups : " + state.moves;
-}
-
-function showStatus(text){
-  statusEl.textContent = text;
-}
-
-function clearStatus(){
-  statusEl.textContent = "";
 }
 
 function buildBoard(){
@@ -338,13 +283,11 @@ function renderBoard(){
   state.board.forEach((card, index) => {
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.dataset.index = index;
     btn.className = "tile " + (
       card.matched ? card.color + " matched" :
       card.open ? card.color + " open" :
       "hidden"
     );
-
     btn.addEventListener("click", () => handleTileClick(index));
     gameGrid.appendChild(btn);
   });
@@ -354,31 +297,30 @@ async function previewBoard(){
   state.locked = true;
   state.board.forEach(card => card.open = true);
   renderBoard();
-  showStatus("Mémorise les couleurs");
   await wait(1400);
   state.board.forEach(card => {
     if(!card.matched) card.open = false;
   });
   renderBoard();
-  clearStatus();
   state.locked = false;
 }
 
-async function newGame(){
+async function startGame(){
   state.locked = true;
   state.moves = 0;
   state.matched = 0;
   state.first = null;
   state.second = null;
-  updateTop();
-  clearStatus();
+  state.finished = false;
+  endMessage.classList.remove("show");
+
   buildBoard();
   renderBoard();
   await previewBoard();
 }
 
 async function handleTileClick(index){
-  if(state.locked) return;
+  if(state.locked || state.finished) return;
 
   const card = state.board[index];
   if(!card || card.open || card.matched) return;
@@ -386,14 +328,13 @@ async function handleTileClick(index){
   card.open = true;
   renderBoard();
 
-  if(!state.first){
+  if(state.first === null){
     state.first = index;
     return;
   }
 
   state.second = index;
   state.moves += 1;
-  updateTop();
   state.locked = true;
 
   const firstCard = state.board[state.first];
@@ -407,16 +348,20 @@ async function handleTileClick(index){
     state.first = null;
     state.second = null;
     renderBoard();
-    state.locked = false;
 
     if(state.matched === state.board.length){
-      saveBest();
-      showStatus("Bravo !");
+      state.finished = true;
+      await wait(250);
+      endText.textContent = "Partie terminée en " + state.moves + " coups.";
+      endMessage.classList.add("show");
+      return;
     }
+
+    state.locked = false;
     return;
   }
 
-  await wait(700);
+  await wait(650);
 
   firstCard.open = false;
   secondCard.open = false;
@@ -426,11 +371,7 @@ async function handleTileClick(index){
   state.locked = false;
 }
 
-actionBtn.addEventListener("click", newGame);
-
-loadBest();
-updateTop();
-newGame();
+startGame();
 </script>
 </body>
 </html>
