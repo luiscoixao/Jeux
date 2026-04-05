@@ -20,17 +20,17 @@
   --text:#ffffff;
 
   --green1:#34d399;  --green2:#059669;
-  --yellow1:#facc15; --yellow2:#a16207;
-  --pink1:#f472b6;   --pink2:#be185d;
-  --cyan1:#22d3ee;   --cyan2:#0369a1;
-  --orange1:#fb923c; --orange2:#c2410c;
-  --blue1:#fff700;   --blue2:#ffcc00;
-  --red1:#f43f5e;    --red2:#9f1239;
-  --lime1:#a3e635;   --lime2:#4d7c0f;
-  --purple1:#c084fc; --purple2:#6d28d9;
+  --yellow1:#facc15; --yellow2:#ca8a04;
+  --pink1:#f472b6;   --pink2:#db2777;
+  --cyan1:#22d3ee;   --cyan2:#0284c7;
+  --orange1:#fb923c; --orange2:#ea580c;
+  --blue1:#fde047;   --blue2:#facc15;
+  --red1:#f43f5e;    --red2:#be123c;
+  --lime1:#a3e635;   --lime2:#65a30d;
+  --purple1:#c084fc; --purple2:#7c3aed;
   --teal1:#2dd4bf;   --teal2:#0f766e;
-  --indigo1:#818cf8; --indigo2:#4338ca;
-  --rose1:#fb7185;   --rose2:#be123c;
+  --indigo1:#818cf8; --indigo2:#4f46e5;
+  --rose1:#fb7185;   --rose2:#e11d48;
 }
 *{
   box-sizing:border-box;
@@ -52,26 +52,56 @@ body{
     radial-gradient(circle at 20% 90%, rgba(34,197,94,.18), transparent 22%),
     linear-gradient(135deg,var(--bg1),var(--bg2) 55%, #5b21b6 75%, var(--bg3));
 }
+
 .app{
   width:100vw;
   height:100dvh;
   padding:
-    calc(env(safe-area-inset-top) + 10px)
-    10px
-    calc(env(safe-area-inset-bottom) + 10px)
-    10px;
+    calc(env(safe-area-inset-top) + 8px)
+    0
+    calc(env(safe-area-inset-bottom) + 0px)
+    0;
   display:flex;
-  justify-content:center;
-  align-items:center;
+  flex-direction:column;
 }
-.board-shell{
-  width:min(100vw - 20px, calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px) * 0.6666667));
-  height:min(calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px), calc((100vw - 20px) * 1.5));
+
+.header{
+  flex:0 0 auto;
+  text-align:center;
+  padding:6px 8px 8px;
+}
+
+h1{
+  margin:0;
+  font-size:clamp(30px, 8vw, 56px);
+  line-height:.92;
+  font-weight:1000;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+  color:#ffffff;
+  text-shadow:
+    0 2px 14px rgba(0,0,0,.18),
+    0 0 26px rgba(255,255,255,.14);
+}
+
+.board-wrap{
+  flex:1;
+  min-height:0;
+  display:flex;
+  align-items:stretch;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.board{
+  width:min(100vw, calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 70px) * 0.6666667));
+  height:min(calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 70px), calc(100vw * 1.5));
   display:grid;
   grid-template-columns:repeat(4, 1fr);
   grid-template-rows:repeat(6, 1fr);
-  gap:8px;
+  gap:0;
 }
+
 .tile{
   width:100%;
   height:100%;
@@ -79,29 +109,32 @@ body{
   min-height:0;
   border:none;
   border-radius:0;
+  padding:0;
+  margin:0;
   cursor:pointer;
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.16),
-    0 4px 14px rgba(0,0,0,.12);
-  transition:transform .16s ease, box-shadow .16s ease, opacity .16s ease, filter .16s ease;
+  transition:transform .14s ease, filter .18s ease, opacity .18s ease, box-shadow .18s ease;
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.45);
 }
+
 .tile:active{
-  transform:scale(.97);
-}
-.tile.hidden{
-  background:rgba(255,255,255,.09);
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.10),
-    0 3px 10px rgba(0,0,0,.10);
-}
-.tile.open{
   transform:scale(.985);
 }
+
+.tile.hidden{
+  background:rgba(255,255,255,.08);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.10);
+}
+
+.tile.open{
+  transform:scale(.99);
+}
+
 .tile.matched{
   box-shadow:
-    inset 0 0 0 4px rgba(255,255,255,.72),
-    0 0 16px rgba(255,255,255,.10);
+    inset 0 0 0 5px rgba(255,255,255,.82),
+    0 0 20px rgba(255,255,255,.10);
 }
+
 .seq-green{background:linear-gradient(135deg,var(--green1),var(--green2));}
 .seq-yellow{background:linear-gradient(135deg,var(--yellow1),var(--yellow2));}
 .seq-pink{background:linear-gradient(135deg,var(--pink1),var(--pink2));}
@@ -115,28 +148,6 @@ body{
 .seq-indigo{background:linear-gradient(135deg,var(--indigo1),var(--indigo2));}
 .seq-rose{background:linear-gradient(135deg,var(--rose1),var(--rose2));}
 
-.title-tile{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  padding:8px;
-  background:rgba(255,255,255,.08);
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.14),
-    0 4px 14px rgba(0,0,0,.12);
-}
-.title-text{
-  font-size:clamp(16px, 3.5vw, 28px);
-  line-height:.95;
-  font-weight:1000;
-  letter-spacing:.10em;
-  text-transform:uppercase;
-  color:#fff;
-  text-shadow:
-    0 2px 10px rgba(0,0,0,.18),
-    0 0 20px rgba(255,255,255,.08);
-}
 .end-message{
   position:fixed;
   inset:0;
@@ -188,14 +199,17 @@ body{
   pointer-events:none;
   z-index:12;
 }
-@media (max-width:420px){
-  .board-shell{ gap:7px; }
-}
 </style>
 </head>
 <body>
   <div class="app">
-    <div id="boardShell" class="board-shell"></div>
+    <header class="header">
+      <h1>MEMORY COLORS</h1>
+    </header>
+
+    <section class="board-wrap">
+      <div id="board" class="board"></div>
+    </section>
   </div>
 
   <div id="endMessage" class="end-message">
@@ -223,9 +237,6 @@ const COLORS = [
   "seq-rose"
 ];
 
-const TOTAL_TILES = 24; // 24 cases = 12 paires
-const TITLE_INDEX = 13; // case centrale visuelle dans une grille 4x6
-
 const state = {
   locked: true,
   moves: 0,
@@ -236,7 +247,7 @@ const state = {
   finished: false
 };
 
-const boardShell = document.getElementById("boardShell");
+const boardEl = document.getElementById("board");
 const endMessage = document.getElementById("endMessage");
 const endText = document.getElementById("endText");
 
@@ -263,22 +274,10 @@ function buildBoard(){
   }));
 }
 
-function createTitleTile(){
-  const tile = document.createElement("div");
-  tile.className = "title-tile";
-  tile.innerHTML = '<div class="title-text">MEMORY<br>COLORS</div>';
-  return tile;
-}
-
 function renderBoard(){
-  boardShell.innerHTML = "";
+  boardEl.innerHTML = "";
 
   state.board.forEach((card, index) => {
-    if(index === TITLE_INDEX){
-      boardShell.appendChild(createTitleTile());
-      return;
-    }
-
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "tile " + (
@@ -287,7 +286,7 @@ function renderBoard(){
       "hidden"
     );
     btn.addEventListener("click", () => handleTileClick(index));
-    boardShell.appendChild(btn);
+    boardEl.appendChild(btn);
   });
 }
 
@@ -319,7 +318,6 @@ async function startGame(){
 
 async function handleTileClick(index){
   if(state.locked || state.finished) return;
-  if(index === TITLE_INDEX) return;
 
   const card = state.board[index];
   if(!card || card.open || card.matched) return;
