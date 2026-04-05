@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+<title>MEMORY COLORS</title>
+
+<meta name="theme-color" content="#4f46e5" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="MEMORY COLORS" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<link rel="apple-touch-icon" href="iconmemorycolors.png" />
+<link rel="icon" type="image/png" href="iconmemorycolors.png" />
+
+<style>
+:root{
+  --bg1:#4338ca;
+  --bg2:#7c3aed;
+  --bg3:#312e81;
+  --text:#ffffff;
+  --panel:rgba(255,255,255,.08);
+  --line:rgba(255,255,255,.18);
+
+  --green1:#34d399;
+  --green2:#059669;
+
+  --yellow1:#facc15;
+  --yellow2:#a16207;
+
+  --pink1:#f472b6;
+  --pink2:#be185d;
+
+  --cyan1:#22d3ee;
+  --cyan2:#0369a1;
+
+  --orange1:#fb923c;
+  --orange2:#c2410c;
+
+  --blue1:#fff700;
+  --blue2:#ffcc00;
+
+  --red1:#f43f5e;
+  --red2:#9f1239;
+
+  --lime1:#a3e635;
+  --lime2:#4d7c0f;
+}
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 10% 15%, rgba(56,189,248,.35), transparent 20%),
+    radial-gradient(circle at 90% 12%, rgba(255,60,172,.35), transparent 20%),
+    radial-gradient(circle at 20% 90%, rgba(34,197,94,.22), transparent 22%),
+    linear-gradient(135deg,var(--bg1),var(--bg2) 55%, #5b21b6 75%, var(--bg3));
+}
+.app{
+  position:relative;
+  width:100vw;
+  height:100dvh;
+  padding:
+    calc(env(safe-area-inset-top) + 10px)
+    10px
+    calc(env(safe-area-inset-bottom) + 92px)
+    10px;
+  display:flex;
+  flex-direction:column;
+}
+.bg-title{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:clamp(44px, 14vw, 108px);
+  font-weight:900;
+  letter-spacing:.08em;
+  color:rgba(255,255,255,.10);
+  text-align:center;
+  pointer-events:none;
+  user-select:none;
+  z-index:0;
+  text-transform:uppercase;
+  line-height:.9;
+}
+.top{
+  position:relative;
+  z-index:2;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:10px;
+}
+.top-pill{
+  min-height:52px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  border-radius:18px;
+  border:1px solid var(--line);
+  background:rgba(8,12,30,.28);
+  backdrop-filter:blur(12px);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);
+  font-size:15px;
+  font-weight:900;
+  padding:10px 12px;
+}
+.game-wrap{
+  position:relative;
+  z-index:2;
+  flex:1;
+  min-height:0;
+  border-radius:28px;
+  border:1px solid rgba(255,255,255,.16);
+  background:rgba(7,10,28,.18);
+  backdrop-filter:blur(6px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.04),
+    0 18px 40px rgba(0,0,0,.22);
+  padding:10px;
+  display:flex;
+}
+.game-grid{
+  width:100%;
+  height:100%;
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:10px;
+}
+.tile{
+  position:relative;
+  width:100%;
+  aspect-ratio:1/1;
+  border:none;
+  border-radius:18px;
+  background:rgba(255,255,255,.12);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.08),
+    0 8px 20px rgba(0,0,0,.14);
+  transition:
+    transform .18s ease,
+    opacity .18s ease,
+    box-shadow .18s ease,
+    filter .18s ease;
+  cursor:pointer;
+}
+.tile:active{
+  transform:scale(.97);
+}
+.tile.hidden{
+  background:rgba(255,255,255,.12);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.08),
+    0 8px 20px rgba(0,0,0,.14);
+}
+.tile.open{
+  transform:scale(.98);
+}
+.tile.matched{
+  outline:3px solid rgba(255,255,255,.78);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.08) inset,
+    0 0 18px rgba(255,255,255,.16);
+}
+.seq-green{background:linear-gradient(135deg,var(--green1),var(--green2));}
+.seq-yellow{background:linear-gradient(135deg,var(--yellow1),var(--yellow2));}
+.seq-pink{background:linear-gradient(135deg,var(--pink1),var(--pink2));}
+.seq-cyan{background:linear-gradient(135deg,var(--cyan1),var(--cyan2));}
+.seq-orange{background:linear-gradient(135deg,var(--orange1),var(--orange2));}
+.seq-blue{background:linear-gradient(135deg,var(--blue1),var(--blue2));}
+.seq-red{background:linear-gradient(135deg,var(--red1),var(--red2));}
+.seq-lime{background:linear-gradient(135deg,var(--lime1),var(--lime2));}
+
+.status{
+  position:relative;
+  z-index:2;
+  min-height:24px;
+  text-align:center;
+  font-size:15px;
+  font-weight:900;
+  color:rgba(255,255,255,.96);
+  margin-top:10px;
+}
+.playbar{
+  position:fixed;
+  left:10px;
+  right:10px;
+  bottom:calc(env(safe-area-inset-bottom) + 12px);
+  display:flex;
+  justify-content:center;
+  z-index:30;
+}
+.action-btn{
+  width:min(100%, 420px);
+  min-height:64px;
+  border:none;
+  border-radius:24px;
+  color:#fff;
+  font-size:20px;
+  font-weight:900;
+  text-align:center;
+  cursor:pointer;
+  background:linear-gradient(135deg,#22c55e,#10b981);
+  box-shadow:0 18px 34px rgba(0,0,0,.26), 0 0 28px rgba(34,197,94,.22);
+}
+.signature{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:calc(env(safe-area-inset-bottom) + 84px);
+  text-align:center;
+  font-size:11px;
+  color:rgba(255,255,255,.54);
+  pointer-events:none;
+  z-index:20;
+}
+@media (max-width:390px){
+  .game-grid{ gap:8px; }
+  .game-wrap{ padding:8px; }
+  .tile{ border-radius:15px; }
+}
+</style>
+</head>
+<body>
+  <div class="app">
+    <div class="bg-title">MEMORY<br>COLORS</div>
+
+    <div class="top">
+      <div class="top-pill" id="movesBox">Coups : 0</div>
+      <div class="top-pill" id="bestBox">Meilleur : 0</div>
+    </div>
+
+    <section class="game-wrap">
+      <div id="gameGrid" class="game-grid"></div>
+    </section>
+
+    <div id="status" class="status"></div>
+
+    <div class="signature">Jeu créé par Luis Coixao à l'aide de ChatGPT.</div>
+  </div>
+
+  <div class="playbar">
+    <button id="actionBtn" class="action-btn" type="button">Nouvelle partie</button>
+  </div>
+
+<script>
+const COLORS = [
+  "seq-green",
+  "seq-yellow",
+  "seq-pink",
+  "seq-cyan",
+  "seq-orange",
+  "seq-blue",
+  "seq-red",
+  "seq-lime"
+];
+
+const BEST_KEY = "memory-colors-best-moves";
+
+const state = {
+  locked: false,
+  moves: 0,
+  matched: 0,
+  first: null,
+  second: null,
+  board: []
+};
+
+const gameGrid = document.getElementById("gameGrid");
+const actionBtn = document.getElementById("actionBtn");
+const movesBox = document.getElementById("movesBox");
+const bestBox = document.getElementById("bestBox");
+const statusEl = document.getElementById("status");
+
+function wait(ms){
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function shuffle(arr){
+  const a = [...arr];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function loadBest(){
+  const best = Number(localStorage.getItem(BEST_KEY) || 0);
+  bestBox.textContent = "Meilleur : " + (best ? best : 0);
+}
+
+function saveBest(){
+  const best = Number(localStorage.getItem(BEST_KEY) || 0);
+  if(best === 0 || state.moves < best){
+    localStorage.setItem(BEST_KEY, String(state.moves));
+  }
+  loadBest();
+}
+
+function updateTop(){
+  movesBox.textContent = "Coups : " + state.moves;
+}
+
+function showStatus(text){
+  statusEl.textContent = text;
+}
+
+function clearStatus(){
+  statusEl.textContent = "";
+}
+
+function buildBoard(){
+  const pairs = [...COLORS, ...COLORS];
+  state.board = shuffle(pairs).map((color, index) => ({
+    id: index,
+    color,
+    open: false,
+    matched: false
+  }));
+}
+
+function renderBoard(){
+  gameGrid.innerHTML = "";
+
+  state.board.forEach((card, index) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.dataset.index = index;
+    btn.className = "tile " + (
+      card.matched ? card.color + " matched" :
+      card.open ? card.color + " open" :
+      "hidden"
+    );
+
+    btn.addEventListener("click", () => handleTileClick(index));
+    gameGrid.appendChild(btn);
+  });
+}
+
+async function previewBoard(){
+  state.locked = true;
+  state.board.forEach(card => card.open = true);
+  renderBoard();
+  showStatus("Mémorise les couleurs");
+  await wait(1400);
+  state.board.forEach(card => {
+    if(!card.matched) card.open = false;
+  });
+  renderBoard();
+  clearStatus();
+  state.locked = false;
+}
+
+async function newGame(){
+  state.locked = true;
+  state.moves = 0;
+  state.matched = 0;
+  state.first = null;
+  state.second = null;
+  updateTop();
+  clearStatus();
+  buildBoard();
+  renderBoard();
+  await previewBoard();
+}
+
+async function handleTileClick(index){
+  if(state.locked) return;
+
+  const card = state.board[index];
+  if(!card || card.open || card.matched) return;
+
+  card.open = true;
+  renderBoard();
+
+  if(!state.first){
+    state.first = index;
+    return;
+  }
+
+  state.second = index;
+  state.moves += 1;
+  updateTop();
+  state.locked = true;
+
+  const firstCard = state.board[state.first];
+  const secondCard = state.board[state.second];
+
+  if(firstCard.color === secondCard.color){
+    firstCard.matched = true;
+    secondCard.matched = true;
+    state.matched += 2;
+
+    state.first = null;
+    state.second = null;
+    renderBoard();
+    state.locked = false;
+
+    if(state.matched === state.board.length){
+      saveBest();
+      showStatus("Bravo !");
+    }
+    return;
+  }
+
+  await wait(700);
+
+  firstCard.open = false;
+  secondCard.open = false;
+  state.first = null;
+  state.second = null;
+  renderBoard();
+  state.locked = false;
+}
+
+actionBtn.addEventListener("click", newGame);
+
+loadBest();
+updateTop();
+newGame();
+</script>
+</body>
+</html>
