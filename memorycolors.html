@@ -1,6 +1,426 @@
-<div id="endMessage" class="end-message" role="button" tabindex="0" aria-label="Fermer et recommencer">
-  <div class="end-box">
-    <div id="endText" class="end-text"></div>
-    <div class="end-hint">Touchez pour recommencer</div>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+<title>MEMORY COLORS</title>
+
+<meta name="theme-color" content="#5b3df5" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="MEMORY COLORS" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<link rel="apple-touch-icon" href="iconmemorycolors.png" />
+<link rel="icon" type="image/png" href="iconmemorycolors.png" />
+
+<style>
+:root{
+  --bg1:#4338ca;
+  --bg2:#7c3aed;
+  --bg3:#312e81;
+  --text:#ffffff;
+
+  --green1:#9bdc1f;  --green2:#6ea80f;
+  --yellow1:#ffe34a; --yellow2:#f3cf00;
+  --pink1:#f56db2;   --pink2:#df2d85;
+  --cyan1:#32cfff;   --cyan2:#1697df;
+  --orange1:#ff9a2f; --orange2:#ff6a00;
+  --blue1:#6d7cff;   --blue2:#4e58e8;
+  --red1:#ff4f74;    --red2:#e2184a;
+  --lime1:#2fd6bf;   --lime2:#0ea885;
+  --purple1:#b66dff; --purple2:#8a3ffc;
+  --teal1:#2ed8d3;   --teal2:#0e9e99;
+  --indigo1:#56c7ff; --indigo2:#18a7f2;
+  --rose1:#ff7ca8;   --rose2:#f1467f;
+}
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 10% 15%, rgba(56,189,248,.35), transparent 20%),
+    radial-gradient(circle at 90% 12%, rgba(255,60,172,.28), transparent 20%),
+    radial-gradient(circle at 20% 90%, rgba(34,197,94,.18), transparent 22%),
+    linear-gradient(135deg,var(--bg1),var(--bg2) 55%, #5b21b6 75%, var(--bg3));
+}
+
+.app{
+  width:100vw;
+  height:100dvh;
+  padding:
+    calc(env(safe-area-inset-top) + 8px)
+    0
+    calc(env(safe-area-inset-bottom) + 0px)
+    0;
+  display:flex;
+  flex-direction:column;
+}
+
+.header{
+  flex:0 0 auto;
+  text-align:center;
+  padding:6px 8px 8px;
+}
+
+h1{
+  margin:0;
+  font-size:clamp(30px, 8vw, 56px);
+  line-height:.92;
+  font-weight:1000;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+  color:#ffffff;
+  text-shadow:
+    0 2px 14px rgba(0,0,0,.18),
+    0 0 26px rgba(255,255,255,.14);
+}
+
+.board-wrap{
+  flex:1;
+  min-height:0;
+  display:flex;
+  align-items:stretch;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.board{
+  width:min(100vw, calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 70px) * 0.6666667));
+  height:min(calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 70px), calc(100vw * 1.5));
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  grid-template-rows:repeat(6, 1fr);
+  gap:0;
+}
+
+.tile{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  border:none;
+  border-radius:0;
+  padding:0;
+  margin:0;
+  cursor:pointer;
+  transition:transform .14s ease, filter .18s ease, opacity .18s ease, box-shadow .18s ease;
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.45);
+}
+
+.tile:active{
+  transform:scale(.985);
+}
+
+.tile.hidden{
+  background:rgba(255,255,255,.08);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.10);
+}
+
+.tile.open{
+  transform:scale(.99);
+}
+
+.tile.matched{
+  box-shadow:
+    inset 0 0 0 5px rgba(255,255,255,.82),
+    0 0 20px rgba(255,255,255,.10);
+}
+
+.seq-green{background:linear-gradient(135deg,var(--green1),var(--green2));}
+.seq-yellow{background:linear-gradient(135deg,var(--yellow1),var(--yellow2));}
+.seq-pink{background:linear-gradient(135deg,var(--pink1),var(--pink2));}
+.seq-cyan{background:linear-gradient(135deg,var(--cyan1),var(--cyan2));}
+.seq-orange{background:linear-gradient(135deg,var(--orange1),var(--orange2));}
+.seq-blue{background:linear-gradient(135deg,var(--blue1),var(--blue2));}
+.seq-red{background:linear-gradient(135deg,var(--red1),var(--red2));}
+.seq-lime{background:linear-gradient(135deg,var(--lime1),var(--lime2));}
+.seq-purple{background:linear-gradient(135deg,var(--purple1),var(--purple2));}
+.seq-teal{background:linear-gradient(135deg,var(--teal1),var(--teal2));}
+.seq-indigo{background:linear-gradient(135deg,var(--indigo1),var(--indigo2));}
+.seq-rose{background:linear-gradient(135deg,var(--rose1),var(--rose2));}
+
+.end-message{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(10,12,28,.42);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .22s ease;
+  z-index:50;
+}
+
+.end-message.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.end-box{
+  width:min(88vw, 380px);
+  padding:24px 22px;
+  text-align:center;
+  background:rgba(12,18,40,.58);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.28),
+    inset 0 0 0 1px rgba(255,255,255,.04);
+}
+
+.end-text{
+  font-size:16px;
+  font-weight:800;
+  color:rgba(255,255,255,.96);
+  line-height:1.45;
+}
+
+.end-hint{
+  margin-top:12px;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.62);
+}
+
+.signature{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:calc(env(safe-area-inset-bottom) + 4px);
+  text-align:center;
+  font-size:10px;
+  color:rgba(255,255,255,.42);
+  pointer-events:none;
+  z-index:12;
+}
+</style>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>MEMORY COLORS</h1>
+    </header>
+
+    <section class="board-wrap">
+      <div id="board" class="board"></div>
+    </section>
   </div>
-</div>
+
+  <div id="endMessage" class="end-message" role="button" tabindex="0" aria-label="Fermer et recommencer">
+    <div class="end-box">
+      <div id="endText" class="end-text"></div>
+      <div class="end-hint">Touchez pour recommencer</div>
+    </div>
+  </div>
+
+  <div class="signature">Jeu créé par Luis Coixao à l'aide de ChatGPT.</div>
+
+<script>
+const COLORS = [
+  "seq-green",
+  "seq-yellow",
+  "seq-pink",
+  "seq-cyan",
+  "seq-orange",
+  "seq-blue",
+  "seq-red",
+  "seq-lime",
+  "seq-purple",
+  "seq-teal",
+  "seq-indigo",
+  "seq-rose"
+];
+
+const BEST_KEY = "memory-colors-best-score";
+
+const state = {
+  locked: true,
+  moves: 0,
+  matched: 0,
+  first: null,
+  second: null,
+  board: [],
+  finished: false
+};
+
+const boardEl = document.getElementById("board");
+const endMessage = document.getElementById("endMessage");
+const endText = document.getElementById("endText");
+
+function wait(ms){
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function shuffle(arr){
+  const a = [...arr];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function getBestScore(){
+  const raw = localStorage.getItem(BEST_KEY);
+  const value = Number(raw || 0);
+  return Number.isFinite(value) ? value : 0;
+}
+
+function saveBestScore(score){
+  const best = getBestScore();
+  if(best === 0 || score < best){
+    localStorage.setItem(BEST_KEY, String(score));
+    return score;
+  }
+  return best;
+}
+
+function buildBoard(){
+  const pairs = [...COLORS, ...COLORS];
+  state.board = shuffle(pairs).map((color, index) => ({
+    id: index,
+    color,
+    open: false,
+    matched: false
+  }));
+}
+
+function renderBoard(){
+  boardEl.innerHTML = "";
+
+  state.board.forEach((card, index) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "tile " + (
+      card.matched ? card.color + " matched" :
+      card.open ? card.color + " open" :
+      "hidden"
+    );
+    btn.disabled = state.finished || state.locked && !card.open && !card.matched;
+    btn.addEventListener("click", () => handleTileClick(index));
+    boardEl.appendChild(btn);
+  });
+}
+
+async function previewBoard(){
+  state.locked = true;
+  state.board.forEach(card => card.open = true);
+  renderBoard();
+  await wait(1400);
+  state.board.forEach(card => {
+    if(!card.matched) card.open = false;
+  });
+  renderBoard();
+  state.locked = false;
+}
+
+async function startGame(){
+  state.locked = true;
+  state.moves = 0;
+  state.matched = 0;
+  state.first = null;
+  state.second = null;
+  state.finished = false;
+
+  endMessage.classList.remove("show");
+
+  buildBoard();
+  renderBoard();
+  await previewBoard();
+}
+
+function showEndMessage(){
+  const best = saveBestScore(state.moves);
+  endText.textContent = `Terminé en ${state.moves} coups • Meilleur score : ${best}`;
+  endMessage.classList.add("show");
+}
+
+async function finishGame(){
+  state.finished = true;
+  state.locked = true;
+  renderBoard();
+  await wait(180);
+  showEndMessage();
+}
+
+async function handleTileClick(index){
+  if(state.locked || state.finished) return;
+
+  const card = state.board[index];
+  if(!card || card.open || card.matched) return;
+
+  card.open = true;
+  renderBoard();
+
+  if(state.first === null){
+    state.first = index;
+    return;
+  }
+
+  state.second = index;
+  state.moves += 1;
+  state.locked = true;
+
+  const firstCard = state.board[state.first];
+  const secondCard = state.board[state.second];
+
+  if(firstCard.color === secondCard.color){
+    firstCard.matched = true;
+    secondCard.matched = true;
+    state.matched += 2;
+
+    state.first = null;
+    state.second = null;
+    renderBoard();
+
+    if(state.matched === state.board.length){
+      await finishGame();
+      return;
+    }
+
+    state.locked = false;
+    return;
+  }
+
+  await wait(650);
+
+  firstCard.open = false;
+  secondCard.open = false;
+  state.first = null;
+  state.second = null;
+  renderBoard();
+  state.locked = false;
+}
+
+async function closeMessageAndRestart(){
+  if(!endMessage.classList.contains("show")) return;
+  endMessage.classList.remove("show");
+  await wait(180);
+  startGame();
+}
+
+endMessage.addEventListener("click", closeMessageAndRestart);
+endMessage.addEventListener("keydown", (e) => {
+  if(e.key === "Enter" || e.key === " "){
+    e.preventDefault();
+    closeMessageAndRestart();
+  }
+});
+
+startGame();
+</script>
+</body>
+</html>
