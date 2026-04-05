@@ -2,540 +2,400 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>CHESSMEMORY</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+<title>MEMORY COLORS</title>
 
-<link rel="apple-touch-icon" href="iconchessmemory.png" />
-<link rel="icon" href="iconchessmemory.png" />
-
+<meta name="theme-color" content="#5b3df5" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="CHESSMEMORY" />
-<meta name="theme-color" content="#2c2c2c" />
+<meta name="apple-mobile-web-app-title" content="MEMORY COLORS" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<link rel="apple-touch-icon" href="iconmemorycolors.png" />
+<link rel="icon" type="image/png" href="iconmemorycolors.png" />
 
 <style>
 :root{
-  --bg:#2c2c2c;
-  --panel:#3a3a3a;
-  --light:#eeeed2;
-  --dark:#769656;
+  --bg1:#4338ca;
+  --bg2:#7c3aed;
+  --bg3:#312e81;
   --text:#ffffff;
-  --gold:#d4af37;
-}
 
+  /* Couleurs volontairement plus distinctes et éloignées du fond violet/bleu */
+  --green1:#4ade80;  --green2:#15803d;
+  --yellow1:#fde047; --yellow2:#ca8a04;
+  --pink1:#f9a8d4;   --pink2:#db2777;
+  --cyan1:#67e8f9;   --cyan2:#0891b2;
+  --orange1:#fdba74; --orange2:#ea580c;
+  --red1:#fb7185;    --red2:#be123c;
+  --lime1:#bef264;   --lime2:#65a30d;
+  --teal1:#5eead4;   --teal2:#0f766e;
+  --amber1:#fcd34d;  --amber2:#d97706;
+  --coral1:#fda4af;  --coral2:#e11d48;
+  --mint1:#86efac;   --mint2:#16a34a;
+  --gold1:#fef08a;   --gold2:#eab308;
+}
 *{
   box-sizing:border-box;
   -webkit-tap-highlight-color:transparent;
 }
-
 html,body{
   margin:0;
   padding:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
+  width:100%;
+  height:100%;
+  overflow:hidden;
 }
-
 body{
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  padding:0 12px calc(18px + env(safe-area-inset-bottom));
-}
-
-h1{
-  margin:calc(env(safe-area-inset-top) + 18px) 0 12px;
-  font-size:28px;
-  line-height:1.08;
-  font-weight:700;
-  text-align:center;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 10% 15%, rgba(56,189,248,.35), transparent 20%),
+    radial-gradient(circle at 90% 12%, rgba(255,60,172,.28), transparent 20%),
+    radial-gradient(circle at 20% 90%, rgba(34,197,94,.18), transparent 22%),
+    linear-gradient(135deg,var(--bg1),var(--bg2) 55%, #5b21b6 75%, var(--bg3));
 }
 
 .app{
-  width:100%;
-  max-width:560px;
+  width:100vw;
+  height:100dvh;
+  padding:
+    calc(env(safe-area-inset-top) + 8px)
+    0
+    calc(env(safe-area-inset-bottom) + 0px)
+    0;
+  display:flex;
+  flex-direction:column;
 }
 
-.controls-panel,
-.timer-panel{
-  background:var(--panel);
-  padding:14px;
-  margin-bottom:12px;
-  box-shadow:0 8px 20px rgba(0,0,0,.18);
+.header{
+  flex:0 0 auto;
+  text-align:center;
+  padding:6px 8px 8px;
 }
 
-#board-container{
-  width:95vw;
-  max-width:500px;
-  aspect-ratio:1 / 1;
+h1{
+  margin:0;
+  font-size:clamp(30px, 8vw, 56px);
+  line-height:.92;
+  font-weight:1000;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+  color:#ffffff;
+  text-shadow:
+    0 2px 14px rgba(0,0,0,.18),
+    0 0 26px rgba(255,255,255,.14);
+}
+
+.board-wrap{
+  flex:1;
+  min-height:0;
+  display:flex;
+  align-items:stretch;
+  justify-content:center;
   overflow:hidden;
-  margin-bottom:12px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.35);
 }
 
-#board{
+.board{
+  width:min(100vw, calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 70px) * 0.6666667));
+  height:min(calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 70px), calc(100vw * 1.5));
   display:grid;
-  grid-template-columns:repeat(8,1fr);
-  grid-template-rows:repeat(8,1fr);
+  grid-template-columns:repeat(4, 1fr);
+  grid-template-rows:repeat(6, 1fr);
+  gap:0;
+}
+
+.tile{
   width:100%;
   height:100%;
-}
-
-.square{
-  position:relative;
-  width:100%;
-  height:100%;
-  user-select:none;
-  overflow:hidden;
-  perspective:900px;
-  -webkit-perspective:900px;
-}
-
-.white{ background:var(--light); }
-.black{ background:var(--dark); }
-
-.coord{
-  position:absolute;
-  font-size:10px;
-  opacity:.65;
-  font-weight:700;
-  pointer-events:none;
-  z-index:4;
-}
-
-.coord.file{
-  left:5px;
-  bottom:3px;
-}
-
-.coord.rank{
-  right:4px;
-  top:2px;
-}
-
-.card{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
+  min-width:0;
+  min-height:0;
   border:none;
-  background:none;
+  border-radius:0;
   padding:0;
   margin:0;
   cursor:pointer;
-  touch-action:manipulation;
-  appearance:none;
-  -webkit-appearance:none;
+  transition:transform .14s ease, filter .18s ease, opacity .18s ease, box-shadow .18s ease;
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.45);
 }
 
-.card-inner{
-  position:relative;
-  width:100%;
-  height:100%;
-  transition:transform .42s ease;
-  transform-style:preserve-3d;
-  -webkit-transform-style:preserve-3d;
+.tile:active{
+  transform:scale(.985);
 }
 
-.square.flipped .card-inner{
-  transform:rotateY(180deg);
-  -webkit-transform:rotateY(180deg);
+.tile.hidden{
+  background:rgba(255,255,255,.08);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.10);
 }
 
-.face{
-  position:absolute;
+.tile.open{
+  transform:scale(.99);
+}
+
+/* Plus aucune bordure spéciale pour les paires trouvées */
+.tile.matched{
+  box-shadow:none;
+}
+
+.seq-green{background:linear-gradient(135deg,var(--green1),var(--green2));}
+.seq-yellow{background:linear-gradient(135deg,var(--yellow1),var(--yellow2));}
+.seq-pink{background:linear-gradient(135deg,var(--pink1),var(--pink2));}
+.seq-cyan{background:linear-gradient(135deg,var(--cyan1),var(--cyan2));}
+.seq-orange{background:linear-gradient(135deg,var(--orange1),var(--orange2));}
+.seq-red{background:linear-gradient(135deg,var(--red1),var(--red2));}
+.seq-lime{background:linear-gradient(135deg,var(--lime1),var(--lime2));}
+.seq-teal{background:linear-gradient(135deg,var(--teal1),var(--teal2));}
+.seq-amber{background:linear-gradient(135deg,var(--amber1),var(--amber2));}
+.seq-coral{background:linear-gradient(135deg,var(--coral1),var(--coral2));}
+.seq-mint{background:linear-gradient(135deg,var(--mint1),var(--mint2));}
+.seq-gold{background:linear-gradient(135deg,var(--gold1),var(--gold2));}
+
+.end-message{
+  position:fixed;
   inset:0;
   display:flex;
   align-items:center;
   justify-content:center;
-  backface-visibility:hidden;
-  -webkit-backface-visibility:hidden;
+  background:rgba(10,12,28,.42);
+  backdrop-filter:blur(8px);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .22s ease;
+  z-index:50;
 }
-
-.back{
-  background:transparent;
+.end-message.show{
+  opacity:1;
+  pointer-events:auto;
 }
-
-.back::before{
-  content:"";
-  width:44%;
-  height:44%;
-  border-radius:50%;
-  background:rgba(0,0,0,.10);
-  box-shadow:
-    inset 0 0 0 2px rgba(255,255,255,.08),
-    0 1px 3px rgba(0,0,0,.12);
-}
-
-.front{
-  transform:rotateY(180deg);
-  -webkit-transform:rotateY(180deg);
-}
-
-.piece{
-  line-height:1;
-  position:relative;
-  z-index:2;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:100%;
-  height:100%;
-  filter:drop-shadow(0 1px 0 rgba(0,0,0,.22));
-  transform-origin:center center;
-  font-size:clamp(56px, 11vw, 82px);
-  font-family:"Arial Unicode MS","Segoe UI Symbol","Apple Symbols","Noto Sans Symbols 2",-apple-system,sans-serif;
-}
-
-/* Réglages fins pièce par pièce */
-.piece-K{ transform:scale(1.00); }
-.piece-k{ transform:scale(1.12); }
-
-.piece-Q{ transform:scale(1.00); }
-.piece-q{ transform:scale(1.02); }
-
-.piece-R{ transform:scale(0.88); }
-.piece-r{ transform:scale(1.02); }
-
-.piece-B{ transform:scale(0.98); }
-.piece-b{ transform:scale(1.02); }
-
-.piece-N{ transform:scale(1.00); }
-.piece-n{ transform:scale(1.00); }
-
-.white-piece{
-  color:#ffffff;
-  text-shadow:
-    0 0 1px #000,
-    0 0 2px #000,
-    0 1px 2px rgba(0,0,0,.55),
-    0 0 6px rgba(255,255,255,.16);
-}
-
-.black-piece{
-  color:#141414;
-  text-shadow:
-    0 0 1px rgba(255,255,255,.18),
-    0 1px 1px rgba(255,255,255,.06);
-}
-
-.square.matched{
-  box-shadow:inset 0 0 0 3px rgba(212,175,55,.95);
-}
-
-.controls{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:28px;
-  background:var(--panel);
-}
-
-.control-btn{
-  width:52px;
-  height:52px;
-  border:none;
-  background:var(--bg);
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  appearance:none;
-  -webkit-appearance:none;
-}
-
-.control-btn span{
-  font-size:24px;
-  line-height:1;
-  display:block;
-}
-
-#memoryStatus{
+.end-box{
+  min-width:min(88vw, 360px);
+  padding:24px 22px;
   text-align:center;
+  background:rgba(12,18,40,.58);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.28),
+    inset 0 0 0 1px rgba(255,255,255,.04);
+}
+.end-text{
   font-size:16px;
   font-weight:700;
-  margin-bottom:6px;
+  color:rgba(255,255,255,.92);
+  line-height:1.4;
 }
-
-#memoryTimer{
-  text-align:center;
-  font-size:22px;
-  font-weight:700;
-  color:var(--gold);
-  min-height:28px;
-}
-
-.footer-note{
-  text-align:center;
+.end-hint{
+  margin-top:10px;
   font-size:12px;
-  margin-top:4px;
-  opacity:.82;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.65);
 }
-
-@media (max-width:420px){
-  .piece{
-    font-size:clamp(50px, 11vw, 70px);
-  }
-
-  .control-btn{
-    width:46px;
-    height:46px;
-  }
-
-  .control-btn span{
-    font-size:22px;
-  }
+.signature{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:calc(env(safe-area-inset-bottom) + 4px);
+  text-align:center;
+  font-size:10px;
+  color:rgba(255,255,255,.42);
+  pointer-events:none;
+  z-index:12;
 }
 </style>
 </head>
 <body>
+  <div class="app">
+    <header class="header">
+      <h1>MEMORY COLORS</h1>
+    </header>
 
-<h1>CHESSMEMORY</h1>
-
-<div class="app">
-  <div id="board-container">
-    <div id="board"></div>
+    <section class="board-wrap">
+      <div id="board" class="board"></div>
+    </section>
   </div>
 
-  <div class="timer-panel">
-    <div id="memoryStatus">Mémorisation</div>
-    <div id="memoryTimer">30</div>
-  </div>
-
-  <div class="controls-panel">
-    <div class="controls">
-      <button class="control-btn" id="restartBtn" type="button" aria-label="Rejouer"><span>🔄</span></button>
+  <div id="endMessage" class="end-message">
+    <div class="end-box">
+      <div id="endText" class="end-text"></div>
+      <div class="end-hint">Touchez pour recommencer</div>
     </div>
   </div>
 
-  <div class="footer-note">Jeu imaginé par Luis et créé par ChatGPT</div>
-</div>
+  <div class="signature">Jeu créé par Luis Coixao à l'aide de ChatGPT.</div>
 
 <script>
-const boardEl=document.getElementById("board");
-const restartBtn=document.getElementById("restartBtn");
-const memoryStatusEl=document.getElementById("memoryStatus");
-const memoryTimerEl=document.getElementById("memoryTimer");
-
-const FILES=["a","b","c","d","e","f","g","h"];
-const PIECES={
-  "N":"♘","B":"♗","R":"♖","Q":"♕","K":"♔",
-  "n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
-};
-
-const BASE_DECK = [
-  {piece:"K", pairId:"K1"}, {piece:"K", pairId:"K1"},
-  {piece:"k", pairId:"k1"}, {piece:"k", pairId:"k1"},
-
-  {piece:"Q", pairId:"Q1"}, {piece:"Q", pairId:"Q1"},
-  {piece:"q", pairId:"q1"}, {piece:"q", pairId:"q1"},
-
-  {piece:"R", pairId:"R1"}, {piece:"R", pairId:"R1"},
-  {piece:"R", pairId:"R2"}, {piece:"R", pairId:"R2"},
-  {piece:"r", pairId:"r1"}, {piece:"r", pairId:"r1"},
-  {piece:"r", pairId:"r2"}, {piece:"r", pairId:"r2"},
-
-  {piece:"B", pairId:"B1"}, {piece:"B", pairId:"B1"},
-  {piece:"B", pairId:"B2"}, {piece:"B", pairId:"B2"},
-  {piece:"b", pairId:"b1"}, {piece:"b", pairId:"b1"},
-  {piece:"b", pairId:"b2"}, {piece:"b", pairId:"b2"},
-
-  {piece:"N", pairId:"N1"}, {piece:"N", pairId:"N1"},
-  {piece:"N", pairId:"N2"}, {piece:"N", pairId:"N2"},
-  {piece:"n", pairId:"n1"}, {piece:"n", pairId:"n1"},
-  {piece:"n", pairId:"n2"}, {piece:"n", pairId:"n2"}
+const COLORS = [
+  "seq-green",
+  "seq-yellow",
+  "seq-pink",
+  "seq-cyan",
+  "seq-orange",
+  "seq-red",
+  "seq-lime",
+  "seq-teal",
+  "seq-amber",
+  "seq-coral",
+  "seq-mint",
+  "seq-gold"
 ];
 
-let squares=[];
-let picks=[];
-let lockBoard=false;
-let matchedPairs=0;
-let memorizationMode=true;
-let memorizationSeconds=30;
-let memorizationInterval=null;
-const totalPairs=32;
+const BEST_KEY = "memory-colors-best-score";
 
-function shuffle(array){
-  const arr=[...array];
-  for(let i=arr.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [arr[i],arr[j]]=[arr[j],arr[i]];
+const state = {
+  locked: true,
+  moves: 0,
+  matched: 0,
+  first: null,
+  second: null,
+  board: [],
+  finished: false
+};
+
+const boardEl = document.getElementById("board");
+const endMessage = document.getElementById("endMessage");
+const endText = document.getElementById("endText");
+
+function wait(ms){
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function shuffle(arr){
+  const a = [...arr];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
   }
-  return arr;
+  return a;
 }
 
-function createDeck(){
-  const full=[...BASE_DECK,...BASE_DECK];
-  return shuffle(full.map((card,index)=>({
-    piece:card.piece,
-    pairId:card.pairId+"-"+Math.floor(index/2),
-    uid:"u"+index+"-"+Math.random().toString(36).slice(2,8),
-    state:"hidden"
-  })));
+function getBestScore(){
+  const best = Number(localStorage.getItem(BEST_KEY) || 0);
+  return Number.isFinite(best) ? best : 0;
 }
 
-function coordsToSquare(file,rank){
-  return FILES[file]+String(rank+1);
-}
-
-function stopMemorizationTimer(){
-  if(memorizationInterval){
-    clearInterval(memorizationInterval);
-    memorizationInterval=null;
+function saveBestScore(score){
+  const currentBest = getBestScore();
+  if(currentBest === 0 || score < currentBest){
+    localStorage.setItem(BEST_KEY, String(score));
+    return score;
   }
+  return currentBest;
 }
 
-function startMemorizationPhase(){
-  memorizationMode=true;
-  memorizationSeconds=30;
-  memoryStatusEl.textContent="Mémorisation";
-  memoryTimerEl.textContent=memorizationSeconds;
-
-  squares.forEach(card=>{
-    card.state="revealed";
-  });
-  renderBoard();
-
-  stopMemorizationTimer();
-  memorizationInterval=setInterval(()=>{
-    memorizationSeconds--;
-    memoryTimerEl.textContent=memorizationSeconds;
-
-    if(memorizationSeconds<=0){
-      stopMemorizationTimer();
-      memorizationMode=false;
-      memoryStatusEl.textContent="À vous de jouer";
-      memoryTimerEl.textContent="";
-
-      squares.forEach(card=>{
-        if(card.state!=="matched"){
-          card.state="hidden";
-        }
-      });
-      renderBoard();
-    }
-  },1000);
-}
-
-function createBoard(){
-  stopMemorizationTimer();
-  squares=createDeck();
-  picks=[];
-  lockBoard=false;
-  matchedPairs=0;
-  startMemorizationPhase();
+function buildBoard(){
+  const pairs = [...COLORS, ...COLORS];
+  state.board = shuffle(pairs).map((color, index) => ({
+    id: index,
+    color,
+    open: false,
+    matched: false
+  }));
 }
 
 function renderBoard(){
-  boardEl.innerHTML="";
+  boardEl.innerHTML = "";
 
-  for(let row=7;row>=0;row--){
-    for(let col=0;col<8;col++){
-      const idx=row*8+col;
-      const data=squares[idx];
-
-      const sq=document.createElement("div");
-      sq.className="square "+(((row+col)%2===0)?"white":"black");
-
-      if(data.state==="revealed" || data.state==="matched") sq.classList.add("flipped");
-      if(data.state==="matched") sq.classList.add("matched");
-
-      const button=document.createElement("button");
-      button.className="card";
-      button.type="button";
-      button.setAttribute("aria-label", coordsToSquare(col,row));
-
-      const inner=document.createElement("div");
-      inner.className="card-inner";
-
-      const back=document.createElement("div");
-      back.className="face back";
-
-      const front=document.createElement("div");
-      front.className="face front";
-
-      const piece=document.createElement("span");
-      piece.className="piece "+(data.piece===data.piece.toUpperCase() ? "white-piece " : "black-piece ")+"piece-"+data.piece;
-      piece.textContent=PIECES[data.piece];
-
-      front.appendChild(piece);
-      inner.appendChild(back);
-      inner.appendChild(front);
-      button.appendChild(inner);
-      button.onclick=()=>handleSquare(idx);
-      sq.appendChild(button);
-
-      if(row===0){
-        const file=document.createElement("span");
-        file.className="coord file";
-        file.textContent=FILES[col];
-        sq.appendChild(file);
-      }
-
-      if(col===7){
-        const rank=document.createElement("span");
-        rank.className="coord rank";
-        rank.textContent=String(row+1);
-        sq.appendChild(rank);
-      }
-
-      boardEl.appendChild(sq);
-    }
-  }
+  state.board.forEach((card, index) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "tile " + (
+      card.matched ? card.color + " matched" :
+      card.open ? card.color + " open" :
+      "hidden"
+    );
+    btn.addEventListener("click", () => handleTileClick(index));
+    boardEl.appendChild(btn);
+  });
 }
 
-function isPair(a,b){
-  return a.pairId===b.pairId && a.uid!==b.uid;
+async function previewBoard(){
+  state.locked = true;
+  state.board.forEach(card => card.open = true);
+  renderBoard();
+  await wait(1400);
+  state.board.forEach(card => {
+    if(!card.matched) card.open = false;
+  });
+  renderBoard();
+  state.locked = false;
 }
 
-function handleSquare(index){
-  if(lockBoard || memorizationMode) return;
+async function startGame(){
+  state.locked = true;
+  state.moves = 0;
+  state.matched = 0;
+  state.first = null;
+  state.second = null;
+  state.finished = false;
+  endMessage.classList.remove("show");
 
-  const card=squares[index];
-  if(card.state!=="hidden") return;
+  buildBoard();
+  renderBoard();
+  await previewBoard();
+}
 
-  card.state="revealed";
-  picks.push(index);
+async function handleTileClick(index){
+  if(state.locked || state.finished) return;
+
+  const card = state.board[index];
+  if(!card || card.open || card.matched) return;
+
+  card.open = true;
   renderBoard();
 
-  if(picks.length<2) return;
-
-  lockBoard=true;
-
-  const [i1,i2]=picks;
-  const a=squares[i1];
-  const b=squares[i2];
-
-  if(isPair(a,b)){
-    a.state="matched";
-    b.state="matched";
-    matchedPairs++;
-    picks=[];
-    lockBoard=false;
-    renderBoard();
-
-    if(matchedPairs===totalPairs){
-      memoryStatusEl.textContent="Bravo";
-      memoryTimerEl.textContent="Toutes les paires trouvées";
-    }
+  if(state.first === null){
+    state.first = index;
     return;
   }
 
-  setTimeout(()=>{
-    a.state="hidden";
-    b.state="hidden";
-    picks=[];
-    lockBoard=false;
+  state.second = index;
+  state.moves += 1;
+  state.locked = true;
+
+  const firstCard = state.board[state.first];
+  const secondCard = state.board[state.second];
+
+  if(firstCard.color === secondCard.color){
+    firstCard.matched = true;
+    secondCard.matched = true;
+    state.matched += 2;
+
+    state.first = null;
+    state.second = null;
     renderBoard();
-  },700);
+
+    if(state.matched === state.board.length){
+      state.finished = true;
+      const best = saveBestScore(state.moves);
+      await wait(250);
+      endText.textContent = "Partie terminée en " + state.moves + " coups. Meilleur score : " + best + ".";
+      endMessage.classList.add("show");
+      return;
+    }
+
+    state.locked = false;
+    return;
+  }
+
+  await wait(650);
+
+  firstCard.open = false;
+  secondCard.open = false;
+  state.first = null;
+  state.second = null;
+  renderBoard();
+  state.locked = false;
 }
 
-restartBtn.addEventListener("click",createBoard);
+async function restartGame(){
+  if(!endMessage.classList.contains("show")) return;
+  endMessage.classList.remove("show");
+  await wait(180);
+  startGame();
+}
 
-createBoard();
+endMessage.addEventListener("click", restartGame);
+
+startGame();
 </script>
-
 </body>
 </html>
