@@ -54,7 +54,6 @@ body{
   flex-direction:column;
 }
 
-/* HEADER */
 .header{
   flex:0 0 auto;
   text-align:center;
@@ -105,7 +104,6 @@ h1{
 .t11{color:var(--mint);}
 .t12{color:var(--gold);}
 
-/* BOARD */
 .board-wrap{
   flex:1;
   min-height:0;
@@ -130,7 +128,7 @@ h1{
   border:none;
   cursor:pointer;
   box-shadow:inset 0 0 0 2px rgba(255,255,255,.10);
-  transition:.15s;
+  transition:transform .15s ease, box-shadow .15s ease, opacity .15s ease;
 }
 
 .tile:active{transform:scale(.985);}
@@ -144,7 +142,6 @@ h1{
   box-shadow:inset 0 0 0 3px rgba(255,255,255,.58);
 }
 
-/* COULEURS */
 .seq-green{background:var(--green);}
 .seq-yellow{background:var(--yellow);}
 .seq-pink{background:var(--pink);}
@@ -158,7 +155,6 @@ h1{
 .seq-mint{background:var(--mint);}
 .seq-gold{background:var(--gold);}
 
-/* FIN */
 .end-message{
   position:fixed;
   inset:0;
@@ -167,26 +163,59 @@ h1{
   justify-content:center;
   background:rgba(10,12,28,.42);
   backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
   opacity:0;
   pointer-events:none;
-  transition:.22s;
+  transition:opacity .22s ease;
+  z-index:50;
 }
+
 .end-message.show{
   opacity:1;
   pointer-events:auto;
 }
 
 .end-box{
-  padding:24px;
+  min-width:min(88vw, 360px);
+  padding:24px 22px;
+  text-align:center;
   background:rgba(12,18,40,.62);
   border:1px solid rgba(255,255,255,.16);
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.28),
+    inset 0 0 0 1px rgba(255,255,255,.03);
+}
+
+.end-text{
+  font-size:16px;
+  font-weight:700;
+  color:rgba(255,255,255,.92);
+  line-height:1.4;
+}
+
+.end-hint{
+  margin-top:10px;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.65);
 }
 
 .signature{
+  flex:0 0 auto;
   margin-top:10px;
   text-align:center;
   font-size:10px;
-  opacity:.5;
+  color:rgba(255,255,255,.42);
+  pointer-events:none;
+  width:100%;
+}
+
+@media (max-height:700px){
+  .signature{
+    margin-top:8px;
+  }
 }
 </style>
 </head>
@@ -194,104 +223,208 @@ h1{
 <body>
 <div class="app">
 
-<header class="header">
-<h1>
-  <div class="title-line">
-    <span class="title-letter t1">M</span>
-    <span class="title-letter t2">E</span>
-    <span class="title-letter t3">M</span>
-    <span class="title-letter t4">O</span>
-    <span class="title-letter t5">R</span>
-    <span class="title-letter t6">Y</span>
-  </div>
-  <div class="title-line">
-    <span class="title-letter t7">C</span>
-    <span class="title-letter t8">O</span>
-    <span class="title-letter t9">L</span>
-    <span class="title-letter t10">O</span>
-    <span class="title-letter t11">R</span>
-    <span class="title-letter t12">S</span>
-  </div>
-</h1>
-</header>
+  <header class="header">
+    <h1 aria-label="MEMORY COLORS">
+      <div class="title-line">
+        <span class="title-letter t1">M</span>
+        <span class="title-letter t2">E</span>
+        <span class="title-letter t3">M</span>
+        <span class="title-letter t4">O</span>
+        <span class="title-letter t5">R</span>
+        <span class="title-letter t6">Y</span>
+      </div>
+      <div class="title-line">
+        <span class="title-letter t7">C</span>
+        <span class="title-letter t8">O</span>
+        <span class="title-letter t9">L</span>
+        <span class="title-letter t10">O</span>
+        <span class="title-letter t11">R</span>
+        <span class="title-letter t12">S</span>
+      </div>
+    </h1>
+  </header>
 
-<section class="board-wrap">
-<div id="board" class="board"></div>
-<div class="signature">Jeu créé par Luis Coixao</div>
-</section>
+  <section class="board-wrap">
+    <div id="board" class="board"></div>
+    <div class="signature">Jeu créé par Luis Coixao</div>
+  </section>
 
 </div>
 
 <div id="endMessage" class="end-message">
-<div class="end-box">
-<div id="endText"></div>
-</div>
+  <div class="end-box">
+    <div id="endText" class="end-text"></div>
+    <div class="end-hint">Touchez pour recommencer</div>
+  </div>
 </div>
 
 <script>
 const COLORS = [
-"seq-green","seq-yellow","seq-pink","seq-cyan",
-"seq-orange","seq-red","seq-lime","seq-teal",
-"seq-amber","seq-coral","seq-mint","seq-gold"
+  "seq-green","seq-yellow","seq-pink","seq-cyan",
+  "seq-orange","seq-red","seq-lime","seq-teal",
+  "seq-amber","seq-coral","seq-mint","seq-gold"
 ];
 
-const state={locked:true,moves:0,matched:0,first:null,second:null,board:[],finished:false};
+const BEST_KEY = "memory-colors-best-score";
 
-const boardEl=document.getElementById("board");
+const state = {
+  locked: true,
+  moves: 0,
+  matched: 0,
+  first: null,
+  second: null,
+  board: [],
+  finished: false
+};
 
-function shuffle(a){return a.sort(()=>Math.random()-.5)}
+const boardEl = document.getElementById("board");
+const endMessage = document.getElementById("endMessage");
+const endText = document.getElementById("endText");
+
+function wait(ms){
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function shuffle(arr){
+  const a = [...arr];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function getBestScore(){
+  const best = Number(localStorage.getItem(BEST_KEY) || 0);
+  return Number.isFinite(best) ? best : 0;
+}
+
+function saveBestScore(score){
+  const currentBest = getBestScore();
+  if(currentBest === 0 || score < currentBest){
+    localStorage.setItem(BEST_KEY, String(score));
+    return score;
+  }
+  return currentBest;
+}
 
 function buildBoard(){
-  const pairs=[...COLORS,...COLORS];
-  state.board=shuffle(pairs).map((c,i)=>({id:i,color:c,open:false,matched:false}));
+  const pairs = [...COLORS, ...COLORS];
+  state.board = shuffle(pairs).map((color, index) => ({
+    id:index,
+    color,
+    open:false,
+    matched:false
+  }));
 }
 
 function renderBoard(){
-  boardEl.innerHTML="";
-  state.board.forEach((c,i)=>{
-    const b=document.createElement("button");
-    b.className="tile "+(c.matched?c.color+" matched":c.open?c.color+" open":"hidden");
-    b.onclick=()=>clickTile(i);
-    boardEl.appendChild(b);
+  boardEl.innerHTML = "";
+  state.board.forEach((card, index) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "tile " + (
+      card.matched ? card.color + " matched" :
+      card.open ? card.color + " open" :
+      "hidden"
+    );
+    btn.addEventListener("click", () => handleTileClick(index));
+    boardEl.appendChild(btn);
   });
 }
 
-function clickTile(i){
-  if(state.locked||state.finished)return;
-  const c=state.board[i];
-  if(c.open||c.matched)return;
-
-  c.open=true; renderBoard();
-
-  if(state.first==null){state.first=i;return;}
-
-  state.second=i; state.locked=true;
-
-  const a=state.board[state.first];
-  const b=state.board[state.second];
-
-  if(a.color===b.color){
-    a.matched=b.matched=true;
-    state.first=state.second=null;
-    state.locked=false;
-    renderBoard();
-  }else{
-    setTimeout(()=>{
-      a.open=b.open=false;
-      state.first=state.second=null;
-      state.locked=false;
-      renderBoard();
-    },500);
-  }
+async function previewBoard(){
+  state.locked = true;
+  state.board.forEach(card => card.open = true);
+  renderBoard();
+  await wait(1200);
+  state.board.forEach(card => card.open = false);
+  renderBoard();
+  state.locked = false;
 }
 
-function start(){
+async function startGame(){
+  state.locked = true;
+  state.moves = 0;
+  state.matched = 0;
+  state.first = null;
+  state.second = null;
+  state.finished = false;
+  endMessage.classList.remove("show");
+
   buildBoard();
   renderBoard();
-  state.locked=false;
+  await previewBoard();
 }
 
-start();
+async function finishGame(){
+  state.finished = true;
+  state.locked = true;
+  const best = saveBestScore(state.moves);
+  await wait(220);
+  endText.textContent = "Partie terminée en " + state.moves + " coups. Meilleur score : " + best + ".";
+  endMessage.classList.add("show");
+}
+
+async function handleTileClick(index){
+  if(state.locked || state.finished) return;
+
+  const card = state.board[index];
+  if(!card || card.open || card.matched) return;
+
+  card.open = true;
+  renderBoard();
+
+  if(state.first === null){
+    state.first = index;
+    return;
+  }
+
+  state.second = index;
+  state.moves += 1;
+  state.locked = true;
+
+  const firstCard = state.board[state.first];
+  const secondCard = state.board[state.second];
+
+  if(firstCard.color === secondCard.color){
+    firstCard.matched = true;
+    secondCard.matched = true;
+    state.matched += 2;
+
+    state.first = null;
+    state.second = null;
+    renderBoard();
+
+    if(state.matched === state.board.length){
+      await finishGame();
+      return;
+    }
+
+    state.locked = false;
+    return;
+  }
+
+  await wait(500);
+
+  firstCard.open = false;
+  secondCard.open = false;
+  state.first = null;
+  state.second = null;
+  renderBoard();
+  state.locked = false;
+}
+
+async function restartGame(){
+  if(!endMessage.classList.contains("show")) return;
+  endMessage.classList.remove("show");
+  await wait(180);
+  startGame();
+}
+
+endMessage.addEventListener("click", restartGame);
+
+startGame();
 </script>
 </body>
 </html>
