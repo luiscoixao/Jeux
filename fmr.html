@@ -19,6 +19,7 @@
   --bg3:#312e81;
   --text:#ffffff;
 
+  /* Palette plus franche et plus distincte */
   --green1:#4ade80;  --green2:#15803d;
   --yellow1:#fde047; --yellow2:#ca8a04;
   --pink1:#f9a8d4;   --pink2:#db2777;
@@ -27,10 +28,10 @@
   --red1:#fb7185;    --red2:#be123c;
   --lime1:#bef264;   --lime2:#65a30d;
   --teal1:#5eead4;   --teal2:#0f766e;
-  --brown1:#d6a46b;  --brown2:#8b5e34;
-  --white1:#f8fafc;  --white2:#cbd5e1;
-  --black1:#4b5563;  --black2:#111827;
+  --amber1:#fcd34d;  --amber2:#d97706;
   --coral1:#fda4af;  --coral2:#e11d48;
+  --mint1:#86efac;   --mint2:#16a34a;
+  --gold1:#fef08a;   --gold2:#eab308;
 }
 *{
   box-sizing:border-box;
@@ -68,9 +69,7 @@ body{
 .header{
   flex:0 0 auto;
   text-align:center;
-  padding:10px 8px 12px;
-  background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.04));
-  box-shadow:inset 0 -1px 0 rgba(255,255,255,.10);
+  padding:8px 8px 10px;
 }
 
 h1{
@@ -80,11 +79,27 @@ h1{
   font-weight:1000;
   letter-spacing:.10em;
   text-transform:uppercase;
-  color:#ffffff;
   text-shadow:
-    0 2px 14px rgba(0,0,0,.22),
-    0 0 22px rgba(255,255,255,.08);
+    0 2px 14px rgba(0,0,0,.18),
+    0 0 26px rgba(255,255,255,.10);
 }
+
+.title-letter{
+  display:inline-block;
+}
+
+.t1{color:#4ade80;}
+.t2{color:#fde047;}
+.t3{color:#f9a8d4;}
+.t4{color:#67e8f9;}
+.t5{color:#fdba74;}
+.t6{color:#fb7185;}
+.t7{color:#bef264;}
+.t8{color:#5eead4;}
+.t9{color:#fcd34d;}
+.t10{color:#fda4af;}
+.t11{color:#86efac;}
+.t12{color:#fef08a;}
 
 .board-wrap{
   flex:1;
@@ -94,20 +109,17 @@ h1{
   align-items:center;
   justify-content:flex-start;
   overflow:hidden;
-  padding:0 0 14px;
 }
 
 .board{
-  width:min(100vw, calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 130px) * 0.6666667));
-  height:min(calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 130px), calc(100vw * 1.5));
+  width:min(100vw, calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 98px) * 0.6666667));
+  height:min(calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 98px), calc(100vw * 1.5));
   display:grid;
   grid-template-columns:repeat(4, 1fr);
   grid-template-rows:repeat(6, 1fr);
   gap:0;
-  background:rgba(8,10,26,.32);
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.10),
-    0 10px 28px rgba(0,0,0,.12);
+  background:rgba(255,255,255,.04);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
 }
 
 .tile{
@@ -121,7 +133,7 @@ h1{
   margin:0;
   cursor:pointer;
   transition:transform .14s ease, filter .18s ease, opacity .18s ease, box-shadow .18s ease;
-  box-shadow:inset 0 0 0 2px rgba(255,255,255,.14);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.10);
 }
 
 .tile:active{
@@ -129,8 +141,8 @@ h1{
 }
 
 .tile.hidden{
-  background:rgba(7,9,24,.26);
-  box-shadow:inset 0 0 0 2px rgba(255,255,255,.10);
+  background:rgba(255,255,255,.03);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.09);
 }
 
 .tile.open{
@@ -138,9 +150,9 @@ h1{
   box-shadow:inset 0 0 0 3px rgba(255,255,255,.58);
 }
 
-/* même bordure que lorsqu'on appuie / ouvre une case */
+/* aucune bordure spéciale quand une paire est trouvée */
 .tile.matched{
-  box-shadow:inset 0 0 0 3px rgba(255,255,255,.58);
+  box-shadow:none;
 }
 
 .seq-green{background:linear-gradient(135deg,var(--green1),var(--green2));}
@@ -151,10 +163,10 @@ h1{
 .seq-red{background:linear-gradient(135deg,var(--red1),var(--red2));}
 .seq-lime{background:linear-gradient(135deg,var(--lime1),var(--lime2));}
 .seq-teal{background:linear-gradient(135deg,var(--teal1),var(--teal2));}
-.seq-brown{background:linear-gradient(135deg,var(--brown1),var(--brown2));}
-.seq-white{background:linear-gradient(135deg,var(--white1),var(--white2));}
-.seq-black{background:linear-gradient(135deg,var(--black1),var(--black2));}
+.seq-amber{background:linear-gradient(135deg,var(--amber1),var(--amber2));}
 .seq-coral{background:linear-gradient(135deg,var(--coral1),var(--coral2));}
+.seq-mint{background:linear-gradient(135deg,var(--mint1),var(--mint2));}
+.seq-gold{background:linear-gradient(135deg,var(--gold1),var(--gold2));}
 
 .end-message{
   position:fixed;
@@ -199,27 +211,20 @@ h1{
   color:rgba(255,255,255,.65);
 }
 
-.footer{
-  flex:0 0 auto;
-  width:100%;
-  margin-top:10px;
-  padding:8px 12px;
-  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
-}
-
+/* signature replacée juste sous la grille */
 .signature{
+  flex:0 0 auto;
+  margin-top:10px;
   text-align:center;
   font-size:10px;
-  color:rgba(255,255,255,.46);
+  color:rgba(255,255,255,.42);
   pointer-events:none;
   width:100%;
 }
 
 @media (max-height:700px){
-  .footer{
+  .signature{
     margin-top:8px;
-    padding:6px 12px;
   }
 }
 </style>
@@ -227,16 +232,27 @@ h1{
 <body>
   <div class="app">
     <header class="header">
-      <h1>MEMORY COLORS</h1>
+      <h1 aria-label="MEMORY COLORS">
+        <span class="title-letter t1">M</span>
+        <span class="title-letter t2">E</span>
+        <span class="title-letter t3">M</span>
+        <span class="title-letter t4">O</span>
+        <span class="title-letter t5">R</span>
+        <span class="title-letter t6">Y</span>
+        <span class="title-letter">&nbsp;</span>
+        <span class="title-letter t7">C</span>
+        <span class="title-letter t8">O</span>
+        <span class="title-letter t9">L</span>
+        <span class="title-letter t10">O</span>
+        <span class="title-letter t11">R</span>
+        <span class="title-letter t12">S</span>
+      </h1>
     </header>
 
     <section class="board-wrap">
       <div id="board" class="board"></div>
-    </section>
-
-    <div class="footer">
       <div class="signature">Jeu créé par Luis Coixao à l'aide de ChatGPT.</div>
-    </div>
+    </section>
   </div>
 
   <div id="endMessage" class="end-message">
@@ -256,10 +272,10 @@ const COLORS = [
   "seq-red",
   "seq-lime",
   "seq-teal",
-  "seq-brown",
-  "seq-white",
-  "seq-black",
-  "seq-coral"
+  "seq-amber",
+  "seq-coral",
+  "seq-mint",
+  "seq-gold"
 ];
 
 const BEST_KEY = "memory-colors-best-score";
