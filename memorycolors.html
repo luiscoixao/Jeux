@@ -6,7 +6,11 @@
 <title>MEMORY COLORS</title>
 
 <meta name="theme-color" content="#5b3df5" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="MEMORY COLORS" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <link rel="apple-touch-icon" href="iconmemorycolors.png" />
+<link rel="icon" type="image/png" href="iconmemorycolors.png" />
 
 <style>
 :root{
@@ -26,10 +30,23 @@
   --turquoise:#2dd4bf;
   --fuchsia:#d946ef;
   --amber:#f59e0b;
+
+  --glass:rgba(255,255,255,.05);
+  --line:rgba(255,255,255,.08);
+  --line-strong:rgba(255,255,255,.28);
+  --shadow:0 10px 30px rgba(0,0,0,.18);
 }
 
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{margin:0;height:100%;overflow:hidden;}
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  margin:0;
+  height:100%;
+  overflow:hidden;
+}
 
 body{
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",sans-serif;
@@ -38,7 +55,7 @@ body{
     radial-gradient(circle at 90% 12%, rgba(255,60,172,.18), transparent 20%),
     radial-gradient(circle at 20% 90%, rgba(34,197,94,.10), transparent 22%),
     linear-gradient(135deg,var(--bg1),var(--bg2) 55%, #5b21b6 75%, var(--bg3));
-  color:white;
+  color:#fff;
 }
 
 .app{
@@ -47,10 +64,11 @@ body{
   flex-direction:column;
 }
 
-/* ===== TITRE ===== */
+/* HEADER */
 .header{
+  flex:0 0 auto;
   text-align:center;
-  padding:12px 6px 10px;
+  padding:14px 8px 10px;
 }
 
 h1{
@@ -58,30 +76,31 @@ h1{
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:2px;
+  gap:0;
 }
 
 .title-line{
   display:flex;
   gap:2px;
-  font-size:clamp(36px,9vw,68px);
+  font-size:clamp(36px, 9vw, 68px);
   font-weight:1000;
   letter-spacing:.04em;
+  line-height:.92;
   text-transform:uppercase;
+}
+
+.title-line:first-child{
   transform:translateY(2px);
 }
 
 .title-letter{
   display:inline-block;
-  background:linear-gradient(135deg, currentColor, rgba(255,255,255,.9));
+  background:linear-gradient(135deg, currentColor 0%, rgba(255,255,255,.92) 100%);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
-  text-shadow:
-    0 4px 18px rgba(0,0,0,.25),
-    0 0 12px currentColor;
+  filter:drop-shadow(0 4px 16px rgba(0,0,0,.24)) drop-shadow(0 0 10px currentColor);
 }
 
-/* couleurs lettres */
 .t1{color:var(--green);}
 .t2{color:var(--yellow);}
 .t3{color:var(--pink);}
@@ -95,35 +114,104 @@ h1{
 .t11{color:var(--blue);}
 .t12{color:var(--purple);}
 
-/* ===== GRILLE ===== */
+/* BOARD */
 .board{
   flex:1;
   display:grid;
   grid-template-columns:repeat(4,1fr);
   grid-template-rows:repeat(6,1fr);
-  background:rgba(255,255,255,.04);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
-}
-
-.tile{
-  border:none;
-  cursor:pointer;
-  box-shadow:inset 0 0 0 2px rgba(255,255,255,.10);
-  transition:.15s;
-}
-
-.tile:active{transform:scale(.985);}
-
-.tile.hidden{
   background:rgba(255,255,255,.03);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+  perspective:1200px;
 }
 
-.tile.open,
-.tile.matched{
-  box-shadow:inset 0 0 0 3px rgba(255,255,255,.58);
+.card{
+  position:relative;
+  border:none;
+  padding:0;
+  margin:0;
+  background:none;
+  cursor:pointer;
+  perspective:1000px;
+  overflow:hidden;
 }
 
-/* couleurs cases */
+.card-inner{
+  position:absolute;
+  inset:0;
+  transform-style:preserve-3d;
+  transition:transform .48s cubic-bezier(.2,.8,.2,1), filter .25s ease;
+}
+
+.card.flipped .card-inner{
+  transform:rotateY(180deg) scale(.985);
+}
+
+.card.matched .card-inner{
+  transform:rotateY(180deg) scale(.985);
+}
+
+.face{
+  position:absolute;
+  inset:0;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+
+.face.back{
+  background:rgba(255,255,255,.02);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.08);
+}
+
+.face.front{
+  transform:rotateY(180deg);
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.42);
+  filter:saturate(1.06);
+}
+
+.card:active .card-inner{
+  transform:scale(.975);
+}
+
+.card.flipped:active .card-inner,
+.card.matched:active .card-inner{
+  transform:rotateY(180deg) scale(.975);
+}
+
+/* premium glow */
+.card.flipped .face.front,
+.card.matched .face.front{
+  animation:softPop .22s ease;
+}
+
+.card.matched .face.front{
+  box-shadow:
+    inset 0 0 0 3px rgba(255,255,255,.42),
+    0 0 18px rgba(255,255,255,.10);
+  animation:matchPulse .55s ease;
+}
+
+@keyframes softPop{
+  0%{transform:rotateY(180deg) scale(.93);}
+  100%{transform:rotateY(180deg) scale(1);}
+}
+
+@keyframes matchPulse{
+  0%{
+    transform:rotateY(180deg) scale(.96);
+    filter:brightness(1);
+  }
+  45%{
+    transform:rotateY(180deg) scale(1.02);
+    filter:brightness(1.12);
+  }
+  100%{
+    transform:rotateY(180deg) scale(1);
+    filter:brightness(1);
+  }
+}
+
+/* colors */
 .seq-green{background:var(--green);}
 .seq-yellow{background:var(--yellow);}
 .seq-pink{background:var(--pink);}
@@ -137,17 +225,27 @@ h1{
 .seq-fuchsia{background:var(--fuchsia);}
 .seq-amber{background:var(--amber);}
 
-/* ===== FIN ===== */
+/* footer */
+.signature{
+  text-align:center;
+  font-size:10px;
+  opacity:.5;
+  padding:10px 8px 8px;
+}
+
+/* end overlay */
 .end{
   position:fixed;
   inset:0;
   display:flex;
   align-items:center;
   justify-content:center;
-  background:rgba(0,0,0,.4);
-  backdrop-filter:blur(6px);
+  background:rgba(7,10,26,.38);
+  backdrop-filter:blur(10px) saturate(1.1);
+  -webkit-backdrop-filter:blur(10px) saturate(1.1);
   opacity:0;
   pointer-events:none;
+  transition:opacity .25s ease;
 }
 
 .end.show{
@@ -156,124 +254,199 @@ h1{
 }
 
 .box{
-  background:rgba(12,18,40,.7);
-  padding:20px;
-  border-radius:14px;
+  min-width:min(86vw, 360px);
+  padding:22px 20px 18px;
+  border-radius:22px;
+  background:linear-gradient(180deg, rgba(18,24,48,.82), rgba(14,18,36,.78));
+  box-shadow:
+    0 22px 60px rgba(0,0,0,.28),
+    inset 0 0 0 1px rgba(255,255,255,.08);
   text-align:center;
 }
 
-.signature{
-  text-align:center;
-  font-size:10px;
-  opacity:.5;
-  padding:6px;
+#endText{
+  font-size:17px;
+  font-weight:700;
+  line-height:1.45;
+}
+
+.end-hint{
+  margin-top:10px;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  opacity:.7;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .card-inner,
+  .end,
+  .title-letter{
+    transition:none !important;
+    animation:none !important;
+  }
 }
 </style>
 </head>
-
 <body>
 
 <div class="app">
-
-<div class="header">
-<h1>
-  <div class="title-line">
-    <span class="title-letter t1">M</span>
-    <span class="title-letter t2">E</span>
-    <span class="title-letter t3">M</span>
-    <span class="title-letter t4">O</span>
-    <span class="title-letter t5">R</span>
-    <span class="title-letter t6">Y</span>
+  <div class="header">
+    <h1 aria-label="MEMORY COLORS">
+      <div class="title-line">
+        <span class="title-letter t1">M</span>
+        <span class="title-letter t2">E</span>
+        <span class="title-letter t3">M</span>
+        <span class="title-letter t4">O</span>
+        <span class="title-letter t5">R</span>
+        <span class="title-letter t6">Y</span>
+      </div>
+      <div class="title-line">
+        <span class="title-letter t7">C</span>
+        <span class="title-letter t8">O</span>
+        <span class="title-letter t9">L</span>
+        <span class="title-letter t10">O</span>
+        <span class="title-letter t11">R</span>
+        <span class="title-letter t12">S</span>
+      </div>
+    </h1>
   </div>
-  <div class="title-line">
-    <span class="title-letter t7">C</span>
-    <span class="title-letter t8">O</span>
-    <span class="title-letter t9">L</span>
-    <span class="title-letter t10">O</span>
-    <span class="title-letter t11">R</span>
-    <span class="title-letter t12">S</span>
-  </div>
-</h1>
-</div>
 
-<div id="board" class="board"></div>
+  <div id="board" class="board"></div>
 
-<div class="signature">Jeu créé par Luis Coixao</div>
-
+  <div class="signature">Jeu créé par Luis Coixao</div>
 </div>
 
 <div id="end" class="end">
-  <div class="box" id="endText"></div>
+  <div class="box">
+    <div id="endText"></div>
+    <div class="end-hint">Touchez pour rejouer</div>
+  </div>
 </div>
 
 <script>
 const COLORS = [
-"seq-green","seq-yellow","seq-pink","seq-cyan",
-"seq-orange","seq-red","seq-purple","seq-blue",
-"seq-lime","seq-turquoise","seq-fuchsia","seq-amber"
+  "seq-green","seq-yellow","seq-pink","seq-cyan",
+  "seq-orange","seq-red","seq-purple","seq-blue",
+  "seq-lime","seq-turquoise","seq-fuchsia","seq-amber"
 ];
 
-let state={first:null,second:null,locked:false,matched:0,moves:0,finished:false};
+const BEST_KEY = "memory-colors-best-score";
 
-const board=document.getElementById("board");
-const end=document.getElementById("end");
-const endText=document.getElementById("endText");
+let state = {
+  first:null,
+  second:null,
+  locked:false,
+  matched:0,
+  moves:0,
+  finished:false
+};
 
-function shuffle(a){return a.sort(()=>Math.random()-.5)}
+const board = document.getElementById("board");
+const end = document.getElementById("end");
+const endText = document.getElementById("endText");
+
+function shuffle(array){
+  const a = [...array];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function getBestScore(){
+  const best = Number(localStorage.getItem(BEST_KEY) || 0);
+  return Number.isFinite(best) ? best : 0;
+}
+
+function saveBestScore(score){
+  const currentBest = getBestScore();
+  if(currentBest === 0 || score < currentBest){
+    localStorage.setItem(BEST_KEY, String(score));
+    return score;
+  }
+  return currentBest;
+}
 
 function start(){
-  state={first:null,second:null,locked:false,matched:0,moves:0,finished:false};
-  const cards=shuffle([...COLORS,...COLORS]);
-  board.innerHTML="";
-  cards.forEach((c,i)=>{
-    const b=document.createElement("button");
-    b.className="tile hidden";
-    b.onclick=()=>click(i,b,c);
-    board.appendChild(b);
+  state = { first:null, second:null, locked:false, matched:0, moves:0, finished:false };
+  const cards = shuffle([...COLORS, ...COLORS]);
+  board.innerHTML = "";
+
+  cards.forEach((color, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "card";
+    button.dataset.color = color;
+    button.dataset.index = index;
+
+    button.innerHTML = `
+      <div class="card-inner">
+        <div class="face back"></div>
+        <div class="face front ${color}"></div>
+      </div>
+    `;
+
+    button.addEventListener("click", () => clickCard(button, color));
+    board.appendChild(button);
   });
 }
 
-function click(i,el,color){
-  if(state.locked||state.finished||el.classList.contains("open"))return;
+function clickCard(el, color){
+  if(state.locked || state.finished) return;
+  if(el.classList.contains("flipped") || el.classList.contains("matched")) return;
 
-  el.className="tile open "+color;
+  el.classList.add("flipped");
 
-  if(state.first===null){state.first={el,color};return;}
+  if(state.first === null){
+    state.first = { el, color };
+    return;
+  }
 
-  state.second={el,color};
+  state.second = { el, color };
   state.moves++;
-  state.locked=true;
+  state.locked = true;
 
-  if(state.first.color===state.second.color){
+  if(state.first.color === state.second.color){
+    state.first.el.classList.remove("flipped");
+    state.second.el.classList.remove("flipped");
     state.first.el.classList.add("matched");
     state.second.el.classList.add("matched");
-    state.matched+=2;
+    state.matched += 2;
 
-    reset();
+    resetTurn();
 
-    if(state.matched===24) finish();
-  }else{
-    setTimeout(()=>{
-      state.first.el.className="tile hidden";
-      state.second.el.className="tile hidden";
-      reset();
-    },500);
+    if(state.matched === 24){
+      finish();
+    }
+  } else {
+    setTimeout(() => {
+      state.first.el.classList.remove("flipped");
+      state.second.el.classList.remove("flipped");
+      resetTurn();
+    }, 620);
   }
 }
 
-function reset(){
-  state.first=null;
-  state.second=null;
-  state.locked=false;
+function resetTurn(){
+  state.first = null;
+  state.second = null;
+  state.locked = false;
 }
 
 function finish(){
-  state.finished=true;
-  endText.innerHTML="Terminé en "+state.moves+" coups<br><small>Tap pour rejouer</small>";
+  state.finished = true;
+  const best = saveBestScore(state.moves);
+  endText.innerHTML = "Terminé en " + state.moves + " coups.<br>Meilleur score : " + best + ".";
   end.classList.add("show");
 }
 
-end.onclick=()=>{end.classList.remove("show");start();};
+end.addEventListener("click", () => {
+  end.classList.remove("show");
+  start();
+});
 
 start();
 </script>
