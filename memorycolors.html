@@ -19,31 +19,23 @@
   --bg3:#312e81;
   --text:#ffffff;
 
-  /* Palette plus franche et plus distincte */
-  --green1:#4ade80;  --green2:#15803d;
-  --yellow1:#fde047; --yellow2:#ca8a04;
-  --pink1:#f9a8d4;   --pink2:#db2777;
-  --cyan1:#67e8f9;   --cyan2:#0891b2;
-  --orange1:#fdba74; --orange2:#ea580c;
-  --red1:#fb7185;    --red2:#be123c;
-  --lime1:#bef264;   --lime2:#65a30d;
-  --teal1:#5eead4;   --teal2:#0f766e;
-  --amber1:#fcd34d;  --amber2:#d97706;
-  --coral1:#fda4af;  --coral2:#e11d48;
-  --mint1:#86efac;   --mint2:#16a34a;
-  --gold1:#fef08a;   --gold2:#eab308;
+  --green:#22c55e;
+  --yellow:#facc15;
+  --pink:#ec4899;
+  --cyan:#06b6d4;
+  --orange:#f97316;
+  --red:#ef4444;
+  --lime:#84cc16;
+  --teal:#14b8a6;
+  --amber:#f59e0b;
+  --coral:#fb7185;
+  --mint:#34d399;
+  --gold:#eab308;
 }
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
-html,body{
-  margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;}
+
 body{
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",sans-serif;
   color:var(--text);
@@ -57,34 +49,63 @@ body{
 .app{
   width:100vw;
   height:100dvh;
-  padding:
-    calc(env(safe-area-inset-top) + 8px)
-    0
-    calc(env(safe-area-inset-bottom) + 10px)
-    0;
+  padding:calc(env(safe-area-inset-top) + 8px) 0 calc(env(safe-area-inset-bottom) + 10px) 0;
   display:flex;
   flex-direction:column;
 }
 
+/* HEADER */
 .header{
   flex:0 0 auto;
   text-align:center;
-  padding:8px 8px 10px;
+  padding:10px 6px 12px;
+  overflow:hidden;
 }
 
 h1{
   margin:0;
-  font-size:clamp(30px, 8vw, 56px);
-  line-height:.92;
-  font-weight:1000;
-  letter-spacing:.10em;
-  text-transform:uppercase;
-  color:#ffffff;
-  text-shadow:
-    0 2px 14px rgba(0,0,0,.18),
-    0 0 26px rgba(255,255,255,.10);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:1px;
 }
 
+.title-line{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:1px;
+  font-size:clamp(36px, 9vw, 68px);
+  line-height:.92;
+  font-weight:1000;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  text-shadow:
+    0 3px 14px rgba(0,0,0,.22),
+    0 0 22px rgba(255,255,255,.10);
+}
+
+.title-line:first-child{
+  transform:translateY(2px);
+}
+
+.title-letter{display:inline-block;}
+
+.t1{color:var(--green);}
+.t2{color:var(--yellow);}
+.t3{color:var(--pink);}
+.t4{color:var(--cyan);}
+.t5{color:var(--orange);}
+.t6{color:var(--red);}
+.t7{color:var(--lime);}
+.t8{color:var(--teal);}
+.t9{color:var(--amber);}
+.t10{color:var(--coral);}
+.t11{color:var(--mint);}
+.t12{color:var(--gold);}
+
+/* BOARD */
 .board-wrap{
   flex:1;
   min-height:0;
@@ -96,62 +117,48 @@ h1{
 }
 
 .board{
-  width:min(100vw, calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 98px) * 0.6666667));
+  width:min(100vw, calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 98px) * 0.6667));
   height:min(calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 98px), calc(100vw * 1.5));
   display:grid;
-  grid-template-columns:repeat(4, 1fr);
-  grid-template-rows:repeat(6, 1fr);
-  gap:0;
+  grid-template-columns:repeat(4,1fr);
+  grid-template-rows:repeat(6,1fr);
   background:rgba(255,255,255,.04);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
 }
 
 .tile{
-  width:100%;
-  height:100%;
-  min-width:0;
-  min-height:0;
   border:none;
-  border-radius:0;
-  padding:0;
-  margin:0;
   cursor:pointer;
-  transition:transform .14s ease, filter .18s ease, opacity .18s ease, box-shadow .18s ease;
   box-shadow:inset 0 0 0 2px rgba(255,255,255,.10);
+  transition:.15s;
 }
 
-.tile:active{
-  transform:scale(.985);
-}
+.tile:active{transform:scale(.985);}
 
 .tile.hidden{
   background:rgba(255,255,255,.03);
-  box-shadow:inset 0 0 0 2px rgba(255,255,255,.09);
 }
 
-.tile.open{
-  transform:scale(.99);
+.tile.open,
+.tile.matched{
   box-shadow:inset 0 0 0 3px rgba(255,255,255,.58);
 }
 
-/* aucune bordure spéciale quand une paire est trouvée */
-.tile.matched{
-  box-shadow:none;
-}
+/* COULEURS */
+.seq-green{background:var(--green);}
+.seq-yellow{background:var(--yellow);}
+.seq-pink{background:var(--pink);}
+.seq-cyan{background:var(--cyan);}
+.seq-orange{background:var(--orange);}
+.seq-red{background:var(--red);}
+.seq-lime{background:var(--lime);}
+.seq-teal{background:var(--teal);}
+.seq-amber{background:var(--amber);}
+.seq-coral{background:var(--coral);}
+.seq-mint{background:var(--mint);}
+.seq-gold{background:var(--gold);}
 
-.seq-green{background:linear-gradient(135deg,var(--green1),var(--green2));}
-.seq-yellow{background:linear-gradient(135deg,var(--yellow1),var(--yellow2));}
-.seq-pink{background:linear-gradient(135deg,var(--pink1),var(--pink2));}
-.seq-cyan{background:linear-gradient(135deg,var(--cyan1),var(--cyan2));}
-.seq-orange{background:linear-gradient(135deg,var(--orange1),var(--orange2));}
-.seq-red{background:linear-gradient(135deg,var(--red1),var(--red2));}
-.seq-lime{background:linear-gradient(135deg,var(--lime1),var(--lime2));}
-.seq-teal{background:linear-gradient(135deg,var(--teal1),var(--teal2));}
-.seq-amber{background:linear-gradient(135deg,var(--amber1),var(--amber2));}
-.seq-coral{background:linear-gradient(135deg,var(--coral1),var(--coral2));}
-.seq-mint{background:linear-gradient(135deg,var(--mint1),var(--mint2));}
-.seq-gold{background:linear-gradient(135deg,var(--gold1),var(--gold2));}
-
+/* FIN */
 .end-message{
   position:fixed;
   inset:0;
@@ -160,252 +167,131 @@ h1{
   justify-content:center;
   background:rgba(10,12,28,.42);
   backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
   opacity:0;
   pointer-events:none;
-  transition:opacity .22s ease;
-  z-index:50;
+  transition:.22s;
 }
 .end-message.show{
   opacity:1;
   pointer-events:auto;
 }
+
 .end-box{
-  min-width:min(88vw, 360px);
-  padding:24px 22px;
-  text-align:center;
+  padding:24px;
   background:rgba(12,18,40,.62);
   border:1px solid rgba(255,255,255,.16);
-  box-shadow:
-    0 24px 60px rgba(0,0,0,.28),
-    inset 0 0 0 1px rgba(255,255,255,.03);
-}
-.end-text{
-  font-size:16px;
-  font-weight:700;
-  color:rgba(255,255,255,.92);
-  line-height:1.4;
-}
-.end-hint{
-  margin-top:10px;
-  font-size:12px;
-  font-weight:700;
-  letter-spacing:.06em;
-  text-transform:uppercase;
-  color:rgba(255,255,255,.65);
 }
 
-/* signature replacée juste sous la grille */
 .signature{
-  flex:0 0 auto;
   margin-top:10px;
   text-align:center;
   font-size:10px;
-  color:rgba(255,255,255,.42);
-  pointer-events:none;
-  width:100%;
-}
-
-@media (max-height:700px){
-  .signature{
-    margin-top:8px;
-  }
+  opacity:.5;
 }
 </style>
 </head>
+
 <body>
-  <div class="app">
-    <header class="header">
-      <h1>MEMORY COLORS</h1>
-    </header>
+<div class="app">
 
-    <section class="board-wrap">
-      <div id="board" class="board"></div>
-      <div class="signature">Jeu créé par Luis Coixao à l'aide de ChatGPT.</div>
-    </section>
+<header class="header">
+<h1>
+  <div class="title-line">
+    <span class="title-letter t1">M</span>
+    <span class="title-letter t2">E</span>
+    <span class="title-letter t3">M</span>
+    <span class="title-letter t4">O</span>
+    <span class="title-letter t5">R</span>
+    <span class="title-letter t6">Y</span>
   </div>
+  <div class="title-line">
+    <span class="title-letter t7">C</span>
+    <span class="title-letter t8">O</span>
+    <span class="title-letter t9">L</span>
+    <span class="title-letter t10">O</span>
+    <span class="title-letter t11">R</span>
+    <span class="title-letter t12">S</span>
+  </div>
+</h1>
+</header>
 
-  <div id="endMessage" class="end-message">
-    <div class="end-box">
-      <div id="endText" class="end-text"></div>
-      <div class="end-hint">Touchez pour recommencer</div>
-    </div>
-  </div>
+<section class="board-wrap">
+<div id="board" class="board"></div>
+<div class="signature">Jeu créé par Luis Coixao</div>
+</section>
+
+</div>
+
+<div id="endMessage" class="end-message">
+<div class="end-box">
+<div id="endText"></div>
+</div>
+</div>
 
 <script>
 const COLORS = [
-  "seq-green",
-  "seq-yellow",
-  "seq-pink",
-  "seq-cyan",
-  "seq-orange",
-  "seq-red",
-  "seq-lime",
-  "seq-teal",
-  "seq-amber",
-  "seq-coral",
-  "seq-mint",
-  "seq-gold"
+"seq-green","seq-yellow","seq-pink","seq-cyan",
+"seq-orange","seq-red","seq-lime","seq-teal",
+"seq-amber","seq-coral","seq-mint","seq-gold"
 ];
 
-const BEST_KEY = "memory-colors-best-score";
+const state={locked:true,moves:0,matched:0,first:null,second:null,board:[],finished:false};
 
-const state = {
-  locked: true,
-  moves: 0,
-  matched: 0,
-  first: null,
-  second: null,
-  board: [],
-  finished: false
-};
+const boardEl=document.getElementById("board");
 
-const boardEl = document.getElementById("board");
-const endMessage = document.getElementById("endMessage");
-const endText = document.getElementById("endText");
-
-function wait(ms){
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-function shuffle(arr){
-  const a = [...arr];
-  for(let i = a.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function getBestScore(){
-  const best = Number(localStorage.getItem(BEST_KEY) || 0);
-  return Number.isFinite(best) ? best : 0;
-}
-
-function saveBestScore(score){
-  const currentBest = getBestScore();
-  if(currentBest === 0 || score < currentBest){
-    localStorage.setItem(BEST_KEY, String(score));
-    return score;
-  }
-  return currentBest;
-}
+function shuffle(a){return a.sort(()=>Math.random()-.5)}
 
 function buildBoard(){
-  const pairs = [...COLORS, ...COLORS];
-  state.board = shuffle(pairs).map((color, index) => ({
-    id: index,
-    color,
-    open: false,
-    matched: false
-  }));
+  const pairs=[...COLORS,...COLORS];
+  state.board=shuffle(pairs).map((c,i)=>({id:i,color:c,open:false,matched:false}));
 }
 
 function renderBoard(){
-  boardEl.innerHTML = "";
-
-  state.board.forEach((card, index) => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "tile " + (
-      card.matched ? card.color + " matched" :
-      card.open ? card.color + " open" :
-      "hidden"
-    );
-    btn.addEventListener("click", () => handleTileClick(index));
-    boardEl.appendChild(btn);
+  boardEl.innerHTML="";
+  state.board.forEach((c,i)=>{
+    const b=document.createElement("button");
+    b.className="tile "+(c.matched?c.color+" matched":c.open?c.color+" open":"hidden");
+    b.onclick=()=>clickTile(i);
+    boardEl.appendChild(b);
   });
 }
 
-async function previewBoard(){
-  state.locked = true;
-  state.board.forEach(card => card.open = true);
-  renderBoard();
-  await wait(1400);
-  state.board.forEach(card => {
-    if(!card.matched) card.open = false;
-  });
-  renderBoard();
-  state.locked = false;
+function clickTile(i){
+  if(state.locked||state.finished)return;
+  const c=state.board[i];
+  if(c.open||c.matched)return;
+
+  c.open=true; renderBoard();
+
+  if(state.first==null){state.first=i;return;}
+
+  state.second=i; state.locked=true;
+
+  const a=state.board[state.first];
+  const b=state.board[state.second];
+
+  if(a.color===b.color){
+    a.matched=b.matched=true;
+    state.first=state.second=null;
+    state.locked=false;
+    renderBoard();
+  }else{
+    setTimeout(()=>{
+      a.open=b.open=false;
+      state.first=state.second=null;
+      state.locked=false;
+      renderBoard();
+    },500);
+  }
 }
 
-async function startGame(){
-  state.locked = true;
-  state.moves = 0;
-  state.matched = 0;
-  state.first = null;
-  state.second = null;
-  state.finished = false;
-  endMessage.classList.remove("show");
-
+function start(){
   buildBoard();
   renderBoard();
-  await previewBoard();
+  state.locked=false;
 }
 
-async function handleTileClick(index){
-  if(state.locked || state.finished) return;
-
-  const card = state.board[index];
-  if(!card || card.open || card.matched) return;
-
-  card.open = true;
-  renderBoard();
-
-  if(state.first === null){
-    state.first = index;
-    return;
-  }
-
-  state.second = index;
-  state.moves += 1;
-  state.locked = true;
-
-  const firstCard = state.board[state.first];
-  const secondCard = state.board[state.second];
-
-  if(firstCard.color === secondCard.color){
-    firstCard.matched = true;
-    secondCard.matched = true;
-    state.matched += 2;
-
-    state.first = null;
-    state.second = null;
-    renderBoard();
-
-    if(state.matched === state.board.length){
-      state.finished = true;
-      const best = saveBestScore(state.moves);
-      await wait(250);
-      endText.textContent = "Partie terminée en " + state.moves + " coups. Meilleur score : " + best + ".";
-      endMessage.classList.add("show");
-      return;
-    }
-
-    state.locked = false;
-    return;
-  }
-
-  await wait(650);
-
-  firstCard.open = false;
-  secondCard.open = false;
-  state.first = null;
-  state.second = null;
-  renderBoard();
-  state.locked = false;
-}
-
-async function restartGame(){
-  if(!endMessage.classList.contains("show")) return;
-  endMessage.classList.remove("show");
-  await wait(180);
-  startGame();
-}
-
-endMessage.addEventListener("click", restartGame);
-
-startGame();
+start();
 </script>
 </body>
 </html>
