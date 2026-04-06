@@ -19,19 +19,19 @@
   --bg3:#312e81;
   --text:#ffffff;
 
-  /* Palette plus franche et plus distincte */
-  --green1:#4ade80;  --green2:#15803d;
-  --yellow1:#fde047; --yellow2:#ca8a04;
-  --pink1:#f9a8d4;   --pink2:#db2777;
-  --cyan1:#67e8f9;   --cyan2:#0891b2;
-  --orange1:#fdba74; --orange2:#ea580c;
-  --red1:#fb7185;    --red2:#be123c;
-  --lime1:#bef264;   --lime2:#65a30d;
-  --teal1:#5eead4;   --teal2:#0f766e;
-  --amber1:#fcd34d;  --amber2:#d97706;
-  --coral1:#fda4af;  --coral2:#e11d48;
-  --mint1:#86efac;   --mint2:#16a34a;
-  --gold1:#fef08a;   --gold2:#eab308;
+  /* Couleurs unies, bien distinctes */
+  --green:#22c55e;
+  --yellow:#facc15;
+  --pink:#ec4899;
+  --cyan:#06b6d4;
+  --orange:#f97316;
+  --red:#ef4444;
+  --lime:#84cc16;
+  --teal:#14b8a6;
+  --amber:#f59e0b;
+  --coral:#fb7185;
+  --mint:#34d399;
+  --gold:#eab308;
 }
 *{
   box-sizing:border-box;
@@ -69,37 +69,39 @@ body{
 .header{
   flex:0 0 auto;
   text-align:center;
-  padding:8px 8px 10px;
+  padding:10px 6px 10px;
+  overflow:hidden;
 }
 
 h1{
   margin:0;
-  font-size:clamp(30px, 8vw, 56px);
-  line-height:.92;
+  font-size:clamp(24px, 6.2vw, 50px);
+  line-height:1;
   font-weight:1000;
-  letter-spacing:.10em;
+  letter-spacing:.06em;
   text-transform:uppercase;
   text-shadow:
     0 2px 14px rgba(0,0,0,.18),
     0 0 26px rgba(255,255,255,.10);
+  white-space:nowrap;
 }
 
 .title-letter{
   display:inline-block;
 }
 
-.t1{color:#4ade80;}
-.t2{color:#fde047;}
-.t3{color:#f9a8d4;}
-.t4{color:#67e8f9;}
+.t1{color:var(--green);}
+.t2{color:var(--yellow);}
+.t3{color:var(--pink);}
+.t4{color:var(--cyan);}
 .t5{color:#fdba74;}
-.t6{color:#fb7185;}
-.t7{color:#bef264;}
-.t8{color:#5eead4;}
-.t9{color:#fcd34d;}
-.t10{color:#fda4af;}
-.t11{color:#86efac;}
-.t12{color:#fef08a;}
+.t6{color:var(--red);}
+.t7{color:var(--lime);}
+.t8{color:var(--teal);}
+.t9{color:var(--amber);}
+.t10{color:var(--coral);}
+.t11{color:var(--mint);}
+.t12{color:var(--gold);}
 
 .board-wrap{
   flex:1;
@@ -132,7 +134,7 @@ h1{
   padding:0;
   margin:0;
   cursor:pointer;
-  transition:transform .14s ease, filter .18s ease, opacity .18s ease, box-shadow .18s ease;
+  transition:transform .14s ease, opacity .18s ease, box-shadow .18s ease;
   box-shadow:inset 0 0 0 2px rgba(255,255,255,.10);
 }
 
@@ -150,23 +152,23 @@ h1{
   box-shadow:inset 0 0 0 3px rgba(255,255,255,.58);
 }
 
-/* aucune bordure spéciale quand une paire est trouvée */
+/* même bordure pour une paire trouvée */
 .tile.matched{
-  box-shadow:none;
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.58);
 }
 
-.seq-green{background:linear-gradient(135deg,var(--green1),var(--green2));}
-.seq-yellow{background:linear-gradient(135deg,var(--yellow1),var(--yellow2));}
-.seq-pink{background:linear-gradient(135deg,var(--pink1),var(--pink2));}
-.seq-cyan{background:linear-gradient(135deg,var(--cyan1),var(--cyan2));}
-.seq-orange{background:linear-gradient(135deg,var(--orange1),var(--orange2));}
-.seq-red{background:linear-gradient(135deg,var(--red1),var(--red2));}
-.seq-lime{background:linear-gradient(135deg,var(--lime1),var(--lime2));}
-.seq-teal{background:linear-gradient(135deg,var(--teal1),var(--teal2));}
-.seq-amber{background:linear-gradient(135deg,var(--amber1),var(--amber2));}
-.seq-coral{background:linear-gradient(135deg,var(--coral1),var(--coral2));}
-.seq-mint{background:linear-gradient(135deg,var(--mint1),var(--mint2));}
-.seq-gold{background:linear-gradient(135deg,var(--gold1),var(--gold2));}
+.seq-green{background:var(--green);}
+.seq-yellow{background:var(--yellow);}
+.seq-pink{background:var(--pink);}
+.seq-cyan{background:var(--cyan);}
+.seq-orange{background:var(--orange);}
+.seq-red{background:var(--red);}
+.seq-lime{background:var(--lime);}
+.seq-teal{background:var(--teal);}
+.seq-amber{background:var(--amber);}
+.seq-coral{background:var(--coral);}
+.seq-mint{background:var(--mint);}
+.seq-gold{background:var(--gold);}
 
 .end-message{
   position:fixed;
@@ -211,7 +213,6 @@ h1{
   color:rgba(255,255,255,.65);
 }
 
-/* signature replacée juste sous la grille */
 .signature{
   flex:0 0 auto;
   margin-top:10px;
