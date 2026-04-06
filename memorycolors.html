@@ -13,7 +13,6 @@
   --bg1:#4338ca;
   --bg2:#7c3aed;
   --bg3:#312e81;
-  --text:#ffffff;
 
   --green:#22c55e;
   --yellow:#facc15;
@@ -33,8 +32,12 @@
 html,body{margin:0;height:100%;overflow:hidden;}
 
 body{
-  font-family:-apple-system;
-  background:linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at 10% 15%, rgba(56,189,248,.22), transparent 20%),
+    radial-gradient(circle at 90% 12%, rgba(255,60,172,.18), transparent 20%),
+    radial-gradient(circle at 20% 90%, rgba(34,197,94,.10), transparent 22%),
+    linear-gradient(135deg,var(--bg1),var(--bg2) 55%, #5b21b6 75%, var(--bg3));
   color:white;
 }
 
@@ -47,25 +50,38 @@ body{
 /* ===== TITRE ===== */
 .header{
   text-align:center;
-  padding:10px;
+  padding:12px 6px 10px;
 }
 
 h1{
+  margin:0;
   display:flex;
   flex-direction:column;
   align-items:center;
   gap:2px;
-  margin:0;
 }
 
 .title-line{
   display:flex;
   gap:2px;
   font-size:clamp(36px,9vw,68px);
-  font-weight:900;
-  text-shadow:0 4px 18px rgba(0,0,0,.25);
+  font-weight:1000;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  transform:translateY(2px);
 }
 
+.title-letter{
+  display:inline-block;
+  background:linear-gradient(135deg, currentColor, rgba(255,255,255,.9));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  text-shadow:
+    0 4px 18px rgba(0,0,0,.25),
+    0 0 12px currentColor;
+}
+
+/* couleurs lettres */
 .t1{color:var(--green);}
 .t2{color:var(--yellow);}
 .t3{color:var(--pink);}
@@ -85,21 +101,29 @@ h1{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   grid-template-rows:repeat(6,1fr);
+  background:rgba(255,255,255,.04);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
 }
 
 .tile{
   border:none;
-  box-shadow:inset 0 0 0 2px rgba(255,255,255,.1);
+  cursor:pointer;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.10);
+  transition:.15s;
 }
 
-.tile.hidden{background:rgba(255,255,255,.05);}
+.tile:active{transform:scale(.985);}
+
+.tile.hidden{
+  background:rgba(255,255,255,.03);
+}
 
 .tile.open,
 .tile.matched{
-  box-shadow:inset 0 0 0 3px rgba(255,255,255,.6);
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.58);
 }
 
-/* couleurs */
+/* couleurs cases */
 .seq-green{background:var(--green);}
 .seq-yellow{background:var(--yellow);}
 .seq-pink{background:var(--pink);}
@@ -132,9 +156,10 @@ h1{
 }
 
 .box{
-  background:#111;
+  background:rgba(12,18,40,.7);
   padding:20px;
-  border-radius:12px;
+  border-radius:14px;
+  text-align:center;
 }
 
 .signature{
@@ -153,10 +178,20 @@ h1{
 <div class="header">
 <h1>
   <div class="title-line">
-    <span class="t1">M</span><span class="t2">E</span><span class="t3">M</span><span class="t4">O</span><span class="t5">R</span><span class="t6">Y</span>
+    <span class="title-letter t1">M</span>
+    <span class="title-letter t2">E</span>
+    <span class="title-letter t3">M</span>
+    <span class="title-letter t4">O</span>
+    <span class="title-letter t5">R</span>
+    <span class="title-letter t6">Y</span>
   </div>
   <div class="title-line">
-    <span class="t7">C</span><span class="t8">O</span><span class="t9">L</span><span class="t10">O</span><span class="t11">R</span><span class="t12">S</span>
+    <span class="title-letter t7">C</span>
+    <span class="title-letter t8">O</span>
+    <span class="title-letter t9">L</span>
+    <span class="title-letter t10">O</span>
+    <span class="title-letter t11">R</span>
+    <span class="title-letter t12">S</span>
   </div>
 </h1>
 </div>
