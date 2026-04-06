@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reset Score</title>
+
+<style>
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;
+  background:linear-gradient(135deg,#4338ca,#7c3aed);
+  color:white;
+}
+
+.box{
+  text-align:center;
+}
+
+button{
+  padding:14px 20px;
+  font-size:16px;
+  font-weight:700;
+  border:none;
+  border-radius:16px;
+  background:white;
+  color:#4338ca;
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
+}
+
+p{
+  margin-top:20px;
+  font-size:14px;
+  opacity:.8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <button onclick="reset()">Réinitialiser le meilleur score</button>
+  <p id="msg"></p>
+</div>
+
+<script>
+function reset(){
+  localStorage.removeItem("memory-colors-best-score");
+  document.getElementById("msg").textContent = "Score réinitialisé ✅";
+}
+</script>
+
+</body>
+</html>
