@@ -4,146 +4,41 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
 <title>BALLOONS</title>
-<meta name="theme-color" content="#345dff" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="BALLOONS" />
-<link rel="apple-touch-icon" href="icon.png" />
-<link rel="icon" type="image/png" href="icon.png" />
-<link rel="manifest" href="manifest.webmanifest" />
+
 <style>
-:root{
-  --safe-top: env(safe-area-inset-top);
-  --safe-bottom: env(safe-area-inset-bottom);
-  --safe-left: env(safe-area-inset-left);
-  --safe-right: env(safe-area-inset-right);
-  --white:#fff;
-  --line:rgba(255,255,255,.22);
-  --glass:rgba(255,255,255,.13);
-  --shadow:0 18px 42px rgba(7,10,40,.34);
-  --green1:#48ff8c;
-  --green2:#06b34a;
-  --red1:#ff5e85;
-  --red2:#cf1133;
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
 }
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;width:100%;height:100%;overflow:hidden}
+
 body{
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",sans-serif;
-  color:var(--white);
   background:
     radial-gradient(circle at 12% 12%, rgba(255,239,118,.95) 0 0, rgba(255,239,118,0) 17%),
     radial-gradient(circle at 84% 12%, rgba(74,196,255,.92) 0 0, rgba(74,196,255,0) 18%),
     radial-gradient(circle at 82% 86%, rgba(86,255,227,.80) 0 0, rgba(86,255,227,0) 22%),
     radial-gradient(circle at 18% 88%, rgba(255,122,214,.72) 0 0, rgba(255,122,214,0) 22%),
-    radial-gradient(circle at 50% 72%, rgba(181,102,255,.45) 0 0, rgba(181,102,255,0) 30%),
-    linear-gradient(150deg,#5ae8ff 0%, #3a67ff 32%, #7b43ff 63%, #ff58ab 100%);
+    linear-gradient(150deg,#5ae8ff,#3a67ff,#7b43ff,#ff58ab);
 }
-body::before,
-body::after{
-  content:"";
+
+.board{
   position:fixed;
-  border-radius:50%;
-  filter:blur(72px);
-  pointer-events:none;
-  opacity:.34;
+  inset:0;
+  overflow:hidden;
 }
-body::before{width:38vw;height:38vw;left:-10vw;bottom:8vh;background:#67ffe4}
-body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
-.game,.board,.hud,.endOverlay{position:fixed;inset:0}
-.board{overflow:hidden;touch-action:manipulation}
-.hud{pointer-events:none;z-index:5}
-.title{
-  position:absolute;
-  top:calc(8px + var(--safe-top));
-  left:calc(10px + var(--safe-left));
-  right:calc(10px + var(--safe-right));
-  margin:0;
-  text-align:center;
-  font-weight:1000;
-  letter-spacing:.12em;
-  line-height:.92;
-  font-size:clamp(30px,8.5vw,56px);
-  color:#fff;
-  text-shadow:
-    0 2px 0 rgba(255,255,255,.18),
-    0 4px 0 rgba(24,32,110,.35),
-    0 10px 20px rgba(10,16,69,.55),
-    0 0 24px rgba(255,255,255,.20);
-}
-.bottomBar{
-  position:absolute;
-  left:calc(12px + var(--safe-left));
-  right:calc(12px + var(--safe-right));
-  bottom:calc(10px + var(--safe-bottom));
-  display:grid;
-  grid-template-columns:minmax(100px,1fr) minmax(100px,1fr) minmax(132px,1.32fr);
-  gap:10px;
-  align-items:stretch;
-  pointer-events:auto;
-}
-.stat,.toggleBtn,.endCard{
-  border:1px solid var(--line);
-  box-shadow:var(--shadow);
-  backdrop-filter:blur(16px) saturate(1.15);
-  -webkit-backdrop-filter:blur(16px) saturate(1.15);
-}
-.stat{
-  min-height:84px;
-  background:linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.10));
-  border-radius:25px;
-  padding:10px 12px 8px;
-  text-align:center;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-}
-.stat .label{
-  font-size:11px;
-  font-weight:900;
-  letter-spacing:.16em;
-  text-transform:uppercase;
-  opacity:.98;
-}
-.stat .value{
-  margin-top:7px;
-  font-size:clamp(18px,5.2vw,31px);
-  line-height:1;
-  font-weight:1000;
-  font-variant-numeric:tabular-nums;
-  white-space:nowrap;
-  letter-spacing:-.02em;
-}
-.toggleBtn{
-  appearance:none;
-  border-radius:29px;
-  min-height:84px;
-  width:100%;
-  min-width:0;
-  color:#fff;
-  font-weight:1000;
-  font-size:clamp(20px,5.3vw,34px);
-  letter-spacing:.03em;
-  text-shadow:0 2px 10px rgba(0,0,0,.18);
-  padding:0 14px;
-}
-.toggleBtn.play{background:linear-gradient(180deg,var(--green1),var(--green2))}
-.toggleBtn.stop{background:linear-gradient(180deg,var(--red1),var(--red2))}
+
+/* BALLOONS */
 .balloon{
   position:absolute;
-  border:none;
   border-radius:48% 48% 45% 45% / 43% 43% 57% 57%;
   transform:translate(-50%,-50%);
   box-shadow:
     inset -10px -14px 22px rgba(0,0,0,.16),
     inset 7px 10px 12px rgba(255,255,255,.20),
-    0 16px 24px rgba(0,0,0,.16),
-    0 0 0 1px rgba(255,255,255,.07);
-  transition:
-    transform .14s ease,
-    opacity .24s ease;
+    0 16px 24px rgba(0,0,0,.16);
 }
+
 .balloon::before{
   content:"";
   position:absolute;
@@ -153,496 +48,109 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
   top:15%;
   border-radius:50%;
   background:rgba(255,255,255,.22);
-  transform:rotate(-18deg);
-  filter:blur(.6px);
 }
-.balloon:active{transform:translate(-50%,-50%) scale(.95)}
-.balloon:focus,.balloon:focus-visible{outline:none;}
-.balloon.majority{
-  filter:none;
-  box-shadow:
-    inset -10px -14px 22px rgba(0,0,0,.16),
-    inset 7px 10px 12px rgba(255,255,255,.20),
-    0 0 0 2px rgba(255,255,255,.16),
-    0 16px 24px rgba(0,0,0,.16);
-}
-.balloon.wrong{animation:wrongShake .34s ease}
+
+/* ENVOI */
 .balloon.fly{
-  animation:flyAway 3.4s ease-out forwards;
-  pointer-events:none;
-  will-change:transform, opacity;
+  animation:fly 3.4s ease-out forwards;
 }
-.particle{display:none !important;}
-.endOverlay{
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:24px;
-  background:rgba(12,16,36,.18);
-  z-index:8;
-}
-.endOverlay.show{display:flex}
-.endCard{
-  width:min(90vw,520px);
-  background:rgba(255,255,255,.18);
-  border-radius:34px;
-  padding:24px 20px 20px;
-  text-align:center;
-}
-.endMini{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:900;opacity:.92}
-.endTitle{margin:10px 0 6px;font-size:clamp(28px,8vw,42px);line-height:.95;font-weight:1000}
-.endTime{font-size:clamp(34px,9vw,52px);font-weight:1000;line-height:1;margin:8px 0 10px;font-variant-numeric:tabular-nums}
-.endText{font-size:16px;line-height:1.35;font-weight:700;margin:0 0 14px}
-.endBtn{
-  appearance:none;border:none;min-width:180px;min-height:56px;border-radius:20px;
-  font-size:20px;font-weight:1000;color:#fff;
-  background:linear-gradient(180deg,var(--green1),var(--green2));box-shadow:var(--shadow);
-}
-@keyframes wrongShake{
-  0%,100%{transform:translate(-50%,-50%)}
-  25%{transform:translate(calc(-50% - 7px),-50%)}
-  50%{transform:translate(calc(-50% + 7px),-50%)}
-  75%{transform:translate(calc(-50% - 5px),-50%)}
-}
-@keyframes flyAway{
+
+@keyframes fly{
   0%{
     opacity:1;
-    transform:translate(-50%,-50%) scale(1);
+    transform:translate(-50%,-50%);
   }
   100%{
     opacity:0;
     transform:translate(
-      calc(-50% + var(--driftx)),
-      calc(-50% - 620px)
-    ) scale(1.015);
+      calc(-50% + var(--dx)),
+      calc(-50% - 650px)
+    );
   }
-}
-  100%{
-    opacity:0;
-    transform:translate(
-      calc(-50% + var(--driftx)),
-      calc(-50% - 600px)
-    ) translate3d(0,0,0) scale(1.02);
-  }
-}
-  16%{
-    opacity:1;
-    transform:translate(
-      calc(-50% + var(--driftx) * .08),
-      calc(-50% - 18px)
-    ) translate3d(0,0,0) scale(1.008) rotate(calc(var(--spin) * .06));
-  }
-  38%{
-    opacity:.99;
-    transform:translate(
-      calc(-50% + var(--driftx) * .24),
-      calc(-50% - 72px)
-    ) translate3d(0,0,0) scale(1.018) rotate(calc(var(--spin) * .18));
-  }
-  68%{
-    opacity:.95;
-    transform:translate(
-      calc(-50% + var(--driftx) * .56),
-      calc(-50% - 205px)
-    ) translate3d(0,0,0) scale(1.03) rotate(calc(var(--spin) * .48));
-  }
-  100%{
-    opacity:0;
-    transform:translate(
-      calc(-50% + var(--driftx) * .86),
-      calc(-50% - 430px)
-    ) translate3d(0,0,0) scale(1.01) rotate(calc(var(--spin) * .72));
-  }
-}
-@keyframes particle{0%{opacity:0}100%{opacity:0}}
-  100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.14)}
-}
-
-.board.resolving .balloon.majority{
-  filter:none !important;
-  box-shadow:
-    inset -10px -14px 22px rgba(0,0,0,.16),
-    inset 7px 10px 12px rgba(255,255,255,.20),
-    0 16px 24px rgba(0,0,0,.16),
-    0 0 0 1px rgba(255,255,255,.07) !important;
-}
-.board.resolving .balloon:not(.fly){
-  transition:none;
-}
-
-@media (max-width: 430px){
-  .bottomBar{grid-template-columns:minmax(94px,1fr) minmax(94px,1fr) minmax(126px,1.2fr);gap:8px}
-  .stat{min-height:78px;border-radius:22px;padding:10px 10px 8px}
-  .toggleBtn{min-height:78px;border-radius:24px;font-size:clamp(18px,5vw,28px);padding:0 12px}
 }
 </style>
 </head>
-<body>
-<div class="game">
-  <div class="board" id="board"></div>
-  <div class="hud">
-    <h1 class="title">BALLOONS</h1>
-    <div class="bottomBar" id="bottomBar">
-      <div class="stat">
-        <div class="label">Chrono</div>
-        <div class="value" id="timer">00:00.0</div>
-      </div>
-      <div class="stat">
-        <div class="label">Record</div>
-        <div class="value" id="best">--:--.-</div>
-      </div>
-      <button class="toggleBtn play" id="toggleBtn" aria-label="Jouer">JOUER</button>
-    </div>
-  </div>
-</div>
 
-<div class="endOverlay" id="endOverlay">
-  <div class="endCard">
-    <div class="endMini">Partie terminée</div>
-    <div class="endTitle">Bravo</div>
-    <div class="endTime" id="endTime">00:00.0</div>
-    <p class="endText" id="endText">Tu as vidé les 10 séries.</p>
-    <button class="endBtn" id="restartBtn">REJOUER</button>
-  </div>
-</div>
+<body>
+
+<div class="board" id="board"></div>
 
 <script>
-(() => {
-  const board = document.getElementById('board');
-  const timerEl = document.getElementById('timer');
-  const bestEl = document.getElementById('best');
-  const toggleBtn = document.getElementById('toggleBtn');
-  const bottomBar = document.getElementById('bottomBar');
-  const endOverlay = document.getElementById('endOverlay');
-  const endTimeEl = document.getElementById('endTime');
-  const endTextEl = document.getElementById('endText');
-  const restartBtn = document.getElementById('restartBtn');
+const board = document.getElementById("board")
 
-  const STORAGE_BEST = 'balloons-best-v2';
-  const MAX_SERIES = 10;
-  const COLORS = [
-    ['#ff8bac','#ff2d67'],
-    ['#7bff85','#19bb41'],
-    ['#ffe86d','#ffbb0f'],
-    ['#84dfff','#149dff'],
-    ['#c89cff','#8250ff'],
-    ['#ffbf7f','#ff7315'],
-    ['#71fff0','#07c7b2'],
-    ['#ff8ee3','#ff3dc3']
-  ];
+const COLORS = [
+  ["#ff8bac","#ff2d67"],
+  ["#7bff85","#19bb41"],
+  ["#ffe86d","#ffbb0f"],
+  ["#84dfff","#149dff"],
+  ["#c89cff","#8250ff"],
+  ["#ffbf7f","#ff7315"],
+  ["#71fff0","#07c7b2"],
+  ["#ff8ee3","#ff3dc3"]
+]
 
-  let bestMs = Number(localStorage.getItem(STORAGE_BEST) || 0);
-  let raf = 0;
-  let startTs = 0;
-  let state = null;
-  let isResolving = false;
+let balloons = []
 
-  function fmt(ms){
-    if(ms == null || Number.isNaN(ms)) return '--:--.-';
-    const totalTenths = Math.floor(ms / 100);
-    const minutes = Math.floor(totalTenths / 600);
-    const seconds = Math.floor((totalTenths % 600) / 10);
-    const tenths = totalTenths % 10;
-    return `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}.${tenths}`;
-  }
+function create(){
+  balloons=[]
+  board.innerHTML=""
 
-  function updateBest(){
-    bestEl.textContent = bestMs ? fmt(bestMs) : '--:--.-';
-  }
+  const total = 180
 
-  function setButtonState(running){
-    toggleBtn.className = 'toggleBtn ' + (running ? 'stop' : 'play');
-    toggleBtn.textContent = running ? 'ARRÊTER' : 'JOUER';
-    toggleBtn.setAttribute('aria-label', running ? 'Arrêter' : 'Jouer');
-  }
+  for(let i=0;i<total;i++){
 
-  function computeSeriesCount(series){
-    const start = 210;
-    const end = 168;
-    const t = (series - 1) / Math.max(1, MAX_SERIES - 1);
-    const eased = Math.pow(t, 1.9);
-    return Math.round(start + (end - start) * eased);
-  }
+    const b=document.createElement("div")
+    b.className="balloon"
 
-  function makeBalancedCounts(total){
-    const colorCount = COLORS.length;
-    const winnerIndex = Math.floor(Math.random() * colorCount);
-    const weights = Array.from({ length: colorCount }, () => 0.9 + Math.random() * 0.14);
-    weights[winnerIndex] += 0.18 + Math.random() * 0.05;
-
-    const sum = weights.reduce((a,b) => a+b, 0);
-    const counts = weights.map(w => Math.max(6, Math.floor(total * w / sum)));
-    let diff = total - counts.reduce((a,b) => a+b, 0);
-
-    while(diff !== 0){
-      if(diff > 0){ counts[Math.floor(Math.random()*colorCount)]++; diff--; }
-      else {
-        const donors = counts.map((v,i)=>({v,i})).filter(x => x.v > 6);
-        if(!donors.length) break;
-        counts[donors[Math.floor(Math.random()*donors.length)].i]--; diff++;
-      }
+    const r=Math.random()
+    let size
+    if(r<0.2){
+      size=38+Math.random()*10
+    }else if(r<0.85){
+      size=50+Math.random()*18
+    }else{
+      size=68+Math.random()*14
     }
 
-    const otherMax = Math.max(...counts.filter((_,i)=>i!==winnerIndex));
-    if(counts[winnerIndex] <= otherMax){
-      const need = otherMax - counts[winnerIndex] + 1;
-      counts[winnerIndex] += need;
-      for(let n = 0; n < need; n++){
-        const donor = counts
-          .map((v,i)=>({v,i}))
-          .filter(x => x.i !== winnerIndex && x.v > 7)
-          .sort((a,b)=>b.v-a.v)[0];
-        if(!donor) break;
-        counts[donor.i]--;
-      }
-    }
-    return counts;
+    b.style.width=size+"px"
+    b.style.height=size*1.2+"px"
+
+    b.style.left=Math.random()*100+"vw"
+    b.style.top=Math.random()*100+"vh"
+
+    const color=COLORS[Math.floor(Math.random()*COLORS.length)]
+    b.style.background=`radial-gradient(circle at 30% 30%,${color[0]},${color[1]})`
+
+    b.dataset.color=color[1]
+
+    b.onclick=()=>pop(color[1])
+
+    board.appendChild(b)
+    balloons.push(b)
   }
+}
 
-  function makeBalloons(series){
-    const total = computeSeriesCount(series);
-    const counts = makeBalancedCounts(total);
-    const balloons = [];
-    let id = 1;
-    counts.forEach((count, colorIndex) => {
-      for(let i = 0; i < count; i++){
-        const roll = Math.random();
-        let w;
-        if(roll < 0.22){
-          w = 40 + Math.random() * 10;      // petits
-        }else if(roll < 0.84){
-          w = 52 + Math.random() * 12;      // majorité de moyens
-        }else{
-          w = 66 + Math.random() * 10;      // quelques grands
-        }
-        const h = w * (1.14 + Math.random() * 0.10);
-        balloons.push({
-          id: id++, colorIndex, lane: -1, x: 0, y: 0, w, h,
-          driftX: (Math.random() - 0.5) * 180,
-          spin: `${(Math.random() > .5 ? 1 : -1) * (10 + Math.random() * 24)}deg`
-        });
-      }
-    });
-    for(let i = balloons.length - 1; i > 0; i--){
-      const j = Math.floor(Math.random() * (i + 1));
-      [balloons[i], balloons[j]] = [balloons[j], balloons[i]];
-    }
-    return balloons;
+function pop(color){
+
+  const group=balloons.filter(b=>b.dataset.color===color)
+
+  if(group.length<2)return
+
+  group.forEach(b=>{
+    b.style.setProperty("--dx",(Math.random()*200-100)+"px")
+    b.classList.add("fly")
+    setTimeout(()=>b.remove(),3200)
+  })
+
+  balloons=balloons.filter(b=>b.dataset.color!==color)
+
+  if(balloons.length<2){
+    setTimeout(create,800)
   }
+}
 
-  function boardZone(){
-    const rect = board.getBoundingClientRect();
-    const root = getComputedStyle(document.documentElement);
-    const safeTop = parseFloat(root.getPropertyValue('--safe-top')) || 0;
-    const safeBottom = parseFloat(root.getPropertyValue('--safe-bottom')) || 0;
-    const barRect = bottomBar.getBoundingClientRect();
-    const reservedBottom = rect.height - barRect.top + 10;
-    return {
-      width: rect.width,
-      height: rect.height,
-      top: 46 + safeTop,
-      bottom: rect.height - Math.max(88 + safeBottom, reservedBottom)
-    };
-  }
-
-  function placeIntoLanes(assignLanes = true){
-    const zone = boardZone();
-    const laneGap = 22;
-    const usableWidth = zone.width - 12;
-    const laneCount = Math.max(7, Math.floor(usableWidth / 42));
-    const laneStep = usableWidth / laneCount;
-    const lanes = Array.from({length: laneCount}, (_, i) => ({
-      x: 6 + laneStep * (i + 0.5) + (Math.random() - 0.5) * 10,
-      floor: zone.bottom - 2,
-      items: []
-    }));
-
-    if(assignLanes){
-      const shuffled = [...state.balloons].sort(() => Math.random() - 0.5);
-      shuffled.forEach(balloon => {
-        const candidates = lanes
-          .map((lane, idx) => ({ idx, fill: lane.items.reduce((s,b)=>s+b.h, 0) }))
-          .sort((a,b)=>a.fill-b.fill)
-          .slice(0, Math.min(7, lanes.length));
-        const preferred = candidates[Math.floor(Math.random() * candidates.length)];
-        const pick = preferred.idx;
-        balloon.lane = pick;
-        lanes[pick].items.push(balloon);
-      });
-    } else {
-      state.balloons.forEach(balloon => {
-        const idx = Math.max(0, Math.min(lanes.length - 1, balloon.lane));
-        lanes[idx].items.push(balloon);
-      });
-    }
-
-    lanes.forEach(lane => {
-      let cursor = lane.floor;
-      lane.items.sort((a,b) => (b.y || 0) - (a.y || 0));
-      lane.items.forEach((balloon, index) => {
-        const jitterX = (Math.random() - 0.5) * Math.min(22, laneStep * .52);
-        const overlap = Math.min(24, balloon.h * .26);
-        const y = cursor - balloon.h / 2;
-        balloon.x = lane.x + jitterX;
-        balloon.y = y;
-        cursor -= balloon.h - overlap - (index % 3 === 0 ? 3 : 0);
-      });
-    });
-  }
-
-  function getMajorityData(){
-    const counts = new Map();
-    state.balloons.forEach(balloon => counts.set(balloon.colorIndex, (counts.get(balloon.colorIndex) || 0) + 1));
-    const max = Math.max(...counts.values());
-    const winners = [...counts.entries()].filter(([, value]) => value === max).map(([key]) => key);
-    return { counts, winners };
-  }
-
-  function render(){
-    const frag = document.createDocumentFragment();
-    const { winners } = getMajorityData();
-    const ordered = [...state.balloons].sort((a,b) => (a.y + a.h/2) - (b.y + b.h/2));
-
-    ordered.forEach(balloon => {
-      const el = document.createElement('button');
-      const isWinner = !isResolving && winners.includes(balloon.colorIndex);
-      el.className = 'balloon' + (isWinner ? ' majority' : '');
-      el.style.width = `${balloon.w}px`;
-      el.style.height = `${balloon.h}px`;
-      el.style.left = `${balloon.x}px`;
-      el.style.top = `${balloon.y}px`;
-      el.style.zIndex = String(Math.round(balloon.y));
-      el.style.setProperty('--driftx', `${balloon.driftX}px`);
-      el.style.setProperty('--spin', balloon.spin);
-      const [c1, c2] = COLORS[balloon.colorIndex];
-      el.style.background = `radial-gradient(circle at 34% 28%, ${c1} 0%, ${c1} 26%, ${c2} 100%)`;
-      el.dataset.id = String(balloon.id);
-      el.dataset.colorIndex = String(balloon.colorIndex);
-      el.addEventListener('click', onBalloonClick, { passive: true });
-      frag.appendChild(el);
-    });
-
-    board.replaceChildren(frag);
-  }
-
-  function spawnParticles(x, y, colorIndex, count = 9){ return; }
-
-  function removeColor(colorIndex){
-    const doomed = state.balloons.filter(balloon => balloon.colorIndex === colorIndex);
-    const els = [...board.querySelectorAll(`.balloon[data-color-index="${colorIndex}"]`)];
-    isResolving = true;
-    board.classList.add('resolving');
-    board.querySelectorAll('.balloon.majority').forEach(el => el.classList.remove('majority'));
-
-    els.forEach((el, i) => {
-      setTimeout(() => {
-        el.classList.add('fly');
-      }, i * 14);
-    });
-
-    setTimeout(() => {
-      state.balloons = state.balloons.filter(balloon => balloon.colorIndex !== colorIndex);
-      if(state.balloons.length <= 1){
-        advanceSeriesOrFinish();
-      } else {
-        isResolving = false;
-        board.classList.remove('resolving');
-        render();
-      }
-    }, 2980);
-  }
-
-  function advanceSeriesOrFinish(){
-    if(state.series >= MAX_SERIES){
-      finishGame();
-      return;
-    }
-    isResolving = false;
-    board.classList.remove('resolving');
-    state = { series: state.series + 1, running: true, finished: false, balloons: makeBalloons(state.series + 1) };
-    placeIntoLanes(true);
-    render();
-  }
-
-  function onBalloonClick(event){
-    if(!state || !state.running || state.finished) return;
-    const colorIndex = Number(event.currentTarget.dataset.colorIndex);
-    const { winners } = getMajorityData();
-    if(!winners.includes(colorIndex)){
-      event.currentTarget.classList.add('wrong');
-      setTimeout(() => event.currentTarget.classList.remove('wrong'), 340);
-      if(navigator.vibrate) navigator.vibrate(26);
-      return;
-    }
-    removeColor(colorIndex);
-  }
-
-  function tick(){
-    if(!state || !state.running) return;
-    timerEl.textContent = fmt(performance.now() - startTs);
-    raf = requestAnimationFrame(tick);
-  }
-
-  function startTimer(){ cancelAnimationFrame(raf); startTs = performance.now(); tick(); }
-  function stopTimer(){ cancelAnimationFrame(raf); }
-
-  function startGame(){
-    endOverlay.classList.remove('show');
-    isResolving = false;
-    board.classList.remove('resolving');
-    state = { series: 1, running: true, finished: false, balloons: makeBalloons(1) };
-    placeIntoLanes(true);
-    render();
-    timerEl.textContent = '00:00.0';
-    setButtonState(true);
-    startTimer();
-  }
-
-  function stopGame(){
-    stopTimer();
-    isResolving = false;
-    board.classList.remove('resolving');
-    state = null;
-    board.replaceChildren();
-    timerEl.textContent = '00:00.0';
-    setButtonState(false);
-  }
-
-  function finishGame(){
-    stopTimer();
-    const elapsed = Math.floor(performance.now() - startTs);
-    timerEl.textContent = fmt(elapsed);
-    endTimeEl.textContent = fmt(elapsed);
-    let newBest = false;
-    if(!bestMs || elapsed < bestMs){
-      bestMs = elapsed;
-      localStorage.setItem(STORAGE_BEST, String(bestMs));
-      updateBest();
-      newBest = true;
-    }
-    endTextEl.innerHTML = newBest ? 'Nouveau <strong>record</strong> !' : 'Partie terminée. Essaie encore plus vite.';
-    setButtonState(false);
-    endOverlay.classList.add('show');
-    state = { finished: true, running: false, balloons: [], series: MAX_SERIES };
-  }
-
-  toggleBtn.addEventListener('click', () => {
-    if(state && state.running && !state.finished) stopGame();
-    else startGame();
-  });
-  restartBtn.addEventListener('click', startGame);
-  window.addEventListener('resize', () => {
-    if(state && state.running && !state.finished){
-      placeIntoLanes(false);
-      render();
-    }
-  }, { passive: true });
-
-  timerEl.textContent = '00:00.0';
-  updateBest();
-  setButtonState(false);
-  startGame();
-})();
+create()
 </script>
+
 </body>
 </html>
