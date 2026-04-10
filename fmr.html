@@ -141,11 +141,8 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
     0 16px 24px rgba(0,0,0,.16),
     0 0 0 1px rgba(255,255,255,.07);
   transition:
-    left .46s cubic-bezier(.22,.84,.18,1),
-    top .46s cubic-bezier(.22,.84,.18,1),
     transform .14s ease,
-    opacity .24s ease,
-    filter .2s ease;
+    opacity .24s ease;
 }
 .balloon::before{
   content:"";
@@ -160,14 +157,14 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
   filter:blur(.6px);
 }
 .balloon:active{transform:translate(-50%,-50%) scale(.95)}
+.balloon:focus,.balloon:focus-visible{outline:none;}
 .balloon.majority{
-  filter:brightness(1.05) saturate(1.14) drop-shadow(0 0 14px rgba(255,255,255,.20));
+  filter:none;
   box-shadow:
-    inset -10px -14px 22px rgba(0,0,0,.15),
-    inset 7px 10px 12px rgba(255,255,255,.22),
-    0 0 0 2px rgba(255,255,255,.14),
-    0 16px 24px rgba(0,0,0,.16),
-    0 0 18px rgba(255,255,255,.08);
+    inset -10px -14px 22px rgba(0,0,0,.16),
+    inset 7px 10px 12px rgba(255,255,255,.20),
+    0 0 0 2px rgba(255,255,255,.16),
+    0 16px 24px rgba(0,0,0,.16);
 }
 .balloon.wrong{animation:wrongShake .34s ease}
 .balloon.fly{
