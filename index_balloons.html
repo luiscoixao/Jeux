@@ -9,8 +9,8 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="BALLOONS" />
-<link rel="apple-touch-icon" href="icon_balloons.png" />
-<link rel="icon" type="image/png" href="icon_balloons.png" />
+<link rel="apple-touch-icon" href="icon.png" />
+<link rel="icon" type="image/png" href="icon.png" />
 <link rel="manifest" href="manifest.webmanifest" />
 <style>
 :root{
@@ -141,11 +141,8 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
     0 16px 24px rgba(0,0,0,.16),
     0 0 0 1px rgba(255,255,255,.07);
   transition:
-    left .46s cubic-bezier(.22,.84,.18,1),
-    top .46s cubic-bezier(.22,.84,.18,1),
     transform .14s ease,
-    opacity .24s ease,
-    filter .2s ease;
+    opacity .24s ease;
 }
 .balloon::before{
   content:"";
@@ -160,14 +157,14 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
   filter:blur(.6px);
 }
 .balloon:active{transform:translate(-50%,-50%) scale(.95)}
+.balloon:focus,.balloon:focus-visible{outline:none;}
 .balloon.majority{
-  filter:brightness(1.05) saturate(1.14) drop-shadow(0 0 14px rgba(255,255,255,.20));
+  filter:none;
   box-shadow:
-    inset -10px -14px 22px rgba(0,0,0,.15),
-    inset 7px 10px 12px rgba(255,255,255,.22),
-    0 0 0 2px rgba(255,255,255,.14),
-    0 16px 24px rgba(0,0,0,.16),
-    0 0 18px rgba(255,255,255,.08);
+    inset -10px -14px 22px rgba(0,0,0,.16),
+    inset 7px 10px 12px rgba(255,255,255,.20),
+    0 0 0 2px rgba(255,255,255,.16),
+    0 16px 24px rgba(0,0,0,.16);
 }
 .balloon.wrong{animation:wrongShake .34s ease}
 .balloon.fly{
@@ -260,6 +257,19 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
 @keyframes particle{0%{opacity:0}100%{opacity:0}}
   100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.14)}
 }
+
+.board.resolving .balloon.majority{
+  filter:none !important;
+  box-shadow:
+    inset -10px -14px 22px rgba(0,0,0,.16),
+    inset 7px 10px 12px rgba(255,255,255,.20),
+    0 16px 24px rgba(0,0,0,.16),
+    0 0 0 1px rgba(255,255,255,.07) !important;
+}
+.board.resolving .balloon:not(.fly){
+  transition:none;
+}
+
 @media (max-width: 430px){
   .bottomBar{grid-template-columns:minmax(94px,1fr) minmax(94px,1fr) minmax(126px,1.2fr);gap:8px}
   .stat{min-height:78px;border-radius:22px;padding:10px 10px 8px}
@@ -325,6 +335,7 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
   let raf = 0;
   let startTs = 0;
   let state = null;
+  let isResolving = false;
 
   function fmt(ms){
     if(ms == null || Number.isNaN(ms)) return '--:--.-';
@@ -494,7 +505,7 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
 
     ordered.forEach(balloon => {
       const el = document.createElement('button');
-      const isWinner = winners.includes(balloon.colorIndex);
+      const isWinner = !isResolving && winners.includes(balloon.colorIndex);
       el.className = 'balloon' + (isWinner ? ' majority' : '');
       el.style.width = `${balloon.w}px`;
       el.style.height = `${balloon.h}px`;
@@ -519,6 +530,9 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
   function removeColor(colorIndex){
     const doomed = state.balloons.filter(balloon => balloon.colorIndex === colorIndex);
     const els = [...board.querySelectorAll(`.balloon[data-color-index="${colorIndex}"]`)];
+    isResolving = true;
+    board.classList.add('resolving');
+    board.querySelectorAll('.balloon.majority').forEach(el => el.classList.remove('majority'));
 
     els.forEach((el, i) => {
       setTimeout(() => {
@@ -531,6 +545,8 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
       if(state.balloons.length <= 1){
         advanceSeriesOrFinish();
       } else {
+        isResolving = false;
+        board.classList.remove('resolving');
         render();
       }
     }, 2980);
@@ -541,6 +557,8 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
       finishGame();
       return;
     }
+    isResolving = false;
+    board.classList.remove('resolving');
     state = { series: state.series + 1, running: true, finished: false, balloons: makeBalloons(state.series + 1) };
     placeIntoLanes(true);
     render();
@@ -570,6 +588,8 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
 
   function startGame(){
     endOverlay.classList.remove('show');
+    isResolving = false;
+    board.classList.remove('resolving');
     state = { series: 1, running: true, finished: false, balloons: makeBalloons(1) };
     placeIntoLanes(true);
     render();
@@ -580,6 +600,8 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
 
   function stopGame(){
     stopTimer();
+    isResolving = false;
+    board.classList.remove('resolving');
     state = null;
     board.replaceChildren();
     timerEl.textContent = '00:00.0';
