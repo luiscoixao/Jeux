@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-<title>COLOR BOWLS</title>
-<meta name="theme-color" content="#3a46ff" />
+<title>BALLOONS</title>
+<meta name="theme-color" content="#4e63ff" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="COLOR BOWLS" />
+<meta name="apple-mobile-web-app-title" content="BALLOONS" />
 <link rel="apple-touch-icon" href="icon.png" />
 <link rel="icon" type="image/png" href="icon.png" />
 <link rel="manifest" href="manifest.webmanifest" />
@@ -19,12 +19,12 @@
   --safe-left: env(safe-area-inset-left);
   --safe-right: env(safe-area-inset-right);
   --white:#fff;
-  --line:rgba(255,255,255,.18);
-  --glass:rgba(255,255,255,.16);
-  --shadow:0 20px 40px rgba(0,0,0,.24);
-  --green1:#41ff79;
-  --green2:#0fa83d;
-  --red1:#ff657e;
+  --line:rgba(255,255,255,.20);
+  --glass:rgba(255,255,255,.14);
+  --shadow:0 20px 42px rgba(0,0,0,.24);
+  --green1:#49ff7c;
+  --green2:#08b23d;
+  --red1:#ff6784;
   --red2:#cf1532;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -33,29 +33,30 @@ body{
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",sans-serif;
   color:var(--white);
   background:
-    radial-gradient(circle at 8% 14%, rgba(255,245,132,.95) 0 0, rgba(255,245,132,0) 18%),
-    radial-gradient(circle at 88% 12%, rgba(105,137,255,.95) 0 0, rgba(105,137,255,0) 20%),
-    radial-gradient(circle at 85% 84%, rgba(104,255,214,.95) 0 0, rgba(104,255,214,0) 22%),
-    radial-gradient(circle at 14% 86%, rgba(255,118,208,.90) 0 0, rgba(255,118,208,0) 24%),
-    linear-gradient(145deg,#38d1ff 0%, #4058ff 42%, #ac58ff 72%, #ff64ab 100%);
+    radial-gradient(circle at 10% 12%, rgba(255,239,117,.92) 0 0, rgba(255,239,117,0) 16%),
+    radial-gradient(circle at 86% 13%, rgba(104,141,255,.92) 0 0, rgba(104,141,255,0) 20%),
+    radial-gradient(circle at 84% 84%, rgba(93,255,220,.94) 0 0, rgba(93,255,220,0) 22%),
+    radial-gradient(circle at 15% 87%, rgba(255,120,206,.88) 0 0, rgba(255,120,206,0) 23%),
+    radial-gradient(circle at 50% 60%, rgba(155,98,255,.30) 0 0, rgba(155,98,255,0) 34%),
+    linear-gradient(145deg,#4fe0ff 0%, #4560ff 38%, #8d54ff 68%, #ff66aa 100%);
 }
 body::before,
 body::after{
   content:"";
   position:fixed;
   border-radius:50%;
-  filter:blur(56px);
+  filter:blur(62px);
   opacity:.34;
   pointer-events:none;
 }
-body::before{width:42vw;height:42vw;left:-8vw;bottom:4vh;background:#53ffe6}
-body::after{width:40vw;height:40vw;right:-10vw;top:0;background:#ffe35d}
+body::before{width:42vw;height:42vw;left:-8vw;bottom:2vh;background:#53ffe6}
+body::after{width:42vw;height:42vw;right:-8vw;top:-2vh;background:#ffe35d}
 .game,.board,.hud,.endOverlay{position:fixed;inset:0}
 .board{overflow:hidden;touch-action:manipulation}
 .hud{pointer-events:none;z-index:5}
 .title{
   position:absolute;
-  top:calc(8px + var(--safe-top));
+  top:calc(6px + var(--safe-top));
   left:calc(12px + var(--safe-left));
   right:calc(12px + var(--safe-right));
   margin:0;
@@ -64,15 +65,19 @@ body::after{width:40vw;height:40vw;right:-10vw;top:0;background:#ffe35d}
   letter-spacing:.12em;
   line-height:.92;
   font-size:clamp(28px,8vw,52px);
-  text-shadow:0 10px 28px rgba(0,0,0,.22);
+  color:#ffffff;
+  text-shadow:
+    0 2px 0 rgba(255,255,255,.12),
+    0 8px 16px rgba(15,24,88,.38),
+    0 0 26px rgba(255,255,255,.18);
 }
 .bottomBar{
   position:absolute;
-  left:calc(12px + var(--safe-left));
-  right:calc(12px + var(--safe-right));
-  bottom:calc(12px + var(--safe-bottom));
+  left:calc(10px + var(--safe-left));
+  right:calc(10px + var(--safe-right));
+  bottom:calc(10px + var(--safe-bottom));
   display:grid;
-  grid-template-columns:minmax(104px,1fr) minmax(104px,1fr) minmax(170px,1.7fr);
+  grid-template-columns:minmax(112px,1fr) minmax(112px,1fr) minmax(0,1.55fr);
   gap:10px;
   align-items:stretch;
   pointer-events:auto;
@@ -80,12 +85,12 @@ body::after{width:40vw;height:40vw;right:-10vw;top:0;background:#ffe35d}
 .stat,.toggleBtn,.endCard{
   border:1px solid var(--line);
   box-shadow:var(--shadow);
-  backdrop-filter:blur(18px) saturate(1.18);
-  -webkit-backdrop-filter:blur(18px) saturate(1.18);
+  backdrop-filter:blur(18px) saturate(1.14);
+  -webkit-backdrop-filter:blur(18px) saturate(1.14);
 }
 .stat{
-  min-height:74px;
-  background:var(--glass);
+  min-height:80px;
+  background:linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.10));
   border-radius:24px;
   padding:10px 10px 8px;
   text-align:center;
@@ -96,84 +101,100 @@ body::after{width:40vw;height:40vw;right:-10vw;top:0;background:#ffe35d}
 .stat .label{
   font-size:11px;
   font-weight:900;
-  letter-spacing:.14em;
+  letter-spacing:.16em;
   text-transform:uppercase;
   opacity:.96;
 }
 .stat .value{
   margin-top:6px;
-  font-size:clamp(19px,5.2vw,30px);
+  font-size:clamp(19px,5vw,30px);
   line-height:1;
   font-weight:1000;
   font-variant-numeric:tabular-nums;
   white-space:nowrap;
-  letter-spacing:.01em;
+  letter-spacing:0;
 }
 .toggleBtn{
   appearance:none;
-  border-radius:26px;
-  min-height:74px;
+  border-radius:28px;
+  min-height:80px;
+  min-width:0;
+  width:100%;
   color:#fff;
   font-weight:1000;
-  font-size:clamp(22px,5.8vw,34px);
-  letter-spacing:.04em;
+  font-size:clamp(22px,5.3vw,34px);
+  letter-spacing:.03em;
   text-shadow:0 2px 8px rgba(0,0,0,.18);
+  padding:0 16px;
 }
 .toggleBtn.play{background:linear-gradient(180deg,var(--green1),var(--green2))}
 .toggleBtn.stop{background:linear-gradient(180deg,var(--red1),var(--red2))}
-.ball{
+.balloon{
   position:absolute;
   border:none;
   border-radius:50%;
   transform:translate(-50%,-50%);
   box-shadow:
-    inset -13px -18px 30px rgba(0,0,0,.14),
-    inset 12px 15px 30px rgba(255,255,255,.32),
-    0 16px 28px rgba(0,0,0,.16);
+    inset -10px -16px 24px rgba(0,0,0,.12),
+    inset 10px 14px 22px rgba(255,255,255,.28),
+    0 15px 28px rgba(0,0,0,.16),
+    0 0 0 1px rgba(255,255,255,.08);
   transition:
-    left .56s cubic-bezier(.22,.8,.18,1),
-    top .56s cubic-bezier(.22,.8,.18,1),
+    left .5s cubic-bezier(.22,.8,.18,1),
+    top .5s cubic-bezier(.22,.8,.18,1),
     transform .14s ease,
-    opacity .22s ease,
+    opacity .24s ease,
     filter .2s ease;
 }
-.ball::before{
+.balloon::before{
   content:"";
   position:absolute;
-  width:40%;
-  height:27%;
-  left:18%;
+  width:37%;
+  height:25%;
+  left:17%;
   top:15%;
   border-radius:50%;
-  background:rgba(255,255,255,.38);
+  background:rgba(255,255,255,.40);
   transform:rotate(-18deg);
   filter:blur(1px);
 }
-.ball:active{transform:translate(-50%,-50%) scale(.93)}
-.ball.majority{
-  filter:drop-shadow(0 0 14px rgba(255,255,255,.46));
-  box-shadow:
-    inset -13px -18px 30px rgba(0,0,0,.14),
-    inset 12px 15px 30px rgba(255,255,255,.32),
-    0 0 0 3px rgba(255,255,255,.16),
-    0 18px 28px rgba(0,0,0,.18),
-    0 0 24px rgba(255,255,255,.16);
+.balloon::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:-18%;
+  width:2px;
+  height:36%;
+  transform:translateX(-50%);
+  background:linear-gradient(180deg, rgba(255,255,255,.58), rgba(255,255,255,.1));
+  border-radius:2px;
+  opacity:.55;
 }
-.ball.wrong{animation:wrongShake .34s ease}
-.ball.pop{animation:dropBurst .58s cubic-bezier(.18,.8,.22,1) forwards;pointer-events:none}
+.balloon:active{transform:translate(-50%,-50%) scale(.94)}
+.balloon.majority{
+  filter:drop-shadow(0 0 16px rgba(255,255,255,.42));
+  box-shadow:
+    inset -10px -16px 24px rgba(0,0,0,.12),
+    inset 10px 14px 22px rgba(255,255,255,.28),
+    0 0 0 3px rgba(255,255,255,.14),
+    0 18px 28px rgba(0,0,0,.16),
+    0 0 24px rgba(255,255,255,.14);
+}
+.balloon.wrong{animation:wrongShake .34s ease}
+.balloon.fly{animation:flyAway .88s cubic-bezier(.12,.74,.18,1) forwards;pointer-events:none}
 .particle{
   position:absolute;
   border-radius:50%;
   pointer-events:none;
   transform:translate(-50%,-50%);
-  animation:particle .76s ease-out forwards;
+  animation:particle .84s ease-out forwards;
 }
 .endOverlay{
   display:none;
   align-items:center;
   justify-content:center;
   padding:24px;
-  background:rgba(12,16,36,.12);
+  background:rgba(12,16,36,.14);
   z-index:8;
 }
 .endOverlay.show{display:flex}
@@ -206,14 +227,19 @@ body::after{width:40vw;height:40vw;right:-10vw;top:0;background:#ffe35d}
   50%{transform:translate(calc(-50% + 7px),-50%)}
   75%{transform:translate(calc(-50% - 5px),-50%)}
 }
-@keyframes dropBurst{
+@keyframes flyAway{
   0%{opacity:1;transform:translate(-50%,-50%) scale(1)}
-  55%{opacity:1;transform:translate(-50%,calc(-50% + 74px)) scale(1.06)}
-  100%{opacity:0;transform:translate(-50%,calc(-50% + 230px)) scale(.22)}
+  35%{opacity:1;transform:translate(calc(-50% + var(--driftx)),calc(-50% - 58px)) scale(1.03)}
+  100%{opacity:0;transform:translate(calc(-50% + var(--driftx)),calc(-50% - 280px)) scale(.9)}
 }
 @keyframes particle{
   0%{opacity:.96}
   100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.16)}
+}
+@media (max-width: 430px){
+  .bottomBar{grid-template-columns:minmax(98px,1fr) minmax(98px,1fr) minmax(0,1.45fr);gap:8px}
+  .stat{min-height:76px;border-radius:22px}
+  .toggleBtn{min-height:76px;border-radius:24px;font-size:clamp(20px,5vw,30px);padding:0 12px}
 }
 </style>
 </head>
@@ -221,7 +247,7 @@ body::after{width:40vw;height:40vw;right:-10vw;top:0;background:#ffe35d}
 <div class="game">
   <div class="board" id="board"></div>
   <div class="hud">
-    <h1 class="title">COLOR BOWLS</h1>
+    <h1 class="title">BALLOONS</h1>
     <div class="bottomBar">
       <div class="stat">
         <div class="label">Chrono</div>
@@ -257,17 +283,18 @@ body::after{width:40vw;height:40vw;right:-10vw;top:0;background:#ffe35d}
   const endTextEl = document.getElementById('endText');
   const restartBtn = document.getElementById('restartBtn');
 
-  const STORAGE_BEST = 'color-bowls-best-v2';
+  const STORAGE_BEST = 'balloons-best-v1';
   const MAX_SERIES = 100;
   const COLORS = [
-    ['#ff5f86','#ff2f58'],
-    ['#54ef6b','#14bc3c'],
-    ['#ffe05f','#ffbd1b'],
-    ['#65cdff','#1c9eff'],
-    ['#b17bff','#8047ff'],
-    ['#ff944d','#ff5e13'],
-    ['#3ff4d6','#00bfa0'],
-    ['#ff7ad8','#ff3fad']
+    ['#ff6c90','#ff2d5e'],
+    ['#5ef36c','#10bf3a'],
+    ['#ffe86e','#ffbf16'],
+    ['#74d6ff','#19a5ff'],
+    ['#bc88ff','#8450ff'],
+    ['#ffab69','#ff6718'],
+    ['#57f1db','#00c7a7'],
+    ['#ff84db','#ff47b7'],
+    ['#78ffb6','#27cf6f']
   ];
 
   let bestMs = Number(localStorage.getItem(STORAGE_BEST) || 0);
@@ -295,30 +322,29 @@ body::after{width:40vw;height:40vw;right:-10vw;top:0;background:#ffe35d}
   }
 
   function computeSeriesCount(series){
-    const start = 360;
-    const end = 170;
+    const start = 460;
+    const end = 345;
     const t = (series - 1) / (MAX_SERIES - 1);
-    const eased = Math.pow(t, 2.8);
+    const eased = Math.pow(t, 1.55);
     return Math.round(start + (end - start) * eased);
   }
 
   function makeBalancedCounts(total){
     const colorCount = COLORS.length;
     const winnerIndex = Math.floor(Math.random() * colorCount);
-    const weights = Array.from({ length: colorCount }, () => 0.9 + Math.random() * 0.28);
-    weights[winnerIndex] += 0.16 + Math.random() * 0.06;
+    const weights = Array.from({ length: colorCount }, () => 0.92 + Math.random() * 0.20);
+    weights[winnerIndex] += 0.09 + Math.random() * 0.04;
 
     const weightSum = weights.reduce((a,b) => a + b, 0);
-    const counts = weights.map(w => Math.max(2, Math.floor(total * w / weightSum)));
+    const counts = weights.map(w => Math.max(5, Math.floor(total * w / weightSum)));
 
     let diff = total - counts.reduce((a,b) => a + b, 0);
     while(diff !== 0){
       if(diff > 0){
-        const idx = Math.floor(Math.random() * colorCount);
-        counts[idx]++;
+        counts[Math.floor(Math.random() * colorCount)]++;
         diff--;
       }else{
-        const candidates = counts.map((v,i) => ({ v, i })).filter(item => item.v > 2);
+        const candidates = counts.map((v,i)=>({v,i})).filter(item => item.v > 5);
         if(!candidates.length) break;
         const idx = candidates[Math.floor(Math.random() * candidates.length)].i;
         counts[idx]--;
@@ -326,14 +352,14 @@ body::after{width:40vw;height:40vw;right:-10vw;top:0;background:#ffe35d}
       }
     }
 
-    const minVisible = Math.max(6, Math.floor(total / 18));
+    const minVisible = Math.max(12, Math.floor(total / 24));
     for(let i = 0; i < colorCount; i++){
       if(i === winnerIndex) continue;
       while(counts[i] < minVisible){
         const donor = counts
-          .map((v,idx) => ({ v, idx }))
-          .filter(item => item.idx !== i && item.v > minVisible + 1)
-          .sort((a,b) => b.v - a.v)[0];
+          .map((v,idx)=>({v,idx}))
+          .filter(item => item.idx !== i && item.v > minVisible + 2)
+          .sort((a,b)=>b.v-a.v)[0];
         if(!donor) break;
         counts[donor.idx]--;
         counts[i]++;
@@ -346,9 +372,9 @@ body::after{width:40vw;height:40vw;right:-10vw;top:0;background:#ffe35d}
       counts[winnerIndex] += need;
       for(let k = 0; k < need; k++){
         const donor = counts
-          .map((v,idx) => ({ v, idx }))
-          .filter(item => item.idx !== winnerIndex && item.v > minVisible + 1)
-          .sort((a,b) => b.v - a.v)[0];
+          .map((v,idx)=>({v,idx}))
+          .filter(item => item.idx !== winnerIndex && item.v > minVisible + 2)
+          .sort((a,b)=>b.v-a.v)[0];
         if(!donor) break;
         counts[donor.idx]--;
       }
@@ -357,25 +383,27 @@ body::after{width:40vw;height:40vw;right:-10vw;top:0;background:#ffe35d}
     return counts;
   }
 
-  function makeBalls(series){
+  function makeBalloons(series){
     const total = computeSeriesCount(series);
     const counts = makeBalancedCounts(total);
-    const balls = [];
+    const balloons = [];
     let id = 1;
     counts.forEach((count, colorIndex) => {
       for(let i = 0; i < count; i++){
-        balls.push({ id: id++, colorIndex, x: 0, y: 0, r: 0 });
+        const sizeBand = Math.random();
+        const r = sizeBand < 0.2 ? 18 + Math.random() * 4 : sizeBand < 0.78 ? 22 + Math.random() * 5 : 27 + Math.random() * 6;
+        balloons.push({ id: id++, colorIndex, x: 0, y: 0, r, driftX: (Math.random() - 0.5) * 120 });
       }
     });
-    for(let i = balls.length - 1; i > 0; i--){
+    for(let i = balloons.length - 1; i > 0; i--){
       const j = Math.floor(Math.random() * (i + 1));
-      [balls[i], balls[j]] = [balls[j], balls[i]];
+      [balloons[i], balloons[j]] = [balloons[j], balloons[i]];
     }
-    return balls;
+    return balloons;
   }
 
   function makeState(series){
-    return { series, running: true, finished: false, balls: makeBalls(series) };
+    return { series, running: true, finished: false, balloons: makeBalloons(series) };
   }
 
   function boardRect(){
@@ -386,8 +414,8 @@ body::after{width:40vw;height:40vw;right:-10vw;top:0;background:#ffe35d}
     return {
       width: rect.width,
       height: rect.height,
-      top: 48 + safeTop,
-      bottom: rect.height - (92 + safeBottom)
+      top: 64 + safeTop,
+      bottom: rect.height - (6 + safeBottom)
     };
   }
 
@@ -399,47 +427,37 @@ body::after{width:40vw;height:40vw;right:-10vw;top:0;background:#ffe35d}
     return array;
   }
 
-  function layoutBalls(){
+  function layoutBalloons(){
     const zone = boardRect();
-    const total = state.balls.length;
+    const total = state.balloons.length;
     const areaW = zone.width;
-    const areaH = Math.max(220, zone.bottom - zone.top);
-
-    const density = total > 320 ? 1.16 : total > 260 ? 1.12 : total > 220 ? 1.09 : total > 180 ? 1.05 : 1.02;
-    const radius = Math.max(16, Math.min(34, Math.sqrt((areaW * areaH) / (total * Math.PI * density))));
-    const stepX = radius * 1.72 * 0.94;
-    const stepY = radius * 1.48 * 0.94;
-    const cols = Math.max(7, Math.ceil((areaW + radius * 2.4) / stepX) + 1);
-    const rows = Math.ceil(total / cols) + 2;
-
-    const xStart = -radius * 0.55;
-    const yStart = zone.top + radius * 0.12;
+    const areaH = Math.max(420, zone.bottom - zone.top);
     const positions = [];
+
+    const cols = Math.max(10, Math.floor(areaW / 40) + 3);
+    const rows = Math.ceil(total / cols) + 5;
+    const stepX = areaW / (cols - 1);
+    const stepY = areaH / (rows - 1);
 
     for(let row = 0; row < rows; row++){
       for(let col = 0; col < cols; col++){
-        const offset = row % 2 ? stepX * 0.5 : 0;
-        const jitterX = (Math.random() - 0.5) * radius * 0.34;
-        const jitterY = (Math.random() - 0.5) * radius * 0.28;
-        positions.push({
-          x: xStart + col * stepX + offset + jitterX,
-          y: yStart + row * stepY + jitterY
-        });
+        const x = col * stepX + (row % 2 ? stepX * 0.45 : 0) - stepX * 0.3 + (Math.random() - 0.5) * 16;
+        const y = zone.top + row * stepY + (Math.random() - 0.5) * 16;
+        positions.push({ x, y });
       }
     }
 
     shuffle(positions);
-    state.balls.forEach((ball, index) => {
+    state.balloons.forEach((balloon, index) => {
       const pos = positions[index];
-      ball.r = radius;
-      ball.x = pos.x;
-      ball.y = pos.y;
+      balloon.x = pos.x;
+      balloon.y = pos.y;
     });
   }
 
   function getMajorityData(){
     const counts = new Map();
-    state.balls.forEach(ball => counts.set(ball.colorIndex, (counts.get(ball.colorIndex) || 0) + 1));
+    state.balloons.forEach(balloon => counts.set(balloon.colorIndex, (counts.get(balloon.colorIndex) || 0) + 1));
     const max = Math.max(...counts.values());
     const winners = [...counts.entries()].filter(([, value]) => value === max).map(([key]) => key);
     return { counts, winners };
@@ -449,33 +467,34 @@ body::after{width:40vw;height:40vw;right:-10vw;top:0;background:#ffe35d}
     const frag = document.createDocumentFragment();
     const { winners } = getMajorityData();
 
-    state.balls.forEach(ball => {
+    state.balloons.forEach(balloon => {
       const el = document.createElement('button');
-      const isWinner = winners.includes(ball.colorIndex);
-      el.className = 'ball' + (isWinner ? ' majority' : '');
-      el.style.width = `${ball.r * 2}px`;
-      el.style.height = `${ball.r * 2}px`;
-      el.style.left = `${ball.x}px`;
-      el.style.top = `${ball.y}px`;
-      const [c1, c2] = COLORS[ball.colorIndex];
-      el.style.background = `radial-gradient(circle at 30% 28%, ${c1} 0%, ${c1} 34%, ${c2} 100%)`;
-      el.dataset.id = String(ball.id);
-      el.dataset.colorIndex = String(ball.colorIndex);
-      el.addEventListener('click', onBallClick, { passive: true });
+      const isWinner = winners.includes(balloon.colorIndex);
+      el.className = 'balloon' + (isWinner ? ' majority' : '');
+      el.style.width = `${balloon.r * 2}px`;
+      el.style.height = `${balloon.r * 2.22}px`;
+      el.style.left = `${balloon.x}px`;
+      el.style.top = `${balloon.y}px`;
+      el.style.setProperty('--driftx', `${balloon.driftX}px`);
+      const [c1, c2] = COLORS[balloon.colorIndex];
+      el.style.background = `radial-gradient(circle at 34% 30%, ${c1} 0%, ${c1} 32%, ${c2} 100%)`;
+      el.dataset.id = String(balloon.id);
+      el.dataset.colorIndex = String(balloon.colorIndex);
+      el.addEventListener('click', onBalloonClick, { passive: true });
       frag.appendChild(el);
     });
 
     board.replaceChildren(frag);
   }
 
-  function spawnParticles(x, y, colorIndex, count = 14){
+  function spawnParticles(x, y, colorIndex, count = 12){
     const [c1, c2] = COLORS[colorIndex];
     for(let i = 0; i < count; i++){
       const p = document.createElement('div');
       p.className = 'particle';
       const size = 5 + Math.random() * 13;
       const angle = Math.random() * Math.PI * 2;
-      const dist = 36 + Math.random() * 110;
+      const dist = 26 + Math.random() * 92;
       p.style.width = `${size}px`;
       p.style.height = `${size}px`;
       p.style.left = `${x}px`;
@@ -484,29 +503,29 @@ body::after{width:40vw;height:40vw;right:-10vw;top:0;background:#ffe35d}
       p.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
       p.style.setProperty('--dy', `${Math.sin(angle) * dist}px`);
       board.appendChild(p);
-      setTimeout(() => p.remove(), 780);
+      setTimeout(() => p.remove(), 860);
     }
   }
 
   function removeColor(colorIndex){
-    const els = [...board.querySelectorAll(`.ball[data-color-index="${colorIndex}"]`)];
+    const els = [...board.querySelectorAll(`.balloon[data-color-index="${colorIndex}"]`)];
 
     els.forEach((el, i) => {
       setTimeout(() => {
-        el.classList.add('pop');
-        spawnParticles(parseFloat(el.style.left), parseFloat(el.style.top), colorIndex, 9);
-      }, i * 12);
+        el.classList.add('fly');
+        spawnParticles(parseFloat(el.style.left), parseFloat(el.style.top), colorIndex, 7);
+      }, i * 8);
     });
 
     setTimeout(() => {
-      state.balls = state.balls.filter(ball => ball.colorIndex !== colorIndex);
-      if(state.balls.length <= 1){
+      state.balloons = state.balloons.filter(balloon => balloon.colorIndex !== colorIndex);
+      if(state.balloons.length <= 1){
         advanceSeriesOrFinish();
       }else{
-        layoutBalls();
+        layoutBalloons();
         render();
       }
-    }, 640);
+    }, 900);
   }
 
   function advanceSeriesOrFinish(){
@@ -515,11 +534,11 @@ body::after{width:40vw;height:40vw;right:-10vw;top:0;background:#ffe35d}
       return;
     }
     state = makeState(state.series + 1);
-    layoutBalls();
+    layoutBalloons();
     render();
   }
 
-  function onBallClick(event){
+  function onBalloonClick(event){
     if(!state || !state.running || state.finished) return;
     const colorIndex = Number(event.currentTarget.dataset.colorIndex);
     const { winners } = getMajorityData();
@@ -551,7 +570,7 @@ body::after{width:40vw;height:40vw;right:-10vw;top:0;background:#ffe35d}
   function startGame(){
     endOverlay.classList.remove('show');
     state = makeState(1);
-    layoutBalls();
+    layoutBalloons();
     render();
     timerEl.textContent = '00:00.0';
     setButtonState(true);
@@ -583,7 +602,7 @@ body::after{width:40vw;height:40vw;right:-10vw;top:0;background:#ffe35d}
     endTextEl.innerHTML = newBest ? 'Nouveau <strong>record</strong> !' : 'Partie terminée. Essaie encore plus vite.';
     setButtonState(false);
     endOverlay.classList.add('show');
-    state = { finished: true, running: false, balls: [], series: MAX_SERIES };
+    state = { finished: true, running: false, balloons: [], series: MAX_SERIES };
   }
 
   toggleBtn.addEventListener('click', () => {
@@ -595,7 +614,7 @@ body::after{width:40vw;height:40vw;right:-10vw;top:0;background:#ffe35d}
 
   window.addEventListener('resize', () => {
     if(state && state.running && !state.finished){
-      layoutBalls();
+      layoutBalloons();
       render();
     }
   }, { passive: true });
