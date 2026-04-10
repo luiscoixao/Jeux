@@ -28,7 +28,6 @@ body{
   overflow:hidden;
 }
 
-/* BALLOONS */
 .balloon{
   position:absolute;
   border:none;
@@ -108,18 +107,28 @@ const COLORS = [
   ["#c89cff","#8250ff"],
   ["#ffbf7f","#ff7315"],
   ["#71fff0","#07c7b2"],
-  ["#ff8ee3","#ff3dc3"]
+  ["#ff8ee3","#ff3dc3"],
+  ["#ffd6a5","#ff9f1c"],
+  ["#b8f2e6","#00b894"],
+  ["#a0c4ff","#4361ee"],
+  ["#ffc6ff","#d63384"],
+  ["#fdffb6","#e9c46a"],
+  ["#caffbf","#2a9d8f"],
+  ["#9bf6ff","#00bbf9"],
+  ["#bdb2ff","#8338ec"],
+  ["#ffadad","#e63946"],
+  ["#d0f4de","#40916c"],
+  ["#f1c0e8","#c77dff"],
+  ["#fefae0","#dda15e"]
 ];
 
 let balloons = [];
-let resolving = false;
 
 function create(){
   balloons = [];
   board.innerHTML = "";
-  resolving = false;
 
-  const total = 180;
+  const total = 1000;
 
   for(let i = 0; i < total; i++){
     const b = document.createElement("button");
@@ -128,12 +137,12 @@ function create(){
 
     const r = Math.random();
     let size;
-    if(r < 0.2){
-      size = 38 + Math.random() * 10;
-    }else if(r < 0.85){
-      size = 50 + Math.random() * 18;
+    if(r < 0.22){
+      size = 30 + Math.random() * 8;
+    }else if(r < 0.88){
+      size = 40 + Math.random() * 12;
     }else{
-      size = 68 + Math.random() * 14;
+      size = 54 + Math.random() * 10;
     }
 
     b.style.width = size + "px";
@@ -146,19 +155,28 @@ function create(){
     const color = COLORS[colorIndex];
 
     b.style.background = `radial-gradient(circle at 30% 30%, ${color[0]}, ${color[1]})`;
-    b.dataset.color = color[1];
+    b.dataset.color = String(colorIndex);
+    b.dataset.flying = "0";
 
-    b.addEventListener("click", () => pop(color[1], b));
+    b.addEventListener("click", () => pop(String(colorIndex), b));
 
     board.appendChild(b);
     balloons.push(b);
   }
 }
 
+function cleanupFinishedFlying(){
+  balloons = balloons.filter(b => b.isConnected);
+}
+
+function getActiveBalloons(){
+  return balloons.filter(b => b.dataset.flying !== "1");
+}
+
 function getColorCounts(){
   const counts = new Map();
 
-  for(const b of balloons){
+  for(const b of getActiveBalloons()){
     const color = b.dataset.color;
     counts.set(color, (counts.get(color) || 0) + 1);
   }
@@ -186,7 +204,9 @@ function getMostNumerousColors(){
 }
 
 function pop(color, clickedBalloon){
-  if(resolving) return;
+  if(clickedBalloon.dataset.flying === "1") return;
+
+  cleanupFinishedFlying();
 
   const mostNumerous = getMostNumerousColors();
 
@@ -197,27 +217,27 @@ function pop(color, clickedBalloon){
     return;
   }
 
-  const group = balloons.filter(b => b.dataset.color === color);
+  const group = balloons.filter(
+    b => b.dataset.color === color && b.dataset.flying !== "1"
+  );
 
   if(group.length < 1) return;
 
-  resolving = true;
-
   group.forEach(b => {
+    b.dataset.flying = "1";
     b.style.setProperty("--dx", (Math.random() * 200 - 100) + "px");
     b.classList.add("fly");
-    setTimeout(() => b.remove(), 3200);
+
+    setTimeout(() => {
+      b.remove();
+      cleanupFinishedFlying();
+
+      const activeLeft = getActiveBalloons().length;
+      if(activeLeft < 2){
+        setTimeout(create, 300);
+      }
+    }, 3200);
   });
-
-  balloons = balloons.filter(b => b.dataset.color !== color);
-
-  setTimeout(() => {
-    resolving = false;
-
-    if(balloons.length < 2){
-      setTimeout(create, 800);
-    }
-  }, 3200);
 }
 
 create();
