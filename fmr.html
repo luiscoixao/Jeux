@@ -3,453 +3,540 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-<title>MEMORY COLORS</title>
-
-<meta name="theme-color" content="#5b3df5" />
+<title>COLOR BOWLS</title>
+<meta name="theme-color" content="#43c7ff" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-title" content="MEMORY COLORS" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<link rel="apple-touch-icon" href="iconmemorycolors.png" />
-<link rel="icon" type="image/png" href="iconmemorycolors.png" />
-
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="COLOR BOWLS" />
+<link rel="apple-touch-icon" href="icon.png" />
+<link rel="icon" type="image/png" href="icon.png" />
 <style>
 :root{
-  --bg1:#4338ca;
-  --bg2:#7c3aed;
-  --bg3:#312e81;
-
-  --green:#22c55e;
-  --yellow:#facc15;
-  --pink:#ec4899;
-  --cyan:#06b6d4;
-  --orange:#f97316;
-  --red:#ef4444;
-  --purple:#a855f7;
-  --blue:#3b82f6;
-  --lime:#84cc16;
-  --turquoise:#2dd4bf;
-  --fuchsia:#d946ef;
-  --amber:#f59e0b;
-
-  --glass:rgba(255,255,255,.05);
-  --line:rgba(255,255,255,.08);
-  --line-strong:rgba(255,255,255,.28);
-  --shadow:0 10px 30px rgba(0,0,0,.18);
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
+  --safe-left: env(safe-area-inset-left);
+  --safe-right: env(safe-area-inset-right);
+  --white:#fff;
+  --line:rgba(255,255,255,.20);
+  --glass:rgba(255,255,255,.14);
+  --shadow:0 18px 40px rgba(0,0,0,.24);
+  --green1:#4cff74;
+  --green2:#11ad3f;
+  --red1:#ff6177;
+  --red2:#d81434;
 }
-
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
-
-html,body{
-  margin:0;
-  height:100%;
-  overflow:hidden;
-}
-
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
 body{
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",sans-serif;
+  color:var(--white);
   background:
-    radial-gradient(circle at 10% 15%, rgba(56,189,248,.22), transparent 20%),
-    radial-gradient(circle at 90% 12%, rgba(255,60,172,.18), transparent 20%),
-    radial-gradient(circle at 20% 90%, rgba(34,197,94,.10), transparent 22%),
-    linear-gradient(135deg,var(--bg1),var(--bg2) 55%, #5b21b6 75%, var(--bg3));
-  color:#fff;
+    radial-gradient(circle at 12% 12%, rgba(255,236,96,.95) 0 0, rgba(255,236,96,0) 18%),
+    radial-gradient(circle at 87% 16%, rgba(97,122,255,.95) 0 0, rgba(97,122,255,0) 22%),
+    radial-gradient(circle at 81% 83%, rgba(83,255,212,.95) 0 0, rgba(83,255,212,0) 20%),
+    radial-gradient(circle at 24% 82%, rgba(255,109,189,.95) 0 0, rgba(255,109,189,0) 22%),
+    linear-gradient(145deg,#29bbff 0%, #735fff 42%, #ff5198 100%);
 }
-
-.app{
-  height:100dvh;
-  display:flex;
-  flex-direction:column;
-}
-
-/* HEADER */
-.header{
-  flex:0 0 auto;
-  text-align:center;
-  padding:14px 8px 10px;
-}
-
-h1{
-  margin:0;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:0;
-}
-
-.title-line{
-  display:flex;
-  gap:2px;
-  font-size:clamp(36px, 9vw, 68px);
-  font-weight:1000;
-  letter-spacing:.04em;
-  line-height:.92;
-  text-transform:uppercase;
-}
-
-.title-line:first-child{
-  transform:translateY(2px);
-}
-
-.title-letter{
-  display:inline-block;
-  background:linear-gradient(135deg, currentColor 0%, rgba(255,255,255,.92) 100%);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  filter:drop-shadow(0 4px 16px rgba(0,0,0,.24)) drop-shadow(0 0 10px currentColor);
-}
-
-.t1{color:var(--green);}
-.t2{color:var(--yellow);}
-.t3{color:var(--pink);}
-.t4{color:var(--cyan);}
-.t5{color:var(--orange);}
-.t6{color:var(--red);}
-.t7{color:var(--lime);}
-.t8{color:var(--turquoise);}
-.t9{color:var(--amber);}
-.t10{color:var(--fuchsia);}
-.t11{color:var(--blue);}
-.t12{color:var(--purple);}
-
-/* BOARD */
-.board{
-  flex:1;
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  grid-template-rows:repeat(6,1fr);
-  background:rgba(255,255,255,.03);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
-  perspective:1200px;
-}
-
-.card{
-  position:relative;
-  border:none;
-  padding:0;
-  margin:0;
-  background:none;
-  cursor:pointer;
-  perspective:1000px;
-  overflow:hidden;
-}
-
-.card-inner{
-  position:absolute;
-  inset:0;
-  transform-style:preserve-3d;
-  transition:transform .48s cubic-bezier(.2,.8,.2,1), filter .25s ease;
-}
-
-.card.flipped .card-inner{
-  transform:rotateY(180deg) scale(.985);
-}
-
-.card.matched .card-inner{
-  transform:rotateY(180deg) scale(.985);
-}
-
-.face{
-  position:absolute;
-  inset:0;
-  backface-visibility:hidden;
-  -webkit-backface-visibility:hidden;
-}
-
-.face.back{
-  background:rgba(255,255,255,.02);
-  box-shadow:inset 0 0 0 2px rgba(255,255,255,.08);
-}
-
-.face.front{
-  transform:rotateY(180deg);
-  box-shadow:inset 0 0 0 3px rgba(255,255,255,.42);
-  filter:saturate(1.06);
-}
-
-.card:active .card-inner{
-  transform:scale(.975);
-}
-
-.card.flipped:active .card-inner,
-.card.matched:active .card-inner{
-  transform:rotateY(180deg) scale(.975);
-}
-
-/* premium glow */
-.card.flipped .face.front,
-.card.matched .face.front{
-  animation:softPop .22s ease;
-}
-
-.card.matched .face.front{
-  box-shadow:
-    inset 0 0 0 3px rgba(255,255,255,.42),
-    0 0 18px rgba(255,255,255,.10);
-  animation:matchPulse .55s ease;
-}
-
-@keyframes softPop{
-  0%{transform:rotateY(180deg) scale(.93);}
-  100%{transform:rotateY(180deg) scale(1);}
-}
-
-@keyframes matchPulse{
-  0%{
-    transform:rotateY(180deg) scale(.96);
-    filter:brightness(1);
-  }
-  45%{
-    transform:rotateY(180deg) scale(1.02);
-    filter:brightness(1.12);
-  }
-  100%{
-    transform:rotateY(180deg) scale(1);
-    filter:brightness(1);
-  }
-}
-
-/* colors */
-.seq-green{background:var(--green);}
-.seq-yellow{background:var(--yellow);}
-.seq-pink{background:var(--pink);}
-.seq-cyan{background:var(--cyan);}
-.seq-orange{background:var(--orange);}
-.seq-red{background:var(--red);}
-.seq-purple{background:var(--purple);}
-.seq-blue{background:var(--blue);}
-.seq-lime{background:var(--lime);}
-.seq-turquoise{background:var(--turquoise);}
-.seq-fuchsia{background:var(--fuchsia);}
-.seq-amber{background:var(--amber);}
-
-/* footer */
-.signature{
-  text-align:center;
-  font-size:10px;
-  opacity:.5;
-  padding:10px 8px 8px;
-}
-
-/* end overlay */
-.end{
+body::before,
+body::after{
+  content:"";
   position:fixed;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:rgba(7,10,26,.38);
-  backdrop-filter:blur(10px) saturate(1.1);
-  -webkit-backdrop-filter:blur(10px) saturate(1.1);
-  opacity:0;
+  border-radius:50%;
+  filter:blur(48px);
+  opacity:.35;
   pointer-events:none;
-  transition:opacity .25s ease;
 }
-
-.end.show{
-  opacity:1;
+body::before{width:42vw;height:42vw;left:-10vw;bottom:0;background:#63fff1}
+body::after{width:38vw;height:38vw;right:-8vw;top:2vh;background:#ffe35f}
+.game,.board,.hud,.endOverlay{position:fixed;inset:0}
+.board{overflow:hidden;touch-action:manipulation}
+.hud{pointer-events:none;z-index:5}
+.title{
+  position:absolute;
+  top:calc(8px + var(--safe-top));
+  left:calc(12px + var(--safe-left));
+  right:calc(12px + var(--safe-right));
+  margin:0;
+  text-align:center;
+  font-weight:1000;
+  letter-spacing:.12em;
+  line-height:.92;
+  font-size:clamp(28px,8.2vw,52px);
+  text-shadow:0 10px 26px rgba(0,0,0,.24);
+}
+.bottomBar{
+  position:absolute;
+  left:calc(10px + var(--safe-left));
+  right:calc(10px + var(--safe-right));
+  bottom:calc(10px + var(--safe-bottom));
+  display:grid;
+  grid-template-columns:86px 86px minmax(160px,1fr);
+  gap:10px;
+  align-items:stretch;
   pointer-events:auto;
 }
-
-.box{
-  min-width:min(86vw, 360px);
-  padding:22px 20px 18px;
+.stat,.toggleBtn,.endCard{
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(18px) saturate(1.15);
+  -webkit-backdrop-filter:blur(18px) saturate(1.15);
+}
+.stat{
+  background:var(--glass);
   border-radius:22px;
-  background:linear-gradient(180deg, rgba(18,24,48,.82), rgba(14,18,36,.78));
-  box-shadow:
-    0 22px 60px rgba(0,0,0,.28),
-    inset 0 0 0 1px rgba(255,255,255,.08);
+  padding:10px 8px 9px;
   text-align:center;
 }
-
-#endText{
-  font-size:17px;
-  font-weight:700;
-  line-height:1.45;
-}
-
-.end-hint{
-  margin-top:10px;
-  font-size:12px;
-  font-weight:700;
-  letter-spacing:.05em;
+.stat .label{
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.14em;
   text-transform:uppercase;
-  opacity:.7;
+  opacity:.96;
 }
-
-@media (prefers-reduced-motion: reduce){
-  .card-inner,
-  .end,
-  .title-letter{
-    transition:none !important;
-    animation:none !important;
-  }
+.stat .value{
+  margin-top:4px;
+  font-size:22px;
+  line-height:1;
+  font-weight:1000;
+}
+.toggleBtn{
+  appearance:none;
+  border-radius:24px;
+  min-height:66px;
+  border-width:1px;
+  color:#fff;
+  font-weight:1000;
+  font-size:24px;
+  letter-spacing:.04em;
+}
+.toggleBtn.play{background:linear-gradient(180deg,var(--green1),var(--green2))}
+.toggleBtn.stop{background:linear-gradient(180deg,var(--red1),var(--red2))}
+.ball{
+  position:absolute;
+  border:none;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  box-shadow:
+    inset -12px -18px 28px rgba(0,0,0,.14),
+    inset 11px 13px 26px rgba(255,255,255,.34),
+    0 14px 26px rgba(0,0,0,.20);
+  transition:
+    left .56s cubic-bezier(.22,.8,.18,1),
+    top .56s cubic-bezier(.22,.8,.18,1),
+    transform .14s ease,
+    opacity .22s ease,
+    filter .2s ease;
+}
+.ball::before{
+  content:"";
+  position:absolute;
+  width:42%;
+  height:28%;
+  left:18%;
+  top:16%;
+  border-radius:50%;
+  background:rgba(255,255,255,.38);
+  transform:rotate(-16deg);
+  filter:blur(1px);
+}
+.ball:active{transform:translate(-50%,-50%) scale(.92)}
+.ball.majority{filter:drop-shadow(0 0 18px rgba(255,255,255,.52))}
+.ball.wrong{animation:wrongShake .34s ease}
+.ball.pop{animation:dropBurst .55s cubic-bezier(.18,.8,.22,1) forwards;pointer-events:none}
+.particle{
+  position:absolute;
+  border-radius:50%;
+  pointer-events:none;
+  transform:translate(-50%,-50%);
+  animation:particle .74s ease-out forwards;
+}
+.endOverlay{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(12,16,36,.12);
+  z-index:8;
+}
+.endOverlay.show{display:flex}
+.endCard{
+  width:min(90vw,520px);
+  background:rgba(255,255,255,.18);
+  border-radius:34px;
+  padding:24px 20px 20px;
+  text-align:center;
+}
+.endMini{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:900;opacity:.92}
+.endTitle{margin:10px 0 6px;font-size:clamp(28px,8vw,42px);line-height:.95;font-weight:1000}
+.endTime{font-size:clamp(34px,9vw,52px);font-weight:1000;line-height:1;margin:8px 0 10px}
+.endText{font-size:16px;line-height:1.35;font-weight:700;margin:0 0 14px}
+.endBtn{
+  appearance:none;
+  border:none;
+  min-width:180px;
+  min-height:56px;
+  border-radius:20px;
+  font-size:20px;
+  font-weight:1000;
+  color:#fff;
+  background:linear-gradient(180deg,var(--green1),var(--green2));
+  box-shadow:var(--shadow);
+}
+@keyframes wrongShake{
+  0%,100%{transform:translate(-50%,-50%)}
+  25%{transform:translate(calc(-50% - 7px),-50%)}
+  50%{transform:translate(calc(-50% + 7px),-50%)}
+  75%{transform:translate(calc(-50% - 5px),-50%)}
+}
+@keyframes dropBurst{
+  0%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  55%{opacity:1;transform:translate(-50%,calc(-50% + 58px)) scale(1.08)}
+  100%{opacity:0;transform:translate(-50%,calc(-50% + 210px)) scale(.26)}
+}
+@keyframes particle{
+  0%{opacity:.95}
+  100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.2)}
 }
 </style>
 </head>
 <body>
-
-<div class="app">
-  <div class="header">
-    <h1 aria-label="MEMORY COLORS">
-      <div class="title-line">
-        <span class="title-letter t1">M</span>
-        <span class="title-letter t2">E</span>
-        <span class="title-letter t3">M</span>
-        <span class="title-letter t4">O</span>
-        <span class="title-letter t5">R</span>
-        <span class="title-letter t6">Y</span>
+<div class="game">
+  <div class="board" id="board"></div>
+  <div class="hud">
+    <h1 class="title">COLOR BOWLS</h1>
+    <div class="bottomBar">
+      <div class="stat">
+        <div class="label">Chrono</div>
+        <div class="value" id="timer">00:00.0</div>
       </div>
-      <div class="title-line">
-        <span class="title-letter t7">C</span>
-        <span class="title-letter t8">O</span>
-        <span class="title-letter t9">L</span>
-        <span class="title-letter t10">O</span>
-        <span class="title-letter t11">R</span>
-        <span class="title-letter t12">S</span>
+      <div class="stat">
+        <div class="label">Record</div>
+        <div class="value" id="best">--:--.-</div>
       </div>
-    </h1>
+      <button class="toggleBtn play" id="toggleBtn">JOUER</button>
+    </div>
   </div>
-
-  <div id="board" class="board"></div>
-
-  <div class="signature">Jeu créé par Luis Coixao</div>
 </div>
 
-<div id="end" class="end">
-  <div class="box">
-    <div id="endText"></div>
-    <div class="end-hint">Touchez pour rejouer</div>
+<div class="endOverlay" id="endOverlay">
+  <div class="endCard">
+    <div class="endMini">Partie terminée</div>
+    <div class="endTitle">Bravo</div>
+    <div class="endTime" id="endTime">00:00.0</div>
+    <p class="endText" id="endText">Tu as vidé les 100 séries.</p>
+    <button class="endBtn" id="restartBtn">REJOUER</button>
   </div>
 </div>
 
 <script>
-const COLORS = [
-  "seq-green","seq-yellow","seq-pink","seq-cyan",
-  "seq-orange","seq-red","seq-purple","seq-blue",
-  "seq-lime","seq-turquoise","seq-fuchsia","seq-amber"
-];
+(() => {
+  const board = document.getElementById('board');
+  const timerEl = document.getElementById('timer');
+  const bestEl = document.getElementById('best');
+  const toggleBtn = document.getElementById('toggleBtn');
+  const endOverlay = document.getElementById('endOverlay');
+  const endTimeEl = document.getElementById('endTime');
+  const endTextEl = document.getElementById('endText');
+  const restartBtn = document.getElementById('restartBtn');
 
-const BEST_KEY = "memory-colors-best-score";
+  const STORAGE_BEST = 'color-bowls-best-v1';
+  const MAX_SERIES = 100;
+  const COLORS = [
+    ['#ff5b77','#ff2a51'],
+    ['#47e866','#15b63a'],
+    ['#ffd84d','#ffb700'],
+    ['#57c8ff','#1499ff'],
+    ['#a76bff','#7b38ff'],
+    ['#ff8b3d','#ff5c00']
+  ];
 
-let state = {
-  first:null,
-  second:null,
-  locked:false,
-  matched:0,
-  moves:0,
-  finished:false
-};
+  let bestMs = Number(localStorage.getItem(STORAGE_BEST) || 0);
+  let raf = 0;
+  let startTs = 0;
+  let state = null;
 
-const board = document.getElementById("board");
-const end = document.getElementById("end");
-const endText = document.getElementById("endText");
-
-function shuffle(array){
-  const a = [...array];
-  for(let i = a.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function getBestScore(){
-  const best = Number(localStorage.getItem(BEST_KEY) || 0);
-  return Number.isFinite(best) ? best : 0;
-}
-
-function saveBestScore(score){
-  const currentBest = getBestScore();
-  if(currentBest === 0 || score < currentBest){
-    localStorage.setItem(BEST_KEY, String(score));
-    return score;
-  }
-  return currentBest;
-}
-
-function start(){
-  state = { first:null, second:null, locked:false, matched:0, moves:0, finished:false };
-  const cards = shuffle([...COLORS, ...COLORS]);
-  board.innerHTML = "";
-
-  cards.forEach((color, index) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "card";
-    button.dataset.color = color;
-    button.dataset.index = index;
-
-    button.innerHTML = `
-      <div class="card-inner">
-        <div class="face back"></div>
-        <div class="face front ${color}"></div>
-      </div>
-    `;
-
-    button.addEventListener("click", () => clickCard(button, color));
-    board.appendChild(button);
-  });
-}
-
-function clickCard(el, color){
-  if(state.locked || state.finished) return;
-  if(el.classList.contains("flipped") || el.classList.contains("matched")) return;
-
-  el.classList.add("flipped");
-
-  if(state.first === null){
-    state.first = { el, color };
-    return;
+  function fmt(ms){
+    if(!ms && ms !== 0) return '--:--.-';
+    const totalTenths = Math.floor(ms / 100);
+    const minutes = Math.floor(totalTenths / 600);
+    const seconds = Math.floor((totalTenths % 600) / 10);
+    const tenths = totalTenths % 10;
+    return `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}.${tenths}`;
   }
 
-  state.second = { el, color };
-  state.moves++;
-  state.locked = true;
+  function updateBest(){ bestEl.textContent = bestMs ? fmt(bestMs) : '--:--.-'; }
+  updateBest();
 
-  if(state.first.color === state.second.color){
-    state.first.el.classList.remove("flipped");
-    state.second.el.classList.remove("flipped");
-    state.first.el.classList.add("matched");
-    state.second.el.classList.add("matched");
-    state.matched += 2;
+  function setButtonState(running){
+    toggleBtn.className = 'toggleBtn ' + (running ? 'stop' : 'play');
+    toggleBtn.textContent = running ? 'ARRÊTER' : 'JOUER';
+  }
 
-    resetTurn();
+  function computeSeriesCount(series){
+    const start = 260;
+    const end = 34;
+    const t = (series - 1) / (MAX_SERIES - 1);
+    const eased = Math.pow(t, 1.55);
+    return Math.round(start + (end - start) * eased);
+  }
 
-    if(state.matched === 24){
-      finish();
+  function colorCounts(total){
+    const countColors = 6;
+    const dominant = Math.floor(Math.random() * countColors);
+    const counts = new Array(countColors).fill(0);
+    const dominantShare = 0.26 + Math.random() * 0.08;
+    counts[dominant] = Math.max(2, Math.round(total * dominantShare));
+    let remaining = total - counts[dominant];
+
+    const secondary = [];
+    for(let i=0;i<countColors;i++) if(i !== dominant) secondary.push(i);
+    for(let i=0;i<secondary.length;i++){
+      const idx = secondary[i];
+      const leftSlots = secondary.length - i;
+      const minKeep = leftSlots - 1;
+      const maxHere = Math.max(1, remaining - minKeep);
+      const value = i === secondary.length - 1 ? remaining : Math.max(1, Math.floor(Math.random() * maxHere) + 1);
+      counts[idx] = value;
+      remaining -= value;
     }
-  } else {
+
+    while(new Set(counts).size !== counts.length){
+      const sorted = counts.map((v,i)=>({v,i})).sort((a,b)=>b.v-a.v);
+      const seen = new Map();
+      let changed = false;
+      for(const item of sorted){
+        if(seen.has(item.v)){
+          const from = item.i;
+          const to = counts.findIndex((v,idx)=>idx!==from && v < counts[dominant]-1);
+          if(to !== -1 && counts[from] > 1){ counts[from]--; counts[to]++; changed = true; break; }
+        }
+        seen.set(item.v, true);
+      }
+      if(!changed) break;
+    }
+
+    return counts;
+  }
+
+  function makeBalls(series){
+    const total = computeSeriesCount(series);
+    const counts = colorCounts(total);
+    const balls = [];
+    let id = 1;
+    counts.forEach((count, colorIndex) => {
+      for(let i=0;i<count;i++){
+        balls.push({ id:id++, colorIndex, x:0, y:0, r:0, pop:false });
+      }
+    });
+    for(let i=balls.length-1;i>0;i--){
+      const j = Math.floor(Math.random() * (i+1));
+      [balls[i], balls[j]] = [balls[j], balls[i]];
+    }
+    return balls;
+  }
+
+  function makeState(series){
+    return { series, running:true, finished:false, balls: makeBalls(series) };
+  }
+
+  function boardRect(){
+    const rect = board.getBoundingClientRect();
+    const bottomReserved = 88 + parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-bottom') || '0');
+    const topReserved = 66 + parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-top') || '0');
+    return {
+      width: rect.width,
+      height: rect.height,
+      left: 0,
+      top: topReserved,
+      bottom: rect.height - bottomReserved
+    };
+  }
+
+  function layoutBalls(){
+    const zone = boardRect();
+    const areaW = zone.width;
+    const areaH = Math.max(140, zone.bottom - zone.top);
+    const total = state.balls.length;
+    const densityFactor = total > 200 ? 1.36 : total > 150 ? 1.3 : total > 100 ? 1.24 : total > 70 ? 1.18 : 1.10;
+    const base = Math.sqrt((areaW * areaH) / (total * Math.PI)) * densityFactor;
+    const radius = Math.max(14, Math.min(34, base));
+    const step = radius * 1.66;
+    const cols = Math.max(4, Math.floor((areaW - radius) / step));
+    const rows = Math.ceil(total / cols);
+    const usedH = rows * step;
+    const yStart = zone.top + Math.max(radius + 4, (areaH - usedH) / 2 + radius);
+    const xPad = Math.max(radius + 4, (areaW - cols * step) / 2 + radius);
+
+    state.balls.forEach((ball, index) => {
+      const row = Math.floor(index / cols);
+      const col = index % cols;
+      const offset = row % 2 ? step * 0.5 : 0;
+      const jitterX = (Math.random() - 0.5) * radius * 0.56;
+      const jitterY = (Math.random() - 0.5) * radius * 0.46;
+      ball.r = radius;
+      ball.x = xPad + col * step + offset + jitterX;
+      ball.y = yStart + row * step + jitterY;
+    });
+  }
+
+  function getMajorityColors(){
+    const counts = new Map();
+    state.balls.forEach(ball => counts.set(ball.colorIndex, (counts.get(ball.colorIndex)||0)+1));
+    const max = Math.max(...counts.values());
+    const winners = [...counts.entries()].filter(([,v]) => v === max).map(([k]) => k);
+    return { counts, winners };
+  }
+
+  function render(){
+    board.innerHTML = '';
+    const { winners } = getMajorityColors();
+    state.balls.forEach(ball => {
+      const el = document.createElement('button');
+      el.className = 'ball' + (winners.includes(ball.colorIndex) ? ' majority' : '');
+      const [c1,c2] = COLORS[ball.colorIndex];
+      el.style.width = `${ball.r * 2}px`;
+      el.style.height = `${ball.r * 2}px`;
+      el.style.left = `${ball.x}px`;
+      el.style.top = `${ball.y}px`;
+      el.style.background = `radial-gradient(circle at 30% 28%, ${c1} 0%, ${c1} 34%, ${c2} 100%)`;
+      el.dataset.id = ball.id;
+      el.dataset.colorIndex = ball.colorIndex;
+      el.addEventListener('click', onBallClick, { passive:true });
+      board.appendChild(el);
+    });
+  }
+
+  function spawnParticles(x,y,colorIndex,count=12){
+    const [c1,c2] = COLORS[colorIndex];
+    for(let i=0;i<count;i++){
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = 6 + Math.random() * 12;
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 34 + Math.random() * 92;
+      p.style.width = `${size}px`;
+      p.style.height = `${size}px`;
+      p.style.left = `${x}px`;
+      p.style.top = `${y}px`;
+      p.style.background = Math.random() > .5 ? c1 : c2;
+      p.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
+      p.style.setProperty('--dy', `${Math.sin(angle) * dist}px`);
+      board.appendChild(p);
+      setTimeout(() => p.remove(), 760);
+    }
+  }
+
+  function removeColor(colorIndex){
+    const els = [...board.querySelectorAll(`.ball[data-color-index="${colorIndex}"]`)];
+    els.forEach((el, i) => {
+      setTimeout(() => {
+        el.classList.add('pop');
+        const x = parseFloat(el.style.left);
+        const y = parseFloat(el.style.top);
+        spawnParticles(x, y, colorIndex, 8);
+      }, i * 18);
+    });
+
     setTimeout(() => {
-      state.first.el.classList.remove("flipped");
-      state.second.el.classList.remove("flipped");
-      resetTurn();
+      state.balls = state.balls.filter(ball => ball.colorIndex !== colorIndex);
+      if(state.balls.length <= 1){
+        advanceSeriesOrFinish();
+      } else {
+        layoutBalls();
+        render();
+      }
     }, 620);
   }
-}
 
-function resetTurn(){
-  state.first = null;
-  state.second = null;
-  state.locked = false;
-}
+  function advanceSeriesOrFinish(){
+    if(state.series >= MAX_SERIES){
+      finishGame();
+      return;
+    }
+    state = makeState(state.series + 1);
+    layoutBalls();
+    render();
+  }
 
-function finish(){
-  state.finished = true;
-  const best = saveBestScore(state.moves);
-  endText.innerHTML = "Terminé en " + state.moves + " coups.<br>Meilleur score : " + best + ".";
-  end.classList.add("show");
-}
+  function onBallClick(e){
+    if(!state || !state.running || state.finished) return;
+    const colorIndex = Number(e.currentTarget.dataset.colorIndex);
+    const { winners } = getMajorityColors();
+    if(!winners.includes(colorIndex)){
+      e.currentTarget.classList.add('wrong');
+      setTimeout(() => e.currentTarget.classList.remove('wrong'), 340);
+      if(navigator.vibrate) navigator.vibrate(34);
+      return;
+    }
+    removeColor(colorIndex);
+  }
 
-end.addEventListener("click", () => {
-  end.classList.remove("show");
-  start();
-});
+  function tick(){
+    if(!state || !state.running) return;
+    timerEl.textContent = fmt(performance.now() - startTs);
+    raf = requestAnimationFrame(tick);
+  }
 
-start();
+  function startTimer(){ cancelAnimationFrame(raf); startTs = performance.now(); tick(); }
+  function stopTimer(){ cancelAnimationFrame(raf); }
+
+  function startGame(){
+    endOverlay.classList.remove('show');
+    state = makeState(1);
+    layoutBalls();
+    render();
+    timerEl.textContent = '00:00.0';
+    setButtonState(true);
+    startTimer();
+  }
+
+  function stopGame(){
+    stopTimer();
+    state = null;
+    board.innerHTML = '';
+    timerEl.textContent = '00:00.0';
+    setButtonState(false);
+  }
+
+  function finishGame(){
+    stopTimer();
+    const elapsed = Math.floor(performance.now() - startTs);
+    timerEl.textContent = fmt(elapsed);
+    endTimeEl.textContent = fmt(elapsed);
+    let newBest = false;
+    if(!bestMs || elapsed < bestMs){
+      bestMs = elapsed;
+      localStorage.setItem(STORAGE_BEST, String(bestMs));
+      updateBest();
+      newBest = true;
+    }
+    endTextEl.innerHTML = newBest ? 'Nouveau <strong>record</strong> !' : 'Partie terminée. Essaie d’aller encore plus vite.';
+    setButtonState(false);
+    endOverlay.classList.add('show');
+    state = { finished:true, running:false, balls:[], series:MAX_SERIES };
+  }
+
+  toggleBtn.addEventListener('click', () => {
+    if(state && state.running && !state.finished) stopGame();
+    else startGame();
+  });
+
+  restartBtn.addEventListener('click', startGame);
+
+  window.addEventListener('resize', () => {
+    if(state && state.running && !state.finished){
+      layoutBalls();
+      render();
+    }
+  }, { passive:true });
+
+  timerEl.textContent = '00:00.0';
+  updateBest();
+  setButtonState(false);
+  startGame();
+})();
 </script>
-
 </body>
 </html>
