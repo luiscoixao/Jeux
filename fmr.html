@@ -136,10 +136,10 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
   border-radius:48% 48% 45% 45% / 43% 43% 57% 57%;
   transform:translate(-50%,-50%);
   box-shadow:
-    inset -12px -18px 26px rgba(0,0,0,.17),
-    inset 10px 14px 18px rgba(255,255,255,.36),
-    0 18px 28px rgba(0,0,0,.18),
-    0 0 0 1px rgba(255,255,255,.10);
+    inset -10px -14px 22px rgba(0,0,0,.16),
+    inset 7px 10px 12px rgba(255,255,255,.20),
+    0 16px 24px rgba(0,0,0,.16),
+    0 0 0 1px rgba(255,255,255,.07);
   transition:
     left .46s cubic-bezier(.22,.84,.18,1),
     top .46s cubic-bezier(.22,.84,.18,1),
@@ -150,28 +150,28 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
 .balloon::before{
   content:"";
   position:absolute;
-  width:34%;
-  height:18%;
-  left:17%;
-  top:14%;
+  width:26%;
+  height:12%;
+  left:19%;
+  top:15%;
   border-radius:50%;
-  background:rgba(255,255,255,.46);
+  background:rgba(255,255,255,.22);
   transform:rotate(-18deg);
-  filter:blur(1px);
+  filter:blur(.6px);
 }
 .balloon:active{transform:translate(-50%,-50%) scale(.95)}
 .balloon.majority{
-  filter:brightness(1.08) saturate(1.16) drop-shadow(0 0 18px rgba(255,255,255,.34));
+  filter:brightness(1.05) saturate(1.14) drop-shadow(0 0 14px rgba(255,255,255,.20));
   box-shadow:
-    inset -12px -18px 26px rgba(0,0,0,.16),
-    inset 10px 14px 18px rgba(255,255,255,.38),
-    0 0 0 3px rgba(255,255,255,.18),
-    0 18px 28px rgba(0,0,0,.18),
-    0 0 24px rgba(255,255,255,.12);
+    inset -10px -14px 22px rgba(0,0,0,.15),
+    inset 7px 10px 12px rgba(255,255,255,.22),
+    0 0 0 2px rgba(255,255,255,.14),
+    0 16px 24px rgba(0,0,0,.16),
+    0 0 18px rgba(255,255,255,.08);
 }
 .balloon.wrong{animation:wrongShake .34s ease}
 .balloon.fly{
-  animation:flyAway 2.35s cubic-bezier(.19,.82,.22,1) forwards;
+  animation:flyAway 2.9s cubic-bezier(.16,.84,.18,1) forwards;
   pointer-events:none;
   will-change:transform, opacity;
 }
@@ -218,33 +218,33 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
     opacity:1;
     transform:translate(-50%,-50%) translate3d(0,0,0) scale(1) rotate(0deg);
   }
-  18%{
+  16%{
     opacity:1;
     transform:translate(
-      calc(-50% + var(--driftx) * .12),
-      calc(-50% - 24px)
-    ) translate3d(0,0,0) scale(1.01) rotate(calc(var(--spin) * .10));
+      calc(-50% + var(--driftx) * .08),
+      calc(-50% - 18px)
+    ) translate3d(0,0,0) scale(1.008) rotate(calc(var(--spin) * .06));
   }
-  42%{
+  38%{
     opacity:.99;
     transform:translate(
-      calc(-50% + var(--driftx) * .34),
-      calc(-50% - 96px)
-    ) translate3d(0,0,0) scale(1.03) rotate(calc(var(--spin) * .30));
+      calc(-50% + var(--driftx) * .24),
+      calc(-50% - 72px)
+    ) translate3d(0,0,0) scale(1.018) rotate(calc(var(--spin) * .18));
   }
-  72%{
-    opacity:.94;
+  68%{
+    opacity:.95;
     transform:translate(
-      calc(-50% + var(--driftx) * .68),
-      calc(-50% - 245px)
-    ) translate3d(0,0,0) scale(1.04) rotate(calc(var(--spin) * .66));
+      calc(-50% + var(--driftx) * .56),
+      calc(-50% - 205px)
+    ) translate3d(0,0,0) scale(1.03) rotate(calc(var(--spin) * .48));
   }
   100%{
     opacity:0;
     transform:translate(
-      calc(-50% + var(--driftx)),
-      calc(-50% - 520px)
-    ) translate3d(0,0,0) scale(.98) rotate(var(--spin));
+      calc(-50% + var(--driftx) * .86),
+      calc(-50% - 430px)
+    ) translate3d(0,0,0) scale(1.01) rotate(calc(var(--spin) * .72));
   }
 }
 @keyframes particle{
@@ -541,10 +541,9 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
       if(state.balloons.length <= 1){
         advanceSeriesOrFinish();
       } else {
-        placeIntoLanes(false);
         render();
       }
-    }, 2420);
+    }, 2980);
   }
 
   function advanceSeriesOrFinish(){
