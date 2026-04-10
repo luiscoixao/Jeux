@@ -171,17 +171,11 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
 }
 .balloon.wrong{animation:wrongShake .34s ease}
 .balloon.fly{
-  animation:flyAway 2.9s cubic-bezier(.16,.84,.18,1) forwards;
+  animation:flyAway 3.4s ease-out forwards;
   pointer-events:none;
   will-change:transform, opacity;
 }
-.particle{
-  position:absolute;
-  border-radius:50%;
-  pointer-events:none;
-  transform:translate(-50%,-50%);
-  animation:particle .92s ease-out forwards;
-}
+.particle{display:none !important;}
 .endOverlay{
   display:none;
   align-items:center;
@@ -216,8 +210,24 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
 @keyframes flyAway{
   0%{
     opacity:1;
-    transform:translate(-50%,-50%) translate3d(0,0,0) scale(1) rotate(0deg);
+    transform:translate(-50%,-50%) scale(1);
   }
+  100%{
+    opacity:0;
+    transform:translate(
+      calc(-50% + var(--driftx)),
+      calc(-50% - 620px)
+    ) scale(1.015);
+  }
+}
+  100%{
+    opacity:0;
+    transform:translate(
+      calc(-50% + var(--driftx)),
+      calc(-50% - 600px)
+    ) translate3d(0,0,0) scale(1.02);
+  }
+}
   16%{
     opacity:1;
     transform:translate(
@@ -247,10 +257,22 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
     ) translate3d(0,0,0) scale(1.01) rotate(calc(var(--spin) * .72));
   }
 }
-@keyframes particle{
-  0%{opacity:.96}
+@keyframes particle{0%{opacity:0}100%{opacity:0}}
   100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.14)}
 }
+
+.board.resolving .balloon.majority{
+  filter:none !important;
+  box-shadow:
+    inset -10px -14px 22px rgba(0,0,0,.16),
+    inset 7px 10px 12px rgba(255,255,255,.20),
+    0 16px 24px rgba(0,0,0,.16),
+    0 0 0 1px rgba(255,255,255,.07) !important;
+}
+.board.resolving .balloon:not(.fly){
+  transition:none;
+}
+
 @media (max-width: 430px){
   .bottomBar{grid-template-columns:minmax(94px,1fr) minmax(94px,1fr) minmax(126px,1.2fr);gap:8px}
   .stat{min-height:78px;border-radius:22px;padding:10px 10px 8px}
@@ -316,6 +338,7 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
   let raf = 0;
   let startTs = 0;
   let state = null;
+  let isResolving = false;
 
   function fmt(ms){
     if(ms == null || Number.isNaN(ms)) return '--:--.-';
@@ -485,7 +508,7 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
 
     ordered.forEach(balloon => {
       const el = document.createElement('button');
-      const isWinner = winners.includes(balloon.colorIndex);
+      const isWinner = !isResolving && winners.includes(balloon.colorIndex);
       el.className = 'balloon' + (isWinner ? ' majority' : '');
       el.style.width = `${balloon.w}px`;
       el.style.height = `${balloon.h}px`;
@@ -505,34 +528,18 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
     board.replaceChildren(frag);
   }
 
-  function spawnParticles(x, y, colorIndex, count = 9){
-    const [c1, c2] = COLORS[colorIndex];
-    for(let i = 0; i < count; i++){
-      const p = document.createElement('div');
-      p.className = 'particle';
-      const size = 5 + Math.random() * 13;
-      const angle = Math.random() * Math.PI * 2;
-      const dist = 22 + Math.random() * 88;
-      p.style.width = `${size}px`;
-      p.style.height = `${size}px`;
-      p.style.left = `${x}px`;
-      p.style.top = `${y}px`;
-      p.style.background = Math.random() > 0.5 ? c1 : c2;
-      p.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
-      p.style.setProperty('--dy', `${Math.sin(angle) * dist}px`);
-      board.appendChild(p);
-      setTimeout(() => p.remove(), 950);
-    }
-  }
+  function spawnParticles(x, y, colorIndex, count = 9){ return; }
 
   function removeColor(colorIndex){
     const doomed = state.balloons.filter(balloon => balloon.colorIndex === colorIndex);
     const els = [...board.querySelectorAll(`.balloon[data-color-index="${colorIndex}"]`)];
+    isResolving = true;
+    board.classList.add('resolving');
+    board.querySelectorAll('.balloon.majority').forEach(el => el.classList.remove('majority'));
 
     els.forEach((el, i) => {
       setTimeout(() => {
         el.classList.add('fly');
-        spawnParticles(parseFloat(el.style.left), parseFloat(el.style.top), colorIndex, 7);
       }, i * 14);
     });
 
@@ -541,6 +548,8 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
       if(state.balloons.length <= 1){
         advanceSeriesOrFinish();
       } else {
+        isResolving = false;
+        board.classList.remove('resolving');
         render();
       }
     }, 2980);
@@ -551,6 +560,8 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
       finishGame();
       return;
     }
+    isResolving = false;
+    board.classList.remove('resolving');
     state = { series: state.series + 1, running: true, finished: false, balloons: makeBalloons(state.series + 1) };
     placeIntoLanes(true);
     render();
@@ -580,6 +591,8 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
 
   function startGame(){
     endOverlay.classList.remove('show');
+    isResolving = false;
+    board.classList.remove('resolving');
     state = { series: 1, running: true, finished: false, balloons: makeBalloons(1) };
     placeIntoLanes(true);
     render();
@@ -590,6 +603,8 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
 
   function stopGame(){
     stopTimer();
+    isResolving = false;
+    board.classList.remove('resolving');
     state = null;
     board.replaceChildren();
     timerEl.textContent = '00:00.0';
