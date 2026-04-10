@@ -21,8 +21,8 @@
   --safe-left: env(safe-area-inset-left);
   --safe-right: env(safe-area-inset-right);
   --text:#fff;
-  --glass:rgba(255,255,255,.16);
-  --glass-strong:rgba(255,255,255,.22);
+  --glass:rgba(255,255,255,.18);
+  --glass-strong:rgba(255,255,255,.94);
   --line:rgba(255,255,255,.24);
   --shadow:0 18px 40px rgba(0,0,0,.22);
 }
@@ -34,155 +34,120 @@ html,body{
   overflow:hidden;
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",sans-serif;
   background:
-    radial-gradient(circle at 18% 16%, #fff06a 0%, rgba(255,240,106,0) 20%),
-    radial-gradient(circle at 85% 18%, #7b6dff 0%, rgba(123,109,255,0) 24%),
-    radial-gradient(circle at 78% 82%, #5ff8cf 0%, rgba(95,248,207,0) 22%),
-    linear-gradient(145deg, #3ab5ff 0%, #8e5bff 48%, #ff5ea8 100%);
+    radial-gradient(circle at 12% 14%, #fff06a 0%, rgba(255,240,106,0) 18%),
+    radial-gradient(circle at 86% 16%, #7b6dff 0%, rgba(123,109,255,0) 24%),
+    radial-gradient(circle at 80% 82%, #5ff8cf 0%, rgba(95,248,207,0) 22%),
+    radial-gradient(circle at 22% 82%, #ff7fbe 0%, rgba(255,127,190,0) 24%),
+    linear-gradient(145deg, #31b6ff 0%, #7d5dff 44%, #ff4e9e 100%);
 }
 body{color:var(--text)}
 body::before,
 body::after{
   content:"";
   position:fixed;
-  inset:auto;
   border-radius:50%;
-  filter:blur(42px);
-  opacity:.34;
+  filter:blur(44px);
+  opacity:.36;
   pointer-events:none;
 }
 body::before{
-  width:42vw;height:42vw;left:-8vw;bottom:6vh;background:#62fff0;
+  width:42vw;height:42vw;left:-10vw;bottom:2vh;background:#62fff0;
 }
 body::after{
-  width:38vw;height:38vw;right:-8vw;top:8vh;background:#ffdf57;
+  width:40vw;height:40vw;right:-10vw;top:4vh;background:#ffdf57;
 }
 
-.game{
+.game,
+.board,
+.overlay,
+.endOverlay{
   position:fixed;
   inset:0;
 }
-
 .board{
-  position:absolute;
-  inset:0;
   overflow:hidden;
   touch-action:manipulation;
 }
+.overlay{pointer-events:none}
 
-.topLayer{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-}
-
-.header{
+.topBar{
   position:absolute;
   top:calc(10px + var(--safe-top));
   left:calc(10px + var(--safe-left));
   right:calc(10px + var(--safe-right));
   display:grid;
-  grid-template-columns:minmax(0,1fr) auto auto;
-  gap:10px;
+  grid-template-columns:minmax(0,1fr) auto auto auto auto;
+  gap:8px;
   align-items:start;
-  pointer-events:none;
 }
 
-.brand,
-.counter,
-.footerBar,
+.titleWrap{
+  min-width:0;
+  padding:4px 2px;
+}
+.title{
+  margin:0;
+  font-size:clamp(28px,8vw,48px);
+  line-height:.9;
+  letter-spacing:.1em;
+  font-weight:1000;
+  text-shadow:0 10px 20px rgba(0,0,0,.22);
+}
+
+.pill,
+.controlBtn,
 .endCard{
-  background:var(--glass);
   border:1px solid var(--line);
   box-shadow:var(--shadow);
   backdrop-filter:blur(18px) saturate(1.15);
   -webkit-backdrop-filter:blur(18px) saturate(1.15);
 }
-
-.brand{
-  border-radius:28px;
-  padding:14px 16px 12px;
-}
-
-h1{
-  margin:0;
-  font-size:clamp(26px,8vw,44px);
-  line-height:.92;
-  letter-spacing:.08em;
-  font-weight:1000;
-}
-.sub{
-  margin-top:5px;
-  font-size:11px;
-  line-height:1.15;
-  letter-spacing:.14em;
-  font-weight:900;
-  opacity:.95;
-}
-
-.counter{
-  min-width:94px;
+.pill{
+  min-width:84px;
+  background:var(--glass);
+  border-radius:22px;
   padding:10px 10px 9px;
-  border-radius:24px;
   text-align:center;
+  pointer-events:auto;
 }
-.counter .label{
+.pill .label{
   font-size:10px;
   text-transform:uppercase;
   letter-spacing:.14em;
   font-weight:900;
-  opacity:.9;
+  opacity:.94;
 }
-.counter .value{
+.pill .value{
   margin-top:4px;
-  font-size:24px;
+  font-size:22px;
   line-height:1;
   font-weight:1000;
 }
-
-.footerWrap{
-  position:absolute;
-  left:calc(10px + var(--safe-left));
-  right:calc(10px + var(--safe-right));
-  bottom:calc(10px + var(--safe-bottom));
-  pointer-events:none;
-}
-.footerBar{
-  border-radius:26px;
-  padding:10px;
-  display:grid;
-  grid-template-columns:minmax(0,1fr) auto auto;
-  gap:10px;
-  align-items:center;
+.controlBtn{
+  appearance:none;
+  border-radius:22px;
+  min-width:96px;
+  padding:14px 16px;
+  font-size:14px;
+  line-height:1;
+  font-weight:1000;
+  background:var(--glass-strong);
+  color:#1a2140;
   pointer-events:auto;
 }
-.info{
-  min-width:0;
-  padding:4px 6px;
-  font-size:14px;
+
+.ruleText{
+  position:absolute;
+  top:calc(80px + var(--safe-top));
+  left:calc(12px + var(--safe-left));
+  right:calc(12px + var(--safe-right));
+  text-align:center;
+  font-size:13px;
   line-height:1.2;
-  font-weight:800;
-}
-.btn{
-  appearance:none;
-  border:none;
-  border-radius:20px;
-  min-width:86px;
-  padding:14px 16px;
-  font-size:15px;
-  font-weight:1000;
-  cursor:pointer;
-  box-shadow:var(--shadow);
-}
-.btn.primary{
-  background:rgba(255,255,255,.92);
-  color:#1a2140;
-}
-.btn.secondary{
-  background:var(--glass-strong);
-  color:#fff;
-  border:1px solid var(--line);
-  backdrop-filter:blur(18px) saturate(1.15);
-  -webkit-backdrop-filter:blur(18px) saturate(1.15);
+  font-weight:900;
+  letter-spacing:.08em;
+  text-shadow:0 8px 18px rgba(0,0,0,.18);
+  opacity:.96;
 }
 
 .ball{
@@ -193,12 +158,13 @@ h1{
   box-shadow:
     inset -12px -18px 28px rgba(0,0,0,.14),
     inset 11px 13px 26px rgba(255,255,255,.34),
-    0 12px 24px rgba(0,0,0,.2);
+    0 14px 26px rgba(0,0,0,.2);
   transition:
     left .55s cubic-bezier(.22,.8,.18,1),
     top .55s cubic-bezier(.22,.8,.18,1),
     transform .14s ease,
-    filter .2s ease;
+    filter .2s ease,
+    opacity .25s ease;
   cursor:pointer;
 }
 .ball::before{
@@ -213,15 +179,13 @@ h1{
   filter:blur(1px);
   transform:rotate(-16deg);
 }
-.ball:active{
-  transform:translate(-50%,-50%) scale(.92);
-}
-.ball.hint{ animation:hintPulse 1s ease-in-out infinite; }
+.ball:active{transform:translate(-50%,-50%) scale(.92)}
 .ball.wrong{ animation:wrongShake .34s ease; }
 .ball.pop{
   animation:dropBurst .52s cubic-bezier(.18,.8,.22,1) forwards;
   pointer-events:none;
 }
+.ball.majorityMark{filter:drop-shadow(0 0 18px rgba(255,255,255,.55))}
 
 .particle{
   position:absolute;
@@ -232,18 +196,16 @@ h1{
 }
 
 .endOverlay{
-  position:absolute;
-  inset:0;
   display:none;
   align-items:center;
   justify-content:center;
   padding:24px;
-  background:rgba(13,18,40,.14);
-  pointer-events:auto;
+  background:rgba(13,18,40,.12);
 }
 .endOverlay.show{display:flex}
 .endCard{
-  width:min(92vw,520px);
+  width:min(90vw,520px);
+  background:rgba(255,255,255,.18);
   border-radius:34px;
   padding:24px 20px 20px;
   text-align:center;
@@ -271,12 +233,6 @@ h1{
   line-height:1.25;
   font-weight:800;
 }
-.endActions{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  margin-top:18px;
-}
 
 @keyframes dropBurst{
   0%{opacity:1;transform:translate(-50%,-50%) scale(1)}
@@ -294,15 +250,12 @@ h1{
   60%{transform:translate(calc(-50% - 5px),-50%)}
   80%{transform:translate(calc(-50% + 5px),-50%)}
 }
-@keyframes hintPulse{
-  0%,100%{filter:none}
-  50%{filter:drop-shadow(0 0 16px rgba(255,255,255,.72))}
-}
 
-@media (max-width: 760px){
-  .header{grid-template-columns:minmax(0,1fr) 92px 92px}
-  .footerBar{grid-template-columns:minmax(0,1fr) 82px 92px}
-  .btn{min-width:0;padding:14px 12px}
+@media (max-width:760px){
+  .topBar{grid-template-columns:minmax(0,1fr) 74px 74px 74px 98px}
+  .pill{min-width:0}
+  .controlBtn{min-width:0;padding:14px 12px}
+  .ruleText{top:calc(84px + var(--safe-top));font-size:12px}
 }
 </style>
 </head>
@@ -310,42 +263,39 @@ h1{
 <div class="game">
   <div class="board" id="board"></div>
 
-  <div class="topLayer">
-    <div class="header">
-      <div class="brand">
-        <h1>COLOR BOWLS</h1>
-        <div class="sub">TOUCHE UNE COULEUR MAJORITAIRE</div>
+  <div class="overlay">
+    <div class="topBar">
+      <div class="titleWrap">
+        <h1 class="title">COLOR BOWLS</h1>
       </div>
 
-      <div class="counter">
+      <div class="pill">
+        <div class="label">Niveau</div>
+        <div class="value" id="levelValue">1</div>
+      </div>
+
+      <div class="pill">
         <div class="label">Chrono</div>
         <div class="value" id="timer">00:00</div>
       </div>
 
-      <div class="counter">
+      <div class="pill">
         <div class="label">Record</div>
-        <div class="value" id="best">--:--</div>
+        <div class="value" id="bestValue">--:--</div>
       </div>
+
+      <button class="controlBtn" id="toggleBtn">ARRÊTER</button>
     </div>
 
-    <div class="footerWrap">
-      <div class="footerBar">
-        <div class="info" id="info">Trouve une couleur majoritaire.</div>
-        <button class="btn secondary" id="hintBtn">AIDE</button>
-        <button class="btn primary" id="restartBtn">REJOUER</button>
-      </div>
-    </div>
+    <div class="ruleText">Touchez l’une des couleurs les plus nombreuses.</div>
+  </div>
 
-    <div class="endOverlay" id="endOverlay">
-      <div class="endCard">
-        <div class="endMini">Partie terminée</div>
-        <h2>COLOR BOWLS</h2>
-        <div class="endTime" id="endTime">00:00</div>
-        <div class="endText" id="endText">Bravo.</div>
-        <div class="endActions">
-          <button class="btn primary" id="playAgainBtn">REJOUER</button>
-        </div>
-      </div>
+  <div class="endOverlay" id="endOverlay">
+    <div class="endCard">
+      <div class="endMini">Série terminée</div>
+      <h2>COLOR BOWLS</h2>
+      <div class="endTime" id="endTime">00:00</div>
+      <div class="endText" id="endText">Bravo.</div>
     </div>
   </div>
 </div>
@@ -361,23 +311,27 @@ h1{
     {name:"bleu", base:"#5dabff", shadow:"#2f7dff"}
   ];
 
-  const STORAGE_BEST = 'color-bowls-best-ms-v2';
+  const MAX_LEVEL = 100;
+  const STORAGE_BEST = 'color-bowls-best-series-ms-v3';
 
   const board = document.getElementById('board');
   const timerEl = document.getElementById('timer');
-  const bestEl = document.getElementById('best');
-  const infoEl = document.getElementById('info');
-  const hintBtn = document.getElementById('hintBtn');
-  const restartBtn = document.getElementById('restartBtn');
+  const levelValueEl = document.getElementById('levelValue');
+  const toggleBtn = document.getElementById('toggleBtn');
+  const bestValueEl = document.getElementById('bestValue');
   const endOverlay = document.getElementById('endOverlay');
   const endTimeEl = document.getElementById('endTime');
   const endTextEl = document.getElementById('endText');
-  const playAgainBtn = document.getElementById('playAgainBtn');
 
   let state = null;
   let timerId = null;
   let startTs = 0;
   let bestMs = Number(localStorage.getItem(STORAGE_BEST) || 0);
+
+  function updateBest(){
+    bestValueEl.textContent = bestMs ? fmt(bestMs) : '--:--';
+  }
+  updateBest();
 
   function fmt(ms){
     const total = Math.max(0, Math.floor(ms / 1000));
@@ -386,33 +340,34 @@ h1{
     return `${m}:${s}`;
   }
 
-  function updateBest(){
-    bestEl.textContent = bestMs ? fmt(bestMs) : '--:--';
-  }
-  updateBest();
-
   function rect(){
     return board.getBoundingClientRect();
   }
 
+  function levelBallCount(level, width){
+    const mobile = width < 430;
+    const min = mobile ? 140 : 180;
+    const max = mobile ? 220 : 290;
+    return Math.round(min + ((max - min) * (level - 1) / (MAX_LEVEL - 1)));
+  }
+
   function buildWeightedPool(targetCount){
-    const dominant = [0,1,2,3].sort(() => Math.random() - 0.5).slice(0,3);
-    const counts = [
-      Math.floor(targetCount * 0.21),
-      Math.floor(targetCount * 0.21),
-      Math.floor(targetCount * 0.18),
-      Math.floor(targetCount * 0.14),
-      Math.floor(targetCount * 0.13),
-      0
-    ];
-    counts[dominant[0]] += 4;
-    counts[dominant[1]] += 4;
-    counts[dominant[2]] += 2;
+    const dominantCount = 2 + Math.floor(Math.random() * 2);
+    const dominant = [...Array(COLORS.length).keys()].sort(() => Math.random() - 0.5).slice(0, dominantCount);
+    const counts = new Array(COLORS.length).fill(0);
+
+    const main1 = Math.max(2, Math.floor(targetCount * 0.24));
+    const main2 = Math.max(2, Math.floor(targetCount * 0.22));
+    counts[dominant[0]] += main1;
+    counts[dominant[1]] += main2;
+    if(dominant[2] !== undefined) counts[dominant[2]] += Math.floor(targetCount * 0.16);
+
     let used = counts.reduce((a,b)=>a+b,0);
     while(used < targetCount){
       counts[Math.floor(Math.random() * COLORS.length)]++;
       used++;
     }
+
     const pool = [];
     counts.forEach((n, i) => {
       for(let k=0;k<n;k++) pool.push(i);
@@ -420,23 +375,23 @@ h1{
     return pool.sort(() => Math.random() - 0.5);
   }
 
-  function generateLevel(){
+  function generateLevel(level){
     const r = rect();
     const w = Math.max(320, r.width);
     const h = Math.max(560, r.height);
+    const targetCount = levelBallCount(level, w);
 
-    const targetCount = w < 430 ? 78 : 108;
-    const cols = w < 430 ? 7 : 9;
-    const rows = Math.ceil(targetCount / cols);
-
-    const topReserved = Math.max(96, h * 0.14);
-    const bottomReserved = Math.max(96, h * 0.14);
+    const topReserved = Math.max(108, h * 0.18);
+    const bottomReserved = Math.max(20, h * 0.03);
     const usableTop = topReserved;
     const usableBottom = h - bottomReserved;
     const usableH = usableBottom - usableTop;
+
+    const rows = Math.max(11, Math.round(Math.sqrt(targetCount * (usableH / w)) * 1.04));
+    const cols = Math.ceil(targetCount / rows);
     const cellW = w / cols;
     const cellH = usableH / rows;
-    const baseSize = Math.max(34, Math.min(cellW, cellH) * 0.94);
+    const baseSize = Math.max(20, Math.min(cellW, cellH) * 1.28);
 
     const pool = buildWeightedPool(targetCount);
     const balls = [];
@@ -444,14 +399,14 @@ h1{
     for(let i = 0; i < targetCount; i++){
       const c = i % cols;
       const row = Math.floor(i / cols);
-      const size = baseSize * (0.9 + Math.random() * 0.22);
-      const jitterX = (Math.random() - 0.5) * cellW * 0.55;
-      const jitterY = (Math.random() - 0.5) * cellH * 0.5;
+      const size = baseSize * (0.9 + Math.random() * 0.28);
+      const jitterX = (Math.random() - 0.5) * cellW * 0.9;
+      const jitterY = (Math.random() - 0.5) * cellH * 0.9;
       const x = c * cellW + cellW / 2 + jitterX;
       const y = usableTop + row * cellH + cellH / 2 + jitterY;
       const colorIndex = pool[i % pool.length];
       balls.push({
-        id: `b_${Date.now()}_${i}_${Math.random().toString(36).slice(2,6)}`,
+        id: `b_${level}_${Date.now()}_${i}_${Math.random().toString(36).slice(2,6)}`,
         colorIndex,
         color: COLORS[colorIndex],
         x, y,
@@ -460,14 +415,18 @@ h1{
       });
     }
 
-    return { balls, started:false, finished:false };
+    return {
+      level,
+      balls,
+      running:true,
+      finished:false,
+      justWon:false
+    };
   }
 
   function counts(){
     const map = new Map();
-    for(const b of state.balls){
-      map.set(b.colorIndex, (map.get(b.colorIndex) || 0) + 1);
-    }
+    for(const b of state.balls) map.set(b.colorIndex, (map.get(b.colorIndex) || 0) + 1);
     return map;
   }
 
@@ -495,9 +454,11 @@ h1{
 
   function render(){
     board.innerHTML = '';
+    const majority = majorities().winners;
     for(const b of state.balls){
       const el = document.createElement('button');
       el.className = 'ball';
+      if(state.balls.length <= 18 && majority.includes(b.colorIndex)) el.classList.add('majorityMark');
       el.style.cssText = ballStyle(b);
       el.dataset.id = b.id;
       el.dataset.colorIndex = String(b.colorIndex);
@@ -506,37 +467,20 @@ h1{
       b.el = el;
       board.appendChild(el);
     }
-    refreshInfo();
+    levelValueEl.textContent = `${state.level}`;
   }
 
-  function refreshInfo(){
-    if(!state || state.finished) return;
-    const { winners, max } = majorities();
-    const names = winners.map(i => COLORS[i].name.toUpperCase()).join(' / ');
-    infoEl.innerHTML = `Majoritaire : <strong>${names}</strong> · <strong>${max}</strong>`;
-  }
-
-  function clearHints(){
-    board.querySelectorAll('.ball.hint').forEach(el => el.classList.remove('hint'));
-  }
-
-  function showHints(){
-    if(!state || state.finished) return;
-    clearHints();
-    const { winners } = majorities();
-    board.querySelectorAll('.ball').forEach(el => {
-      if(winners.includes(Number(el.dataset.colorIndex))) el.classList.add('hint');
-    });
-    setTimeout(clearHints, 1300);
-  }
-
-  function startTimer(){
-    if(state.started) return;
-    state.started = true;
+  function startSeries(){
+    stopTimer();
     startTs = performance.now();
+    timerEl.textContent = '00:00';
     timerId = setInterval(() => {
       timerEl.textContent = fmt(performance.now() - startTs);
     }, 100);
+    endOverlay.classList.remove('show');
+    state = generateLevel(1);
+    toggleBtn.textContent = 'ARRÊTER';
+    render();
   }
 
   function stopTimer(){
@@ -546,6 +490,16 @@ h1{
     }
   }
 
+  function stopSeries(manual = false){
+    stopTimer();
+    board.innerHTML = '';
+    state = { level:1, balls:[], running:false, finished:manual };
+    timerEl.textContent = '00:00';
+    levelValueEl.textContent = '1';
+    toggleBtn.textContent = 'JOUER';
+    if(manual) endOverlay.classList.remove('show');
+  }
+
   function compactLayout(){
     const r = rect();
     const w = Math.max(320, r.width);
@@ -553,8 +507,8 @@ h1{
     const n = state.balls.length;
     if(!n) return;
 
-    const topReserved = Math.max(96, h * 0.14);
-    const bottomReserved = Math.max(96, h * 0.14);
+    const topReserved = Math.max(112, h * 0.18);
+    const bottomReserved = Math.max(20, h * 0.03);
     const usableTop = topReserved;
     const usableBottom = h - bottomReserved;
     const usableH = usableBottom - usableTop;
@@ -565,12 +519,13 @@ h1{
     else if(n <= 9) cols = 3;
     else if(n <= 16) cols = 4;
     else if(n <= 25) cols = 5;
-    else cols = w < 430 ? 6 : 8;
+    else if(n <= 36) cols = 6;
+    else cols = w < 430 ? 7 : 9;
 
     const rows = Math.ceil(n / cols);
     const cellW = w / cols;
     const cellH = usableH / rows;
-    const baseSize = Math.min(118, Math.max(36, Math.min(cellW, cellH) * 0.88));
+    const baseSize = Math.min(116, Math.max(24, Math.min(cellW, cellH) * 1.08));
 
     state.balls.forEach((b, i) => {
       const c = i % cols;
@@ -589,13 +544,13 @@ h1{
     doomed.forEach(b => {
       const el = b.el;
       if(!el) return;
-      el.style.setProperty('--dx', `${(Math.random()*80 - 40).toFixed(1)}px`);
-      el.style.setProperty('--dy1', `${(Math.random()*40 - 10).toFixed(1)}px`);
-      el.style.setProperty('--dx2', `${(Math.random()*180 - 90).toFixed(1)}px`);
-      el.style.setProperty('--dy2', `${(r.height + b.size + 130 + Math.random()*140).toFixed(1)}px`);
+      el.style.setProperty('--dx', `${(Math.random()*90 - 45).toFixed(1)}px`);
+      el.style.setProperty('--dy1', `${(Math.random()*42 - 10).toFixed(1)}px`);
+      el.style.setProperty('--dx2', `${(Math.random()*220 - 110).toFixed(1)}px`);
+      el.style.setProperty('--dy2', `${(r.height + b.size + 130 + Math.random()*160).toFixed(1)}px`);
       el.classList.add('pop');
 
-      for(let i=0;i<7;i++){
+      for(let i=0;i<8;i++){
         const p = document.createElement('div');
         p.className = 'particle';
         const size = 8 + Math.random() * 12;
@@ -604,47 +559,54 @@ h1{
         p.style.left = `${b.x}px`;
         p.style.top = `${b.y}px`;
         p.style.background = `radial-gradient(circle at 35% 35%, rgba(255,255,255,.94), ${b.color.base} 58%, ${b.color.shadow} 100%)`;
-        p.style.setProperty('--tx', `${(Math.random()*170 - 85).toFixed(1)}px`);
-        p.style.setProperty('--ty', `${(Math.random()*170 - 80).toFixed(1)}px`);
+        p.style.setProperty('--tx', `${(Math.random()*180 - 90).toFixed(1)}px`);
+        p.style.setProperty('--ty', `${(Math.random()*180 - 80).toFixed(1)}px`);
         board.appendChild(p);
         setTimeout(() => p.remove(), 760);
       }
     });
 
     if(navigator.vibrate){
-      navigator.vibrate(doomed.length >= 5 ? [18, 18, 45] : 18);
+      navigator.vibrate(doomed.length >= 6 ? [18, 18, 50] : 18);
     }
 
     setTimeout(() => {
       state.balls = survivors;
+      if(state.balls.length <= 1){
+        nextLevelOrFinish();
+        return;
+      }
       compactLayout();
       render();
-      if(state.balls.length <= 1){
-        finishGame();
-      }
     }, 520);
   }
 
+  function nextLevelOrFinish(){
+    if(state.level >= MAX_LEVEL){
+      finishSeries();
+      return;
+    }
+    const nextLevel = state.level + 1;
+    state = generateLevel(nextLevel);
+    render();
+  }
+
   function onBallClick(e){
-    if(!state || state.finished) return;
+    if(!state || !state.running || state.finished) return;
     const colorIndex = Number(e.currentTarget.dataset.colorIndex);
     const { winners } = majorities();
 
     if(!winners.includes(colorIndex)){
       e.currentTarget.classList.add('wrong');
       setTimeout(() => e.currentTarget.classList.remove('wrong'), 360);
-      infoEl.innerHTML = `Non. Choisis une couleur <strong>majoritaire</strong>.`;
-      if(navigator.vibrate) navigator.vibrate(40);
+      if(navigator.vibrate) navigator.vibrate(36);
       return;
     }
 
-    startTimer();
-    clearHints();
     explodeColor(colorIndex);
   }
 
-  function finishGame(){
-    state.finished = true;
+  function finishSeries(){
     stopTimer();
     const elapsed = Math.floor(performance.now() - startTs);
     timerEl.textContent = fmt(elapsed);
@@ -659,31 +621,30 @@ h1{
     }
 
     endTextEl.innerHTML = isBest
-      ? 'Nouveau <strong>meilleur chrono</strong> !'
-      : 'Bravo. Essaie d’aller encore plus vite.';
+      ? 'Série 1 à 100 terminée. <strong>Nouveau meilleur chrono</strong>.'
+      : 'Série 1 à 100 terminée. Touchez <strong>JOUER</strong> pour recommencer.';
 
     endOverlay.classList.add('show');
+    toggleBtn.textContent = 'JOUER';
+    state.running = false;
+    state.finished = true;
   }
 
-  function newGame(){
-    stopTimer();
-    timerEl.textContent = '00:00';
-    endOverlay.classList.remove('show');
-    state = generateLevel();
-    render();
-  }
-
-  hintBtn.addEventListener('click', showHints);
-  restartBtn.addEventListener('click', newGame);
-  playAgainBtn.addEventListener('click', newGame);
+  toggleBtn.addEventListener('click', () => {
+    if(!state || !state.running){
+      startSeries();
+    }else{
+      stopSeries(true);
+    }
+  });
 
   window.addEventListener('resize', () => {
-    if(!state || state.finished) return;
+    if(!state || !state.running || state.finished || !state.balls.length) return;
     compactLayout();
     render();
   }, { passive:true });
 
-  newGame();
+  startSeries();
 })();
 </script>
 </body>
