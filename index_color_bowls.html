@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+<title>COLOR BOWLS</title>
+
+<meta name="theme-color" content="#5aa8ff" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="COLOR BOWLS" />
+
+<link rel="apple-touch-icon" href="icon.png" />
+<link rel="icon" type="image/png" href="icon.png" />
+
+<style>
+:root{
+  --bg1:#4cb0ff;
+  --bg2:#ff6ab6;
+  --panel:rgba(255,255,255,.18);
+  --panel-strong:rgba(255,255,255,.26);
+  --line:rgba(255,255,255,.24);
+  --text:#ffffff;
+  --shadow:0 14px 40px rgba(0,0,0,.18);
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{
+  margin:0;height:100%;overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",sans-serif;
+  background:linear-gradient(160deg,var(--bg1),var(--bg2));
+}
+body{
+  color:var(--text);
+}
+.bgGlow{
+  position:fixed; inset:0; pointer-events:none; overflow:hidden;
+}
+.bgGlow::before,.bgGlow::after{
+  content:""; position:absolute; border-radius:50%;
+  filter:blur(40px); opacity:.36;
+}
+.bgGlow::before{
+  width:48vw;height:48vw;left:-8vw;top:8vh;background:#fff58c;
+}
+.bgGlow::after{
+  width:42vw;height:42vw;right:-8vw;bottom:18vh;background:#6bfff2;
+}
+.app{
+  position:fixed; inset:0;
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+  padding:calc(14px + var(--safe-top)) 12px calc(14px + var(--safe-bottom));
+}
+.topbar{
+  display:grid;
+  grid-template-columns:1fr auto auto;
+  gap:10px;
+  align-items:center;
+}
+.brand{
+  min-width:0;
+  background:var(--panel);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(18px) saturate(1.15);
+  -webkit-backdrop-filter:blur(18px) saturate(1.15);
+  border-radius:24px;
+  padding:14px 16px;
+}
+h1{
+  margin:0;
+  font-size:clamp(28px,8vw,42px);
+  line-height:.92;
+  letter-spacing:.06em;
+  font-weight:900;
+}
+.sub{
+  margin-top:4px;
+  font-size:12px;
+  opacity:.9;
+  letter-spacing:.12em;
+  font-weight:700;
+}
+.pill{
+  min-width:96px;
+  text-align:center;
+  background:var(--panel);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(18px) saturate(1.15);
+  -webkit-backdrop-filter:blur(18px) saturate(1.15);
+  border-radius:24px;
+  padding:10px 12px;
+}
+.pill .label{
+  font-size:11px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  opacity:.9;
+  font-weight:700;
+}
+.pill .value{
+  margin-top:4px;
+  font-size:24px;
+  line-height:1;
+  font-weight:900;
+}
+.boardWrap{
+  position:relative;
+  min-height:0;
+}
+.board{
+  position:absolute; inset:10px 0 10px 0;
+  border-radius:34px;
+  overflow:hidden;
+  touch-action:manipulation;
+}
+.ball{
+  position:absolute;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  user-select:none;
+  cursor:pointer;
+  transform:translate(-50%,-50%);
+  box-shadow:
+    inset -10px -18px 30px rgba(0,0,0,.12),
+    inset 10px 12px 25px rgba(255,255,255,.28),
+    0 14px 28px rgba(0,0,0,.18);
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    top .55s cubic-bezier(.22,.8,.18,1),
+    left .55s cubic-bezier(.22,.8,.18,1);
+}
+.ball::before{
+  content:"";
+  position:absolute;
+  width:46%; height:34%;
+  left:18%; top:16%;
+  border-radius:50%;
+  background:rgba(255,255,255,.32);
+  filter:blur(1px);
+  transform:rotate(-18deg);
+}
+.ball:active{ transform:translate(-50%,-50%) scale(.94); }
+.ball.wrong{
+  animation:wrongShake .34s ease;
+}
+.ball.hint{
+  animation:hintPulse 1.2s ease-in-out infinite;
+}
+.ball.pop{
+  animation:popOut .48s cubic-bezier(.22,.8,.18,1) forwards;
+  pointer-events:none;
+}
+.particle{
+  position:absolute;
+  border-radius:50%;
+  pointer-events:none;
+  transform:translate(-50%,-50%);
+  animation:burst .75s ease-out forwards;
+  box-shadow:0 0 12px rgba(255,255,255,.35);
+}
+.bottom{
+  display:grid;
+  grid-template-columns:1fr auto auto;
+  gap:10px;
+  align-items:center;
+}
+.info{
+  min-width:0;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:13px 16px;
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(18px) saturate(1.15);
+  -webkit-backdrop-filter:blur(18px) saturate(1.15);
+  font-size:14px;
+  line-height:1.25;
+  font-weight:700;
+}
+.btn{
+  appearance:none;border:none;cursor:pointer;
+  min-width:86px;
+  border-radius:22px;
+  padding:15px 18px;
+  background:rgba(255,255,255,.88);
+  color:#18233b;
+  font-weight:900;
+  font-size:15px;
+  box-shadow:var(--shadow);
+}
+.btn.secondary{
+  background:var(--panel-strong);
+  color:#fff;
+  border:1px solid var(--line);
+  backdrop-filter:blur(18px) saturate(1.15);
+  -webkit-backdrop-filter:blur(18px) saturate(1.15);
+}
+.overlay{
+  position:absolute; inset:0;
+  display:none;
+  align-items:center; justify-content:center;
+  padding:22px;
+  background:rgba(12,18,33,.14);
+}
+.overlay.show{ display:flex; }
+.card{
+  width:min(92vw,520px);
+  border-radius:32px;
+  background:rgba(255,255,255,.2);
+  border:1px solid rgba(255,255,255,.28);
+  box-shadow:0 24px 60px rgba(0,0,0,.24);
+  padding:24px 20px 20px;
+  text-align:center;
+  color:#fff;
+  backdrop-filter:blur(18px) saturate(1.2);
+  -webkit-backdrop-filter:blur(18px) saturate(1.2);
+}
+.card h2{
+  margin:0 0 8px;
+  font-size:clamp(28px,7vw,40px);
+  line-height:1;
+  letter-spacing:.03em;
+}
+.card p{
+  margin:8px 0;
+  font-size:17px;
+  font-weight:700;
+}
+.bigTime{
+  margin:16px 0 10px;
+  font-size:clamp(48px,14vw,82px);
+  line-height:.95;
+  font-weight:900;
+  letter-spacing:.02em;
+}
+.cardActions{
+  display:flex; gap:10px; justify-content:center; margin-top:16px;
+}
+.muted{ opacity:.9; font-size:13px; letter-spacing:.08em; text-transform:uppercase; }
+
+@keyframes popOut{
+  0%{opacity:1; transform:translate(-50%,-50%) scale(1);}
+  50%{opacity:1; transform:translate(calc(-50% + var(--dx,0px)), calc(-50% + var(--dy,0px))) scale(1.14);}
+  100%{opacity:0; transform:translate(calc(-50% + var(--dx2,0px)), calc(-50% + var(--dy2,0px))) scale(.2);}
+}
+@keyframes burst{
+  0%{opacity:1; transform:translate(-50%,-50%) scale(1);}
+  100%{opacity:0; transform:translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(.12);}
+}
+@keyframes wrongShake{
+  0%,100%{transform:translate(-50%,-50%)}
+  20%{transform:translate(calc(-50% - 6px),-50%)}
+  40%{transform:translate(calc(-50% + 6px),-50%)}
+  60%{transform:translate(calc(-50% - 4px),-50%)}
+  80%{transform:translate(calc(-50% + 4px),-50%)}
+}
+@keyframes hintPulse{
+  0%,100%{ box-shadow: inset -10px -18px 30px rgba(0,0,0,.12), inset 10px 12px 25px rgba(255,255,255,.28), 0 14px 28px rgba(0,0,0,.18);}
+  50%{ box-shadow: inset -10px -18px 30px rgba(0,0,0,.12), inset 10px 12px 25px rgba(255,255,255,.28), 0 0 0 10px rgba(255,255,255,.10), 0 16px 34px rgba(0,0,0,.22);}
+}
+
+@media (max-width:720px){
+  .topbar{ grid-template-columns:1fr 94px 94px; }
+  .pill{ min-width:0; padding:10px 8px; }
+  .pill .value{ font-size:22px; }
+  .bottom{ grid-template-columns:1fr 82px 82px; }
+  .btn{ min-width:0; padding:14px 12px; }
+  .board{ inset:10px 0; }
+}
+</style>
+</head>
+<body>
+<div class="bgGlow"></div>
+
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <h1>COLOR BOWLS</h1>
+      <div class="sub">TOUCHE UNE COULEUR MAJORITAIRE</div>
+    </div>
+
+    <div class="pill">
+      <div class="label">Chrono</div>
+      <div class="value" id="timer">00:00</div>
+    </div>
+
+    <div class="pill">
+      <div class="label">Record</div>
+      <div class="value" id="best">--:--</div>
+    </div>
+  </div>
+
+  <div class="boardWrap">
+    <div class="board" id="board"></div>
+
+    <div class="overlay show" id="overlay">
+      <div class="card">
+        <div class="muted">Jeu de rapidité</div>
+        <h2>COLOR BOWLS</h2>
+        <p>Appuie sur l’une des <strong>couleurs les plus nombreuses</strong>.</p>
+        <p>Toutes les boules de cette couleur tombent d’un coup.</p>
+        <div class="bigTime" id="lastTime">00:00</div>
+        <p id="resultText">Touchez <strong>JOUER</strong> pour commencer.</p>
+        <div class="cardActions">
+          <button class="btn" id="playBtn">JOUER</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="info" id="info">
+      Trouve la couleur majoritaire à chaque coup.
+    </div>
+    <button class="btn secondary" id="hintBtn">AIDE</button>
+    <button class="btn" id="restartBtn">REJOUER</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  const COLORS = [
+    {name:"jaune", base:"#ffd62f", shadow:"#ffb100"},
+    {name:"turquoise", base:"#18e7c0", shadow:"#0bbda6"},
+    {name:"orange", base:"#ff7e36", shadow:"#ff5e00"},
+    {name:"violet", base:"#b65cff", shadow:"#8934ef"},
+    {name:"rose", base:"#ff5ca8", shadow:"#ff2f85"},
+    {name:"bleu", base:"#57a4ff", shadow:"#2b78ff"}
+  ];
+
+  const STORAGE_BEST = "color-bowls-best-ms-v1";
+
+  const board = document.getElementById("board");
+  const timerEl = document.getElementById("timer");
+  const bestEl = document.getElementById("best");
+  const infoEl = document.getElementById("info");
+  const overlay = document.getElementById("overlay");
+  const playBtn = document.getElementById("playBtn");
+  const restartBtn = document.getElementById("restartBtn");
+  const hintBtn = document.getElementById("hintBtn");
+  const lastTimeEl = document.getElementById("lastTime");
+  const resultTextEl = document.getElementById("resultText");
+
+  let state = null;
+  let timerId = null;
+  let startTs = 0;
+  let bestMs = Number(localStorage.getItem(STORAGE_BEST) || 0);
+
+  function formatMs(ms){
+    const total = Math.max(0, Math.floor(ms / 1000));
+    const m = String(Math.floor(total / 60)).padStart(2, "0");
+    const s = String(total % 60).padStart(2, "0");
+    return `${m}:${s}`;
+  }
+
+  function updateBestUI(){
+    bestEl.textContent = bestMs ? formatMs(bestMs) : "--:--";
+  }
+  updateBestUI();
+
+  function boardRect(){
+    return board.getBoundingClientRect();
+  }
+
+  function makeBallStyle(ball){
+    return `
+      background:
+        radial-gradient(circle at 32% 28%, rgba(255,255,255,.62), rgba(255,255,255,.18) 24%, transparent 28%),
+        radial-gradient(circle at 40% 38%, ${ball.color.base} 0%, ${ball.color.base} 56%, ${ball.color.shadow} 100%);
+      width:${ball.size}px;
+      height:${ball.size}px;
+      left:${ball.x}px;
+      top:${ball.y}px;
+      z-index:${Math.round(ball.y)};
+    `;
+  }
+
+  function weightedColorPool(){
+    // Yields ties frequently so player often has a choice between several major colors.
+    const preset = [
+      0,0,0,0,
+      1,1,1,1,
+      2,2,2,
+      3,3,3,
+      4,4,
+      5,5
+    ];
+    const shuffled = [...preset].sort(() => Math.random() - 0.5);
+    return shuffled;
+  }
+
+  function generateLevel(){
+    const rect = boardRect();
+    const w = Math.max(320, rect.width);
+    const h = Math.max(420, rect.height);
+
+    const count = w < 430 ? 30 : 40;
+    const cols = w < 430 ? 5 : 6;
+    const rows = Math.ceil(count / cols);
+    const cellW = w / cols;
+    const topPad = Math.max(22, h * 0.03);
+    const usableH = h - topPad - 16;
+    const cellH = usableH / rows;
+    const base = Math.max(52, Math.min(cellW, cellH) * 0.78);
+
+    const pool = weightedColorPool();
+    const balls = [];
+    let i = 0;
+
+    for(let r = 0; r < rows; r++){
+      for(let c = 0; c < cols; c++){
+        if(i >= count) break;
+        const size = base * (0.88 + Math.random() * 0.16);
+        const cx = c * cellW + cellW / 2 + (Math.random() * 10 - 5);
+        const cy = topPad + r * cellH + cellH / 2 + (Math.random() * 10 - 5);
+        const colorIndex = pool[i % pool.length];
+        balls.push({
+          id:`b${Date.now()}_${i}_${Math.random().toString(36).slice(2,7)}`,
+          x:cx, y:cy, size:size,
+          color: COLORS[colorIndex],
+          colorIndex,
+          el:null
+        });
+        i++;
+      }
+    }
+
+    // Shuffle positions lightly to make the screen feel lively
+    for(let k = 0; k < balls.length * 2; k++){
+      const a = Math.floor(Math.random() * balls.length);
+      const b = Math.floor(Math.random() * balls.length);
+      const tmp = balls[a].colorIndex;
+      balls[a].colorIndex = balls[b].colorIndex;
+      balls[b].colorIndex = tmp;
+      balls[a].color = COLORS[balls[a].colorIndex];
+      balls[b].color = COLORS[balls[b].colorIndex];
+    }
+
+    return { balls, started:false, finished:false };
+  }
+
+  function countsMap(){
+    const map = new Map();
+    for(const b of state.balls){
+      map.set(b.colorIndex, (map.get(b.colorIndex) || 0) + 1);
+    }
+    return map;
+  }
+
+  function majorityColorIndices(){
+    const map = countsMap();
+    let max = 0;
+    for(const v of map.values()) max = Math.max(max, v);
+    const winners = [];
+    for(const [k,v] of map.entries()) if(v === max) winners.push(k);
+    return { winners, max };
+  }
+
+  function render(){
+    board.innerHTML = "";
+    for(const b of state.balls){
+      const el = document.createElement("button");
+      el.className = "ball";
+      el.style.cssText = makeBallStyle(b);
+      el.dataset.id = b.id;
+      el.dataset.colorIndex = String(b.colorIndex);
+      el.setAttribute("aria-label", b.color.name);
+      el.addEventListener("click", onBallClick, {passive:true});
+      b.el = el;
+      board.appendChild(el);
+    }
+    refreshInfo();
+  }
+
+  function refreshInfo(){
+    if(!state || state.finished) return;
+    const { winners, max } = majorityColorIndices();
+    const names = winners.map(i => COLORS[i].name.toUpperCase()).join(" / ");
+    infoEl.innerHTML = state.started
+      ? `Couleur majoritaire : <strong>${names}</strong> · <strong>${max}</strong> boule${max>1?"s":""}`
+      : `Trouve la couleur majoritaire pour lancer la partie.`;
+  }
+
+  function clearHints(){
+    board.querySelectorAll(".ball.hint").forEach(el => el.classList.remove("hint"));
+  }
+
+  function showHints(){
+    clearHints();
+    const { winners } = majorityColorIndices();
+    board.querySelectorAll(".ball").forEach(el => {
+      if(winners.includes(Number(el.dataset.colorIndex))) el.classList.add("hint");
+    });
+    setTimeout(clearHints, 1500);
+  }
+
+  function startTimerIfNeeded(){
+    if(state.started) return;
+    state.started = true;
+    startTs = performance.now();
+    timerId = setInterval(() => {
+      timerEl.textContent = formatMs(performance.now() - startTs);
+    }, 100);
+  }
+
+  function stopTimer(){
+    if(timerId){
+      clearInterval(timerId);
+      timerId = null;
+    }
+  }
+
+  function dropAndRemove(colorIndex, tappedEl){
+    const doomed = state.balls.filter(b => b.colorIndex === colorIndex);
+    const survivors = state.balls.filter(b => b.colorIndex !== colorIndex);
+    const rect = boardRect();
+    doomed.forEach((b, idx) => {
+      const el = b.el;
+      if(!el) return;
+      const dx = (Math.random() * 80 - 40).toFixed(1) + "px";
+      const dy = (rect.height + b.size + Math.random()*160).toFixed(1) + "px";
+      const dx2 = (Math.random() * 140 - 70).toFixed(1) + "px";
+      const dy2 = (rect.height + b.size + 160 + Math.random()*180).toFixed(1) + "px";
+      el.style.setProperty("--dx", dx);
+      el.style.setProperty("--dy", dy);
+      el.style.setProperty("--dx2", dx2);
+      el.style.setProperty("--dy2", dy2);
+      el.classList.add("pop");
+
+      for(let i = 0; i < 6; i++){
+        const p = document.createElement("div");
+        p.className = "particle";
+        const s = 8 + Math.random() * 14;
+        p.style.width = s + "px";
+        p.style.height = s + "px";
+        p.style.left = b.x + "px";
+        p.style.top = b.y + "px";
+        p.style.background = `radial-gradient(circle at 35% 35%, rgba(255,255,255,.9), ${b.color.base} 55%, ${b.color.shadow} 100%)`;
+        p.style.setProperty("--tx", (Math.random()*170 - 85).toFixed(1) + "px");
+        p.style.setProperty("--ty", (Math.random()*170 - 40).toFixed(1) + "px");
+        board.appendChild(p);
+        setTimeout(() => p.remove(), 760);
+      }
+    });
+
+    if(navigator.vibrate){
+      navigator.vibrate(doomed.length >= 4 ? [18, 25, 45] : 18);
+    }
+
+    setTimeout(() => {
+      state.balls = survivors;
+      compactLayout();
+      render();
+      if(state.balls.length <= 1){
+        finishGame();
+      }
+    }, 520);
+  }
+
+  function compactLayout(){
+    const rect = boardRect();
+    const w = Math.max(320, rect.width);
+    const h = Math.max(420, rect.height);
+    const count = state.balls.length;
+    if(count <= 0) return;
+
+    const cols = count <= 4 ? 2 : count <= 9 ? 3 : count <= 16 ? 4 : (w < 430 ? 5 : 6);
+    const rows = Math.ceil(count / cols);
+    const cellW = w / cols;
+    const topPad = Math.max(20, h * 0.05);
+    const usableH = h - topPad - 16;
+    const cellH = usableH / rows;
+    const base = Math.max(54, Math.min(cellW, cellH) * 0.82);
+
+    state.balls.forEach((b, i) => {
+      const r = Math.floor(i / cols);
+      const c = i % cols;
+      b.size = Math.min(base, 112);
+      b.x = c * cellW + cellW / 2;
+      b.y = topPad + r * cellH + cellH / 2;
+    });
+  }
+
+  function onBallClick(e){
+    if(!state || state.finished) return;
+    const el = e.currentTarget;
+    const colorIndex = Number(el.dataset.colorIndex);
+    const { winners } = majorityColorIndices();
+
+    if(!winners.includes(colorIndex)){
+      el.classList.add("wrong");
+      setTimeout(() => el.classList.remove("wrong"), 360);
+      infoEl.innerHTML = `Non. Choisis une couleur <strong>majoritaire</strong>.`;
+      if(navigator.vibrate) navigator.vibrate(40);
+      return;
+    }
+
+    startTimerIfNeeded();
+    clearHints();
+    dropAndRemove(colorIndex, el);
+  }
+
+  function finishGame(){
+    state.finished = true;
+    stopTimer();
+    const elapsed = performance.now() - startTs;
+    timerEl.textContent = formatMs(elapsed);
+    lastTimeEl.textContent = formatMs(elapsed);
+
+    let isBest = false;
+    if(!bestMs || elapsed < bestMs){
+      bestMs = Math.floor(elapsed);
+      localStorage.setItem(STORAGE_BEST, String(bestMs));
+      updateBestUI();
+      isBest = true;
+    }
+
+    resultTextEl.innerHTML = isBest
+      ? `Nouveau <strong>meilleur chrono</strong> !`
+      : `Partie terminée. Essaie d’aller encore plus vite.`;
+
+    overlay.classList.add("show");
+  }
+
+  function resetGame(showIntro = false){
+    stopTimer();
+    timerEl.textContent = "00:00";
+    state = generateLevel();
+    render();
+    lastTimeEl.textContent = "00:00";
+    resultTextEl.innerHTML = showIntro
+      ? `Touchez <strong>JOUER</strong> pour commencer.`
+      : `Appuie sur une couleur majoritaire.`;
+    overlay.classList.toggle("show", showIntro);
+  }
+
+  playBtn.addEventListener("click", () => {
+    overlay.classList.remove("show");
+    resetGame(false);
+  });
+
+  restartBtn.addEventListener("click", () => {
+    overlay.classList.remove("show");
+    resetGame(false);
+  });
+
+  hintBtn.addEventListener("click", showHints);
+
+  window.addEventListener("resize", () => {
+    if(!state) return;
+    compactLayout();
+    render();
+  }, {passive:true});
+
+  resetGame(true);
+})();
+</script>
+</body>
+</html>
