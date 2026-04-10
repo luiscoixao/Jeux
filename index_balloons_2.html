@@ -51,34 +51,84 @@ body::after{
 }
 body::before{width:38vw;height:38vw;left:-10vw;bottom:8vh;background:#67ffe4}
 body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
-.game,.board,.hud,.board{overflow:hidden;touch-action:manipulation}
+.game,.board,.hud,.endOverlay{position:fixed;inset:0}
+.board{overflow:hidden;touch-action:manipulation}
 .hud{pointer-events:none;z-index:5}
+.title{
+  position:absolute;
+  top:calc(8px + var(--safe-top));
+  left:calc(10px + var(--safe-left));
+  right:calc(10px + var(--safe-right));
+  margin:0;
+  text-align:center;
+  font-weight:1000;
+  letter-spacing:.12em;
+  line-height:.92;
+  font-size:clamp(30px,8.5vw,56px);
+  color:#fff;
+  text-shadow:
+    0 2px 0 rgba(255,255,255,.18),
+    0 4px 0 rgba(24,32,110,.35),
+    0 10px 20px rgba(10,16,69,.55),
+    0 0 24px rgba(255,255,255,.20);
+}
+.bottomBar{
+  position:absolute;
+  left:calc(12px + var(--safe-left));
+  right:calc(12px + var(--safe-right));
+  bottom:calc(10px + var(--safe-bottom));
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  align-items:stretch;
+  pointer-events:auto;
+}
+.toggleBtn,.endCard{
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(16px) saturate(1.15);
+  -webkit-backdrop-filter:blur(16px) saturate(1.15);
+}
+.toggleBtn{
+  appearance:none;
+  border-radius:29px;
+  min-height:84px;
+  width:100%;
+  min-width:0;
+  color:#fff;
+  font-weight:1000;
+  font-size:clamp(20px,5.3vw,34px);
+  letter-spacing:.03em;
+  text-shadow:0 2px 10px rgba(0,0,0,.18);
+  padding:0 14px;
+}
+.toggleBtn.play{background:linear-gradient(180deg,var(--green1),var(--green2))}
+.toggleBtn.stop{background:linear-gradient(180deg,var(--red1),var(--red2))}
 .balloon{
   position:absolute;
   border:none;
   border-radius:48% 48% 45% 45% / 43% 43% 57% 57%;
-  transform:translate(-50%,-50%) translate3d(0,0,0);
+  transform:translate(-50%,-50%);
   box-shadow:
     inset -10px -14px 22px rgba(0,0,0,.16),
-    inset 6px 8px 10px rgba(255,255,255,.16),
+    inset 7px 10px 12px rgba(255,255,255,.20),
     0 16px 24px rgba(0,0,0,.16),
-    0 0 0 1px rgba(255,255,255,.06);
+    0 0 0 1px rgba(255,255,255,.07);
   transition:
     transform .14s ease,
     opacity .24s ease;
-  will-change:transform, opacity;
 }
 .balloon::before{
   content:"";
   position:absolute;
-  width:22%;
-  height:10%;
-  left:20%;
-  top:16%;
+  width:26%;
+  height:12%;
+  left:19%;
+  top:15%;
   border-radius:50%;
-  background:rgba(255,255,255,.16);
+  background:rgba(255,255,255,.22);
   transform:rotate(-18deg);
-  filter:blur(.4px);
+  filter:blur(.6px);
 }
 .balloon:active{transform:translate(-50%,-50%) scale(.95)}
 .balloon:focus,.balloon:focus-visible{outline:none;}
@@ -86,17 +136,42 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
   filter:none;
   box-shadow:
     inset -10px -14px 22px rgba(0,0,0,.16),
-    inset 6px 8px 10px rgba(255,255,255,.16),
-    0 0 0 2px rgba(255,255,255,.14),
+    inset 7px 10px 12px rgba(255,255,255,.20),
+    0 0 0 2px rgba(255,255,255,.16),
     0 16px 24px rgba(0,0,0,.16);
 }
 .balloon.wrong{animation:wrongShake .34s ease}
 .balloon.fly{
-  animation:flyAway 3.8s linear forwards;
+  animation:flyAway 3.4s ease-out forwards;
   pointer-events:none;
   will-change:transform, opacity;
 }
 .particle{display:none !important;}
+.endOverlay{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(12,16,36,.18);
+  z-index:8;
+}
+.endOverlay.show{display:flex}
+.endCard{
+  width:min(90vw,520px);
+  background:rgba(255,255,255,.18);
+  border-radius:34px;
+  padding:24px 20px 20px;
+  text-align:center;
+}
+.endMini{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:900;opacity:.92}
+.endTitle{margin:10px 0 6px;font-size:clamp(28px,8vw,42px);line-height:.95;font-weight:1000}
+.endTime{font-size:clamp(34px,9vw,52px);font-weight:1000;line-height:1;margin:8px 0 10px;font-variant-numeric:tabular-nums}
+.endText{font-size:16px;line-height:1.35;font-weight:700;margin:0 0 14px}
+.endBtn{
+  appearance:none;border:none;min-width:180px;min-height:56px;border-radius:20px;
+  font-size:20px;font-weight:1000;color:#fff;
+  background:linear-gradient(180deg,var(--green1),var(--green2));box-shadow:var(--shadow);
+}
 @keyframes wrongShake{
   0%,100%{transform:translate(-50%,-50%)}
   25%{transform:translate(calc(-50% - 7px),-50%)}
@@ -106,17 +181,56 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
 @keyframes flyAway{
   0%{
     opacity:1;
-    transform:translate(-50%,-50%) translate3d(0,0,0) scale(1);
+    transform:translate(-50%,-50%) scale(1);
   }
   100%{
     opacity:0;
     transform:translate(
       calc(-50% + var(--driftx)),
-      calc(-50% - 660px)
+      calc(-50% - 620px)
+    ) scale(1.015);
+  }
+}
+  100%{
+    opacity:0;
+    transform:translate(
+      calc(-50% + var(--driftx)),
+      calc(-50% - 600px)
     ) translate3d(0,0,0) scale(1.02);
   }
 }
+  16%{
+    opacity:1;
+    transform:translate(
+      calc(-50% + var(--driftx) * .08),
+      calc(-50% - 18px)
+    ) translate3d(0,0,0) scale(1.008) rotate(calc(var(--spin) * .06));
+  }
+  38%{
+    opacity:.99;
+    transform:translate(
+      calc(-50% + var(--driftx) * .24),
+      calc(-50% - 72px)
+    ) translate3d(0,0,0) scale(1.018) rotate(calc(var(--spin) * .18));
+  }
+  68%{
+    opacity:.95;
+    transform:translate(
+      calc(-50% + var(--driftx) * .56),
+      calc(-50% - 205px)
+    ) translate3d(0,0,0) scale(1.03) rotate(calc(var(--spin) * .48));
+  }
+  100%{
+    opacity:0;
+    transform:translate(
+      calc(-50% + var(--driftx) * .86),
+      calc(-50% - 430px)
+    ) translate3d(0,0,0) scale(1.01) rotate(calc(var(--spin) * .72));
+  }
+}
 @keyframes particle{0%{opacity:0}100%{opacity:0}}
+  100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.14)}
+}
 
 .board.resolving .balloon.majority{
   filter:none !important;
@@ -130,23 +244,26 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
   transition:none;
 }
 
+@media (max-width: 430px){
+  .bottomBar{grid-template-columns:minmax(94px,1fr) minmax(94px,1fr) minmax(126px,1.2fr);gap:8px}
+    .toggleBtn{min-height:78px;border-radius:24px;font-size:clamp(18px,5vw,28px);padding:0 12px}
+}
 </style>
 </head>
 <body>
 <div class="game">
   <div class="board" id="board"></div>
   <div class="hud">
-        <div class="value" id="timer">00:00.0</div>
-      </div>
-      <div class="stat">
-        <div class="label">Record</div>
-        <div class="value" id="best">--:--.-</div>
-      </div>
+    <h1 class="title">BALLOONS</h1>
+    <div class="bottomBar" id="bottomBar">
       <button class="toggleBtn play" id="toggleBtn" aria-label="Jouer">JOUER</button>
     </div>
   </div>
 </div>
 
+<div class="endOverlay" id="endOverlay">
+  <div class="endCard">
+    <div class="endMini">Partie terminée</div>
     <div class="endTitle">Bravo</div>
     <div class="endTime" id="endTime">00:00.0</div>
     <p class="endText" id="endText">Tu as vidé les 10 séries.</p>
@@ -156,7 +273,12 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
 
 <script>
 (() => {
-  const board = document.getElementById('board');  const MAX_SERIES = 10;
+  const board = document.getElementById('board');  const toggleBtn = document.getElementById('toggleBtn');
+  const bottomBar = document.getElementById('bottomBar');
+  const endOverlay = document.getElementById('endOverlay');
+  const endTimeEl = document.getElementById('endTime');
+  const endTextEl = document.getElementById('endText');
+  const restartBtn = document.getElementById('restartBtn');  const MAX_SERIES = 10;
   const COLORS = [
     ['#ff8bac','#ff2d67'],
     ['#7bff85','#19bb41'],
@@ -169,9 +291,19 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
   ];  let state = null;
   let isResolving = false;
 
+  function fmt(ms){ return ''; }
+
+  function updateBest(){}
+
+  function setButtonState(running){
+    toggleBtn.className = 'toggleBtn ' + (running ? 'stop' : 'play');
+    toggleBtn.textContent = running ? 'ARRÊTER' : 'JOUER';
+    toggleBtn.setAttribute('aria-label', running ? 'Arrêter' : 'Jouer');
+  }
+
   function computeSeriesCount(series){
-    const start = 230;
-    const end = 190;
+    const start = 210;
+    const end = 168;
     const t = (series - 1) / Math.max(1, MAX_SERIES - 1);
     const eased = Math.pow(t, 1.9);
     return Math.round(start + (end - start) * eased);
@@ -221,17 +353,17 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
       for(let i = 0; i < count; i++){
         const roll = Math.random();
         let w;
-        if(roll < 0.20){
-          w = 38 + Math.random() * 9;
-        }else if(roll < 0.88){
-          w = 49 + Math.random() * 13;
+        if(roll < 0.22){
+          w = 40 + Math.random() * 10;      // petits
+        }else if(roll < 0.84){
+          w = 52 + Math.random() * 12;      // majorité de moyens
         }else{
-          w = 63 + Math.random() * 9;
+          w = 66 + Math.random() * 10;      // quelques grands
         }
         const h = w * (1.14 + Math.random() * 0.10);
         balloons.push({
           id: id++, colorIndex, lane: -1, x: 0, y: 0, w, h,
-          driftX: (Math.random() - 0.5) * 120,
+          driftX: (Math.random() - 0.5) * 180,
           spin: `${(Math.random() > .5 ? 1 : -1) * (10 + Math.random() * 24)}deg`
         });
       }
@@ -248,23 +380,25 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
     const root = getComputedStyle(document.documentElement);
     const safeTop = parseFloat(root.getPropertyValue('--safe-top')) || 0;
     const safeBottom = parseFloat(root.getPropertyValue('--safe-bottom')) || 0;
+    const barRect = bottomBar.getBoundingClientRect();
+    const reservedBottom = rect.height - barRect.top + 10;
     return {
       width: rect.width,
       height: rect.height,
-      top: 6 + safeTop,
-      bottom: rect.height - (6 + safeBottom)
+      top: 46 + safeTop,
+      bottom: rect.height - Math.max(88 + safeBottom, reservedBottom)
     };
   }
 
   function placeIntoLanes(assignLanes = true){
     const zone = boardZone();
-    const laneGap = 18;
-    const usableWidth = zone.width - 4;
-    const laneCount = Math.max(8, Math.floor(usableWidth / 36));
+    const laneGap = 22;
+    const usableWidth = zone.width - 12;
+    const laneCount = Math.max(7, Math.floor(usableWidth / 42));
     const laneStep = usableWidth / laneCount;
     const lanes = Array.from({length: laneCount}, (_, i) => ({
-      x: 2 + laneStep * (i + 0.5) + (Math.random() - 0.5) * 8,
-      floor: zone.bottom - 1,
+      x: 6 + laneStep * (i + 0.5) + (Math.random() - 0.5) * 10,
+      floor: zone.bottom - 2,
       items: []
     }));
 
@@ -291,8 +425,8 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
       let cursor = lane.floor;
       lane.items.sort((a,b) => (b.y || 0) - (a.y || 0));
       lane.items.forEach((balloon, index) => {
-        const jitterX = (Math.random() - 0.5) * Math.min(16, laneStep * .42);
-        const overlap = Math.min(26, balloon.h * .30);
+        const jitterX = (Math.random() - 0.5) * Math.min(22, laneStep * .52);
+        const overlap = Math.min(24, balloon.h * .26);
         const y = cursor - balloon.h / 2;
         balloon.x = lane.x + jitterX;
         balloon.y = y;
@@ -388,25 +522,43 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
     removeColor(colorIndex);
   }
 
+  function tick(){}
+
+  function startTimer(){}
+
   function stopGame(){
     stopTimer();
     isResolving = false;
     board.classList.remove('resolving');
     state = null;
     board.replaceChildren();
-    }
+    setButtonState(false);
+  }
 
   function finishGame(){
-    isResolving = false;
-    board.classList.remove('resolving');
+    stopTimer();
+    const elapsed = Math.floor(performance.now() - startTs);
+    let newBest = false;
+    endTextEl.innerHTML = newBest ? 'Nouveau <strong>record</strong> !' : 'Partie terminée. Essaie encore plus vite.';
+    setButtonState(false);
+    endOverlay.classList.add('show');
     state = { finished: true, running: false, balloons: [], series: MAX_SERIES };
-  }  window.addEventListener('resize', () => {
+  }
+
+  toggleBtn.addEventListener('click', () => {
+    if(state && state.running && !state.finished) stopGame();
+    else startGame();
+  });
+  restartBtn.addEventListener('click', startGame);
+  window.addEventListener('resize', () => {
     if(state && state.running && !state.finished){
       placeIntoLanes(false);
       render();
     }
   }, { passive: true });
 
+  timerEl.textContent = '00:00.0';
+  setButtonState(false);
   startGame();
 })();
 </script>
