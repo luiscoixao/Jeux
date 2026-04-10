@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+<title>BALLOONS</title>
+<meta name="theme-color" content="#345dff" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="BALLOONS" />
+<link rel="apple-touch-icon" href="icon.png" />
+<link rel="icon" type="image/png" href="icon.png" />
+<link rel="manifest" href="manifest.webmanifest" />
+<style>
+:root{
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
+  --safe-left: env(safe-area-inset-left);
+  --safe-right: env(safe-area-inset-right);
+  --white:#fff;
+  --line:rgba(255,255,255,.22);
+  --glass:rgba(255,255,255,.13);
+  --shadow:0 18px 42px rgba(7,10,40,.34);
+  --green1:#48ff8c;
+  --green2:#06b34a;
+  --red1:#ff5e85;
+  --red2:#cf1133;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",sans-serif;
+  color:var(--white);
+  background:
+    radial-gradient(circle at 12% 12%, rgba(255,239,118,.95) 0 0, rgba(255,239,118,0) 17%),
+    radial-gradient(circle at 84% 12%, rgba(74,196,255,.92) 0 0, rgba(74,196,255,0) 18%),
+    radial-gradient(circle at 82% 86%, rgba(86,255,227,.80) 0 0, rgba(86,255,227,0) 22%),
+    radial-gradient(circle at 18% 88%, rgba(255,122,214,.72) 0 0, rgba(255,122,214,0) 22%),
+    radial-gradient(circle at 50% 72%, rgba(181,102,255,.45) 0 0, rgba(181,102,255,0) 30%),
+    linear-gradient(150deg,#5ae8ff 0%, #3a67ff 32%, #7b43ff 63%, #ff58ab 100%);
+}
+body::before,
+body::after{
+  content:"";
+  position:fixed;
+  border-radius:50%;
+  filter:blur(72px);
+  pointer-events:none;
+  opacity:.34;
+}
+body::before{width:38vw;height:38vw;left:-10vw;bottom:8vh;background:#67ffe4}
+body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
+.game,.board,.hud,.board{overflow:hidden;touch-action:manipulation}
+.hud{pointer-events:none;z-index:5}
+.balloon{
+  position:absolute;
+  border:none;
+  border-radius:48% 48% 45% 45% / 43% 43% 57% 57%;
+  transform:translate(-50%,-50%) translate3d(0,0,0);
+  box-shadow:
+    inset -10px -14px 22px rgba(0,0,0,.16),
+    inset 6px 8px 10px rgba(255,255,255,.16),
+    0 16px 24px rgba(0,0,0,.16),
+    0 0 0 1px rgba(255,255,255,.06);
+  transition:
+    transform .14s ease,
+    opacity .24s ease;
+  will-change:transform, opacity;
+}
+.balloon::before{
+  content:"";
+  position:absolute;
+  width:22%;
+  height:10%;
+  left:20%;
+  top:16%;
+  border-radius:50%;
+  background:rgba(255,255,255,.16);
+  transform:rotate(-18deg);
+  filter:blur(.4px);
+}
+.balloon:active{transform:translate(-50%,-50%) scale(.95)}
+.balloon:focus,.balloon:focus-visible{outline:none;}
+.balloon.majority{
+  filter:none;
+  box-shadow:
+    inset -10px -14px 22px rgba(0,0,0,.16),
+    inset 6px 8px 10px rgba(255,255,255,.16),
+    0 0 0 2px rgba(255,255,255,.14),
+    0 16px 24px rgba(0,0,0,.16);
+}
+.balloon.wrong{animation:wrongShake .34s ease}
+.balloon.fly{
+  animation:flyAway 3.8s linear forwards;
+  pointer-events:none;
+  will-change:transform, opacity;
+}
+.particle{display:none !important;}
+@keyframes wrongShake{
+  0%,100%{transform:translate(-50%,-50%)}
+  25%{transform:translate(calc(-50% - 7px),-50%)}
+  50%{transform:translate(calc(-50% + 7px),-50%)}
+  75%{transform:translate(calc(-50% - 5px),-50%)}
+}
+@keyframes flyAway{
+  0%{
+    opacity:1;
+    transform:translate(-50%,-50%) translate3d(0,0,0) scale(1);
+  }
+  100%{
+    opacity:0;
+    transform:translate(
+      calc(-50% + var(--driftx)),
+      calc(-50% - 660px)
+    ) translate3d(0,0,0) scale(1.02);
+  }
+}
+@keyframes particle{0%{opacity:0}100%{opacity:0}}
+
+.board.resolving .balloon.majority{
+  filter:none !important;
+  box-shadow:
+    inset -10px -14px 22px rgba(0,0,0,.16),
+    inset 7px 10px 12px rgba(255,255,255,.20),
+    0 16px 24px rgba(0,0,0,.16),
+    0 0 0 1px rgba(255,255,255,.07) !important;
+}
+.board.resolving .balloon:not(.fly){
+  transition:none;
+}
+
+</style>
+</head>
+<body>
+<div class="game">
+  <div class="board" id="board"></div>
+  <div class="hud">
+        <div class="value" id="timer">00:00.0</div>
+      </div>
+      <div class="stat">
+        <div class="label">Record</div>
+        <div class="value" id="best">--:--.-</div>
+      </div>
+      <button class="toggleBtn play" id="toggleBtn" aria-label="Jouer">JOUER</button>
+    </div>
+  </div>
+</div>
+
+    <div class="endTitle">Bravo</div>
+    <div class="endTime" id="endTime">00:00.0</div>
+    <p class="endText" id="endText">Tu as vidé les 10 séries.</p>
+    <button class="endBtn" id="restartBtn">REJOUER</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  const board = document.getElementById('board');  const MAX_SERIES = 10;
+  const COLORS = [
+    ['#ff8bac','#ff2d67'],
+    ['#7bff85','#19bb41'],
+    ['#ffe86d','#ffbb0f'],
+    ['#84dfff','#149dff'],
+    ['#c89cff','#8250ff'],
+    ['#ffbf7f','#ff7315'],
+    ['#71fff0','#07c7b2'],
+    ['#ff8ee3','#ff3dc3']
+  ];  let state = null;
+  let isResolving = false;
+
+  function computeSeriesCount(series){
+    const start = 230;
+    const end = 190;
+    const t = (series - 1) / Math.max(1, MAX_SERIES - 1);
+    const eased = Math.pow(t, 1.9);
+    return Math.round(start + (end - start) * eased);
+  }
+
+  function makeBalancedCounts(total){
+    const colorCount = COLORS.length;
+    const winnerIndex = Math.floor(Math.random() * colorCount);
+    const weights = Array.from({ length: colorCount }, () => 0.9 + Math.random() * 0.14);
+    weights[winnerIndex] += 0.18 + Math.random() * 0.05;
+
+    const sum = weights.reduce((a,b) => a+b, 0);
+    const counts = weights.map(w => Math.max(6, Math.floor(total * w / sum)));
+    let diff = total - counts.reduce((a,b) => a+b, 0);
+
+    while(diff !== 0){
+      if(diff > 0){ counts[Math.floor(Math.random()*colorCount)]++; diff--; }
+      else {
+        const donors = counts.map((v,i)=>({v,i})).filter(x => x.v > 6);
+        if(!donors.length) break;
+        counts[donors[Math.floor(Math.random()*donors.length)].i]--; diff++;
+      }
+    }
+
+    const otherMax = Math.max(...counts.filter((_,i)=>i!==winnerIndex));
+    if(counts[winnerIndex] <= otherMax){
+      const need = otherMax - counts[winnerIndex] + 1;
+      counts[winnerIndex] += need;
+      for(let n = 0; n < need; n++){
+        const donor = counts
+          .map((v,i)=>({v,i}))
+          .filter(x => x.i !== winnerIndex && x.v > 7)
+          .sort((a,b)=>b.v-a.v)[0];
+        if(!donor) break;
+        counts[donor.i]--;
+      }
+    }
+    return counts;
+  }
+
+  function makeBalloons(series){
+    const total = computeSeriesCount(series);
+    const counts = makeBalancedCounts(total);
+    const balloons = [];
+    let id = 1;
+    counts.forEach((count, colorIndex) => {
+      for(let i = 0; i < count; i++){
+        const roll = Math.random();
+        let w;
+        if(roll < 0.20){
+          w = 38 + Math.random() * 9;
+        }else if(roll < 0.88){
+          w = 49 + Math.random() * 13;
+        }else{
+          w = 63 + Math.random() * 9;
+        }
+        const h = w * (1.14 + Math.random() * 0.10);
+        balloons.push({
+          id: id++, colorIndex, lane: -1, x: 0, y: 0, w, h,
+          driftX: (Math.random() - 0.5) * 120,
+          spin: `${(Math.random() > .5 ? 1 : -1) * (10 + Math.random() * 24)}deg`
+        });
+      }
+    });
+    for(let i = balloons.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [balloons[i], balloons[j]] = [balloons[j], balloons[i]];
+    }
+    return balloons;
+  }
+
+  function boardZone(){
+    const rect = board.getBoundingClientRect();
+    const root = getComputedStyle(document.documentElement);
+    const safeTop = parseFloat(root.getPropertyValue('--safe-top')) || 0;
+    const safeBottom = parseFloat(root.getPropertyValue('--safe-bottom')) || 0;
+    return {
+      width: rect.width,
+      height: rect.height,
+      top: 6 + safeTop,
+      bottom: rect.height - (6 + safeBottom)
+    };
+  }
+
+  function placeIntoLanes(assignLanes = true){
+    const zone = boardZone();
+    const laneGap = 18;
+    const usableWidth = zone.width - 4;
+    const laneCount = Math.max(8, Math.floor(usableWidth / 36));
+    const laneStep = usableWidth / laneCount;
+    const lanes = Array.from({length: laneCount}, (_, i) => ({
+      x: 2 + laneStep * (i + 0.5) + (Math.random() - 0.5) * 8,
+      floor: zone.bottom - 1,
+      items: []
+    }));
+
+    if(assignLanes){
+      const shuffled = [...state.balloons].sort(() => Math.random() - 0.5);
+      shuffled.forEach(balloon => {
+        const candidates = lanes
+          .map((lane, idx) => ({ idx, fill: lane.items.reduce((s,b)=>s+b.h, 0) }))
+          .sort((a,b)=>a.fill-b.fill)
+          .slice(0, Math.min(7, lanes.length));
+        const preferred = candidates[Math.floor(Math.random() * candidates.length)];
+        const pick = preferred.idx;
+        balloon.lane = pick;
+        lanes[pick].items.push(balloon);
+      });
+    } else {
+      state.balloons.forEach(balloon => {
+        const idx = Math.max(0, Math.min(lanes.length - 1, balloon.lane));
+        lanes[idx].items.push(balloon);
+      });
+    }
+
+    lanes.forEach(lane => {
+      let cursor = lane.floor;
+      lane.items.sort((a,b) => (b.y || 0) - (a.y || 0));
+      lane.items.forEach((balloon, index) => {
+        const jitterX = (Math.random() - 0.5) * Math.min(16, laneStep * .42);
+        const overlap = Math.min(26, balloon.h * .30);
+        const y = cursor - balloon.h / 2;
+        balloon.x = lane.x + jitterX;
+        balloon.y = y;
+        cursor -= balloon.h - overlap - (index % 3 === 0 ? 3 : 0);
+      });
+    });
+  }
+
+  function getMajorityData(){
+    const counts = new Map();
+    state.balloons.forEach(balloon => counts.set(balloon.colorIndex, (counts.get(balloon.colorIndex) || 0) + 1));
+    const max = Math.max(...counts.values());
+    const winners = [...counts.entries()].filter(([, value]) => value === max).map(([key]) => key);
+    return { counts, winners };
+  }
+
+  function render(){
+    const frag = document.createDocumentFragment();
+    const { winners } = getMajorityData();
+    const ordered = [...state.balloons].sort((a,b) => (a.y + a.h/2) - (b.y + b.h/2));
+
+    ordered.forEach(balloon => {
+      const el = document.createElement('button');
+      const isWinner = !isResolving && winners.includes(balloon.colorIndex);
+      el.className = 'balloon' + (isWinner ? ' majority' : '');
+      el.style.width = `${balloon.w}px`;
+      el.style.height = `${balloon.h}px`;
+      el.style.left = `${balloon.x}px`;
+      el.style.top = `${balloon.y}px`;
+      el.style.zIndex = String(Math.round(balloon.y));
+      el.style.setProperty('--driftx', `${balloon.driftX}px`);
+      el.style.setProperty('--spin', balloon.spin);
+      const [c1, c2] = COLORS[balloon.colorIndex];
+      el.style.background = `radial-gradient(circle at 34% 28%, ${c1} 0%, ${c1} 26%, ${c2} 100%)`;
+      el.dataset.id = String(balloon.id);
+      el.dataset.colorIndex = String(balloon.colorIndex);
+      el.addEventListener('click', onBalloonClick, { passive: true });
+      frag.appendChild(el);
+    });
+
+    board.replaceChildren(frag);
+  }
+
+  function spawnParticles(x, y, colorIndex, count = 9){ return; }
+
+  function removeColor(colorIndex){
+    const doomed = state.balloons.filter(balloon => balloon.colorIndex === colorIndex);
+    const els = [...board.querySelectorAll(`.balloon[data-color-index="${colorIndex}"]`)];
+    isResolving = true;
+    board.classList.add('resolving');
+    board.querySelectorAll('.balloon.majority').forEach(el => el.classList.remove('majority'));
+
+    els.forEach((el, i) => {
+      setTimeout(() => {
+        el.classList.add('fly');
+      }, i * 14);
+    });
+
+    setTimeout(() => {
+      state.balloons = state.balloons.filter(balloon => balloon.colorIndex !== colorIndex);
+      if(state.balloons.length <= 1){
+        advanceSeriesOrFinish();
+      } else {
+        isResolving = false;
+        board.classList.remove('resolving');
+        render();
+      }
+    }, 2980);
+  }
+
+  function advanceSeriesOrFinish(){
+    if(state.series >= MAX_SERIES){
+      finishGame();
+      return;
+    }
+    isResolving = false;
+    board.classList.remove('resolving');
+    state = { series: state.series + 1, running: true, finished: false, balloons: makeBalloons(state.series + 1) };
+    placeIntoLanes(true);
+    render();
+  }
+
+  function onBalloonClick(event){
+    if(!state || !state.running || state.finished) return;
+    const colorIndex = Number(event.currentTarget.dataset.colorIndex);
+    const { winners } = getMajorityData();
+    if(!winners.includes(colorIndex)){
+      event.currentTarget.classList.add('wrong');
+      setTimeout(() => event.currentTarget.classList.remove('wrong'), 340);
+      if(navigator.vibrate) navigator.vibrate(26);
+      return;
+    }
+    removeColor(colorIndex);
+  }
+
+  function stopGame(){
+    stopTimer();
+    isResolving = false;
+    board.classList.remove('resolving');
+    state = null;
+    board.replaceChildren();
+    }
+
+  function finishGame(){
+    isResolving = false;
+    board.classList.remove('resolving');
+    state = { finished: true, running: false, balloons: [], series: MAX_SERIES };
+  }  window.addEventListener('resize', () => {
+    if(state && state.running && !state.finished){
+      placeIntoLanes(false);
+      render();
+    }
+  }, { passive: true });
+
+  startGame();
+})();
+</script>
+</body>
+</html>
