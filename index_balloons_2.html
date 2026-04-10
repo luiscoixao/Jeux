@@ -108,8 +108,8 @@ function create(){
   balloons = [];
   board.innerHTML = "";
 
-  const cols = 8;
-  const rows = 13;
+  const cols = 9;
+  const rows = 15;
   const width = window.innerWidth;
   const height = window.innerHeight;
 
@@ -122,15 +122,15 @@ function create(){
       b.type = "button";
       b.className = "balloon";
 
-      const sizeBase = Math.min(cellW, cellH) * 0.72;
-      const size = sizeBase + (Math.random() * 16 - 8);
+      const sizeBase = Math.min(cellW, cellH) * 0.82;
+      const size = sizeBase + (Math.random() * 18 - 9);
 
       b.style.width = size + "px";
       b.style.height = (size * 1.22) + "px";
 
       const oddOffset = row % 2 ? cellW * 0.22 : -cellW * 0.12;
-      const x = col * cellW + cellW / 2 + oddOffset + (Math.random() * 26 - 13);
-      const y = row * cellH + cellH / 2 + (Math.random() * 24 - 12);
+      const x = col * cellW + cellW / 2 + oddOffset + (Math.random() * 24 - 12);
+      const y = row * cellH + cellH / 2 + (Math.random() * 22 - 11);
 
       b.style.left = x + "px";
       b.style.top = y + "px";
