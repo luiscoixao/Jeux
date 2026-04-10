@@ -136,10 +136,10 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
   border-radius:48% 48% 45% 45% / 43% 43% 57% 57%;
   transform:translate(-50%,-50%);
   box-shadow:
-    inset -12px -18px 26px rgba(0,0,0,.17),
-    inset 10px 14px 18px rgba(255,255,255,.36),
-    0 18px 28px rgba(0,0,0,.18),
-    0 0 0 1px rgba(255,255,255,.10);
+    inset -10px -14px 22px rgba(0,0,0,.16),
+    inset 7px 10px 12px rgba(255,255,255,.20),
+    0 16px 24px rgba(0,0,0,.16),
+    0 0 0 1px rgba(255,255,255,.07);
   transition:
     left .46s cubic-bezier(.22,.84,.18,1),
     top .46s cubic-bezier(.22,.84,.18,1),
@@ -150,29 +150,30 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
 .balloon::before{
   content:"";
   position:absolute;
-  width:34%;
-  height:18%;
-  left:17%;
-  top:14%;
+  width:26%;
+  height:12%;
+  left:19%;
+  top:15%;
   border-radius:50%;
-  background:rgba(255,255,255,.46);
+  background:rgba(255,255,255,.22);
   transform:rotate(-18deg);
-  filter:blur(1px);
+  filter:blur(.6px);
 }
 .balloon:active{transform:translate(-50%,-50%) scale(.95)}
 .balloon.majority{
-  filter:brightness(1.08) saturate(1.16) drop-shadow(0 0 18px rgba(255,255,255,.34));
+  filter:brightness(1.05) saturate(1.14) drop-shadow(0 0 14px rgba(255,255,255,.20));
   box-shadow:
-    inset -12px -18px 26px rgba(0,0,0,.16),
-    inset 10px 14px 18px rgba(255,255,255,.38),
-    0 0 0 3px rgba(255,255,255,.18),
-    0 18px 28px rgba(0,0,0,.18),
-    0 0 24px rgba(255,255,255,.12);
+    inset -10px -14px 22px rgba(0,0,0,.15),
+    inset 7px 10px 12px rgba(255,255,255,.22),
+    0 0 0 2px rgba(255,255,255,.14),
+    0 16px 24px rgba(0,0,0,.16),
+    0 0 18px rgba(255,255,255,.08);
 }
 .balloon.wrong{animation:wrongShake .34s ease}
 .balloon.fly{
-  animation:flyAway 1.65s cubic-bezier(.14,.74,.16,1) forwards;
+  animation:flyAway 3.2s linear forwards;
   pointer-events:none;
+  will-change:transform, opacity;
 }
 .particle{
   position:absolute;
@@ -213,10 +214,46 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
   75%{transform:translate(calc(-50% - 5px),-50%)}
 }
 @keyframes flyAway{
-  0%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0deg)}
-  24%{opacity:1;transform:translate(calc(-50% + var(--driftx) * .25),calc(-50% - 34px)) scale(1.02) rotate(calc(var(--spin) * .2))}
-  60%{opacity:.96;transform:translate(calc(-50% + var(--driftx) * .65),calc(-50% - 150px)) scale(1.05) rotate(calc(var(--spin) * .65))}
-  100%{opacity:0;transform:translate(calc(-50% + var(--driftx)),calc(-50% - 380px)) scale(.92) rotate(var(--spin))}
+  0%{
+    opacity:1;
+    transform:translate(-50%,-50%) translate3d(0,0,0) scale(1);
+  }
+  100%{
+    opacity:0;
+    transform:translate(
+      calc(-50% + var(--driftx)),
+      calc(-50% - 600px)
+    ) translate3d(0,0,0) scale(1.02);
+  }
+}
+  16%{
+    opacity:1;
+    transform:translate(
+      calc(-50% + var(--driftx) * .08),
+      calc(-50% - 18px)
+    ) translate3d(0,0,0) scale(1.008) rotate(calc(var(--spin) * .06));
+  }
+  38%{
+    opacity:.99;
+    transform:translate(
+      calc(-50% + var(--driftx) * .24),
+      calc(-50% - 72px)
+    ) translate3d(0,0,0) scale(1.018) rotate(calc(var(--spin) * .18));
+  }
+  68%{
+    opacity:.95;
+    transform:translate(
+      calc(-50% + var(--driftx) * .56),
+      calc(-50% - 205px)
+    ) translate3d(0,0,0) scale(1.03) rotate(calc(var(--spin) * .48));
+  }
+  100%{
+    opacity:0;
+    transform:translate(
+      calc(-50% + var(--driftx) * .86),
+      calc(-50% - 430px)
+    ) translate3d(0,0,0) scale(1.01) rotate(calc(var(--spin) * .72));
+  }
 }
 @keyframes particle{
   0%{opacity:.96}
@@ -358,7 +395,14 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
     counts.forEach((count, colorIndex) => {
       for(let i = 0; i < count; i++){
         const roll = Math.random();
-        const w = roll < 0.24 ? 46 + Math.random() * 8 : roll < 0.72 ? 56 + Math.random() * 12 : 69 + Math.random() * 14;
+        let w;
+        if(roll < 0.22){
+          w = 40 + Math.random() * 10;      // petits
+        }else if(roll < 0.84){
+          w = 52 + Math.random() * 12;      // majorité de moyens
+        }else{
+          w = 66 + Math.random() * 10;      // quelques grands
+        }
         const h = w * (1.14 + Math.random() * 0.10);
         balloons.push({
           id: id++, colorIndex, lane: -1, x: 0, y: 0, w, h,
@@ -384,20 +428,20 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
     return {
       width: rect.width,
       height: rect.height,
-      top: 74 + safeTop,
-      bottom: rect.height - Math.max(104 + safeBottom, reservedBottom)
+      top: 46 + safeTop,
+      bottom: rect.height - Math.max(88 + safeBottom, reservedBottom)
     };
   }
 
   function placeIntoLanes(assignLanes = true){
     const zone = boardZone();
-    const laneGap = 28;
-    const usableWidth = zone.width - 26;
-    const laneCount = Math.max(6, Math.floor(usableWidth / 48));
+    const laneGap = 22;
+    const usableWidth = zone.width - 12;
+    const laneCount = Math.max(7, Math.floor(usableWidth / 42));
     const laneStep = usableWidth / laneCount;
     const lanes = Array.from({length: laneCount}, (_, i) => ({
-      x: 13 + laneStep * (i + 0.5) + (Math.random() - 0.5) * 6,
-      floor: zone.bottom - 4,
+      x: 6 + laneStep * (i + 0.5) + (Math.random() - 0.5) * 10,
+      floor: zone.bottom - 2,
       items: []
     }));
 
@@ -407,8 +451,9 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
         const candidates = lanes
           .map((lane, idx) => ({ idx, fill: lane.items.reduce((s,b)=>s+b.h, 0) }))
           .sort((a,b)=>a.fill-b.fill)
-          .slice(0, Math.min(5, lanes.length));
-        const pick = candidates[Math.floor(Math.random() * candidates.length)].idx;
+          .slice(0, Math.min(7, lanes.length));
+        const preferred = candidates[Math.floor(Math.random() * candidates.length)];
+        const pick = preferred.idx;
         balloon.lane = pick;
         lanes[pick].items.push(balloon);
       });
@@ -423,8 +468,8 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
       let cursor = lane.floor;
       lane.items.sort((a,b) => (b.y || 0) - (a.y || 0));
       lane.items.forEach((balloon, index) => {
-        const jitterX = (Math.random() - 0.5) * Math.min(14, laneStep * .36);
-        const overlap = Math.min(20, balloon.h * .22);
+        const jitterX = (Math.random() - 0.5) * Math.min(22, laneStep * .52);
+        const overlap = Math.min(24, balloon.h * .26);
         const y = cursor - balloon.h / 2;
         balloon.x = lane.x + jitterX;
         balloon.y = y;
@@ -504,10 +549,9 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
       if(state.balloons.length <= 1){
         advanceSeriesOrFinish();
       } else {
-        placeIntoLanes(false);
         render();
       }
-    }, 1720);
+    }, 2980);
   }
 
   function advanceSeriesOrFinish(){
