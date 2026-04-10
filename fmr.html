@@ -4,13 +4,14 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
 <title>COLOR BOWLS</title>
-<meta name="theme-color" content="#43c7ff" />
+<meta name="theme-color" content="#3a46ff" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="COLOR BOWLS" />
 <link rel="apple-touch-icon" href="icon.png" />
 <link rel="icon" type="image/png" href="icon.png" />
+<link rel="manifest" href="manifest.webmanifest" />
 <style>
 :root{
   --safe-top: env(safe-area-inset-top);
@@ -18,13 +19,13 @@
   --safe-left: env(safe-area-inset-left);
   --safe-right: env(safe-area-inset-right);
   --white:#fff;
-  --line:rgba(255,255,255,.20);
-  --glass:rgba(255,255,255,.14);
-  --shadow:0 18px 40px rgba(0,0,0,.24);
-  --green1:#4cff74;
-  --green2:#11ad3f;
-  --red1:#ff6177;
-  --red2:#d81434;
+  --line:rgba(255,255,255,.18);
+  --glass:rgba(255,255,255,.16);
+  --shadow:0 20px 40px rgba(0,0,0,.24);
+  --green1:#41ff79;
+  --green2:#0fa83d;
+  --red1:#ff657e;
+  --red2:#cf1532;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;width:100%;height:100%;overflow:hidden}
@@ -32,23 +33,23 @@ body{
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",sans-serif;
   color:var(--white);
   background:
-    radial-gradient(circle at 12% 12%, rgba(255,236,96,.95) 0 0, rgba(255,236,96,0) 18%),
-    radial-gradient(circle at 87% 16%, rgba(97,122,255,.95) 0 0, rgba(97,122,255,0) 22%),
-    radial-gradient(circle at 81% 83%, rgba(83,255,212,.95) 0 0, rgba(83,255,212,0) 20%),
-    radial-gradient(circle at 24% 82%, rgba(255,109,189,.95) 0 0, rgba(255,109,189,0) 22%),
-    linear-gradient(145deg,#29bbff 0%, #735fff 42%, #ff5198 100%);
+    radial-gradient(circle at 8% 14%, rgba(255,245,132,.95) 0 0, rgba(255,245,132,0) 18%),
+    radial-gradient(circle at 88% 12%, rgba(105,137,255,.95) 0 0, rgba(105,137,255,0) 20%),
+    radial-gradient(circle at 85% 84%, rgba(104,255,214,.95) 0 0, rgba(104,255,214,0) 22%),
+    radial-gradient(circle at 14% 86%, rgba(255,118,208,.90) 0 0, rgba(255,118,208,0) 24%),
+    linear-gradient(145deg,#38d1ff 0%, #4058ff 42%, #ac58ff 72%, #ff64ab 100%);
 }
 body::before,
 body::after{
   content:"";
   position:fixed;
   border-radius:50%;
-  filter:blur(48px);
-  opacity:.35;
+  filter:blur(56px);
+  opacity:.34;
   pointer-events:none;
 }
-body::before{width:42vw;height:42vw;left:-10vw;bottom:0;background:#63fff1}
-body::after{width:38vw;height:38vw;right:-8vw;top:2vh;background:#ffe35f}
+body::before{width:42vw;height:42vw;left:-8vw;bottom:4vh;background:#53ffe6}
+body::after{width:40vw;height:40vw;right:-10vw;top:0;background:#ffe35d}
 .game,.board,.hud,.endOverlay{position:fixed;inset:0}
 .board{overflow:hidden;touch-action:manipulation}
 .hud{pointer-events:none;z-index:5}
@@ -62,16 +63,16 @@ body::after{width:38vw;height:38vw;right:-8vw;top:2vh;background:#ffe35f}
   font-weight:1000;
   letter-spacing:.12em;
   line-height:.92;
-  font-size:clamp(28px,8.2vw,52px);
-  text-shadow:0 10px 26px rgba(0,0,0,.24);
+  font-size:clamp(28px,8vw,52px);
+  text-shadow:0 10px 28px rgba(0,0,0,.22);
 }
 .bottomBar{
   position:absolute;
-  left:calc(10px + var(--safe-left));
-  right:calc(10px + var(--safe-right));
-  bottom:calc(10px + var(--safe-bottom));
+  left:calc(12px + var(--safe-left));
+  right:calc(12px + var(--safe-right));
+  bottom:calc(12px + var(--safe-bottom));
   display:grid;
-  grid-template-columns:86px 86px minmax(160px,1fr);
+  grid-template-columns:minmax(104px,1fr) minmax(104px,1fr) minmax(170px,1.7fr);
   gap:10px;
   align-items:stretch;
   pointer-events:auto;
@@ -79,37 +80,44 @@ body::after{width:38vw;height:38vw;right:-8vw;top:2vh;background:#ffe35f}
 .stat,.toggleBtn,.endCard{
   border:1px solid var(--line);
   box-shadow:var(--shadow);
-  backdrop-filter:blur(18px) saturate(1.15);
-  -webkit-backdrop-filter:blur(18px) saturate(1.15);
+  backdrop-filter:blur(18px) saturate(1.18);
+  -webkit-backdrop-filter:blur(18px) saturate(1.18);
 }
 .stat{
+  min-height:74px;
   background:var(--glass);
-  border-radius:22px;
-  padding:10px 8px 9px;
+  border-radius:24px;
+  padding:10px 10px 8px;
   text-align:center;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
 }
 .stat .label{
-  font-size:10px;
+  font-size:11px;
   font-weight:900;
   letter-spacing:.14em;
   text-transform:uppercase;
   opacity:.96;
 }
 .stat .value{
-  margin-top:4px;
-  font-size:22px;
+  margin-top:6px;
+  font-size:clamp(19px,5.2vw,30px);
   line-height:1;
   font-weight:1000;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+  letter-spacing:.01em;
 }
 .toggleBtn{
   appearance:none;
-  border-radius:24px;
-  min-height:66px;
-  border-width:1px;
+  border-radius:26px;
+  min-height:74px;
   color:#fff;
   font-weight:1000;
-  font-size:24px;
+  font-size:clamp(22px,5.8vw,34px);
   letter-spacing:.04em;
+  text-shadow:0 2px 8px rgba(0,0,0,.18);
 }
 .toggleBtn.play{background:linear-gradient(180deg,var(--green1),var(--green2))}
 .toggleBtn.stop{background:linear-gradient(180deg,var(--red1),var(--red2))}
@@ -119,9 +127,9 @@ body::after{width:38vw;height:38vw;right:-8vw;top:2vh;background:#ffe35f}
   border-radius:50%;
   transform:translate(-50%,-50%);
   box-shadow:
-    inset -12px -18px 28px rgba(0,0,0,.14),
-    inset 11px 13px 26px rgba(255,255,255,.34),
-    0 14px 26px rgba(0,0,0,.20);
+    inset -13px -18px 30px rgba(0,0,0,.14),
+    inset 12px 15px 30px rgba(255,255,255,.32),
+    0 16px 28px rgba(0,0,0,.16);
   transition:
     left .56s cubic-bezier(.22,.8,.18,1),
     top .56s cubic-bezier(.22,.8,.18,1),
@@ -132,25 +140,33 @@ body::after{width:38vw;height:38vw;right:-8vw;top:2vh;background:#ffe35f}
 .ball::before{
   content:"";
   position:absolute;
-  width:42%;
-  height:28%;
+  width:40%;
+  height:27%;
   left:18%;
-  top:16%;
+  top:15%;
   border-radius:50%;
   background:rgba(255,255,255,.38);
-  transform:rotate(-16deg);
+  transform:rotate(-18deg);
   filter:blur(1px);
 }
-.ball:active{transform:translate(-50%,-50%) scale(.92)}
-.ball.majority{filter:drop-shadow(0 0 18px rgba(255,255,255,.52))}
+.ball:active{transform:translate(-50%,-50%) scale(.93)}
+.ball.majority{
+  filter:drop-shadow(0 0 14px rgba(255,255,255,.46));
+  box-shadow:
+    inset -13px -18px 30px rgba(0,0,0,.14),
+    inset 12px 15px 30px rgba(255,255,255,.32),
+    0 0 0 3px rgba(255,255,255,.16),
+    0 18px 28px rgba(0,0,0,.18),
+    0 0 24px rgba(255,255,255,.16);
+}
 .ball.wrong{animation:wrongShake .34s ease}
-.ball.pop{animation:dropBurst .55s cubic-bezier(.18,.8,.22,1) forwards;pointer-events:none}
+.ball.pop{animation:dropBurst .58s cubic-bezier(.18,.8,.22,1) forwards;pointer-events:none}
 .particle{
   position:absolute;
   border-radius:50%;
   pointer-events:none;
   transform:translate(-50%,-50%);
-  animation:particle .74s ease-out forwards;
+  animation:particle .76s ease-out forwards;
 }
 .endOverlay{
   display:none;
@@ -170,7 +186,7 @@ body::after{width:38vw;height:38vw;right:-8vw;top:2vh;background:#ffe35f}
 }
 .endMini{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:900;opacity:.92}
 .endTitle{margin:10px 0 6px;font-size:clamp(28px,8vw,42px);line-height:.95;font-weight:1000}
-.endTime{font-size:clamp(34px,9vw,52px);font-weight:1000;line-height:1;margin:8px 0 10px}
+.endTime{font-size:clamp(34px,9vw,52px);font-weight:1000;line-height:1;margin:8px 0 10px;font-variant-numeric:tabular-nums}
 .endText{font-size:16px;line-height:1.35;font-weight:700;margin:0 0 14px}
 .endBtn{
   appearance:none;
@@ -192,12 +208,12 @@ body::after{width:38vw;height:38vw;right:-8vw;top:2vh;background:#ffe35f}
 }
 @keyframes dropBurst{
   0%{opacity:1;transform:translate(-50%,-50%) scale(1)}
-  55%{opacity:1;transform:translate(-50%,calc(-50% + 58px)) scale(1.08)}
-  100%{opacity:0;transform:translate(-50%,calc(-50% + 210px)) scale(.26)}
+  55%{opacity:1;transform:translate(-50%,calc(-50% + 74px)) scale(1.06)}
+  100%{opacity:0;transform:translate(-50%,calc(-50% + 230px)) scale(.22)}
 }
 @keyframes particle{
-  0%{opacity:.95}
-  100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.2)}
+  0%{opacity:.96}
+  100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.16)}
 }
 </style>
 </head>
@@ -215,7 +231,7 @@ body::after{width:38vw;height:38vw;right:-8vw;top:2vh;background:#ffe35f}
         <div class="label">Record</div>
         <div class="value" id="best">--:--.-</div>
       </div>
-      <button class="toggleBtn play" id="toggleBtn">JOUER</button>
+      <button class="toggleBtn play" id="toggleBtn" aria-label="Jouer">JOUER</button>
     </div>
   </div>
 </div>
@@ -241,15 +257,17 @@ body::after{width:38vw;height:38vw;right:-8vw;top:2vh;background:#ffe35f}
   const endTextEl = document.getElementById('endText');
   const restartBtn = document.getElementById('restartBtn');
 
-  const STORAGE_BEST = 'color-bowls-best-v1';
+  const STORAGE_BEST = 'color-bowls-best-v2';
   const MAX_SERIES = 100;
   const COLORS = [
-    ['#ff5b77','#ff2a51'],
-    ['#47e866','#15b63a'],
-    ['#ffd84d','#ffb700'],
-    ['#57c8ff','#1499ff'],
-    ['#a76bff','#7b38ff'],
-    ['#ff8b3d','#ff5c00']
+    ['#ff5f86','#ff2f58'],
+    ['#54ef6b','#14bc3c'],
+    ['#ffe05f','#ffbd1b'],
+    ['#65cdff','#1c9eff'],
+    ['#b17bff','#8047ff'],
+    ['#ff944d','#ff5e13'],
+    ['#3ff4d6','#00bfa0'],
+    ['#ff7ad8','#ff3fad']
   ];
 
   let bestMs = Number(localStorage.getItem(STORAGE_BEST) || 0);
@@ -258,7 +276,7 @@ body::after{width:38vw;height:38vw;right:-8vw;top:2vh;background:#ffe35f}
   let state = null;
 
   function fmt(ms){
-    if(!ms && ms !== 0) return '--:--.-';
+    if(ms == null || Number.isNaN(ms)) return '--:--.-';
     const totalTenths = Math.floor(ms / 100);
     const minutes = Math.floor(totalTenths / 600);
     const seconds = Math.floor((totalTenths % 600) / 10);
@@ -266,55 +284,74 @@ body::after{width:38vw;height:38vw;right:-8vw;top:2vh;background:#ffe35f}
     return `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}.${tenths}`;
   }
 
-  function updateBest(){ bestEl.textContent = bestMs ? fmt(bestMs) : '--:--.-'; }
-  updateBest();
+  function updateBest(){
+    bestEl.textContent = bestMs ? fmt(bestMs) : '--:--.-';
+  }
 
   function setButtonState(running){
     toggleBtn.className = 'toggleBtn ' + (running ? 'stop' : 'play');
     toggleBtn.textContent = running ? 'ARRÊTER' : 'JOUER';
+    toggleBtn.setAttribute('aria-label', running ? 'Arrêter' : 'Jouer');
   }
 
   function computeSeriesCount(series){
-    const start = 260;
-    const end = 34;
+    const start = 360;
+    const end = 170;
     const t = (series - 1) / (MAX_SERIES - 1);
-    const eased = Math.pow(t, 1.55);
+    const eased = Math.pow(t, 2.8);
     return Math.round(start + (end - start) * eased);
   }
 
-  function colorCounts(total){
-    const countColors = 6;
-    const dominant = Math.floor(Math.random() * countColors);
-    const counts = new Array(countColors).fill(0);
-    const dominantShare = 0.26 + Math.random() * 0.08;
-    counts[dominant] = Math.max(2, Math.round(total * dominantShare));
-    let remaining = total - counts[dominant];
+  function makeBalancedCounts(total){
+    const colorCount = COLORS.length;
+    const winnerIndex = Math.floor(Math.random() * colorCount);
+    const weights = Array.from({ length: colorCount }, () => 0.9 + Math.random() * 0.28);
+    weights[winnerIndex] += 0.16 + Math.random() * 0.06;
 
-    const secondary = [];
-    for(let i=0;i<countColors;i++) if(i !== dominant) secondary.push(i);
-    for(let i=0;i<secondary.length;i++){
-      const idx = secondary[i];
-      const leftSlots = secondary.length - i;
-      const minKeep = leftSlots - 1;
-      const maxHere = Math.max(1, remaining - minKeep);
-      const value = i === secondary.length - 1 ? remaining : Math.max(1, Math.floor(Math.random() * maxHere) + 1);
-      counts[idx] = value;
-      remaining -= value;
+    const weightSum = weights.reduce((a,b) => a + b, 0);
+    const counts = weights.map(w => Math.max(2, Math.floor(total * w / weightSum)));
+
+    let diff = total - counts.reduce((a,b) => a + b, 0);
+    while(diff !== 0){
+      if(diff > 0){
+        const idx = Math.floor(Math.random() * colorCount);
+        counts[idx]++;
+        diff--;
+      }else{
+        const candidates = counts.map((v,i) => ({ v, i })).filter(item => item.v > 2);
+        if(!candidates.length) break;
+        const idx = candidates[Math.floor(Math.random() * candidates.length)].i;
+        counts[idx]--;
+        diff++;
+      }
     }
 
-    while(new Set(counts).size !== counts.length){
-      const sorted = counts.map((v,i)=>({v,i})).sort((a,b)=>b.v-a.v);
-      const seen = new Map();
-      let changed = false;
-      for(const item of sorted){
-        if(seen.has(item.v)){
-          const from = item.i;
-          const to = counts.findIndex((v,idx)=>idx!==from && v < counts[dominant]-1);
-          if(to !== -1 && counts[from] > 1){ counts[from]--; counts[to]++; changed = true; break; }
-        }
-        seen.set(item.v, true);
+    const minVisible = Math.max(6, Math.floor(total / 18));
+    for(let i = 0; i < colorCount; i++){
+      if(i === winnerIndex) continue;
+      while(counts[i] < minVisible){
+        const donor = counts
+          .map((v,idx) => ({ v, idx }))
+          .filter(item => item.idx !== i && item.v > minVisible + 1)
+          .sort((a,b) => b.v - a.v)[0];
+        if(!donor) break;
+        counts[donor.idx]--;
+        counts[i]++;
       }
-      if(!changed) break;
+    }
+
+    const topOther = Math.max(...counts.filter((_, idx) => idx !== winnerIndex));
+    if(counts[winnerIndex] <= topOther){
+      const need = topOther - counts[winnerIndex] + 1;
+      counts[winnerIndex] += need;
+      for(let k = 0; k < need; k++){
+        const donor = counts
+          .map((v,idx) => ({ v, idx }))
+          .filter(item => item.idx !== winnerIndex && item.v > minVisible + 1)
+          .sort((a,b) => b.v - a.v)[0];
+        if(!donor) break;
+        counts[donor.idx]--;
+      }
     }
 
     return counts;
@@ -322,132 +359,154 @@ body::after{width:38vw;height:38vw;right:-8vw;top:2vh;background:#ffe35f}
 
   function makeBalls(series){
     const total = computeSeriesCount(series);
-    const counts = colorCounts(total);
+    const counts = makeBalancedCounts(total);
     const balls = [];
     let id = 1;
     counts.forEach((count, colorIndex) => {
-      for(let i=0;i<count;i++){
-        balls.push({ id:id++, colorIndex, x:0, y:0, r:0, pop:false });
+      for(let i = 0; i < count; i++){
+        balls.push({ id: id++, colorIndex, x: 0, y: 0, r: 0 });
       }
     });
-    for(let i=balls.length-1;i>0;i--){
-      const j = Math.floor(Math.random() * (i+1));
+    for(let i = balls.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
       [balls[i], balls[j]] = [balls[j], balls[i]];
     }
     return balls;
   }
 
   function makeState(series){
-    return { series, running:true, finished:false, balls: makeBalls(series) };
+    return { series, running: true, finished: false, balls: makeBalls(series) };
   }
 
   function boardRect(){
     const rect = board.getBoundingClientRect();
-    const bottomReserved = 88 + parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-bottom') || '0');
-    const topReserved = 66 + parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-top') || '0');
+    const root = getComputedStyle(document.documentElement);
+    const safeTop = parseFloat(root.getPropertyValue('--safe-top')) || 0;
+    const safeBottom = parseFloat(root.getPropertyValue('--safe-bottom')) || 0;
     return {
       width: rect.width,
       height: rect.height,
-      left: 0,
-      top: topReserved,
-      bottom: rect.height - bottomReserved
+      top: 48 + safeTop,
+      bottom: rect.height - (92 + safeBottom)
     };
+  }
+
+  function shuffle(array){
+    for(let i = array.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
   }
 
   function layoutBalls(){
     const zone = boardRect();
-    const areaW = zone.width;
-    const areaH = Math.max(140, zone.bottom - zone.top);
     const total = state.balls.length;
-    const densityFactor = total > 200 ? 1.36 : total > 150 ? 1.3 : total > 100 ? 1.24 : total > 70 ? 1.18 : 1.10;
-    const base = Math.sqrt((areaW * areaH) / (total * Math.PI)) * densityFactor;
-    const radius = Math.max(14, Math.min(34, base));
-    const step = radius * 1.66;
-    const cols = Math.max(4, Math.floor((areaW - radius) / step));
-    const rows = Math.ceil(total / cols);
-    const usedH = rows * step;
-    const yStart = zone.top + Math.max(radius + 4, (areaH - usedH) / 2 + radius);
-    const xPad = Math.max(radius + 4, (areaW - cols * step) / 2 + radius);
+    const areaW = zone.width;
+    const areaH = Math.max(220, zone.bottom - zone.top);
 
+    const density = total > 320 ? 1.16 : total > 260 ? 1.12 : total > 220 ? 1.09 : total > 180 ? 1.05 : 1.02;
+    const radius = Math.max(16, Math.min(34, Math.sqrt((areaW * areaH) / (total * Math.PI * density))));
+    const stepX = radius * 1.72 * 0.94;
+    const stepY = radius * 1.48 * 0.94;
+    const cols = Math.max(7, Math.ceil((areaW + radius * 2.4) / stepX) + 1);
+    const rows = Math.ceil(total / cols) + 2;
+
+    const xStart = -radius * 0.55;
+    const yStart = zone.top + radius * 0.12;
+    const positions = [];
+
+    for(let row = 0; row < rows; row++){
+      for(let col = 0; col < cols; col++){
+        const offset = row % 2 ? stepX * 0.5 : 0;
+        const jitterX = (Math.random() - 0.5) * radius * 0.34;
+        const jitterY = (Math.random() - 0.5) * radius * 0.28;
+        positions.push({
+          x: xStart + col * stepX + offset + jitterX,
+          y: yStart + row * stepY + jitterY
+        });
+      }
+    }
+
+    shuffle(positions);
     state.balls.forEach((ball, index) => {
-      const row = Math.floor(index / cols);
-      const col = index % cols;
-      const offset = row % 2 ? step * 0.5 : 0;
-      const jitterX = (Math.random() - 0.5) * radius * 0.56;
-      const jitterY = (Math.random() - 0.5) * radius * 0.46;
+      const pos = positions[index];
       ball.r = radius;
-      ball.x = xPad + col * step + offset + jitterX;
-      ball.y = yStart + row * step + jitterY;
+      ball.x = pos.x;
+      ball.y = pos.y;
     });
   }
 
-  function getMajorityColors(){
+  function getMajorityData(){
     const counts = new Map();
-    state.balls.forEach(ball => counts.set(ball.colorIndex, (counts.get(ball.colorIndex)||0)+1));
+    state.balls.forEach(ball => counts.set(ball.colorIndex, (counts.get(ball.colorIndex) || 0) + 1));
     const max = Math.max(...counts.values());
-    const winners = [...counts.entries()].filter(([,v]) => v === max).map(([k]) => k);
+    const winners = [...counts.entries()].filter(([, value]) => value === max).map(([key]) => key);
     return { counts, winners };
   }
 
   function render(){
-    board.innerHTML = '';
-    const { winners } = getMajorityColors();
+    const frag = document.createDocumentFragment();
+    const { winners } = getMajorityData();
+
     state.balls.forEach(ball => {
       const el = document.createElement('button');
-      el.className = 'ball' + (winners.includes(ball.colorIndex) ? ' majority' : '');
-      const [c1,c2] = COLORS[ball.colorIndex];
+      const isWinner = winners.includes(ball.colorIndex);
+      el.className = 'ball' + (isWinner ? ' majority' : '');
       el.style.width = `${ball.r * 2}px`;
       el.style.height = `${ball.r * 2}px`;
       el.style.left = `${ball.x}px`;
       el.style.top = `${ball.y}px`;
+      const [c1, c2] = COLORS[ball.colorIndex];
       el.style.background = `radial-gradient(circle at 30% 28%, ${c1} 0%, ${c1} 34%, ${c2} 100%)`;
-      el.dataset.id = ball.id;
-      el.dataset.colorIndex = ball.colorIndex;
-      el.addEventListener('click', onBallClick, { passive:true });
-      board.appendChild(el);
+      el.dataset.id = String(ball.id);
+      el.dataset.colorIndex = String(ball.colorIndex);
+      el.addEventListener('click', onBallClick, { passive: true });
+      frag.appendChild(el);
     });
+
+    board.replaceChildren(frag);
   }
 
-  function spawnParticles(x,y,colorIndex,count=12){
-    const [c1,c2] = COLORS[colorIndex];
-    for(let i=0;i<count;i++){
+  function spawnParticles(x, y, colorIndex, count = 14){
+    const [c1, c2] = COLORS[colorIndex];
+    for(let i = 0; i < count; i++){
       const p = document.createElement('div');
       p.className = 'particle';
-      const size = 6 + Math.random() * 12;
+      const size = 5 + Math.random() * 13;
       const angle = Math.random() * Math.PI * 2;
-      const dist = 34 + Math.random() * 92;
+      const dist = 36 + Math.random() * 110;
       p.style.width = `${size}px`;
       p.style.height = `${size}px`;
       p.style.left = `${x}px`;
       p.style.top = `${y}px`;
-      p.style.background = Math.random() > .5 ? c1 : c2;
+      p.style.background = Math.random() > 0.5 ? c1 : c2;
       p.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
       p.style.setProperty('--dy', `${Math.sin(angle) * dist}px`);
       board.appendChild(p);
-      setTimeout(() => p.remove(), 760);
+      setTimeout(() => p.remove(), 780);
     }
   }
 
   function removeColor(colorIndex){
     const els = [...board.querySelectorAll(`.ball[data-color-index="${colorIndex}"]`)];
+
     els.forEach((el, i) => {
       setTimeout(() => {
         el.classList.add('pop');
-        const x = parseFloat(el.style.left);
-        const y = parseFloat(el.style.top);
-        spawnParticles(x, y, colorIndex, 8);
-      }, i * 18);
+        spawnParticles(parseFloat(el.style.left), parseFloat(el.style.top), colorIndex, 9);
+      }, i * 12);
     });
 
     setTimeout(() => {
       state.balls = state.balls.filter(ball => ball.colorIndex !== colorIndex);
       if(state.balls.length <= 1){
         advanceSeriesOrFinish();
-      } else {
+      }else{
         layoutBalls();
         render();
       }
-    }, 620);
+    }, 640);
   }
 
   function advanceSeriesOrFinish(){
@@ -460,14 +519,14 @@ body::after{width:38vw;height:38vw;right:-8vw;top:2vh;background:#ffe35f}
     render();
   }
 
-  function onBallClick(e){
+  function onBallClick(event){
     if(!state || !state.running || state.finished) return;
-    const colorIndex = Number(e.currentTarget.dataset.colorIndex);
-    const { winners } = getMajorityColors();
+    const colorIndex = Number(event.currentTarget.dataset.colorIndex);
+    const { winners } = getMajorityData();
     if(!winners.includes(colorIndex)){
-      e.currentTarget.classList.add('wrong');
-      setTimeout(() => e.currentTarget.classList.remove('wrong'), 340);
-      if(navigator.vibrate) navigator.vibrate(34);
+      event.currentTarget.classList.add('wrong');
+      setTimeout(() => event.currentTarget.classList.remove('wrong'), 340);
+      if(navigator.vibrate) navigator.vibrate(28);
       return;
     }
     removeColor(colorIndex);
@@ -479,8 +538,15 @@ body::after{width:38vw;height:38vw;right:-8vw;top:2vh;background:#ffe35f}
     raf = requestAnimationFrame(tick);
   }
 
-  function startTimer(){ cancelAnimationFrame(raf); startTs = performance.now(); tick(); }
-  function stopTimer(){ cancelAnimationFrame(raf); }
+  function startTimer(){
+    cancelAnimationFrame(raf);
+    startTs = performance.now();
+    tick();
+  }
+
+  function stopTimer(){
+    cancelAnimationFrame(raf);
+  }
 
   function startGame(){
     endOverlay.classList.remove('show');
@@ -495,7 +561,7 @@ body::after{width:38vw;height:38vw;right:-8vw;top:2vh;background:#ffe35f}
   function stopGame(){
     stopTimer();
     state = null;
-    board.innerHTML = '';
+    board.replaceChildren();
     timerEl.textContent = '00:00.0';
     setButtonState(false);
   }
@@ -505,6 +571,7 @@ body::after{width:38vw;height:38vw;right:-8vw;top:2vh;background:#ffe35f}
     const elapsed = Math.floor(performance.now() - startTs);
     timerEl.textContent = fmt(elapsed);
     endTimeEl.textContent = fmt(elapsed);
+
     let newBest = false;
     if(!bestMs || elapsed < bestMs){
       bestMs = elapsed;
@@ -512,10 +579,11 @@ body::after{width:38vw;height:38vw;right:-8vw;top:2vh;background:#ffe35f}
       updateBest();
       newBest = true;
     }
-    endTextEl.innerHTML = newBest ? 'Nouveau <strong>record</strong> !' : 'Partie terminée. Essaie d’aller encore plus vite.';
+
+    endTextEl.innerHTML = newBest ? 'Nouveau <strong>record</strong> !' : 'Partie terminée. Essaie encore plus vite.';
     setButtonState(false);
     endOverlay.classList.add('show');
-    state = { finished:true, running:false, balls:[], series:MAX_SERIES };
+    state = { finished: true, running: false, balls: [], series: MAX_SERIES };
   }
 
   toggleBtn.addEventListener('click', () => {
@@ -530,7 +598,7 @@ body::after{width:38vw;height:38vw;right:-8vw;top:2vh;background:#ffe35f}
       layoutBalls();
       render();
     }
-  }, { passive:true });
+  }, { passive: true });
 
   timerEl.textContent = '00:00.0';
   updateBest();
