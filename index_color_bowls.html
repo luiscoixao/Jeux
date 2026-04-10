@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
 <title>COLOR BOWLS</title>
 
-<meta name="theme-color" content="#5aa8ff" />
+<meta name="theme-color" content="#42c8ff" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="COLOR BOWLS" />
 
@@ -15,438 +16,454 @@
 
 <style>
 :root{
-  --bg1:#4cb0ff;
-  --bg2:#ff6ab6;
-  --panel:rgba(255,255,255,.18);
-  --panel-strong:rgba(255,255,255,.26);
-  --line:rgba(255,255,255,.24);
-  --text:#ffffff;
-  --shadow:0 14px 40px rgba(0,0,0,.18);
   --safe-top: env(safe-area-inset-top);
   --safe-bottom: env(safe-area-inset-bottom);
+  --safe-left: env(safe-area-inset-left);
+  --safe-right: env(safe-area-inset-right);
+  --text:#fff;
+  --glass:rgba(255,255,255,.16);
+  --glass-strong:rgba(255,255,255,.22);
+  --line:rgba(255,255,255,.24);
+  --shadow:0 18px 40px rgba(0,0,0,.22);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{
-  margin:0;height:100%;overflow:hidden;
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",sans-serif;
-  background:linear-gradient(160deg,var(--bg1),var(--bg2));
-}
-body{
-  color:var(--text);
-}
-.bgGlow{
-  position:fixed; inset:0; pointer-events:none; overflow:hidden;
-}
-.bgGlow::before,.bgGlow::after{
-  content:""; position:absolute; border-radius:50%;
-  filter:blur(40px); opacity:.36;
-}
-.bgGlow::before{
-  width:48vw;height:48vw;left:-8vw;top:8vh;background:#fff58c;
-}
-.bgGlow::after{
-  width:42vw;height:42vw;right:-8vw;bottom:18vh;background:#6bfff2;
-}
-.app{
-  position:fixed; inset:0;
-  display:grid;
-  grid-template-rows:auto 1fr auto;
-  padding:calc(14px + var(--safe-top)) 12px calc(14px + var(--safe-bottom));
-}
-.topbar{
-  display:grid;
-  grid-template-columns:1fr auto auto;
-  gap:10px;
-  align-items:center;
-}
-.brand{
-  min-width:0;
-  background:var(--panel);
-  border:1px solid var(--line);
-  box-shadow:var(--shadow);
-  backdrop-filter:blur(18px) saturate(1.15);
-  -webkit-backdrop-filter:blur(18px) saturate(1.15);
-  border-radius:24px;
-  padding:14px 16px;
-}
-h1{
   margin:0;
-  font-size:clamp(28px,8vw,42px);
-  line-height:.92;
-  letter-spacing:.06em;
-  font-weight:900;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",sans-serif;
+  background:
+    radial-gradient(circle at 18% 16%, #fff06a 0%, rgba(255,240,106,0) 20%),
+    radial-gradient(circle at 85% 18%, #7b6dff 0%, rgba(123,109,255,0) 24%),
+    radial-gradient(circle at 78% 82%, #5ff8cf 0%, rgba(95,248,207,0) 22%),
+    linear-gradient(145deg, #3ab5ff 0%, #8e5bff 48%, #ff5ea8 100%);
 }
-.sub{
-  margin-top:4px;
-  font-size:12px;
-  opacity:.9;
-  letter-spacing:.12em;
-  font-weight:700;
+body{color:var(--text)}
+body::before,
+body::after{
+  content:"";
+  position:fixed;
+  inset:auto;
+  border-radius:50%;
+  filter:blur(42px);
+  opacity:.34;
+  pointer-events:none;
 }
-.pill{
-  min-width:96px;
-  text-align:center;
-  background:var(--panel);
-  border:1px solid var(--line);
-  box-shadow:var(--shadow);
-  backdrop-filter:blur(18px) saturate(1.15);
-  -webkit-backdrop-filter:blur(18px) saturate(1.15);
-  border-radius:24px;
-  padding:10px 12px;
+body::before{
+  width:42vw;height:42vw;left:-8vw;bottom:6vh;background:#62fff0;
 }
-.pill .label{
-  font-size:11px;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-  opacity:.9;
-  font-weight:700;
+body::after{
+  width:38vw;height:38vw;right:-8vw;top:8vh;background:#ffdf57;
 }
-.pill .value{
-  margin-top:4px;
-  font-size:24px;
-  line-height:1;
-  font-weight:900;
+
+.game{
+  position:fixed;
+  inset:0;
 }
-.boardWrap{
-  position:relative;
-  min-height:0;
-}
+
 .board{
-  position:absolute; inset:10px 0 10px 0;
-  border-radius:34px;
+  position:absolute;
+  inset:0;
   overflow:hidden;
   touch-action:manipulation;
 }
+
+.topLayer{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+
+.header{
+  position:absolute;
+  top:calc(10px + var(--safe-top));
+  left:calc(10px + var(--safe-left));
+  right:calc(10px + var(--safe-right));
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto auto;
+  gap:10px;
+  align-items:start;
+  pointer-events:none;
+}
+
+.brand,
+.counter,
+.footerBar,
+.endCard{
+  background:var(--glass);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(18px) saturate(1.15);
+  -webkit-backdrop-filter:blur(18px) saturate(1.15);
+}
+
+.brand{
+  border-radius:28px;
+  padding:14px 16px 12px;
+}
+
+h1{
+  margin:0;
+  font-size:clamp(26px,8vw,44px);
+  line-height:.92;
+  letter-spacing:.08em;
+  font-weight:1000;
+}
+.sub{
+  margin-top:5px;
+  font-size:11px;
+  line-height:1.15;
+  letter-spacing:.14em;
+  font-weight:900;
+  opacity:.95;
+}
+
+.counter{
+  min-width:94px;
+  padding:10px 10px 9px;
+  border-radius:24px;
+  text-align:center;
+}
+.counter .label{
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  font-weight:900;
+  opacity:.9;
+}
+.counter .value{
+  margin-top:4px;
+  font-size:24px;
+  line-height:1;
+  font-weight:1000;
+}
+
+.footerWrap{
+  position:absolute;
+  left:calc(10px + var(--safe-left));
+  right:calc(10px + var(--safe-right));
+  bottom:calc(10px + var(--safe-bottom));
+  pointer-events:none;
+}
+.footerBar{
+  border-radius:26px;
+  padding:10px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto auto;
+  gap:10px;
+  align-items:center;
+  pointer-events:auto;
+}
+.info{
+  min-width:0;
+  padding:4px 6px;
+  font-size:14px;
+  line-height:1.2;
+  font-weight:800;
+}
+.btn{
+  appearance:none;
+  border:none;
+  border-radius:20px;
+  min-width:86px;
+  padding:14px 16px;
+  font-size:15px;
+  font-weight:1000;
+  cursor:pointer;
+  box-shadow:var(--shadow);
+}
+.btn.primary{
+  background:rgba(255,255,255,.92);
+  color:#1a2140;
+}
+.btn.secondary{
+  background:var(--glass-strong);
+  color:#fff;
+  border:1px solid var(--line);
+  backdrop-filter:blur(18px) saturate(1.15);
+  -webkit-backdrop-filter:blur(18px) saturate(1.15);
+}
+
 .ball{
   position:absolute;
+  border:none;
   border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  user-select:none;
-  cursor:pointer;
   transform:translate(-50%,-50%);
   box-shadow:
-    inset -10px -18px 30px rgba(0,0,0,.12),
-    inset 10px 12px 25px rgba(255,255,255,.28),
-    0 14px 28px rgba(0,0,0,.18);
+    inset -12px -18px 28px rgba(0,0,0,.14),
+    inset 11px 13px 26px rgba(255,255,255,.34),
+    0 12px 24px rgba(0,0,0,.2);
   transition:
-    transform .18s ease,
-    box-shadow .18s ease,
+    left .55s cubic-bezier(.22,.8,.18,1),
     top .55s cubic-bezier(.22,.8,.18,1),
-    left .55s cubic-bezier(.22,.8,.18,1);
+    transform .14s ease,
+    filter .2s ease;
+  cursor:pointer;
 }
 .ball::before{
   content:"";
   position:absolute;
-  width:46%; height:34%;
-  left:18%; top:16%;
+  width:42%;
+  height:28%;
+  left:18%;
+  top:16%;
   border-radius:50%;
-  background:rgba(255,255,255,.32);
+  background:rgba(255,255,255,.36);
   filter:blur(1px);
-  transform:rotate(-18deg);
+  transform:rotate(-16deg);
 }
-.ball:active{ transform:translate(-50%,-50%) scale(.94); }
-.ball.wrong{
-  animation:wrongShake .34s ease;
+.ball:active{
+  transform:translate(-50%,-50%) scale(.92);
 }
-.ball.hint{
-  animation:hintPulse 1.2s ease-in-out infinite;
-}
+.ball.hint{ animation:hintPulse 1s ease-in-out infinite; }
+.ball.wrong{ animation:wrongShake .34s ease; }
 .ball.pop{
-  animation:popOut .48s cubic-bezier(.22,.8,.18,1) forwards;
+  animation:dropBurst .52s cubic-bezier(.18,.8,.22,1) forwards;
   pointer-events:none;
 }
+
 .particle{
   position:absolute;
   border-radius:50%;
   pointer-events:none;
   transform:translate(-50%,-50%);
-  animation:burst .75s ease-out forwards;
-  box-shadow:0 0 12px rgba(255,255,255,.35);
+  animation:particle .72s ease-out forwards;
 }
-.bottom{
-  display:grid;
-  grid-template-columns:1fr auto auto;
-  gap:10px;
-  align-items:center;
-}
-.info{
-  min-width:0;
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:22px;
-  padding:13px 16px;
-  box-shadow:var(--shadow);
-  backdrop-filter:blur(18px) saturate(1.15);
-  -webkit-backdrop-filter:blur(18px) saturate(1.15);
-  font-size:14px;
-  line-height:1.25;
-  font-weight:700;
-}
-.btn{
-  appearance:none;border:none;cursor:pointer;
-  min-width:86px;
-  border-radius:22px;
-  padding:15px 18px;
-  background:rgba(255,255,255,.88);
-  color:#18233b;
-  font-weight:900;
-  font-size:15px;
-  box-shadow:var(--shadow);
-}
-.btn.secondary{
-  background:var(--panel-strong);
-  color:#fff;
-  border:1px solid var(--line);
-  backdrop-filter:blur(18px) saturate(1.15);
-  -webkit-backdrop-filter:blur(18px) saturate(1.15);
-}
-.overlay{
-  position:absolute; inset:0;
+
+.endOverlay{
+  position:absolute;
+  inset:0;
   display:none;
-  align-items:center; justify-content:center;
-  padding:22px;
-  background:rgba(12,18,33,.14);
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(13,18,40,.14);
+  pointer-events:auto;
 }
-.overlay.show{ display:flex; }
-.card{
+.endOverlay.show{display:flex}
+.endCard{
   width:min(92vw,520px);
-  border-radius:32px;
-  background:rgba(255,255,255,.2);
-  border:1px solid rgba(255,255,255,.28);
-  box-shadow:0 24px 60px rgba(0,0,0,.24);
+  border-radius:34px;
   padding:24px 20px 20px;
   text-align:center;
-  color:#fff;
-  backdrop-filter:blur(18px) saturate(1.2);
-  -webkit-backdrop-filter:blur(18px) saturate(1.2);
 }
-.card h2{
-  margin:0 0 8px;
-  font-size:clamp(28px,7vw,40px);
-  line-height:1;
-  letter-spacing:.03em;
-}
-.card p{
-  margin:8px 0;
-  font-size:17px;
-  font-weight:700;
-}
-.bigTime{
-  margin:16px 0 10px;
-  font-size:clamp(48px,14vw,82px);
-  line-height:.95;
+.endMini{
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
   font-weight:900;
-  letter-spacing:.02em;
+  opacity:.95;
 }
-.cardActions{
-  display:flex; gap:10px; justify-content:center; margin-top:16px;
+.endCard h2{
+  margin:8px 0 10px;
+  font-size:clamp(28px,8vw,42px);
+  line-height:.95;
 }
-.muted{ opacity:.9; font-size:13px; letter-spacing:.08em; text-transform:uppercase; }
+.endTime{
+  font-size:clamp(52px,15vw,86px);
+  line-height:.92;
+  font-weight:1000;
+  margin:10px 0;
+}
+.endText{
+  font-size:17px;
+  line-height:1.25;
+  font-weight:800;
+}
+.endActions{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-top:18px;
+}
 
-@keyframes popOut{
-  0%{opacity:1; transform:translate(-50%,-50%) scale(1);}
-  50%{opacity:1; transform:translate(calc(-50% + var(--dx,0px)), calc(-50% + var(--dy,0px))) scale(1.14);}
-  100%{opacity:0; transform:translate(calc(-50% + var(--dx2,0px)), calc(-50% + var(--dy2,0px))) scale(.2);}
+@keyframes dropBurst{
+  0%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  30%{opacity:1;transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy1))) scale(1.08)}
+  100%{opacity:0;transform:translate(calc(-50% + var(--dx2)), calc(-50% + var(--dy2))) scale(.18)}
 }
-@keyframes burst{
-  0%{opacity:1; transform:translate(-50%,-50%) scale(1);}
-  100%{opacity:0; transform:translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(.12);}
+@keyframes particle{
+  0%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(.1)}
 }
 @keyframes wrongShake{
   0%,100%{transform:translate(-50%,-50%)}
-  20%{transform:translate(calc(-50% - 6px),-50%)}
-  40%{transform:translate(calc(-50% + 6px),-50%)}
-  60%{transform:translate(calc(-50% - 4px),-50%)}
-  80%{transform:translate(calc(-50% + 4px),-50%)}
+  20%{transform:translate(calc(-50% - 7px),-50%)}
+  40%{transform:translate(calc(-50% + 7px),-50%)}
+  60%{transform:translate(calc(-50% - 5px),-50%)}
+  80%{transform:translate(calc(-50% + 5px),-50%)}
 }
 @keyframes hintPulse{
-  0%,100%{ box-shadow: inset -10px -18px 30px rgba(0,0,0,.12), inset 10px 12px 25px rgba(255,255,255,.28), 0 14px 28px rgba(0,0,0,.18);}
-  50%{ box-shadow: inset -10px -18px 30px rgba(0,0,0,.12), inset 10px 12px 25px rgba(255,255,255,.28), 0 0 0 10px rgba(255,255,255,.10), 0 16px 34px rgba(0,0,0,.22);}
+  0%,100%{filter:none}
+  50%{filter:drop-shadow(0 0 16px rgba(255,255,255,.72))}
 }
 
-@media (max-width:720px){
-  .topbar{ grid-template-columns:1fr 94px 94px; }
-  .pill{ min-width:0; padding:10px 8px; }
-  .pill .value{ font-size:22px; }
-  .bottom{ grid-template-columns:1fr 82px 82px; }
-  .btn{ min-width:0; padding:14px 12px; }
-  .board{ inset:10px 0; }
+@media (max-width: 760px){
+  .header{grid-template-columns:minmax(0,1fr) 92px 92px}
+  .footerBar{grid-template-columns:minmax(0,1fr) 82px 92px}
+  .btn{min-width:0;padding:14px 12px}
 }
 </style>
 </head>
 <body>
-<div class="bgGlow"></div>
+<div class="game">
+  <div class="board" id="board"></div>
 
-<div class="app">
-  <div class="topbar">
-    <div class="brand">
-      <h1>COLOR BOWLS</h1>
-      <div class="sub">TOUCHE UNE COULEUR MAJORITAIRE</div>
+  <div class="topLayer">
+    <div class="header">
+      <div class="brand">
+        <h1>COLOR BOWLS</h1>
+        <div class="sub">TOUCHE UNE COULEUR MAJORITAIRE</div>
+      </div>
+
+      <div class="counter">
+        <div class="label">Chrono</div>
+        <div class="value" id="timer">00:00</div>
+      </div>
+
+      <div class="counter">
+        <div class="label">Record</div>
+        <div class="value" id="best">--:--</div>
+      </div>
     </div>
 
-    <div class="pill">
-      <div class="label">Chrono</div>
-      <div class="value" id="timer">00:00</div>
+    <div class="footerWrap">
+      <div class="footerBar">
+        <div class="info" id="info">Trouve une couleur majoritaire.</div>
+        <button class="btn secondary" id="hintBtn">AIDE</button>
+        <button class="btn primary" id="restartBtn">REJOUER</button>
+      </div>
     </div>
 
-    <div class="pill">
-      <div class="label">Record</div>
-      <div class="value" id="best">--:--</div>
-    </div>
-  </div>
-
-  <div class="boardWrap">
-    <div class="board" id="board"></div>
-
-    <div class="overlay show" id="overlay">
-      <div class="card">
-        <div class="muted">Jeu de rapidité</div>
+    <div class="endOverlay" id="endOverlay">
+      <div class="endCard">
+        <div class="endMini">Partie terminée</div>
         <h2>COLOR BOWLS</h2>
-        <p>Appuie sur l’une des <strong>couleurs les plus nombreuses</strong>.</p>
-        <p>Toutes les boules de cette couleur tombent d’un coup.</p>
-        <div class="bigTime" id="lastTime">00:00</div>
-        <p id="resultText">Touchez <strong>JOUER</strong> pour commencer.</p>
-        <div class="cardActions">
-          <button class="btn" id="playBtn">JOUER</button>
+        <div class="endTime" id="endTime">00:00</div>
+        <div class="endText" id="endText">Bravo.</div>
+        <div class="endActions">
+          <button class="btn primary" id="playAgainBtn">REJOUER</button>
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="bottom">
-    <div class="info" id="info">
-      Trouve la couleur majoritaire à chaque coup.
-    </div>
-    <button class="btn secondary" id="hintBtn">AIDE</button>
-    <button class="btn" id="restartBtn">REJOUER</button>
   </div>
 </div>
 
 <script>
 (() => {
   const COLORS = [
-    {name:"jaune", base:"#ffd62f", shadow:"#ffb100"},
-    {name:"turquoise", base:"#18e7c0", shadow:"#0bbda6"},
-    {name:"orange", base:"#ff7e36", shadow:"#ff5e00"},
-    {name:"violet", base:"#b65cff", shadow:"#8934ef"},
-    {name:"rose", base:"#ff5ca8", shadow:"#ff2f85"},
-    {name:"bleu", base:"#57a4ff", shadow:"#2b78ff"}
+    {name:"jaune", base:"#ffd835", shadow:"#ffb800"},
+    {name:"turquoise", base:"#16ebc2", shadow:"#05bfa0"},
+    {name:"orange", base:"#ff8437", shadow:"#ff5f00"},
+    {name:"violet", base:"#b76aff", shadow:"#8d39f6"},
+    {name:"rose", base:"#ff5fab", shadow:"#ff2b87"},
+    {name:"bleu", base:"#5dabff", shadow:"#2f7dff"}
   ];
 
-  const STORAGE_BEST = "color-bowls-best-ms-v1";
+  const STORAGE_BEST = 'color-bowls-best-ms-v2';
 
-  const board = document.getElementById("board");
-  const timerEl = document.getElementById("timer");
-  const bestEl = document.getElementById("best");
-  const infoEl = document.getElementById("info");
-  const overlay = document.getElementById("overlay");
-  const playBtn = document.getElementById("playBtn");
-  const restartBtn = document.getElementById("restartBtn");
-  const hintBtn = document.getElementById("hintBtn");
-  const lastTimeEl = document.getElementById("lastTime");
-  const resultTextEl = document.getElementById("resultText");
+  const board = document.getElementById('board');
+  const timerEl = document.getElementById('timer');
+  const bestEl = document.getElementById('best');
+  const infoEl = document.getElementById('info');
+  const hintBtn = document.getElementById('hintBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const endOverlay = document.getElementById('endOverlay');
+  const endTimeEl = document.getElementById('endTime');
+  const endTextEl = document.getElementById('endText');
+  const playAgainBtn = document.getElementById('playAgainBtn');
 
   let state = null;
   let timerId = null;
   let startTs = 0;
   let bestMs = Number(localStorage.getItem(STORAGE_BEST) || 0);
 
-  function formatMs(ms){
+  function fmt(ms){
     const total = Math.max(0, Math.floor(ms / 1000));
-    const m = String(Math.floor(total / 60)).padStart(2, "0");
-    const s = String(total % 60).padStart(2, "0");
+    const m = String(Math.floor(total / 60)).padStart(2, '0');
+    const s = String(total % 60).padStart(2, '0');
     return `${m}:${s}`;
   }
 
-  function updateBestUI(){
-    bestEl.textContent = bestMs ? formatMs(bestMs) : "--:--";
+  function updateBest(){
+    bestEl.textContent = bestMs ? fmt(bestMs) : '--:--';
   }
-  updateBestUI();
+  updateBest();
 
-  function boardRect(){
+  function rect(){
     return board.getBoundingClientRect();
   }
 
-  function makeBallStyle(ball){
-    return `
-      background:
-        radial-gradient(circle at 32% 28%, rgba(255,255,255,.62), rgba(255,255,255,.18) 24%, transparent 28%),
-        radial-gradient(circle at 40% 38%, ${ball.color.base} 0%, ${ball.color.base} 56%, ${ball.color.shadow} 100%);
-      width:${ball.size}px;
-      height:${ball.size}px;
-      left:${ball.x}px;
-      top:${ball.y}px;
-      z-index:${Math.round(ball.y)};
-    `;
-  }
-
-  function weightedColorPool(){
-    // Yields ties frequently so player often has a choice between several major colors.
-    const preset = [
-      0,0,0,0,
-      1,1,1,1,
-      2,2,2,
-      3,3,3,
-      4,4,
-      5,5
+  function buildWeightedPool(targetCount){
+    const dominant = [0,1,2,3].sort(() => Math.random() - 0.5).slice(0,3);
+    const counts = [
+      Math.floor(targetCount * 0.21),
+      Math.floor(targetCount * 0.21),
+      Math.floor(targetCount * 0.18),
+      Math.floor(targetCount * 0.14),
+      Math.floor(targetCount * 0.13),
+      0
     ];
-    const shuffled = [...preset].sort(() => Math.random() - 0.5);
-    return shuffled;
+    counts[dominant[0]] += 4;
+    counts[dominant[1]] += 4;
+    counts[dominant[2]] += 2;
+    let used = counts.reduce((a,b)=>a+b,0);
+    while(used < targetCount){
+      counts[Math.floor(Math.random() * COLORS.length)]++;
+      used++;
+    }
+    const pool = [];
+    counts.forEach((n, i) => {
+      for(let k=0;k<n;k++) pool.push(i);
+    });
+    return pool.sort(() => Math.random() - 0.5);
   }
 
   function generateLevel(){
-    const rect = boardRect();
-    const w = Math.max(320, rect.width);
-    const h = Math.max(420, rect.height);
+    const r = rect();
+    const w = Math.max(320, r.width);
+    const h = Math.max(560, r.height);
 
-    const count = w < 430 ? 30 : 40;
-    const cols = w < 430 ? 5 : 6;
-    const rows = Math.ceil(count / cols);
+    const targetCount = w < 430 ? 78 : 108;
+    const cols = w < 430 ? 7 : 9;
+    const rows = Math.ceil(targetCount / cols);
+
+    const topReserved = Math.max(96, h * 0.14);
+    const bottomReserved = Math.max(96, h * 0.14);
+    const usableTop = topReserved;
+    const usableBottom = h - bottomReserved;
+    const usableH = usableBottom - usableTop;
     const cellW = w / cols;
-    const topPad = Math.max(22, h * 0.03);
-    const usableH = h - topPad - 16;
     const cellH = usableH / rows;
-    const base = Math.max(52, Math.min(cellW, cellH) * 0.78);
+    const baseSize = Math.max(34, Math.min(cellW, cellH) * 0.94);
 
-    const pool = weightedColorPool();
+    const pool = buildWeightedPool(targetCount);
     const balls = [];
-    let i = 0;
 
-    for(let r = 0; r < rows; r++){
-      for(let c = 0; c < cols; c++){
-        if(i >= count) break;
-        const size = base * (0.88 + Math.random() * 0.16);
-        const cx = c * cellW + cellW / 2 + (Math.random() * 10 - 5);
-        const cy = topPad + r * cellH + cellH / 2 + (Math.random() * 10 - 5);
-        const colorIndex = pool[i % pool.length];
-        balls.push({
-          id:`b${Date.now()}_${i}_${Math.random().toString(36).slice(2,7)}`,
-          x:cx, y:cy, size:size,
-          color: COLORS[colorIndex],
-          colorIndex,
-          el:null
-        });
-        i++;
-      }
-    }
-
-    // Shuffle positions lightly to make the screen feel lively
-    for(let k = 0; k < balls.length * 2; k++){
-      const a = Math.floor(Math.random() * balls.length);
-      const b = Math.floor(Math.random() * balls.length);
-      const tmp = balls[a].colorIndex;
-      balls[a].colorIndex = balls[b].colorIndex;
-      balls[b].colorIndex = tmp;
-      balls[a].color = COLORS[balls[a].colorIndex];
-      balls[b].color = COLORS[balls[b].colorIndex];
+    for(let i = 0; i < targetCount; i++){
+      const c = i % cols;
+      const row = Math.floor(i / cols);
+      const size = baseSize * (0.9 + Math.random() * 0.22);
+      const jitterX = (Math.random() - 0.5) * cellW * 0.55;
+      const jitterY = (Math.random() - 0.5) * cellH * 0.5;
+      const x = c * cellW + cellW / 2 + jitterX;
+      const y = usableTop + row * cellH + cellH / 2 + jitterY;
+      const colorIndex = pool[i % pool.length];
+      balls.push({
+        id: `b_${Date.now()}_${i}_${Math.random().toString(36).slice(2,6)}`,
+        colorIndex,
+        color: COLORS[colorIndex],
+        x, y,
+        size,
+        el:null
+      });
     }
 
     return { balls, started:false, finished:false };
   }
 
-  function countsMap(){
+  function counts(){
     const map = new Map();
     for(const b of state.balls){
       map.set(b.colorIndex, (map.get(b.colorIndex) || 0) + 1);
@@ -454,25 +471,38 @@ h1{
     return map;
   }
 
-  function majorityColorIndices(){
-    const map = countsMap();
+  function majorities(){
+    const map = counts();
     let max = 0;
-    for(const v of map.values()) max = Math.max(max, v);
+    for(const value of map.values()) max = Math.max(max, value);
     const winners = [];
     for(const [k,v] of map.entries()) if(v === max) winners.push(k);
     return { winners, max };
   }
 
+  function ballStyle(ball){
+    return `
+      width:${ball.size}px;
+      height:${ball.size}px;
+      left:${ball.x}px;
+      top:${ball.y}px;
+      z-index:${Math.round(ball.y)};
+      background:
+        radial-gradient(circle at 32% 28%, rgba(255,255,255,.68), rgba(255,255,255,.18) 23%, transparent 28%),
+        radial-gradient(circle at 45% 42%, ${ball.color.base} 0%, ${ball.color.base} 58%, ${ball.color.shadow} 100%);
+    `;
+  }
+
   function render(){
-    board.innerHTML = "";
+    board.innerHTML = '';
     for(const b of state.balls){
-      const el = document.createElement("button");
-      el.className = "ball";
-      el.style.cssText = makeBallStyle(b);
+      const el = document.createElement('button');
+      el.className = 'ball';
+      el.style.cssText = ballStyle(b);
       el.dataset.id = b.id;
       el.dataset.colorIndex = String(b.colorIndex);
-      el.setAttribute("aria-label", b.color.name);
-      el.addEventListener("click", onBallClick, {passive:true});
+      el.setAttribute('aria-label', b.color.name);
+      el.addEventListener('click', onBallClick, { passive:true });
       b.el = el;
       board.appendChild(el);
     }
@@ -481,32 +511,31 @@ h1{
 
   function refreshInfo(){
     if(!state || state.finished) return;
-    const { winners, max } = majorityColorIndices();
-    const names = winners.map(i => COLORS[i].name.toUpperCase()).join(" / ");
-    infoEl.innerHTML = state.started
-      ? `Couleur majoritaire : <strong>${names}</strong> · <strong>${max}</strong> boule${max>1?"s":""}`
-      : `Trouve la couleur majoritaire pour lancer la partie.`;
+    const { winners, max } = majorities();
+    const names = winners.map(i => COLORS[i].name.toUpperCase()).join(' / ');
+    infoEl.innerHTML = `Majoritaire : <strong>${names}</strong> · <strong>${max}</strong>`;
   }
 
   function clearHints(){
-    board.querySelectorAll(".ball.hint").forEach(el => el.classList.remove("hint"));
+    board.querySelectorAll('.ball.hint').forEach(el => el.classList.remove('hint'));
   }
 
   function showHints(){
+    if(!state || state.finished) return;
     clearHints();
-    const { winners } = majorityColorIndices();
-    board.querySelectorAll(".ball").forEach(el => {
-      if(winners.includes(Number(el.dataset.colorIndex))) el.classList.add("hint");
+    const { winners } = majorities();
+    board.querySelectorAll('.ball').forEach(el => {
+      if(winners.includes(Number(el.dataset.colorIndex))) el.classList.add('hint');
     });
-    setTimeout(clearHints, 1500);
+    setTimeout(clearHints, 1300);
   }
 
-  function startTimerIfNeeded(){
+  function startTimer(){
     if(state.started) return;
     state.started = true;
     startTs = performance.now();
     timerId = setInterval(() => {
-      timerEl.textContent = formatMs(performance.now() - startTs);
+      timerEl.textContent = fmt(performance.now() - startTs);
     }, 100);
   }
 
@@ -517,41 +546,73 @@ h1{
     }
   }
 
-  function dropAndRemove(colorIndex, tappedEl){
+  function compactLayout(){
+    const r = rect();
+    const w = Math.max(320, r.width);
+    const h = Math.max(560, r.height);
+    const n = state.balls.length;
+    if(!n) return;
+
+    const topReserved = Math.max(96, h * 0.14);
+    const bottomReserved = Math.max(96, h * 0.14);
+    const usableTop = topReserved;
+    const usableBottom = h - bottomReserved;
+    const usableH = usableBottom - usableTop;
+
+    let cols;
+    if(n <= 1) cols = 1;
+    else if(n <= 4) cols = 2;
+    else if(n <= 9) cols = 3;
+    else if(n <= 16) cols = 4;
+    else if(n <= 25) cols = 5;
+    else cols = w < 430 ? 6 : 8;
+
+    const rows = Math.ceil(n / cols);
+    const cellW = w / cols;
+    const cellH = usableH / rows;
+    const baseSize = Math.min(118, Math.max(36, Math.min(cellW, cellH) * 0.88));
+
+    state.balls.forEach((b, i) => {
+      const c = i % cols;
+      const row = Math.floor(i / cols);
+      b.size = baseSize;
+      b.x = c * cellW + cellW / 2;
+      b.y = usableTop + row * cellH + cellH / 2;
+    });
+  }
+
+  function explodeColor(colorIndex){
     const doomed = state.balls.filter(b => b.colorIndex === colorIndex);
     const survivors = state.balls.filter(b => b.colorIndex !== colorIndex);
-    const rect = boardRect();
-    doomed.forEach((b, idx) => {
+    const r = rect();
+
+    doomed.forEach(b => {
       const el = b.el;
       if(!el) return;
-      const dx = (Math.random() * 80 - 40).toFixed(1) + "px";
-      const dy = (rect.height + b.size + Math.random()*160).toFixed(1) + "px";
-      const dx2 = (Math.random() * 140 - 70).toFixed(1) + "px";
-      const dy2 = (rect.height + b.size + 160 + Math.random()*180).toFixed(1) + "px";
-      el.style.setProperty("--dx", dx);
-      el.style.setProperty("--dy", dy);
-      el.style.setProperty("--dx2", dx2);
-      el.style.setProperty("--dy2", dy2);
-      el.classList.add("pop");
+      el.style.setProperty('--dx', `${(Math.random()*80 - 40).toFixed(1)}px`);
+      el.style.setProperty('--dy1', `${(Math.random()*40 - 10).toFixed(1)}px`);
+      el.style.setProperty('--dx2', `${(Math.random()*180 - 90).toFixed(1)}px`);
+      el.style.setProperty('--dy2', `${(r.height + b.size + 130 + Math.random()*140).toFixed(1)}px`);
+      el.classList.add('pop');
 
-      for(let i = 0; i < 6; i++){
-        const p = document.createElement("div");
-        p.className = "particle";
-        const s = 8 + Math.random() * 14;
-        p.style.width = s + "px";
-        p.style.height = s + "px";
-        p.style.left = b.x + "px";
-        p.style.top = b.y + "px";
-        p.style.background = `radial-gradient(circle at 35% 35%, rgba(255,255,255,.9), ${b.color.base} 55%, ${b.color.shadow} 100%)`;
-        p.style.setProperty("--tx", (Math.random()*170 - 85).toFixed(1) + "px");
-        p.style.setProperty("--ty", (Math.random()*170 - 40).toFixed(1) + "px");
+      for(let i=0;i<7;i++){
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = 8 + Math.random() * 12;
+        p.style.width = `${size}px`;
+        p.style.height = `${size}px`;
+        p.style.left = `${b.x}px`;
+        p.style.top = `${b.y}px`;
+        p.style.background = `radial-gradient(circle at 35% 35%, rgba(255,255,255,.94), ${b.color.base} 58%, ${b.color.shadow} 100%)`;
+        p.style.setProperty('--tx', `${(Math.random()*170 - 85).toFixed(1)}px`);
+        p.style.setProperty('--ty', `${(Math.random()*170 - 80).toFixed(1)}px`);
         board.appendChild(p);
         setTimeout(() => p.remove(), 760);
       }
     });
 
     if(navigator.vibrate){
-      navigator.vibrate(doomed.length >= 4 ? [18, 25, 45] : 18);
+      navigator.vibrate(doomed.length >= 5 ? [18, 18, 45] : 18);
     }
 
     setTimeout(() => {
@@ -564,102 +625,65 @@ h1{
     }, 520);
   }
 
-  function compactLayout(){
-    const rect = boardRect();
-    const w = Math.max(320, rect.width);
-    const h = Math.max(420, rect.height);
-    const count = state.balls.length;
-    if(count <= 0) return;
-
-    const cols = count <= 4 ? 2 : count <= 9 ? 3 : count <= 16 ? 4 : (w < 430 ? 5 : 6);
-    const rows = Math.ceil(count / cols);
-    const cellW = w / cols;
-    const topPad = Math.max(20, h * 0.05);
-    const usableH = h - topPad - 16;
-    const cellH = usableH / rows;
-    const base = Math.max(54, Math.min(cellW, cellH) * 0.82);
-
-    state.balls.forEach((b, i) => {
-      const r = Math.floor(i / cols);
-      const c = i % cols;
-      b.size = Math.min(base, 112);
-      b.x = c * cellW + cellW / 2;
-      b.y = topPad + r * cellH + cellH / 2;
-    });
-  }
-
   function onBallClick(e){
     if(!state || state.finished) return;
-    const el = e.currentTarget;
-    const colorIndex = Number(el.dataset.colorIndex);
-    const { winners } = majorityColorIndices();
+    const colorIndex = Number(e.currentTarget.dataset.colorIndex);
+    const { winners } = majorities();
 
     if(!winners.includes(colorIndex)){
-      el.classList.add("wrong");
-      setTimeout(() => el.classList.remove("wrong"), 360);
+      e.currentTarget.classList.add('wrong');
+      setTimeout(() => e.currentTarget.classList.remove('wrong'), 360);
       infoEl.innerHTML = `Non. Choisis une couleur <strong>majoritaire</strong>.`;
       if(navigator.vibrate) navigator.vibrate(40);
       return;
     }
 
-    startTimerIfNeeded();
+    startTimer();
     clearHints();
-    dropAndRemove(colorIndex, el);
+    explodeColor(colorIndex);
   }
 
   function finishGame(){
     state.finished = true;
     stopTimer();
-    const elapsed = performance.now() - startTs;
-    timerEl.textContent = formatMs(elapsed);
-    lastTimeEl.textContent = formatMs(elapsed);
+    const elapsed = Math.floor(performance.now() - startTs);
+    timerEl.textContent = fmt(elapsed);
+    endTimeEl.textContent = fmt(elapsed);
 
     let isBest = false;
     if(!bestMs || elapsed < bestMs){
-      bestMs = Math.floor(elapsed);
+      bestMs = elapsed;
       localStorage.setItem(STORAGE_BEST, String(bestMs));
-      updateBestUI();
+      updateBest();
       isBest = true;
     }
 
-    resultTextEl.innerHTML = isBest
-      ? `Nouveau <strong>meilleur chrono</strong> !`
-      : `Partie terminée. Essaie d’aller encore plus vite.`;
+    endTextEl.innerHTML = isBest
+      ? 'Nouveau <strong>meilleur chrono</strong> !'
+      : 'Bravo. Essaie d’aller encore plus vite.';
 
-    overlay.classList.add("show");
+    endOverlay.classList.add('show');
   }
 
-  function resetGame(showIntro = false){
+  function newGame(){
     stopTimer();
-    timerEl.textContent = "00:00";
+    timerEl.textContent = '00:00';
+    endOverlay.classList.remove('show');
     state = generateLevel();
     render();
-    lastTimeEl.textContent = "00:00";
-    resultTextEl.innerHTML = showIntro
-      ? `Touchez <strong>JOUER</strong> pour commencer.`
-      : `Appuie sur une couleur majoritaire.`;
-    overlay.classList.toggle("show", showIntro);
   }
 
-  playBtn.addEventListener("click", () => {
-    overlay.classList.remove("show");
-    resetGame(false);
-  });
+  hintBtn.addEventListener('click', showHints);
+  restartBtn.addEventListener('click', newGame);
+  playAgainBtn.addEventListener('click', newGame);
 
-  restartBtn.addEventListener("click", () => {
-    overlay.classList.remove("show");
-    resetGame(false);
-  });
-
-  hintBtn.addEventListener("click", showHints);
-
-  window.addEventListener("resize", () => {
-    if(!state) return;
+  window.addEventListener('resize', () => {
+    if(!state || state.finished) return;
     compactLayout();
     render();
-  }, {passive:true});
+  }, { passive:true });
 
-  resetGame(true);
+  newGame();
 })();
 </script>
 </body>
