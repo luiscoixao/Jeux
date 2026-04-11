@@ -243,9 +243,8 @@ body::after{
   animation:wrongShake .34s ease;
 }
 
-
 .balloon.fly{
-  animation:flyAway 2.2s ease-out forwards;
+  animation:flyAway 2.8s ease-out forwards;
   pointer-events:none;
   will-change:transform, opacity;
 }
@@ -326,11 +325,18 @@ body::after{
     opacity:1;
     transform:translate(-50%,-50%) scale(1);
   }
+  70%{
+    opacity:1;
+    transform:translate(
+      calc(-50% + var(--driftx) * .55),
+      calc(-50% - 180px)
+    ) scale(1.01);
+  }
   100%{
     opacity:0;
     transform:translate(
       calc(-50% + var(--driftx)),
-      calc(-50% - 620px)
+      calc(-50% - 420px)
     ) scale(1.015);
   }
 }
@@ -438,8 +444,8 @@ body::after{
   }
 
   function computeSeriesCount(series){
-    const start = 96;
-    const end = 440;
+    const start = 24;
+    const end = 220;
     const t = (series - 1) / Math.max(1, MAX_SERIES - 1);
     const eased = Math.pow(t, 1.18);
     return Math.round(start + (end - start) * eased);
@@ -644,43 +650,41 @@ body::after{
     board.replaceChildren(frag);
   }
 
-function removeColor(colorIndex){
-  const els = [...board.querySelectorAll(`.balloon[data-color-index="${colorIndex}"]`)]
-    .filter(el => !el.classList.contains('fly'));
+  function removeColor(colorIndex){
+    const els = [...board.querySelectorAll(`.balloon[data-color-index="${colorIndex}"]`)]
+      .filter(el => !el.classList.contains('fly'));
 
-  if(!els.length) return;
+    if(!els.length) return;
 
-  isResolving = true;
-  board.classList.add('resolving');
-  board.querySelectorAll('.balloon.majority').forEach(el => el.classList.remove('majority'));
+    isResolving = true;
+    board.classList.add('resolving');
+    board.querySelectorAll('.balloon.majority').forEach(el => el.classList.remove('majority'));
 
-  // retirer immédiatement les ballons du state pour qu'ils ne puissent plus être recréés
-  state.balloons = state.balloons.filter(balloon => balloon.colorIndex !== colorIndex);
+    state.balloons = state.balloons.filter(balloon => balloon.colorIndex !== colorIndex);
 
-  let remaining = els.length;
+    let remaining = els.length;
 
-  els.forEach((el) => {
-    el.classList.add('fly');
+    els.forEach((el) => {
+      el.classList.add('fly');
 
-    const done = () => {
-      el.removeEventListener('animationend', done);
-      if(el.isConnected) el.remove();
-      remaining--;
+      const done = () => {
+        if(el.isConnected) el.remove();
+        remaining--;
 
-      if(remaining === 0){
-        if(state.balloons.length <= 1){
-          advanceSeriesOrFinish();
-        }else{
-          isResolving = false;
-          board.classList.remove('resolving');
-          render();
+        if(remaining === 0){
+          if(state.balloons.length === 0){
+            advanceSeriesOrFinish();
+          }else{
+            isResolving = false;
+            board.classList.remove('resolving');
+            render();
+          }
         }
-      }
-    };
+      };
 
-    el.addEventListener('animationend', done, { once:true });
-  });
-}
+      el.addEventListener('animationend', done, { once:true });
+    });
+  }
 
   function advanceSeriesOrFinish(){
     if(state.series >= MAX_SERIES){
@@ -712,7 +716,7 @@ function removeColor(colorIndex){
   }
 
   function onBalloonClick(event){
-    if(!state || !state.running || state.finished) return;
+    if(!state || !state.running || state.finished || isResolving) return;
 
     const colorIndex = Number(event.currentTarget.dataset.colorIndex);
     const { winners } = getMajorityData();
@@ -787,13 +791,12 @@ function removeColor(colorIndex){
 
   restartBtn.addEventListener('click', startGame);
 
-
-window.addEventListener('resize', () => {
-  if(state && state.running && !state.finished && !isResolving){
-    placeIntoLanes(false);
-    render();
-  }
-}, { passive:true });
+  window.addEventListener('resize', () => {
+    if(state && state.running && !state.finished && !isResolving){
+      placeIntoLanes(false);
+      render();
+    }
+  }, { passive:true });
 
   levelEl.textContent = '1';
   updateBest();
