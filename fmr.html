@@ -243,8 +243,9 @@ body::after{
   animation:wrongShake .34s ease;
 }
 
+
 .balloon.fly{
-  animation:flyAway 3.4s ease-out forwards;
+  animation:flyAway 2.2s ease-out forwards;
   pointer-events:none;
   will-change:transform, opacity;
 }
@@ -644,30 +645,28 @@ body::after{
   }
 
   function removeColor(colorIndex){
-    const els = [...board.querySelectorAll(`.balloon[data-color-index="${colorIndex}"]`)];
+  const els = [...board.querySelectorAll(`.balloon[data-color-index="${colorIndex}"]`)];
 
-    isResolving = true;
-    board.classList.add('resolving');
-    board.querySelectorAll('.balloon.majority').forEach(el => el.classList.remove('majority'));
+  isResolving = true;
+  board.classList.add('resolving');
+  board.querySelectorAll('.balloon.majority').forEach(el => el.classList.remove('majority'));
 
-    els.forEach((el, i) => {
-      setTimeout(() => {
-        el.classList.add('fly');
-      }, i * 14);
-    });
+  els.forEach((el) => {
+    el.classList.add('fly');
+  });
 
-    setTimeout(() => {
-      state.balloons = state.balloons.filter(balloon => balloon.colorIndex !== colorIndex);
+  setTimeout(() => {
+    state.balloons = state.balloons.filter(balloon => balloon.colorIndex !== colorIndex);
 
-      if(state.balloons.length <= 1){
-        advanceSeriesOrFinish();
-      }else{
-        isResolving = false;
-        board.classList.remove('resolving');
-        render();
-      }
-    }, 3450);
-  }
+    if(state.balloons.length <= 1){
+      advanceSeriesOrFinish();
+    }else{
+      isResolving = false;
+      board.classList.remove('resolving');
+      render();
+    }
+  }, 2250);
+}
 
   function advanceSeriesOrFinish(){
     if(state.series >= MAX_SERIES){
