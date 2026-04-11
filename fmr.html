@@ -644,28 +644,42 @@ body::after{
     board.replaceChildren(frag);
   }
 
-  function removeColor(colorIndex){
-  const els = [...board.querySelectorAll(`.balloon[data-color-index="${colorIndex}"]`)];
+function removeColor(colorIndex){
+  const els = [...board.querySelectorAll(`.balloon[data-color-index="${colorIndex}"]`)]
+    .filter(el => !el.classList.contains('fly'));
+
+  if(!els.length) return;
 
   isResolving = true;
   board.classList.add('resolving');
   board.querySelectorAll('.balloon.majority').forEach(el => el.classList.remove('majority'));
 
+  // retirer immédiatement les ballons du state pour qu'ils ne puissent plus être recréés
+  state.balloons = state.balloons.filter(balloon => balloon.colorIndex !== colorIndex);
+
+  let remaining = els.length;
+
   els.forEach((el) => {
     el.classList.add('fly');
+
+    const done = () => {
+      el.removeEventListener('animationend', done);
+      if(el.isConnected) el.remove();
+      remaining--;
+
+      if(remaining === 0){
+        if(state.balloons.length <= 1){
+          advanceSeriesOrFinish();
+        }else{
+          isResolving = false;
+          board.classList.remove('resolving');
+          render();
+        }
+      }
+    };
+
+    el.addEventListener('animationend', done, { once:true });
   });
-
-  setTimeout(() => {
-    state.balloons = state.balloons.filter(balloon => balloon.colorIndex !== colorIndex);
-
-    if(state.balloons.length <= 1){
-      advanceSeriesOrFinish();
-    }else{
-      isResolving = false;
-      board.classList.remove('resolving');
-      render();
-    }
-  }, 2250);
 }
 
   function advanceSeriesOrFinish(){
@@ -773,12 +787,13 @@ body::after{
 
   restartBtn.addEventListener('click', startGame);
 
-  window.addEventListener('resize', () => {
-    if(state && state.running && !state.finished){
-      placeIntoLanes(false);
-      render();
-    }
-  }, { passive:true });
+
+window.addEventListener('resize', () => {
+  if(state && state.running && !state.finished && !isResolving){
+    placeIntoLanes(false);
+    render();
+  }
+}, { passive:true });
 
   levelEl.textContent = '1';
   updateBest();
