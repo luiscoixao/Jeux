@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
@@ -39,13 +39,6 @@ html,body{
   height:100%;
   min-height:100dvh;
   overflow:hidden;
-  background:#3a67ff;
-}
-
-body{
-  min-height:100dvh;
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",sans-serif;
-  color:var(--white);
   overscroll-behavior:none;
   background:
     radial-gradient(circle at 12% 12%, rgba(255,239,118,.95) 0 0, rgba(255,239,118,0) 17%),
@@ -54,6 +47,11 @@ body{
     radial-gradient(circle at 18% 88%, rgba(255,122,214,.72) 0 0, rgba(255,122,214,0) 22%),
     radial-gradient(circle at 50% 72%, rgba(181,102,255,.45) 0 0, rgba(181,102,255,0) 30%),
     linear-gradient(150deg,#5ae8ff 0%, #3a67ff 32%, #7b43ff 63%, #ff58ab 100%);
+}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",sans-serif;
+  color:var(--white);
 }
 
 body::before,
@@ -88,6 +86,10 @@ body::after{
   left:0;
   right:0;
   bottom:0;
+}
+
+.game{
+  min-height:100dvh;
 }
 
 .board{
@@ -130,6 +132,7 @@ body::after{
   gap:10px;
   align-items:stretch;
   pointer-events:auto;
+  z-index:6;
 }
 
 .stat,.toggleBtn,.endCard{
@@ -443,8 +446,8 @@ body::after{
   }
 
   function computeSeriesCount(series){
-    const start = 30;
-    const end = 1000;
+    const start = 3;
+    const end = 100;
     const t = (series - 1) / Math.max(1, MAX_SERIES - 1);
     return Math.round(start + (end - start) * t);
   }
@@ -452,33 +455,34 @@ body::after{
   function makeBalancedCounts(total){
     const colorCount = COLORS.length;
     const winnerIndex = Math.floor(Math.random() * colorCount);
+
     const weights = Array.from({ length: colorCount }, () => 0.9 + Math.random() * 0.14);
-    weights[winnerIndex] += 0.18 + Math.random() * 0.05;
+    weights[winnerIndex] += 0.4 + Math.random() * 0.1;
 
     const sum = weights.reduce((a,b) => a + b, 0);
-    const counts = weights.map(w => Math.max(1, Math.floor(total * w / sum)));
+    const counts = weights.map(w => Math.max(0, Math.floor(total * w / sum)));
     let diff = total - counts.reduce((a,b) => a + b, 0);
 
-    while(diff !== 0){
-      if(diff > 0){
-        counts[Math.floor(Math.random() * colorCount)]++;
-        diff--;
-      }else{
-        const donors = counts.map((v,i) => ({ v, i })).filter(x => x.v > 1);
-        if(!donors.length) break;
-        counts[donors[Math.floor(Math.random() * donors.length)].i]--;
-        diff++;
-      }
+    while(diff > 0){
+      counts[Math.floor(Math.random() * colorCount)]++;
+      diff--;
+    }
+    while(diff < 0){
+      const donors = counts.map((v,i) => ({ v, i })).filter(x => x.v > 0);
+      if(!donors.length) break;
+      counts[donors[Math.floor(Math.random() * donors.length)].i]--;
+      diff++;
     }
 
-    const otherMax = Math.max(...counts.filter((_,i) => i !== winnerIndex));
+    const otherMax = Math.max(...counts.filter((_, i) => i !== winnerIndex), 0);
     if(counts[winnerIndex] <= otherMax){
       const need = otherMax - counts[winnerIndex] + 1;
       counts[winnerIndex] += need;
+
       for(let n = 0; n < need; n++){
         const donor = counts
           .map((v,i) => ({ v, i }))
-          .filter(x => x.i !== winnerIndex && x.v > 1)
+          .filter(x => x.i !== winnerIndex && x.v > 0)
           .sort((a,b) => b.v - a.v)[0];
         if(!donor) break;
         counts[donor.i]--;
@@ -594,10 +598,9 @@ body::after{
 
   function getMajorityData(){
     const counts = new Map();
+    const visibleEls = [...board.querySelectorAll('.balloon')].filter(el => !el.classList.contains('fly'));
 
-    const els = [...board.querySelectorAll('.balloon')].filter(el => !el.classList.contains('fly'));
-
-    els.forEach(el => {
+    visibleEls.forEach(el => {
       const rect = el.getBoundingClientRect();
 
       const visibleW = Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0);
@@ -611,14 +614,20 @@ body::after{
       counts.set(colorIndex, (counts.get(colorIndex) || 0) + visibleArea);
     });
 
-    const values = [...counts.values()];
-    const max = values.length ? Math.max(...values) : 0;
+    let winner = null;
+    let max = -1;
 
-    const winners = [...counts.entries()]
-      .filter(([, value]) => value === max)
-      .map(([key]) => key);
+    for(const [colorIndex, area] of counts.entries()){
+      if(area > max){
+        max = area;
+        winner = colorIndex;
+      }
+    }
 
-    return { counts, winners };
+    return {
+      counts,
+      winners: winner === null ? [] : [winner]
+    };
   }
 
   function render(){
@@ -674,7 +683,7 @@ body::after{
         board.classList.remove('resolving');
         render();
       }
-    }, 2980);
+    }, 3450);
   }
 
   function advanceSeriesOrFinish(){
