@@ -39,13 +39,6 @@ html,body{
   height:100%;
   min-height:100dvh;
   overflow:hidden;
-  background:#3a67ff;
-}
-
-body{
-  min-height:100dvh;
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",sans-serif;
-  color:var(--white);
   overscroll-behavior:none;
   background:
     radial-gradient(circle at 12% 12%, rgba(255,239,118,.95) 0 0, rgba(255,239,118,0) 17%),
@@ -54,6 +47,11 @@ body{
     radial-gradient(circle at 18% 88%, rgba(255,122,214,.72) 0 0, rgba(255,122,214,0) 22%),
     radial-gradient(circle at 50% 72%, rgba(181,102,255,.45) 0 0, rgba(181,102,255,0) 30%),
     linear-gradient(150deg,#5ae8ff 0%, #3a67ff 32%, #7b43ff 63%, #ff58ab 100%);
+}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",sans-serif;
+  color:var(--white);
 }
 
 body::before,
@@ -88,6 +86,10 @@ body::after{
   left:0;
   right:0;
   bottom:0;
+}
+
+.game{
+  min-height:100dvh;
 }
 
 .board{
@@ -130,6 +132,7 @@ body::after{
   gap:10px;
   align-items:stretch;
   pointer-events:auto;
+  z-index:6;
 }
 
 .stat,.toggleBtn,.endCard{
@@ -240,8 +243,9 @@ body::after{
   animation:wrongShake .34s ease;
 }
 
+
 .balloon.fly{
-  animation:flyAway 3.4s ease-out forwards;
+  animation:flyAway 2.2s ease-out forwards;
   pointer-events:none;
   will-change:transform, opacity;
 }
@@ -372,12 +376,12 @@ body::after{
     <h1 class="title">BALLOONS</h1>
     <div class="bottomBar" id="bottomBar">
       <div class="stat">
-        <div class="label">Chrono</div>
-        <div class="value" id="timer">00:00.0</div>
+        <div class="label">Niveau</div>
+        <div class="value" id="level">1</div>
       </div>
       <div class="stat">
         <div class="label">Record</div>
-        <div class="value" id="best">--:--.-</div>
+        <div class="value" id="best">0</div>
       </div>
       <button class="toggleBtn play" id="toggleBtn" aria-label="Jouer">JOUER</button>
     </div>
@@ -388,8 +392,8 @@ body::after{
   <div class="endCard">
     <div class="endMini">Partie terminée</div>
     <div class="endTitle">Bravo</div>
-    <div class="endTime" id="endTime">00:00.0</div>
-    <p class="endText" id="endText">Tu as vidé les 3 séries.</p>
+    <div class="endTime" id="endTime">Niveau 100</div>
+    <p class="endText" id="endText">Tu as vidé les 100 niveaux.</p>
     <button class="endBtn" id="restartBtn">REJOUER</button>
   </div>
 </div>
@@ -397,7 +401,7 @@ body::after{
 <script>
 (() => {
   const board = document.getElementById('board');
-  const timerEl = document.getElementById('timer');
+  const levelEl = document.getElementById('level');
   const bestEl = document.getElementById('best');
   const toggleBtn = document.getElementById('toggleBtn');
   const bottomBar = document.getElementById('bottomBar');
@@ -406,8 +410,8 @@ body::after{
   const endTextEl = document.getElementById('endText');
   const restartBtn = document.getElementById('restartBtn');
 
-  const STORAGE_BEST = 'balloons-best-v2';
-  const MAX_SERIES = 3;
+  const STORAGE_BEST = 'balloons-best-level-v1';
+  const MAX_SERIES = 100;
   const COLORS = [
     ['#ff8bac','#ff2d67'],
     ['#7bff85','#19bb41'],
@@ -419,23 +423,12 @@ body::after{
     ['#ff8ee3','#ff3dc3']
   ];
 
-  let bestMs = Number(localStorage.getItem(STORAGE_BEST) || 0);
-  let raf = 0;
-  let startTs = 0;
+  let bestLevel = Number(localStorage.getItem(STORAGE_BEST) || 0);
   let state = null;
   let isResolving = false;
 
-  function fmt(ms){
-    if(ms == null || Number.isNaN(ms)) return '--:--.-';
-    const totalTenths = Math.floor(ms / 100);
-    const minutes = Math.floor(totalTenths / 600);
-    const seconds = Math.floor((totalTenths % 600) / 10);
-    const tenths = totalTenths % 10;
-    return `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}.${tenths}`;
-  }
-
   function updateBest(){
-    bestEl.textContent = bestMs ? fmt(bestMs) : '--:--.-';
+    bestEl.textContent = String(bestLevel || 0);
   }
 
   function setButtonState(running){
@@ -445,50 +438,42 @@ body::after{
   }
 
   function computeSeriesCount(series){
-    const start = 210;
-    const end = 168;
+    const start = 96;
+    const end = 440;
     const t = (series - 1) / Math.max(1, MAX_SERIES - 1);
-    const eased = Math.pow(t, 1.9);
+    const eased = Math.pow(t, 1.18);
     return Math.round(start + (end - start) * eased);
   }
 
   function makeBalancedCounts(total){
     const colorCount = COLORS.length;
-    const winnerIndex = Math.floor(Math.random() * colorCount);
-    const weights = Array.from({ length: colorCount }, () => 0.9 + Math.random() * 0.14);
-    weights[winnerIndex] += 0.18 + Math.random() * 0.05;
 
-    const sum = weights.reduce((a,b) => a + b, 0);
-    const counts = weights.map(w => Math.max(6, Math.floor(total * w / sum)));
-    let diff = total - counts.reduce((a,b) => a + b, 0);
+    let activeColors = Math.floor((Math.sqrt(1 + 4 * total) - 1) / 2);
+    activeColors = Math.max(3, Math.min(colorCount, activeColors));
 
-    while(diff !== 0){
-      if(diff > 0){
-        counts[Math.floor(Math.random() * colorCount)]++;
-        diff--;
-      }else{
-        const donors = counts.map((v,i) => ({ v, i })).filter(x => x.v > 6);
-        if(!donors.length) break;
-        counts[donors[Math.floor(Math.random() * donors.length)].i]--;
-        diff++;
-      }
+    let counts = Array.from({ length: activeColors }, (_, i) => 2 * (activeColors - i));
+    let used = counts.reduce((a,b) => a + b, 0);
+    let remaining = total - used;
+
+    while(remaining >= activeColors){
+      counts = counts.map(v => v + 1);
+      remaining -= activeColors;
     }
 
-    const otherMax = Math.max(...counts.filter((_,i) => i !== winnerIndex));
-    if(counts[winnerIndex] <= otherMax){
-      const need = otherMax - counts[winnerIndex] + 1;
-      counts[winnerIndex] += need;
-      for(let n = 0; n < need; n++){
-        const donor = counts
-          .map((v,i) => ({ v, i }))
-          .filter(x => x.i !== winnerIndex && x.v > 7)
-          .sort((a,b) => b.v - a.v)[0];
-        if(!donor) break;
-        counts[donor.i]--;
-      }
+    for(let i = 0; i < activeColors && remaining > 0; i++, remaining--){
+      counts[i] += 1;
     }
 
-    return counts;
+    const colorIndices = Array.from({ length: colorCount }, (_, i) => i)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, activeColors);
+
+    const finalCounts = Array(colorCount).fill(0);
+    counts.forEach((count, i) => {
+      finalCounts[colorIndices[i]] = count;
+    });
+
+    return finalCounts;
   }
 
   function makeBalloons(series){
@@ -551,7 +536,7 @@ body::after{
   function placeIntoLanes(assignLanes = true){
     const zone = boardZone();
     const usableWidth = zone.width - 12;
-    const laneCount = Math.max(7, Math.floor(usableWidth / 42));
+    const laneCount = Math.max(3, Math.floor(usableWidth / 42));
     const laneStep = usableWidth / laneCount;
 
     const lanes = Array.from({ length: laneCount }, (_, i) => ({
@@ -597,10 +582,9 @@ body::after{
 
   function getMajorityData(){
     const counts = new Map();
+    const visibleEls = [...board.querySelectorAll('.balloon')].filter(el => !el.classList.contains('fly'));
 
-    const els = [...board.querySelectorAll('.balloon')].filter(el => !el.classList.contains('fly'));
-
-    els.forEach(el => {
+    visibleEls.forEach(el => {
       const rect = el.getBoundingClientRect();
 
       const visibleW = Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0);
@@ -614,14 +598,20 @@ body::after{
       counts.set(colorIndex, (counts.get(colorIndex) || 0) + visibleArea);
     });
 
-    const values = [...counts.values()];
-    const max = values.length ? Math.max(...values) : 0;
+    let winner = null;
+    let max = -1;
 
-    const winners = [...counts.entries()]
-      .filter(([, value]) => value === max)
-      .map(([key]) => key);
+    for(const [colorIndex, area] of counts.entries()){
+      if(area > max){
+        max = area;
+        winner = colorIndex;
+      }
+    }
 
-    return { counts, winners };
+    return {
+      counts,
+      winners: winner === null ? [] : [winner]
+    };
   }
 
   function render(){
@@ -654,31 +644,43 @@ body::after{
     board.replaceChildren(frag);
   }
 
-  function removeColor(colorIndex){
-    const els = [...board.querySelectorAll(`.balloon[data-color-index="${colorIndex}"]`)];
+function removeColor(colorIndex){
+  const els = [...board.querySelectorAll(`.balloon[data-color-index="${colorIndex}"]`)]
+    .filter(el => !el.classList.contains('fly'));
 
-    isResolving = true;
-    board.classList.add('resolving');
-    board.querySelectorAll('.balloon.majority').forEach(el => el.classList.remove('majority'));
+  if(!els.length) return;
 
-    els.forEach((el, i) => {
-      setTimeout(() => {
-        el.classList.add('fly');
-      }, i * 14);
-    });
+  isResolving = true;
+  board.classList.add('resolving');
+  board.querySelectorAll('.balloon.majority').forEach(el => el.classList.remove('majority'));
 
-    setTimeout(() => {
-      state.balloons = state.balloons.filter(balloon => balloon.colorIndex !== colorIndex);
+  // retirer immédiatement les ballons du state pour qu'ils ne puissent plus être recréés
+  state.balloons = state.balloons.filter(balloon => balloon.colorIndex !== colorIndex);
 
-      if(state.balloons.length <= 1){
-        advanceSeriesOrFinish();
-      }else{
-        isResolving = false;
-        board.classList.remove('resolving');
-        render();
+  let remaining = els.length;
+
+  els.forEach((el) => {
+    el.classList.add('fly');
+
+    const done = () => {
+      el.removeEventListener('animationend', done);
+      if(el.isConnected) el.remove();
+      remaining--;
+
+      if(remaining === 0){
+        if(state.balloons.length <= 1){
+          advanceSeriesOrFinish();
+        }else{
+          isResolving = false;
+          board.classList.remove('resolving');
+          render();
+        }
       }
-    }, 2980);
-  }
+    };
+
+    el.addEventListener('animationend', done, { once:true });
+  });
+}
 
   function advanceSeriesOrFinish(){
     if(state.series >= MAX_SERIES){
@@ -688,12 +690,22 @@ body::after{
 
     isResolving = false;
     board.classList.remove('resolving');
+
+    const nextSeries = state.series + 1;
     state = {
-      series: state.series + 1,
+      series: nextSeries,
       running: true,
       finished: false,
-      balloons: makeBalloons(state.series + 1)
+      balloons: makeBalloons(nextSeries)
     };
+
+    levelEl.textContent = String(nextSeries);
+
+    if(nextSeries > bestLevel){
+      bestLevel = nextSeries;
+      localStorage.setItem(STORAGE_BEST, String(bestLevel));
+      updateBest();
+    }
 
     placeIntoLanes(true);
     render();
@@ -715,21 +727,9 @@ body::after{
     removeColor(colorIndex);
   }
 
-  function tick(){
-    if(!state || !state.running) return;
-    timerEl.textContent = fmt(performance.now() - startTs);
-    raf = requestAnimationFrame(tick);
-  }
-
-  function startTimer(){
-    cancelAnimationFrame(raf);
-    startTs = performance.now();
-    tick();
-  }
-
-  function stopTimer(){
-    cancelAnimationFrame(raf);
-  }
+  function tick(){}
+  function startTimer(){}
+  function stopTimer(){}
 
   function startGame(){
     endOverlay.classList.remove('show');
@@ -743,9 +743,9 @@ body::after{
       balloons: makeBalloons(1)
     };
 
+    levelEl.textContent = '1';
     placeIntoLanes(true);
     render();
-    timerEl.textContent = '00:00.0';
     setButtonState(true);
     startTimer();
   }
@@ -756,26 +756,25 @@ body::after{
     board.classList.remove('resolving');
     state = null;
     board.replaceChildren();
-    timerEl.textContent = '00:00.0';
+    levelEl.textContent = '1';
     setButtonState(false);
   }
 
   function finishGame(){
     stopTimer();
-    const elapsed = Math.floor(performance.now() - startTs);
-
-    timerEl.textContent = fmt(elapsed);
-    endTimeEl.textContent = fmt(elapsed);
 
     let newBest = false;
-    if(!bestMs || elapsed < bestMs){
-      bestMs = elapsed;
-      localStorage.setItem(STORAGE_BEST, String(bestMs));
+    if(MAX_SERIES > bestLevel){
+      bestLevel = MAX_SERIES;
+      localStorage.setItem(STORAGE_BEST, String(bestLevel));
       updateBest();
       newBest = true;
     }
 
-    endTextEl.innerHTML = newBest ? 'Nouveau <strong>record</strong> !' : 'Partie terminée. Essaie encore plus vite.';
+    endTimeEl.textContent = 'Niveau 100';
+    endTextEl.innerHTML = newBest
+      ? 'Nouveau <strong>record</strong> !'
+      : 'Partie terminée. Tu as atteint le niveau 100.';
     setButtonState(false);
     endOverlay.classList.add('show');
     state = { finished:true, running:false, balloons:[], series:MAX_SERIES };
@@ -788,14 +787,15 @@ body::after{
 
   restartBtn.addEventListener('click', startGame);
 
-  window.addEventListener('resize', () => {
-    if(state && state.running && !state.finished){
-      placeIntoLanes(false);
-      render();
-    }
-  }, { passive:true });
 
-  timerEl.textContent = '00:00.0';
+window.addEventListener('resize', () => {
+  if(state && state.running && !state.finished && !isResolving){
+    placeIntoLanes(false);
+    render();
+  }
+}, { passive:true });
+
+  levelEl.textContent = '1';
   updateBest();
   setButtonState(false);
   startGame();
