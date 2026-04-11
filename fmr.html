@@ -4,45 +4,192 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
 <title>BALLOONS</title>
+<meta name="theme-color" content="#345dff" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="BALLOONS" />
+<link rel="apple-touch-icon" href="icon_balloons.png" />
+<link rel="icon" type="image/png" href="icon_balloons.png" />
+<link rel="manifest" href="manifest.webmanifest" />
 
 <style>
+:root{
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
+  --safe-left: env(safe-area-inset-left);
+  --safe-right: env(safe-area-inset-right);
+  --white:#fff;
+  --line:rgba(255,255,255,.22);
+  --shadow:0 18px 42px rgba(7,10,40,.34);
+  --green1:#48ff8c;
+  --green2:#06b34a;
+  --red1:#ff5e85;
+  --red2:#cf1133;
+}
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
 html,body{
   margin:0;
   width:100%;
-  height:100dvh;
+  height:100%;
+  min-height:100dvh;
   overflow:hidden;
+  background:#3a67ff;
 }
 
 body{
+  min-height:100dvh;
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",sans-serif;
-  color:#fff;
+  color:var(--white);
+  overscroll-behavior:none;
   background:
-    radial-gradient(circle at 12% 12%, rgba(255,239,118,.95) 0 0, transparent 17%),
-    radial-gradient(circle at 84% 12%, rgba(74,196,255,.92) 0 0, transparent 18%),
-    radial-gradient(circle at 82% 86%, rgba(86,255,227,.80) 0 0, transparent 22%),
-    radial-gradient(circle at 18% 88%, rgba(255,122,214,.72) 0 0, transparent 22%),
-    linear-gradient(150deg,#5ae8ff,#3a67ff,#7b43ff,#ff58ab);
+    radial-gradient(circle at 12% 12%, rgba(255,239,118,.95) 0 0, rgba(255,239,118,0) 17%),
+    radial-gradient(circle at 84% 12%, rgba(74,196,255,.92) 0 0, rgba(74,196,255,0) 18%),
+    radial-gradient(circle at 82% 86%, rgba(86,255,227,.80) 0 0, rgba(86,255,227,0) 22%),
+    radial-gradient(circle at 18% 88%, rgba(255,122,214,.72) 0 0, rgba(255,122,214,0) 22%),
+    radial-gradient(circle at 50% 72%, rgba(181,102,255,.45) 0 0, rgba(181,102,255,0) 30%),
+    linear-gradient(150deg,#5ae8ff 0%, #3a67ff 32%, #7b43ff 63%, #ff58ab 100%);
+}
+
+body::before,
+body::after{
+  content:"";
+  position:fixed;
+  border-radius:50%;
+  filter:blur(72px);
+  pointer-events:none;
+  opacity:.34;
+}
+
+body::before{
+  width:38vw;
+  height:38vw;
+  left:-10vw;
+  bottom:8vh;
+  background:#67ffe4;
+}
+
+body::after{
+  width:40vw;
+  height:40vw;
+  right:-8vw;
+  top:4vh;
+  background:#ffe660;
+}
+
+.game,.board,.hud,.endOverlay{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
 }
 
 .board{
-  position:fixed;
-  inset:0;
   overflow:hidden;
+  touch-action:manipulation;
+  min-height:100dvh;
+}
+
+.hud{
+  pointer-events:none;
+  z-index:5;
 }
 
 .title{
   position:absolute;
-  top:10px;
-  width:100%;
+  top:calc(8px + var(--safe-top));
+  left:calc(10px + var(--safe-left));
+  right:calc(10px + var(--safe-right));
+  margin:0;
   text-align:center;
-  font-size:40px;
-  font-weight:900;
-  letter-spacing:.1em;
-  text-shadow:0 6px 20px rgba(0,0,0,.4);
-  pointer-events:none;
+  font-weight:1000;
+  letter-spacing:.12em;
+  line-height:.92;
+  font-size:clamp(30px,8.5vw,56px);
+  color:#fff;
+  text-shadow:
+    0 2px 0 rgba(255,255,255,.18),
+    0 4px 0 rgba(24,32,110,.35),
+    0 10px 20px rgba(10,16,69,.55),
+    0 0 24px rgba(255,255,255,.20);
 }
 
-/* BALLONS */
+.bottomBar{
+  position:absolute;
+  left:calc(12px + var(--safe-left));
+  right:calc(12px + var(--safe-right));
+  bottom:calc(10px + var(--safe-bottom));
+  display:grid;
+  grid-template-columns:minmax(100px,1fr) minmax(100px,1fr) minmax(132px,1.32fr);
+  gap:10px;
+  align-items:stretch;
+  pointer-events:auto;
+}
+
+.stat,.toggleBtn,.endCard{
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(16px) saturate(1.15);
+  -webkit-backdrop-filter:blur(16px) saturate(1.15);
+}
+
+.stat{
+  min-height:84px;
+  background:linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.10));
+  border-radius:25px;
+  padding:10px 12px 8px;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.stat .label{
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  opacity:.98;
+}
+
+.stat .value{
+  margin-top:7px;
+  font-size:clamp(18px,5.2vw,31px);
+  line-height:1;
+  font-weight:1000;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+  letter-spacing:-.02em;
+}
+
+.toggleBtn{
+  appearance:none;
+  border-radius:29px;
+  min-height:84px;
+  width:100%;
+  min-width:0;
+  color:#fff;
+  font-weight:1000;
+  font-size:clamp(20px,5.3vw,34px);
+  letter-spacing:.03em;
+  text-shadow:0 2px 10px rgba(0,0,0,.18);
+  padding:0 14px;
+}
+
+.toggleBtn.play{
+  background:linear-gradient(180deg,var(--green1),var(--green2));
+}
+
+.toggleBtn.stop{
+  background:linear-gradient(180deg,var(--red1),var(--red2));
+}
+
 .balloon{
   position:absolute;
   border:none;
@@ -51,8 +198,11 @@ body{
   box-shadow:
     inset -10px -14px 22px rgba(0,0,0,.16),
     inset 7px 10px 12px rgba(255,255,255,.20),
-    0 16px 24px rgba(0,0,0,.16);
-  cursor:pointer;
+    0 16px 24px rgba(0,0,0,.16),
+    0 0 0 1px rgba(255,255,255,.07);
+  transition:
+    transform .14s ease,
+    opacity .24s ease;
 }
 
 .balloon::before{
@@ -64,13 +214,107 @@ body{
   top:15%;
   border-radius:50%;
   background:rgba(255,255,255,.22);
+  transform:rotate(-18deg);
+  filter:blur(.6px);
 }
 
-/* ANIMATIONS CORRIGÉES */
+.balloon:active{
+  transform:translate(-50%,-50%) scale(.95);
+}
+
+.balloon:focus,
+.balloon:focus-visible{
+  outline:none;
+}
+
+.balloon.majority{
+  filter:none;
+  box-shadow:
+    inset -10px -14px 22px rgba(0,0,0,.16),
+    inset 7px 10px 12px rgba(255,255,255,.20),
+    0 0 0 2px rgba(255,255,255,.16),
+    0 16px 24px rgba(0,0,0,.16);
+}
+
+.balloon.wrong{
+  animation:wrongShake .34s ease;
+}
+
 .balloon.fly{
   animation:flyAway 3.4s ease-out forwards;
   pointer-events:none;
   will-change:transform, opacity;
+}
+
+.endOverlay{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(12,16,36,.18);
+  z-index:8;
+}
+
+.endOverlay.show{
+  display:flex;
+}
+
+.endCard{
+  width:min(90vw,520px);
+  background:rgba(255,255,255,.18);
+  border-radius:34px;
+  padding:24px 20px 20px;
+  text-align:center;
+}
+
+.endMini{
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  font-weight:900;
+  opacity:.92;
+}
+
+.endTitle{
+  margin:10px 0 6px;
+  font-size:clamp(28px,8vw,42px);
+  line-height:.95;
+  font-weight:1000;
+}
+
+.endTime{
+  font-size:clamp(34px,9vw,52px);
+  font-weight:1000;
+  line-height:1;
+  margin:8px 0 10px;
+  font-variant-numeric:tabular-nums;
+}
+
+.endText{
+  font-size:16px;
+  line-height:1.35;
+  font-weight:700;
+  margin:0 0 14px;
+}
+
+.endBtn{
+  appearance:none;
+  border:none;
+  min-width:180px;
+  min-height:56px;
+  border-radius:20px;
+  font-size:20px;
+  font-weight:1000;
+  color:#fff;
+  background:linear-gradient(180deg,var(--green1),var(--green2));
+  box-shadow:var(--shadow);
+}
+
+@keyframes wrongShake{
+  0%,100%{transform:translate(-50%,-50%)}
+  25%{transform:translate(calc(-50% - 7px),-50%)}
+  50%{transform:translate(calc(-50% + 7px),-50%)}
+  75%{transform:translate(calc(-50% - 5px),-50%)}
 }
 
 @keyframes flyAway{
@@ -81,141 +325,481 @@ body{
   100%{
     opacity:0;
     transform:translate(
-      calc(-50% + var(--dx)),
-      calc(-50% - 650px)
-    ) scale(1.02);
+      calc(-50% + var(--driftx)),
+      calc(-50% - 620px)
+    ) scale(1.015);
   }
 }
 
-.balloon.wrong{
-  animation:shake .3s;
+.board.resolving .balloon.majority{
+  filter:none !important;
+  box-shadow:
+    inset -10px -14px 22px rgba(0,0,0,.16),
+    inset 7px 10px 12px rgba(255,255,255,.20),
+    0 16px 24px rgba(0,0,0,.16),
+    0 0 0 1px rgba(255,255,255,.07) !important;
 }
 
-@keyframes shake{
-  0%,100%{transform:translate(-50%,-50%)}
-  25%{transform:translate(calc(-50% - 6px),-50%)}
-  50%{transform:translate(calc(-50% + 6px),-50%)}
+.board.resolving .balloon:not(.fly){
+  transition:none;
+}
+
+@media (max-width: 430px){
+  .bottomBar{
+    grid-template-columns:minmax(94px,1fr) minmax(94px,1fr) minmax(126px,1.2fr);
+    gap:8px;
+  }
+
+  .stat{
+    min-height:78px;
+    border-radius:22px;
+    padding:10px 10px 8px;
+  }
+
+  .toggleBtn{
+    min-height:78px;
+    border-radius:24px;
+    font-size:clamp(18px,5vw,28px);
+    padding:0 12px;
+  }
 }
 </style>
 </head>
-
 <body>
+<div class="game">
+  <div class="board" id="board"></div>
+  <div class="hud">
+    <h1 class="title">BALLOONS</h1>
+    <div class="bottomBar" id="bottomBar">
+      <div class="stat">
+        <div class="label">Chrono</div>
+        <div class="value" id="timer">00:00.0</div>
+      </div>
+      <div class="stat">
+        <div class="label">Record</div>
+        <div class="value" id="best">--:--.-</div>
+      </div>
+      <button class="toggleBtn play" id="toggleBtn" aria-label="Jouer">JOUER</button>
+    </div>
+  </div>
+</div>
 
-<div class="title">BALLOONS</div>
-<div class="board" id="board"></div>
+<div class="endOverlay" id="endOverlay">
+  <div class="endCard">
+    <div class="endMini">Partie terminée</div>
+    <div class="endTitle">Bravo</div>
+    <div class="endTime" id="endTime">00:00.0</div>
+    <p class="endText" id="endText">Tu as vidé les 3 séries.</p>
+    <button class="endBtn" id="restartBtn">REJOUER</button>
+  </div>
+</div>
 
 <script>
-const board = document.getElementById("board");
+(() => {
+  const board = document.getElementById('board');
+  const timerEl = document.getElementById('timer');
+  const bestEl = document.getElementById('best');
+  const toggleBtn = document.getElementById('toggleBtn');
+  const bottomBar = document.getElementById('bottomBar');
+  const endOverlay = document.getElementById('endOverlay');
+  const endTimeEl = document.getElementById('endTime');
+  const endTextEl = document.getElementById('endText');
+  const restartBtn = document.getElementById('restartBtn');
 
-const COLORS = [
-  ["#ff8bac","#ff2d67"],
-  ["#7bff85","#19bb41"],
-  ["#ffe86d","#ffbb0f"],
-  ["#84dfff","#149dff"],
-  ["#c89cff","#8250ff"],
-  ["#ffbf7f","#ff7315"],
-  ["#71fff0","#07c7b2"],
-  ["#ff8ee3","#ff3dc3"]
-];
+  const STORAGE_BEST = 'balloons-best-v2';
+  const MAX_SERIES = 3;
+  const COLORS = [
+    ['#ff8bac','#ff2d67'],
+    ['#7bff85','#19bb41'],
+    ['#ffe86d','#ffbb0f'],
+    ['#84dfff','#149dff'],
+    ['#c89cff','#8250ff'],
+    ['#ffbf7f','#ff7315'],
+    ['#71fff0','#07c7b2'],
+    ['#ff8ee3','#ff3dc3']
+  ];
 
-let balloons = [];
+  let bestMs = Number(localStorage.getItem(STORAGE_BEST) || 0);
+  let raf = 0;
+  let startTs = 0;
+  let state = null;
+  let isResolving = false;
 
-function create(){
-  balloons = [];
-  board.innerHTML = "";
-
-  const total = 350;
-  const width = window.innerWidth;
-  const height = window.innerHeight;
-
-  for(let i = 0; i < total; i++){
-    const b = document.createElement("button");
-    b.className = "balloon";
-
-    const size = 45 + Math.random()*30;
-
-    b.style.width = size + "px";
-    b.style.height = size*1.15 + "px";
-
-    b.style.left = Math.random()*width + "px";
-    b.style.top = Math.random()*height + "px";
-
-    const colorIndex = Math.floor(Math.random()*COLORS.length);
-    const color = COLORS[colorIndex];
-
-    b.style.background = `radial-gradient(circle at 30% 30%, ${color[0]}, ${color[1]})`;
-
-    b.dataset.colorIndex = colorIndex;
-    b.dataset.flying = "0";
-
-    b.addEventListener("click", () => pop(colorIndex, b));
-
-    board.appendChild(b);
-    balloons.push(b);
-  }
-}
-
-/* CALCUL VISUEL (IMPORTANT) */
-function getMajority(){
-  const counts = new Map();
-
-  const els = [...board.querySelectorAll('.balloon')].filter(el => el.dataset.flying === "0");
-
-  els.forEach(el => {
-    const rect = el.getBoundingClientRect();
-
-    const visibleW = Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0);
-    const visibleH = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
-
-    if(visibleW <= 0 || visibleH <= 0) return;
-
-    const area = visibleW * visibleH;
-    const c = Number(el.dataset.colorIndex);
-
-    counts.set(c, (counts.get(c) || 0) + area);
-  });
-
-  let max = 0;
-  for(const v of counts.values()) if(v > max) max = v;
-
-  return new Set([...counts.entries()].filter(([_,v]) => v === max).map(([k]) => k));
-}
-
-/* SUPPRESSION */
-function pop(colorIndex, clicked){
-  if(clicked.dataset.flying === "1") return;
-
-  const winners = getMajority();
-
-  if(!winners.has(colorIndex)){
-    clicked.classList.add("wrong");
-    setTimeout(()=>clicked.classList.remove("wrong"),300);
-    return;
+  function fmt(ms){
+    if(ms == null || Number.isNaN(ms)) return '--:--.-';
+    const totalTenths = Math.floor(ms / 100);
+    const minutes = Math.floor(totalTenths / 600);
+    const seconds = Math.floor((totalTenths % 600) / 10);
+    const tenths = totalTenths % 10;
+    return `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}.${tenths}`;
   }
 
-  const group = balloons.filter(b =>
-    b.dataset.colorIndex == colorIndex && b.dataset.flying === "0"
-  );
+  function updateBest(){
+    bestEl.textContent = bestMs ? fmt(bestMs) : '--:--.-';
+  }
 
-  group.forEach(b => {
-    b.dataset.flying = "1";
-    b.style.setProperty("--dx", (Math.random()*200-100)+"px");
-    b.classList.add("fly");
+  function setButtonState(running){
+    toggleBtn.className = 'toggleBtn ' + (running ? 'stop' : 'play');
+    toggleBtn.textContent = running ? 'ARRÊTER' : 'JOUER';
+    toggleBtn.setAttribute('aria-label', running ? 'Arrêter' : 'Jouer');
+  }
+
+  function computeSeriesCount(series){
+    const start = 210;
+    const end = 168;
+    const t = (series - 1) / Math.max(1, MAX_SERIES - 1);
+    const eased = Math.pow(t, 1.9);
+    return Math.round(start + (end - start) * eased);
+  }
+
+  function makeBalancedCounts(total){
+    const colorCount = COLORS.length;
+    const winnerIndex = Math.floor(Math.random() * colorCount);
+    const weights = Array.from({ length: colorCount }, () => 0.9 + Math.random() * 0.14);
+    weights[winnerIndex] += 0.18 + Math.random() * 0.05;
+
+    const sum = weights.reduce((a,b) => a + b, 0);
+    const counts = weights.map(w => Math.max(6, Math.floor(total * w / sum)));
+    let diff = total - counts.reduce((a,b) => a + b, 0);
+
+    while(diff !== 0){
+      if(diff > 0){
+        counts[Math.floor(Math.random() * colorCount)]++;
+        diff--;
+      }else{
+        const donors = counts.map((v,i) => ({ v, i })).filter(x => x.v > 6);
+        if(!donors.length) break;
+        counts[donors[Math.floor(Math.random() * donors.length)].i]--;
+        diff++;
+      }
+    }
+
+    const otherMax = Math.max(...counts.filter((_,i) => i !== winnerIndex));
+    if(counts[winnerIndex] <= otherMax){
+      const need = otherMax - counts[winnerIndex] + 1;
+      counts[winnerIndex] += need;
+      for(let n = 0; n < need; n++){
+        const donor = counts
+          .map((v,i) => ({ v, i }))
+          .filter(x => x.i !== winnerIndex && x.v > 7)
+          .sort((a,b) => b.v - a.v)[0];
+        if(!donor) break;
+        counts[donor.i]--;
+      }
+    }
+
+    return counts;
+  }
+
+  function makeBalloons(series){
+    const total = computeSeriesCount(series);
+    const counts = makeBalancedCounts(total);
+    const balloons = [];
+    let id = 1;
+
+    counts.forEach((count, colorIndex) => {
+      for(let i = 0; i < count; i++){
+        const roll = Math.random();
+        let w;
+
+        if(roll < 0.22){
+          w = 40 + Math.random() * 10;
+        }else if(roll < 0.84){
+          w = 52 + Math.random() * 12;
+        }else{
+          w = 66 + Math.random() * 10;
+        }
+
+        const h = w * (1.14 + Math.random() * 0.10);
+
+        balloons.push({
+          id: id++,
+          colorIndex,
+          lane: -1,
+          x: 0,
+          y: 0,
+          w,
+          h,
+          driftX: (Math.random() - 0.5) * 180
+        });
+      }
+    });
+
+    for(let i = balloons.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [balloons[i], balloons[j]] = [balloons[j], balloons[i]];
+    }
+
+    return balloons;
+  }
+
+  function boardZone(){
+    const rect = board.getBoundingClientRect();
+    const root = getComputedStyle(document.documentElement);
+    const safeBottom = parseFloat(root.getPropertyValue('--safe-bottom')) || 0;
+    const barRect = bottomBar.getBoundingClientRect();
+    const reservedBottom = rect.height - barRect.top + 10;
+
+    return {
+      width: rect.width,
+      height: rect.height,
+      top: 0,
+      bottom: rect.height - Math.max(88 + safeBottom, reservedBottom)
+    };
+  }
+
+  function placeIntoLanes(assignLanes = true){
+    const zone = boardZone();
+    const usableWidth = zone.width - 12;
+    const laneCount = Math.max(7, Math.floor(usableWidth / 42));
+    const laneStep = usableWidth / laneCount;
+
+    const lanes = Array.from({ length: laneCount }, (_, i) => ({
+      x: 6 + laneStep * (i + 0.5) + (Math.random() - 0.5) * 10,
+      floor: zone.bottom - 2,
+      items: []
+    }));
+
+    if(assignLanes){
+      const shuffled = [...state.balloons].sort(() => Math.random() - 0.5);
+      shuffled.forEach(balloon => {
+        const candidates = lanes
+          .map((lane, idx) => ({ idx, fill: lane.items.reduce((s,b) => s + b.h, 0) }))
+          .sort((a,b) => a.fill - b.fill)
+          .slice(0, Math.min(7, lanes.length));
+
+        const pick = candidates[Math.floor(Math.random() * candidates.length)].idx;
+        balloon.lane = pick;
+        lanes[pick].items.push(balloon);
+      });
+    }else{
+      state.balloons.forEach(balloon => {
+        const idx = Math.max(0, Math.min(lanes.length - 1, balloon.lane));
+        lanes[idx].items.push(balloon);
+      });
+    }
+
+    lanes.forEach(lane => {
+      let cursor = lane.floor;
+      lane.items.sort((a,b) => (b.y || 0) - (a.y || 0));
+
+      lane.items.forEach((balloon, index) => {
+        const jitterX = (Math.random() - 0.5) * Math.min(22, laneStep * 0.52);
+        const overlap = Math.min(24, balloon.h * 0.26);
+        const y = cursor - balloon.h / 2;
+
+        balloon.x = lane.x + jitterX;
+        balloon.y = y;
+        cursor -= balloon.h - overlap - (index % 3 === 0 ? 3 : 0);
+      });
+    });
+  }
+
+  function getMajorityData(){
+    const counts = new Map();
+
+    const els = [...board.querySelectorAll('.balloon')].filter(el => !el.classList.contains('fly'));
+
+    els.forEach(el => {
+      const rect = el.getBoundingClientRect();
+
+      const visibleW = Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0);
+      const visibleH = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+
+      if(visibleW <= 0 || visibleH <= 0) return;
+
+      const visibleArea = visibleW * visibleH;
+      const colorIndex = Number(el.dataset.colorIndex);
+
+      counts.set(colorIndex, (counts.get(colorIndex) || 0) + visibleArea);
+    });
+
+    const values = [...counts.values()];
+    const max = values.length ? Math.max(...values) : 0;
+
+    const winners = [...counts.entries()]
+      .filter(([, value]) => value === max)
+      .map(([key]) => key);
+
+    return { counts, winners };
+  }
+
+  function render(){
+    const frag = document.createDocumentFragment();
+    const { winners } = getMajorityData();
+    const ordered = [...state.balloons].sort((a,b) => (a.y + a.h / 2) - (b.y + b.h / 2));
+
+    ordered.forEach(balloon => {
+      const el = document.createElement('button');
+      const isWinner = !isResolving && winners.includes(balloon.colorIndex);
+
+      el.className = 'balloon' + (isWinner ? ' majority' : '');
+      el.style.width = `${balloon.w}px`;
+      el.style.height = `${balloon.h}px`;
+      el.style.left = `${balloon.x}px`;
+      el.style.top = `${balloon.y}px`;
+      el.style.zIndex = String(Math.round(balloon.y));
+      el.style.setProperty('--driftx', `${balloon.driftX}px`);
+
+      const [c1, c2] = COLORS[balloon.colorIndex];
+      el.style.background = `radial-gradient(circle at 34% 28%, ${c1} 0%, ${c1} 26%, ${c2} 100%)`;
+
+      el.dataset.id = String(balloon.id);
+      el.dataset.colorIndex = String(balloon.colorIndex);
+
+      el.addEventListener('click', onBalloonClick, { passive:true });
+      frag.appendChild(el);
+    });
+
+    board.replaceChildren(frag);
+  }
+
+  function removeColor(colorIndex){
+    const els = [...board.querySelectorAll(`.balloon[data-color-index="${colorIndex}"]`)];
+
+    isResolving = true;
+    board.classList.add('resolving');
+    board.querySelectorAll('.balloon.majority').forEach(el => el.classList.remove('majority'));
+
+    els.forEach((el, i) => {
+      setTimeout(() => {
+        el.classList.add('fly');
+      }, i * 14);
+    });
 
     setTimeout(() => {
-      b.remove();
-      balloons = balloons.filter(x => x.isConnected);
+      state.balloons = state.balloons.filter(balloon => balloon.colorIndex !== colorIndex);
 
-      if(balloons.filter(x=>x.dataset.flying==="0").length < 2){
-        setTimeout(create,300);
+      if(state.balloons.length <= 1){
+        advanceSeriesOrFinish();
+      }else{
+        isResolving = false;
+        board.classList.remove('resolving');
+        render();
       }
+    }, 2980);
+  }
 
-    }, 3400); // ✅ synchro animation
+  function advanceSeriesOrFinish(){
+    if(state.series >= MAX_SERIES){
+      finishGame();
+      return;
+    }
+
+    isResolving = false;
+    board.classList.remove('resolving');
+    state = {
+      series: state.series + 1,
+      running: true,
+      finished: false,
+      balloons: makeBalloons(state.series + 1)
+    };
+
+    placeIntoLanes(true);
+    render();
+  }
+
+  function onBalloonClick(event){
+    if(!state || !state.running || state.finished) return;
+
+    const colorIndex = Number(event.currentTarget.dataset.colorIndex);
+    const { winners } = getMajorityData();
+
+    if(!winners.includes(colorIndex)){
+      event.currentTarget.classList.add('wrong');
+      setTimeout(() => event.currentTarget.classList.remove('wrong'), 340);
+      if(navigator.vibrate) navigator.vibrate(26);
+      return;
+    }
+
+    removeColor(colorIndex);
+  }
+
+  function tick(){
+    if(!state || !state.running) return;
+    timerEl.textContent = fmt(performance.now() - startTs);
+    raf = requestAnimationFrame(tick);
+  }
+
+  function startTimer(){
+    cancelAnimationFrame(raf);
+    startTs = performance.now();
+    tick();
+  }
+
+  function stopTimer(){
+    cancelAnimationFrame(raf);
+  }
+
+  function startGame(){
+    endOverlay.classList.remove('show');
+    isResolving = false;
+    board.classList.remove('resolving');
+
+    state = {
+      series: 1,
+      running: true,
+      finished: false,
+      balloons: makeBalloons(1)
+    };
+
+    placeIntoLanes(true);
+    render();
+    timerEl.textContent = '00:00.0';
+    setButtonState(true);
+    startTimer();
+  }
+
+  function stopGame(){
+    stopTimer();
+    isResolving = false;
+    board.classList.remove('resolving');
+    state = null;
+    board.replaceChildren();
+    timerEl.textContent = '00:00.0';
+    setButtonState(false);
+  }
+
+  function finishGame(){
+    stopTimer();
+    const elapsed = Math.floor(performance.now() - startTs);
+
+    timerEl.textContent = fmt(elapsed);
+    endTimeEl.textContent = fmt(elapsed);
+
+    let newBest = false;
+    if(!bestMs || elapsed < bestMs){
+      bestMs = elapsed;
+      localStorage.setItem(STORAGE_BEST, String(bestMs));
+      updateBest();
+      newBest = true;
+    }
+
+    endTextEl.innerHTML = newBest ? 'Nouveau <strong>record</strong> !' : 'Partie terminée. Essaie encore plus vite.';
+    setButtonState(false);
+    endOverlay.classList.add('show');
+    state = { finished:true, running:false, balloons:[], series:MAX_SERIES };
+  }
+
+  toggleBtn.addEventListener('click', () => {
+    if(state && state.running && !state.finished) stopGame();
+    else startGame();
   });
-}
 
-create();
+  restartBtn.addEventListener('click', startGame);
+
+  window.addEventListener('resize', () => {
+    if(state && state.running && !state.finished){
+      placeIntoLanes(false);
+      render();
+    }
+  }, { passive:true });
+
+  timerEl.textContent = '00:00.0';
+  updateBest();
+  setButtonState(false);
+  startGame();
+})();
 </script>
-
 </body>
 </html>
