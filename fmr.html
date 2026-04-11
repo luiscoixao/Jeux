@@ -372,8 +372,8 @@ body::after{
     <h1 class="title">BALLOONS</h1>
     <div class="bottomBar" id="bottomBar">
       <div class="stat">
-        <div class="label">Chrono</div>
-        <div class="value" id="timer">00:00.0</div>
+        <div class="label">Niveau</div>
+        <div class="value" id="level">1</div>
       </div>
       <div class="stat">
         <div class="label">Record</div>
@@ -388,8 +388,8 @@ body::after{
   <div class="endCard">
     <div class="endMini">Partie terminée</div>
     <div class="endTitle">Bravo</div>
-    <div class="endTime" id="endTime">00:00.0</div>
-    <p class="endText" id="endText">Tu as vidé les 3 séries.</p>
+    <div class="endTime" id="endTime">Niveau 100</div>
+    <p class="endText" id="endText">Tu as vidé les 100 niveaux.</p>
     <button class="endBtn" id="restartBtn">REJOUER</button>
   </div>
 </div>
@@ -397,7 +397,7 @@ body::after{
 <script>
 (() => {
   const board = document.getElementById('board');
-  const timerEl = document.getElementById('timer');
+  const levelEl = document.getElementById('level');
   const bestEl = document.getElementById('best');
   const toggleBtn = document.getElementById('toggleBtn');
   const bottomBar = document.getElementById('bottomBar');
@@ -407,7 +407,7 @@ body::after{
   const restartBtn = document.getElementById('restartBtn');
 
   const STORAGE_BEST = 'balloons-best-v2';
-  const MAX_SERIES = 3;
+  const MAX_SERIES = 100;
   const COLORS = [
     ['#ff8bac','#ff2d67'],
     ['#7bff85','#19bb41'],
@@ -420,8 +420,6 @@ body::after{
   ];
 
   let bestMs = Number(localStorage.getItem(STORAGE_BEST) || 0);
-  let raf = 0;
-  let startTs = 0;
   let state = null;
   let isResolving = false;
 
@@ -445,11 +443,10 @@ body::after{
   }
 
   function computeSeriesCount(series){
-    const start = 210;
-    const end = 168;
+    const start = 3;
+    const end = 100;
     const t = (series - 1) / Math.max(1, MAX_SERIES - 1);
-    const eased = Math.pow(t, 1.9);
-    return Math.round(start + (end - start) * eased);
+    return Math.round(start + (end - start) * t);
   }
 
   function makeBalancedCounts(total){
@@ -459,7 +456,7 @@ body::after{
     weights[winnerIndex] += 0.18 + Math.random() * 0.05;
 
     const sum = weights.reduce((a,b) => a + b, 0);
-    const counts = weights.map(w => Math.max(6, Math.floor(total * w / sum)));
+    const counts = weights.map(w => Math.max(1, Math.floor(total * w / sum)));
     let diff = total - counts.reduce((a,b) => a + b, 0);
 
     while(diff !== 0){
@@ -467,7 +464,7 @@ body::after{
         counts[Math.floor(Math.random() * colorCount)]++;
         diff--;
       }else{
-        const donors = counts.map((v,i) => ({ v, i })).filter(x => x.v > 6);
+        const donors = counts.map((v,i) => ({ v, i })).filter(x => x.v > 1);
         if(!donors.length) break;
         counts[donors[Math.floor(Math.random() * donors.length)].i]--;
         diff++;
@@ -481,7 +478,7 @@ body::after{
       for(let n = 0; n < need; n++){
         const donor = counts
           .map((v,i) => ({ v, i }))
-          .filter(x => x.i !== winnerIndex && x.v > 7)
+          .filter(x => x.i !== winnerIndex && x.v > 1)
           .sort((a,b) => b.v - a.v)[0];
         if(!donor) break;
         counts[donor.i]--;
@@ -551,7 +548,7 @@ body::after{
   function placeIntoLanes(assignLanes = true){
     const zone = boardZone();
     const usableWidth = zone.width - 12;
-    const laneCount = Math.max(7, Math.floor(usableWidth / 42));
+    const laneCount = Math.max(3, Math.floor(usableWidth / 42));
     const laneStep = usableWidth / laneCount;
 
     const lanes = Array.from({ length: laneCount }, (_, i) => ({
@@ -688,13 +685,16 @@ body::after{
 
     isResolving = false;
     board.classList.remove('resolving');
+
+    const nextSeries = state.series + 1;
     state = {
-      series: state.series + 1,
+      series: nextSeries,
       running: true,
       finished: false,
-      balloons: makeBalloons(state.series + 1)
+      balloons: makeBalloons(nextSeries)
     };
 
+    levelEl.textContent = String(nextSeries);
     placeIntoLanes(true);
     render();
   }
@@ -715,21 +715,9 @@ body::after{
     removeColor(colorIndex);
   }
 
-  function tick(){
-    if(!state || !state.running) return;
-    timerEl.textContent = fmt(performance.now() - startTs);
-    raf = requestAnimationFrame(tick);
-  }
-
-  function startTimer(){
-    cancelAnimationFrame(raf);
-    startTs = performance.now();
-    tick();
-  }
-
-  function stopTimer(){
-    cancelAnimationFrame(raf);
-  }
+  function tick(){}
+  function startTimer(){}
+  function stopTimer(){}
 
   function startGame(){
     endOverlay.classList.remove('show');
@@ -743,9 +731,9 @@ body::after{
       balloons: makeBalloons(1)
     };
 
+    levelEl.textContent = '1';
     placeIntoLanes(true);
     render();
-    timerEl.textContent = '00:00.0';
     setButtonState(true);
     startTimer();
   }
@@ -756,26 +744,25 @@ body::after{
     board.classList.remove('resolving');
     state = null;
     board.replaceChildren();
-    timerEl.textContent = '00:00.0';
+    levelEl.textContent = '1';
     setButtonState(false);
   }
 
   function finishGame(){
     stopTimer();
-    const elapsed = Math.floor(performance.now() - startTs);
-
-    timerEl.textContent = fmt(elapsed);
-    endTimeEl.textContent = fmt(elapsed);
 
     let newBest = false;
-    if(!bestMs || elapsed < bestMs){
-      bestMs = elapsed;
+    if(!bestMs || MAX_SERIES < bestMs){
+      bestMs = MAX_SERIES;
       localStorage.setItem(STORAGE_BEST, String(bestMs));
       updateBest();
       newBest = true;
     }
 
-    endTextEl.innerHTML = newBest ? 'Nouveau <strong>record</strong> !' : 'Partie terminée. Essaie encore plus vite.';
+    endTimeEl.textContent = 'Niveau 100';
+    endTextEl.innerHTML = newBest
+      ? 'Nouveau <strong>record</strong> !'
+      : 'Partie terminée. Tu as atteint le niveau 100.';
     setButtonState(false);
     endOverlay.classList.add('show');
     state = { finished:true, running:false, balloons:[], series:MAX_SERIES };
@@ -795,7 +782,7 @@ body::after{
     }
   }, { passive:true });
 
-  timerEl.textContent = '00:00.0';
+  levelEl.textContent = '1';
   updateBest();
   setButtonState(false);
   startGame();
