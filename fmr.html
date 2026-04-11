@@ -194,16 +194,34 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
   }
 
   function getColorCounts(){
-    const counts = new Map();
 
-    for(const b of balloons){
-      if(b.dataset.flying === "1") continue;
-      const color = b.dataset.color;
-      counts.set(color, (counts.get(color) || 0) + 1);
+  const counts = new Map();
+
+  const elements = board.querySelectorAll('.balloon');
+
+  elements.forEach(el => {
+
+    // ignore ceux en train de voler
+    if(el.dataset.flying === "1") return;
+
+    // ignore ceux presque invisibles (hors écran / opacity)
+    const rect = el.getBoundingClientRect();
+
+    if(
+      rect.bottom < 0 ||
+      rect.top > window.innerHeight ||
+      rect.right < 0 ||
+      rect.left > window.innerWidth
+    ){
+      return;
     }
 
-    return counts;
-  }
+    const color = el.dataset.color;
+    counts.set(color, (counts.get(color) || 0) + 1);
+  });
+
+  return counts;
+}
 
   function getMostNumerousColors(){
     const counts = getColorCounts();
