@@ -437,8 +437,8 @@ body::after{
   }
 
   function computeSeriesCount(series){
-    const start = 24;
-    const end = 220;
+    const start = 96;
+    const end = 440;
     const t = (series - 1) / Math.max(1, MAX_SERIES - 1);
     const eased = Math.pow(t, 1.18);
     return Math.round(start + (end - start) * eased);
