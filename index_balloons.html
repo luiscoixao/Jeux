@@ -490,13 +490,38 @@ body::after{width:40vw;height:40vw;right:-8vw;top:4vh;background:#ffe660}
     });
   }
 
+  
+  
   function getMajorityData(){
-    const counts = new Map();
-    state.balloons.forEach(balloon => counts.set(balloon.colorIndex, (counts.get(balloon.colorIndex) || 0) + 1));
-    const max = Math.max(...counts.values());
-    const winners = [...counts.entries()].filter(([, value]) => value === max).map(([key]) => key);
-    return { counts, winners };
-  }
+  const counts = new Map();
+
+  const els = [...board.querySelectorAll('.balloon')].filter(el => !el.classList.contains('fly'));
+
+  els.forEach(el => {
+    const rect = el.getBoundingClientRect();
+
+    // hors écran
+    const visibleW = Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0);
+    const visibleH = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+
+    if(visibleW <= 0 || visibleH <= 0) return;
+
+    // surface visible approximative
+    const visibleArea = visibleW * visibleH;
+
+    const colorIndex = Number(el.dataset.colorIndex);
+    counts.set(colorIndex, (counts.get(colorIndex) || 0) + visibleArea);
+  });
+
+  const values = [...counts.values()];
+  const max = values.length ? Math.max(...values) : 0;
+
+  const winners = [...counts.entries()]
+    .filter(([, value]) => value === max)
+    .map(([key]) => key);
+
+  return { counts, winners };
+}
 
   function render(){
     const frag = document.createDocumentFragment();
