@@ -380,17 +380,6 @@ body::after{
   <div class="board" id="board"></div>
   <div class="hud">
     <h1 class="title">BALLOONS</h1>
-    <div class="bottomBar" id="bottomBar">
-      <div class="stat">
-        <div class="label">Points</div>
-        <div class="value" id="points">0</div>
-      </div>
-      <div class="stat">
-        <div class="label">Score</div>
-        <div class="value" id="best">0</div>
-      </div>
-      <button class="toggleBtn play" id="toggleBtn" aria-label="Jouer">JOUER</button>
-    </div>
   </div>
 </div>
 
@@ -417,7 +406,7 @@ body::after{
   const restartBtn = document.getElementById('restartBtn');
 
   const STORAGE_BEST = 'balloons-best-score-v1';
-  const MAX_SERIES = 100;
+  const MAX_SERIES = 5;
   const SERIES_DURATION = 30000;
   const COLORS = [
     ['#ff8bac','#ff2d67'],
