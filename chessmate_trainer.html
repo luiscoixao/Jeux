@@ -3,34 +3,30 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>CHESSMATE TRAINER</title>
+<title>CHESSMEMORY</title>
 
 <link rel="apple-touch-icon" href="iconchessmemory.png" />
 <link rel="icon" href="iconchessmemory.png" />
 
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="CHESSMATE" />
+<meta name="apple-mobile-web-app-title" content="CHESSMEMORY" />
 <meta name="theme-color" content="#2c2c2c" />
 
 <style>
 :root{
   --bg:#2c2c2c;
   --panel:#3a3a3a;
-  --panel-2:#454545;
   --light:#eeeed2;
   --dark:#769656;
   --text:#ffffff;
   --gold:#d4af37;
-  --accent:#8bc34a;
-  --danger:#ef6b6b;
-  --soft:#d7d7d7;
-  --select:rgba(212,175,55,.45);
-  --target:rgba(139,195,74,.55);
-  --last:rgba(80,160,255,.28);
 }
 
-*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
 
 html,body{
   margin:0;
@@ -49,83 +45,24 @@ body{
 }
 
 h1{
-  margin:calc(env(safe-area-inset-top) + 18px) 0 10px;
+  margin:calc(env(safe-area-inset-top) + 18px) 0 12px;
   font-size:28px;
   line-height:1.08;
   font-weight:700;
   text-align:center;
-  letter-spacing:.3px;
 }
 
-.app{ width:100%; max-width:560px; }
+.app{
+  width:100%;
+  max-width:560px;
+}
 
-.panel{
+.controls-panel,
+.timer-panel{
   background:var(--panel);
   padding:14px;
   margin-bottom:12px;
   box-shadow:0 8px 20px rgba(0,0,0,.18);
-}
-
-.top-grid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:10px;
-}
-
-.levels{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
-}
-
-.level-btn,
-.action-btn{
-  border:none;
-  background:var(--bg);
-  color:#fff;
-  min-height:46px;
-  font-size:15px;
-  font-weight:700;
-  padding:10px 12px;
-  cursor:pointer;
-  appearance:none;
-  -webkit-appearance:none;
-}
-
-.level-btn.active{
-  background:var(--gold);
-  color:#111;
-}
-
-.actions{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
-}
-
-.meta{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
-}
-
-.meta-box{
-  background:var(--panel-2);
-  padding:10px 8px;
-  text-align:center;
-}
-
-.meta-label{
-  font-size:11px;
-  opacity:.8;
-  margin-bottom:4px;
-  text-transform:uppercase;
-  letter-spacing:.5px;
-}
-
-.meta-value{
-  font-size:17px;
-  font-weight:800;
 }
 
 #board-container{
@@ -151,6 +88,8 @@ h1{
   height:100%;
   user-select:none;
   overflow:hidden;
+  perspective:900px;
+  -webkit-perspective:900px;
 }
 
 .white{ background:var(--light); }
@@ -165,40 +104,14 @@ h1{
   z-index:4;
 }
 
-.coord.file{ left:5px; bottom:3px; }
-.coord.rank{ right:4px; top:2px; }
-
-.square.selected{
-  box-shadow:inset 0 0 0 4px var(--select);
+.coord.file{
+  left:5px;
+  bottom:3px;
 }
 
-.square.last-move{
-  box-shadow:inset 0 0 0 999px var(--last);
-}
-
-.square.target::after{
-  content:"";
-  position:absolute;
-  inset:50% auto auto 50%;
-  width:30%;
-  height:30%;
-  transform:translate(-50%,-50%);
-  border-radius:50%;
-  background:var(--target);
-  z-index:1;
-}
-
-.square.capture-target::after{
-  content:"";
-  position:absolute;
-  inset:7%;
-  border:4px solid rgba(239,107,107,.72);
-  border-radius:50%;
-  z-index:1;
-}
-
-.square.in-check{
-  box-shadow:inset 0 0 0 999px rgba(239,107,107,.26);
+.coord.rank{
+  right:4px;
+  top:2px;
 }
 
 .card{
@@ -216,12 +129,48 @@ h1{
   -webkit-appearance:none;
 }
 
+.card-inner{
+  position:relative;
+  width:100%;
+  height:100%;
+  transition:transform .42s ease;
+  transform-style:preserve-3d;
+  -webkit-transform-style:preserve-3d;
+}
+
+.square.flipped .card-inner{
+  transform:rotateY(180deg);
+  -webkit-transform:rotateY(180deg);
+}
+
 .face{
   position:absolute;
   inset:0;
   display:flex;
   align-items:center;
   justify-content:center;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+
+.back{
+  background:transparent;
+}
+
+.back::before{
+  content:"";
+  width:44%;
+  height:44%;
+  border-radius:50%;
+  background:rgba(0,0,0,.10);
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,.08),
+    0 1px 3px rgba(0,0,0,.12);
+}
+
+.front{
+  transform:rotateY(180deg);
+  -webkit-transform:rotateY(180deg);
 }
 
 .piece{
@@ -239,18 +188,21 @@ h1{
   font-family:"Arial Unicode MS","Segoe UI Symbol","Apple Symbols","Noto Sans Symbols 2",-apple-system,sans-serif;
 }
 
+/* Réglages fins pièce par pièce */
 .piece-K{ transform:scale(1.00); }
 .piece-k{ transform:scale(1.12); }
+
 .piece-Q{ transform:scale(1.00); }
 .piece-q{ transform:scale(1.02); }
+
 .piece-R{ transform:scale(0.88); }
 .piece-r{ transform:scale(1.02); }
+
 .piece-B{ transform:scale(0.98); }
 .piece-b{ transform:scale(1.02); }
+
 .piece-N{ transform:scale(1.00); }
 .piece-n{ transform:scale(1.00); }
-.piece-P{ transform:scale(.95); }
-.piece-p{ transform:scale(.95); }
 
 .white-piece{
   color:#ffffff;
@@ -268,27 +220,51 @@ h1{
     0 1px 1px rgba(255,255,255,.06);
 }
 
-#statusLine{
+.square.matched{
+  box-shadow:inset 0 0 0 3px rgba(212,175,55,.95);
+}
+
+.controls{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:28px;
+  background:var(--panel);
+}
+
+.control-btn{
+  width:52px;
+  height:52px;
+  border:none;
+  background:var(--bg);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  appearance:none;
+  -webkit-appearance:none;
+}
+
+.control-btn span{
+  font-size:24px;
+  line-height:1;
+  display:block;
+}
+
+#memoryStatus{
   text-align:center;
   font-size:16px;
   font-weight:700;
   margin-bottom:6px;
-  min-height:20px;
 }
 
-#subStatus{
+#memoryTimer{
   text-align:center;
-  font-size:14px;
+  font-size:22px;
+  font-weight:700;
   color:var(--gold);
-  min-height:18px;
-}
-
-.moves-line{
-  background:var(--panel-2);
-  padding:12px;
-  font-size:14px;
-  line-height:1.45;
-  min-height:48px;
+  min-height:28px;
 }
 
 .footer-note{
@@ -298,234 +274,170 @@ h1{
   opacity:.82;
 }
 
-.small{
-  font-size:12px;
-  opacity:.78;
-  line-height:1.4;
-}
-
 @media (max-width:420px){
-  .piece{ font-size:clamp(50px, 11vw, 70px); }
-  .level-btn,.action-btn{ min-height:44px; font-size:14px; padding:8px 10px; }
-  .meta-value{ font-size:16px; }
+  .piece{
+    font-size:clamp(50px, 11vw, 70px);
+  }
+
+  .control-btn{
+    width:46px;
+    height:46px;
+  }
+
+  .control-btn span{
+    font-size:22px;
+  }
 }
 </style>
 </head>
 <body>
 
-<h1>CHESSMATE TRAINER</h1>
+<h1>CHESSMEMORY</h1>
 
 <div class="app">
-  <div class="panel">
-    <div class="top-grid">
-      <div class="levels">
-        <button class="level-btn active" data-level="1" type="button">Mat en 1</button>
-        <button class="level-btn" data-level="2" type="button">Mat en 2</button>
-        <button class="level-btn" data-level="3" type="button">Mat en 3</button>
-      </div>
-
-      <div class="meta">
-        <div class="meta-box">
-          <div class="meta-label">Niveau</div>
-          <div class="meta-value" id="levelValue">1</div>
-        </div>
-        <div class="meta-box">
-          <div class="meta-label">Score</div>
-          <div class="meta-value" id="scoreValue">0</div>
-        </div>
-        <div class="meta-box">
-          <div class="meta-label">Série</div>
-          <div class="meta-value" id="streakValue">0</div>
-        </div>
-      </div>
-
-      <div class="actions">
-        <button class="action-btn" id="newBtn" type="button">Nouveau</button>
-        <button class="action-btn" id="solutionBtn" type="button">Solution</button>
-        <button class="action-btn" id="resetStatsBtn" type="button">Stats 0</button>
-      </div>
-
-      <div class="small">
-        Touchez une pièce puis une case cible. L’appli génère et mémorise progressivement une large base de positions.
-      </div>
-    </div>
-  </div>
-
   <div id="board-container">
     <div id="board"></div>
   </div>
 
-  <div class="panel">
-    <div id="statusLine">Chargement du puzzle…</div>
-    <div id="subStatus"></div>
+  <div class="timer-panel">
+    <div id="memoryStatus">Mat en 1</div>
+    <div id="memoryTimer">Position 1</div>
   </div>
 
-  <div class="panel">
-    <div class="moves-line" id="movesLine">Aucune solution affichée.</div>
+  <div class="controls-panel">
+    <div class="controls">
+      <button class="control-btn" id="mate1Btn" type="button" aria-label="Mat en 1"><span>1</span></button>
+      <button class="control-btn" id="mate2Btn" type="button" aria-label="Mat en 2"><span>2</span></button>
+      <button class="control-btn" id="mate3Btn" type="button" aria-label="Mat en 3"><span>3</span></button>
+      <button class="control-btn" id="prevBtn" type="button" aria-label="Position précédente"><span>◀</span></button>
+      <button class="control-btn" id="restartBtn" type="button" aria-label="Rejouer"><span>🔄</span></button>
+      <button class="control-btn" id="nextBtn" type="button" aria-label="Position suivante"><span>▶</span></button>
+    </div>
   </div>
 
-  <div class="footer-note">Appli imaginée par Luis et créée par ChatGPT</div>
+  <div class="footer-note">Jeu imaginé par Luis et créé par ChatGPT</div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/1.0.0/chess.min.js"></script>
 <script>
 const boardEl=document.getElementById("board");
-const statusLine=document.getElementById("statusLine");
-const subStatus=document.getElementById("subStatus");
-const movesLine=document.getElementById("movesLine");
-const newBtn=document.getElementById("newBtn");
-const solutionBtn=document.getElementById("solutionBtn");
-const resetStatsBtn=document.getElementById("resetStatsBtn");
-const levelValue=document.getElementById("levelValue");
-const scoreValue=document.getElementById("scoreValue");
-const streakValue=document.getElementById("streakValue");
-const levelBtns=[...document.querySelectorAll(".level-btn")];
+const restartBtn=document.getElementById("restartBtn");
+const prevBtn=document.getElementById("prevBtn");
+const nextBtn=document.getElementById("nextBtn");
+const mate1Btn=document.getElementById("mate1Btn");
+const mate2Btn=document.getElementById("mate2Btn");
+const mate3Btn=document.getElementById("mate3Btn");
+const memoryStatusEl=document.getElementById("memoryStatus");
+const memoryTimerEl=document.getElementById("memoryTimer");
 
 const FILES=["a","b","c","d","e","f","g","h"];
-const RANKS=["1","2","3","4","5","6","7","8"];
 const PIECES={
   "P":"♙","N":"♘","B":"♗","R":"♖","Q":"♕","K":"♔",
   "p":"♟","n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
 };
 
-const STORAGE_KEY="chessmate-trainer-v1";
-const LIBRARY_KEY="chessmate-generated-library-v1";
+const POSITIONS = {
+  1: [
+    {label:"Position 1", fen:"6k1/5ppp/8/8/8/8/5PPP/5RK1"},
+    {label:"Position 2", fen:"7k/5K2/6Q1/8/8/8/8/8"},
+    {label:"Position 3", fen:"k7/1R6/K7/8/8/8/8/8"},
+    {label:"Position 4", fen:"7k/6R1/6K1/8/8/8/8/8"},
+    {label:"Position 5", fen:"k7/8/1QK5/8/8/8/8/8"},
+    {label:"Position 6", fen:"6k1/5ppp/8/8/8/6Q1/5PPP/6K1"}
+  ],
+  2: [
+    {label:"Position 1", fen:"6k1/5ppp/8/8/8/6Q1/5PPP/5RK1"},
+    {label:"Position 2", fen:"k7/1R6/2K5/8/8/8/8/8"},
+    {label:"Position 3", fen:"7k/6pp/6Q1/6K1/8/8/8/8"},
+    {label:"Position 4", fen:"6k1/6pp/8/8/8/6R1/6PP/6K1"},
+    {label:"Position 5", fen:"7k/5K2/8/6Q1/8/8/8/8"},
+    {label:"Position 6", fen:"k7/8/2QK4/8/8/8/8/8"}
+  ],
+  3: [
+    {label:"Position 1", fen:"6k1/6pp/8/8/8/6R1/6PP/6K1"},
+    {label:"Position 2", fen:"7k/5K2/6Q1/8/8/8/8/8"},
+    {label:"Position 3", fen:"k7/8/2QK4/8/8/8/8/8"},
+    {label:"Position 4", fen:"7k/6R1/6K1/8/8/8/8/8"},
+    {label:"Position 5", fen:"6k1/5ppp/8/8/8/6Q1/5PPP/6K1"},
+    {label:"Position 6", fen:"k7/8/1QK5/8/8/8/8/8"}
+  ]
+};
 
-let currentLevel=1;
-let game=null;
-let selectedSquare=null;
-let legalTargets=[];
-let currentPuzzle=null;
-let currentLineIndex=0;
-let solvingLocked=false;
-let bufferByLevel={1:[],2:[],3:[]};
-let lastMoveSquares=[];
-let stats=loadStats();
+let currentMode=1;
+let currentIndex=0;
+let squares=[];
 
-function loadStats(){
-  try{
-    return Object.assign({
-      totalSolved:0,
-      streak:0,
-      perLevel:{
-        1:{solved:0,attempts:0},
-        2:{solved:0,attempts:0},
-        3:{solved:0,attempts:0}
+function fenToSquares(fen){
+  const rows = fen.split("/");   // rang 8 -> rang 1
+  const result = [];
+  for(let boardRow=7; boardRow>=0; boardRow--){
+    const fenRow = rows[7-boardRow];
+    const expanded = [];
+    for(const ch of fenRow){
+      if(/[1-8]/.test(ch)){
+        for(let i=0;i<Number(ch);i++) expanded.push("");
+      }else{
+        expanded.push(ch);
       }
-    }, JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}"));
-  }catch(e){
-    return {
-      totalSolved:0,
-      streak:0,
-      perLevel:{1:{solved:0,attempts:0},2:{solved:0,attempts:0},3:{solved:0,attempts:0}}
-    };
+    }
+    for(let col=0; col<8; col++){
+      result.push(expanded[col] || "");
+    }
   }
-}
-
-function saveStats(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
-}
-
-function loadLibrary(){
-  try{
-    const parsed=JSON.parse(localStorage.getItem(LIBRARY_KEY)||"{}");
-    return {
-      1:Array.isArray(parsed[1])?parsed[1]:[],
-      2:Array.isArray(parsed[2])?parsed[2]:[],
-      3:Array.isArray(parsed[3])?parsed[3]:[]
-    };
-  }catch(e){
-    return {1:[],2:[],3:[]};
-  }
-}
-
-function saveLibrary(){
-  localStorage.setItem(LIBRARY_KEY, JSON.stringify(bufferByLevel));
-}
-
-function updateStatsUI(){
-  levelValue.textContent=String(currentLevel);
-  scoreValue.textContent=String(stats.totalSolved);
-  streakValue.textContent=String(stats.streak);
-}
-
-function squareColor(square){
-  const file=FILES.indexOf(square[0]);
-  const rank=Number(square[1])-1;
-  return ((file+rank)%2===0) ? "white" : "black";
+  return result;
 }
 
 function coordsToSquare(file,rank){
   return FILES[file]+String(rank+1);
 }
 
-function normalizeMoveObject(move){
-  return {from:move.from,to:move.to,promotion:move.promotion||undefined};
+function getCurrentPosition(){
+  return POSITIONS[currentMode][currentIndex];
 }
 
-function moveKey(move){
-  return move.from+move.to+(move.promotion||"");
-}
-
-function clearSelection(){
-  selectedSquare=null;
-  legalTargets=[];
-}
-
-function getKingSquare(chess,color){
-  const board=chess.board();
-  for(let r=0;r<8;r++){
-    for(let c=0;c<8;c++){
-      const piece=board[r][c];
-      if(piece && piece.type==="k" && piece.color===color){
-        return FILES[c]+String(8-r);
-      }
-    }
-  }
-  return null;
+function loadPosition(){
+  const position = getCurrentPosition();
+  squares = fenToSquares(position.fen);
+  memoryStatusEl.textContent = "Mat en " + currentMode;
+  memoryTimerEl.textContent = position.label;
+  renderBoard();
 }
 
 function renderBoard(){
-  if(!game) return;
   boardEl.innerHTML="";
-  const board=game.board();
-  const checkSquare=getKingSquare(game, game.inCheck() ? game.turn() : null);
 
   for(let row=7;row>=0;row--){
     for(let col=0;col<8;col++){
-      const squareName=coordsToSquare(col,row);
-      const piece=board[7-row][col];
+      const idx=row*8+col;
+      const pieceCode=squares[idx];
+
       const sq=document.createElement("div");
-      sq.className="square "+squareColor(squareName);
-
-      if(selectedSquare===squareName) sq.classList.add("selected");
-      if(lastMoveSquares.includes(squareName)) sq.classList.add("last-move");
-      if(checkSquare===squareName) sq.classList.add("in-check");
-
-      const target=legalTargets.find(m=>m.to===squareName);
-      if(target){
-        if(piece) sq.classList.add("capture-target");
-        else sq.classList.add("target");
-      }
+      sq.className="square "+(((row+col)%2===0)?"white":"black");
+      sq.classList.add("flipped");
 
       const button=document.createElement("button");
       button.className="card";
       button.type="button";
-      button.setAttribute("aria-label", squareName);
-      button.addEventListener("click",()=>handleSquareTap(squareName));
+      button.setAttribute("aria-label", coordsToSquare(col,row));
 
-      const face=document.createElement("div");
-      face.className="face";
+      const inner=document.createElement("div");
+      inner.className="card-inner";
 
-      if(piece){
-        const code=piece.color==="w" ? piece.type.toUpperCase() : piece.type;
-        const span=document.createElement("span");
-        span.className="piece "+(piece.color==="w" ? "white-piece " : "black-piece ")+"piece-"+code;
-        span.textContent=PIECES[code];
-        face.appendChild(span);
+      const back=document.createElement("div");
+      back.className="face back";
+
+      const front=document.createElement("div");
+      front.className="face front";
+
+      if(pieceCode){
+        const piece=document.createElement("span");
+        piece.className="piece "+(pieceCode===pieceCode.toUpperCase() ? "white-piece " : "black-piece ")+"piece-"+pieceCode;
+        piece.textContent=PIECES[pieceCode];
+        front.appendChild(piece);
       }
 
-      button.appendChild(face);
+      inner.appendChild(back);
+      inner.appendChild(front);
+      button.appendChild(inner);
       sq.appendChild(button);
 
       if(row===0){
@@ -534,500 +446,45 @@ function renderBoard(){
         file.textContent=FILES[col];
         sq.appendChild(file);
       }
+
       if(col===7){
         const rank=document.createElement("span");
         rank.className="coord rank";
         rank.textContent=String(row+1);
         sq.appendChild(rank);
       }
+
       boardEl.appendChild(sq);
     }
   }
 }
 
-function showStatus(main,sub=""){
-  statusLine.textContent=main;
-  subStatus.textContent=sub;
+function setMode(mode){
+  currentMode=mode;
+  currentIndex=0;
+  loadPosition();
 }
 
-function updateMovesLine(text){
-  movesLine.textContent=text;
+function prevPosition(){
+  const list = POSITIONS[currentMode];
+  currentIndex = (currentIndex - 1 + list.length) % list.length;
+  loadPosition();
 }
 
-function getLegalMovesFrom(square){
-  if(!game) return [];
-  return game.moves({square,verbose:true}).map(normalizeMoveObject);
+function nextPosition(){
+  const list = POSITIONS[currentMode];
+  currentIndex = (currentIndex + 1) % list.length;
+  loadPosition();
 }
 
-function handleSquareTap(square){
-  if(solvingLocked || !game || !currentPuzzle) return;
-
-  const piece=game.get(square);
-
-  if(selectedSquare && legalTargets.some(m=>m.to===square)){
-    const move=legalTargets.find(m=>m.to===square);
-    playUserMove(move);
-    return;
-  }
-
-  if(piece && piece.color===currentPuzzle.attackerColor && game.turn()===currentPuzzle.attackerColor){
-    selectedSquare=square;
-    legalTargets=getLegalMovesFrom(square);
-    renderBoard();
-    return;
-  }
-
-  clearSelection();
-  renderBoard();
-}
-
-function recordWrongAttempt(){
-  stats.perLevel[currentLevel].attempts++;
-  stats.streak=0;
-  saveStats();
-  updateStatsUI();
-}
-
-function recordSolved(){
-  stats.totalSolved++;
-  stats.streak++;
-  stats.perLevel[currentLevel].solved++;
-  stats.perLevel[currentLevel].attempts++;
-  saveStats();
-  updateStatsUI();
-}
-
-function playUserMove(move){
-  const expected=currentPuzzle.solution[currentLineIndex];
-  if(!expected){
-    return;
-  }
-
-  if(moveKey(move)!==moveKey(expected)){
-    recordWrongAttempt();
-    showStatus("Ce n’est pas le bon coup.", "Cherchez la suite forcée.");
-    clearSelection();
-    renderBoard();
-    return;
-  }
-
-  const played=game.move(move);
-  lastMoveSquares=[played.from,played.to];
-  currentLineIndex++;
-  clearSelection();
-  renderBoard();
-
-  if(game.isCheckmate()){
-    recordSolved();
-    showStatus("Bravo, mat trouvé.", currentPuzzle.label);
-    updateMovesLine("Solution : "+currentPuzzle.solutionSan.join(" "));
-    currentPuzzle=null;
-    refillLibraryAsync(currentLevel);
-    return;
-  }
-
-  if(currentLineIndex < currentPuzzle.solution.length){
-    solvingLocked=true;
-    setTimeout(()=>{
-      const reply=currentPuzzle.solution[currentLineIndex];
-      const replyPlayed=game.move(reply);
-      lastMoveSquares=[replyPlayed.from,replyPlayed.to];
-      currentLineIndex++;
-      renderBoard();
-      solvingLocked=false;
-
-      if(game.isCheckmate()){
-        showStatus("Suite terminée.", currentPuzzle.label);
-        updateMovesLine("Solution : "+currentPuzzle.solutionSan.join(" "));
-        currentPuzzle=null;
-        refillLibraryAsync(currentLevel);
-      }else{
-        showStatus("À vous.", "Trouvez le prochain coup.");
-      }
-    }, 420);
-  }
-}
-
-function applyPuzzle(puzzle){
-  currentPuzzle=JSON.parse(JSON.stringify(puzzle));
-  game=new Chess(puzzle.fen);
-  selectedSquare=null;
-  legalTargets=[];
-  currentLineIndex=0;
-  lastMoveSquares=[];
-  solvingLocked=false;
-  renderBoard();
-  showStatus("À vous.", puzzle.label);
-  updateMovesLine("Trait aux blancs. Trouvez la suite forcée.");
-}
-
-function invertColor(c){ return c==="w" ? "b" : "w"; }
-
-function cloneChess(chess){
-  return new Chess(chess.fen());
-}
-
-function memoKey(chess, plies, attackerColor){
-  return chess.fen()+"|"+plies+"|"+attackerColor;
-}
-
-function hasForcedMate(chess, plies, attackerColor, memo){
-  const key=memoKey(chess, plies, attackerColor);
-  if(memo.has(key)) return memo.get(key);
-
-  if(plies===0){
-    const res=chess.isCheckmate();
-    memo.set(key,res);
-    return res;
-  }
-
-  const moves=chess.moves({verbose:true});
-  if(!moves.length){
-    memo.set(key,false);
-    return false;
-  }
-
-  const attackerTurn=chess.turn()===attackerColor;
-  let result=false;
-
-  if(attackerTurn){
-    result=false;
-    for(const mv of moves){
-      chess.move(mv);
-      if(hasForcedMate(chess, plies-1, attackerColor, memo)){
-        chess.undo();
-        result=true;
-        break;
-      }
-      chess.undo();
-    }
-  }else{
-    result=true;
-    for(const mv of moves){
-      chess.move(mv);
-      if(!hasForcedMate(chess, plies-1, attackerColor, memo)){
-        chess.undo();
-        result=false;
-        break;
-      }
-      chess.undo();
-    }
-  }
-
-  memo.set(key,result);
-  return result;
-}
-
-function exactMateInfo(chess, mateMoves, attackerColor){
-  const plies=mateMoves*2-1;
-  const memo=new Map();
-  const forced=hasForcedMate(chess, plies, attackerColor, memo);
-  if(!forced) return null;
-  if(mateMoves>1 && hasForcedMate(cloneChess(chess), plies-2, attackerColor, memo)) return null;
-
-  const solution=[];
-  const solutionSan=[];
-  const lineGame=cloneChess(chess);
-
-  for(let d=plies; d>0; d--){
-    const moves=lineGame.moves({verbose:true});
-    const attackerTurn=lineGame.turn()===attackerColor;
-    let chosen=null;
-
-    if(attackerTurn){
-      for(const mv of moves){
-        lineGame.move(mv);
-        if(hasForcedMate(lineGame, d-1, attackerColor, memo)){
-          chosen=mv;
-          const san=lineGame.history().slice(-1)[0];
-          lineGame.undo();
-          chosen.san=san;
-          break;
-        }
-        lineGame.undo();
-      }
-    }else{
-      for(const mv of moves){
-        lineGame.move(mv);
-        if(hasForcedMate(lineGame, d-1, attackerColor, memo)){
-          chosen=mv;
-          const san=lineGame.history().slice(-1)[0];
-          lineGame.undo();
-          chosen.san=san;
-          break;
-        }
-        lineGame.undo();
-      }
-    }
-
-    if(!chosen) return null;
-    solution.push(normalizeMoveObject(chosen));
-    const applied=lineGame.move(chosen);
-    solutionSan.push(applied.san);
-  }
-
-  if(!lineGame.isCheckmate()) return null;
-
-  return {
-    mateMoves,
-    solution,
-    solutionSan
-  };
-}
-
-function randomChoice(arr){
-  return arr[Math.floor(Math.random()*arr.length)];
-}
-
-function allSquares(){
-  const out=[];
-  for(const f of FILES){
-    for(const r of RANKS) out.push(f+r);
-  }
-  return out;
-}
-
-const ALL_SQUARES=allSquares();
-
-function areAdjacent(a,b){
-  const fx=Math.abs(FILES.indexOf(a[0]) - FILES.indexOf(b[0]));
-  const ry=Math.abs(Number(a[1]) - Number(b[1]));
-  return fx<=1 && ry<=1;
-}
-
-function squareDistance(a,b){
-  const fx=Math.abs(FILES.indexOf(a[0]) - FILES.indexOf(b[0]));
-  const ry=Math.abs(Number(a[1]) - Number(b[1]));
-  return Math.max(fx,ry);
-}
-
-function randomSquare(filterFn){
-  const candidates=ALL_SQUARES.filter(filterFn);
-  return candidates.length ? randomChoice(candidates) : null;
-}
-
-function pieceSetsFor(level){
-  if(level===1){
-    return [
-      ["Q"],["R"],["Q","P"],["Q","N"],["R","B"],["Q","B"],["R","P"]
-    ];
-  }
-  if(level===2){
-    return [
-      ["Q","R"],["Q","B"],["Q","N"],["R","B"],["R","N"],["Q","P","P"],["R","P","P"]
-    ];
-  }
-  return [
-    ["Q","R","P"],["Q","B","P"],["Q","N","P"],["R","B","P"],["R","N","P"],["Q","R"],["Q","B","N"]
-  ];
-}
-
-function createRandomPosition(level){
-  for(let attempt=0; attempt<220; attempt++){
-    const chess=new Chess();
-    chess.clear();
-
-    const attackerColor="w";
-    const defenderColor="b";
-
-    const blackKing=randomSquare(sq=>{
-      const file=FILES.indexOf(sq[0]);
-      const rank=Number(sq[1]);
-      return file>=1 && file<=6 && rank>=6 && rank<=8;
-    }) || randomChoice(ALL_SQUARES);
-
-    const whiteKing=randomSquare(sq=>sq!==blackKing && !areAdjacent(sq,blackKing) && squareDistance(sq,blackKing)<=3);
-    if(!whiteKing) continue;
-
-    chess.put({type:"k", color:"b"}, blackKing);
-    chess.put({type:"k", color:"w"}, whiteKing);
-
-    const occupied=new Set([blackKing,whiteKing]);
-
-    const set=randomChoice(pieceSetsFor(level));
-    for(const piece of set){
-      let sq=null;
-      for(let inner=0; inner<60; inner++){
-        sq=randomSquare(s=>{
-          if(occupied.has(s)) return false;
-          const nearKing=squareDistance(s,blackKing)<=3;
-          const notAdjacentKing=!areAdjacent(s,blackKing);
-          return nearKing && notAdjacentKing;
-        });
-        if(sq) break;
-      }
-      if(!sq){
-        sq=randomSquare(s=>!occupied.has(s));
-      }
-      if(!sq) continue;
-      chess.put({type:piece.toLowerCase(), color:"w"}, sq);
-      occupied.add(sq);
-    }
-
-    const blackPawnsCount=level===1 ? (Math.random()<0.55 ? 1 : 2) : (Math.random()<0.75 ? 2 : 3);
-    for(let i=0;i<blackPawnsCount;i++){
-      let sq=null;
-      for(let inner=0; inner<40; inner++){
-        sq=randomSquare(s=>{
-          if(occupied.has(s)) return false;
-          const file=FILES.indexOf(s[0]);
-          const rank=Number(s[1]);
-          return rank>=5 && rank<=7 && file>=0 && file<=7 && squareDistance(s,blackKing)<=2 && !areAdjacent(s,whiteKing);
-        });
-        if(sq) break;
-      }
-      if(sq){
-        chess.put({type:"p", color:"b"}, sq);
-        occupied.add(sq);
-      }
-    }
-
-    if(level>=2 && Math.random()<0.35){
-      const extras=["r","n","b"];
-      let sq=randomSquare(s=>!occupied.has(s) && squareDistance(s,blackKing)<=3);
-      if(sq){
-        chess.put({type:randomChoice(extras), color:"b"}, sq);
-        occupied.add(sq);
-      }
-    }
-
-    const fen=chess.fen().split(" ")[0]+" w - - 0 1";
-    const gameTry=new Chess(fen);
-
-    if(gameTry.inCheck()) continue;
-    if(gameTry.isCheckmate() || gameTry.isStalemate()) continue;
-
-    const info=exactMateInfo(gameTry, level, "w");
-    if(!info) continue;
-
-    return {
-      fen:gameTry.fen(),
-      attackerColor:"w",
-      label:"Mat en "+level,
-      solution:info.solution,
-      solutionSan:info.solutionSan
-    };
-  }
-  return null;
-}
-
-async function generatePuzzle(level){
-  showStatus("Génération du puzzle…", "Recherche d’une position de mat en "+level);
-  updateMovesLine("Patientez pendant la création de la position.");
-
-  return new Promise(resolve=>{
-    setTimeout(()=>{
-      let puzzle=createRandomPosition(level);
-
-      if(!puzzle){
-        const fallbackFen = level===1
-          ? "6k1/8/6KQ/8/8/8/8/8 w - - 0 1"
-          : level===2
-            ? "6k1/5ppp/6K1/6Q1/8/8/8/7R w - - 0 1"
-            : "6k1/5ppp/6K1/6Q1/8/8/6PP/7R w - - 0 1";
-
-        const fallbackGame=new Chess(fallbackFen);
-        const info=exactMateInfo(fallbackGame, level, "w");
-
-        if(info){
-          puzzle={
-            fen:fallbackGame.fen(),
-            attackerColor:"w",
-            label:"Mat en "+level,
-            solution:info.solution,
-            solutionSan:info.solutionSan
-          };
-        }
-      }
-      resolve(puzzle);
-    }, 30);
-  });
-}
-
-async function refillLibraryAsync(level){
-  const targetSize=12;
-  if(bufferByLevel[level].length>=targetSize) return;
-
-  for(let i=bufferByLevel[level].length; i<targetSize; i++){
-    const created=await generatePuzzle(level);
-    if(created){
-      bufferByLevel[level].push(created);
-      saveLibrary();
-    }else{
-      break;
-    }
-  }
-}
-
-async function getNextPuzzle(level){
-  if(bufferByLevel[level].length){
-    const next=bufferByLevel[level].shift();
-    saveLibrary();
-    refillLibraryAsync(level);
-    return next;
-  }
-  const fresh=await generatePuzzle(level);
-  refillLibraryAsync(level);
-  return fresh;
-}
-
-async function loadPuzzle(level){
-  clearSelection();
-  selectedSquare=null;
-  legalTargets=[];
-  solvingLocked=true;
-  const puzzle=await getNextPuzzle(level);
-  solvingLocked=false;
-
-  if(!puzzle){
-    showStatus("Impossible de générer une position.", "Réessaie avec le bouton Nouveau.");
-    updateMovesLine("Aucune solution disponible.");
-    return;
-  }
-
-  applyPuzzle(puzzle);
-}
-
-function showSolution(){
-  if(!currentPuzzle){
-    updateMovesLine("La solution du dernier exercice est déjà affichée ou la position est terminée.");
-    return;
-  }
-  updateMovesLine("Solution : "+currentPuzzle.solutionSan.join(" "));
-  showStatus("Solution affichée.", currentPuzzle.label);
-}
-
-function resetStats(){
-  stats={
-    totalSolved:0,
-    streak:0,
-    perLevel:{1:{solved:0,attempts:0},2:{solved:0,attempts:0},3:{solved:0,attempts:0}}
-  };
-  saveStats();
-  updateStatsUI();
-  showStatus("Statistiques remises à zéro.", "La bibliothèque de puzzles est conservée.");
-}
-
-levelBtns.forEach(btn=>{
-  btn.addEventListener("click", async ()=>{
-    const level=Number(btn.dataset.level);
-    currentLevel=level;
-    levelBtns.forEach(b=>b.classList.toggle("active", Number(b.dataset.level)===level));
-    updateStatsUI();
-    await loadPuzzle(currentLevel);
-  });
-});
-
-newBtn.addEventListener("click", ()=>loadPuzzle(currentLevel));
-solutionBtn.addEventListener("click", showSolution);
-resetStatsBtn.addEventListener("click", resetStats);
-
-bufferByLevel=loadLibrary();
-updateStatsUI();
-loadPuzzle(currentLevel);
-refillLibraryAsync(1);
-refillLibraryAsync(2);
-refillLibraryAsync(3);
+mate1Btn.addEventListener("click",()=>setMode(1));
+mate2Btn.addEventListener("click",()=>setMode(2));
+mate3Btn.addEventListener("click",()=>setMode(3));
+prevBtn.addEventListener("click",prevPosition);
+nextBtn.addEventListener("click",nextPosition);
+restartBtn.addEventListener("click",loadPosition);
+
+loadPosition();
 </script>
 
 </body>
