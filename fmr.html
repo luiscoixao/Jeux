@@ -40,6 +40,9 @@ html,body{
   min-height:100dvh;
   overflow:hidden;
   overscroll-behavior:none;
+}
+
+html{
   background:
     radial-gradient(circle at 12% 12%, rgba(255,239,118,.95) 0 0, rgba(255,239,118,0) 17%),
     radial-gradient(circle at 84% 12%, rgba(74,196,255,.92) 0 0, rgba(74,196,255,0) 18%),
@@ -50,8 +53,10 @@ html,body{
 }
 
 body{
+  min-height:100dvh;
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",sans-serif;
   color:var(--white);
+  background:transparent;
 }
 
 body::before,
@@ -90,12 +95,14 @@ body::after{
 
 .game{
   min-height:100dvh;
+  padding-bottom:env(safe-area-inset-bottom);
 }
 
 .board{
   overflow:hidden;
   touch-action:manipulation;
-  min-height:100dvh;
+  height:calc(100dvh + env(safe-area-inset-bottom));
+  min-height:calc(100dvh + env(safe-area-inset-bottom));
 }
 
 .hud{
@@ -128,7 +135,7 @@ body::after{
   right:calc(12px + var(--safe-right));
   bottom:calc(10px + var(--safe-bottom));
   display:grid;
-  grid-template-columns:minmax(100px,1fr) minmax(100px,1fr) minmax(100px,1fr) minmax(132px,1.32fr);
+  grid-template-columns:minmax(100px,1fr) minmax(100px,1fr) minmax(132px,1.32fr);
   gap:10px;
   align-items:stretch;
   pointer-events:auto;
@@ -349,7 +356,7 @@ body::after{
 
 @media (max-width: 430px){
   .bottomBar{
-    grid-template-columns:minmax(86px,1fr) minmax(86px,1fr) minmax(86px,1fr) minmax(120px,1.2fr);
+    grid-template-columns:minmax(94px,1fr) minmax(94px,1fr) minmax(126px,1.2fr);
     gap:8px;
   }
 
@@ -374,10 +381,6 @@ body::after{
   <div class="hud">
     <h1 class="title">BALLOONS</h1>
     <div class="bottomBar" id="bottomBar">
-      <div class="stat">
-        <div class="label">Chrono</div>
-        <div class="value" id="chrono">00:30.0</div>
-      </div>
       <div class="stat">
         <div class="label">Points</div>
         <div class="value" id="points">0</div>
@@ -404,7 +407,6 @@ body::after{
 <script>
 (() => {
   const board = document.getElementById('board');
-  const chronoEl = document.getElementById('chrono');
   const pointsEl = document.getElementById('points');
   const bestEl = document.getElementById('best');
   const toggleBtn = document.getElementById('toggleBtn');
@@ -461,7 +463,6 @@ body::after{
     if(!state || !state.running || state.finished) return;
 
     const remaining = Math.max(0, seriesDeadline - performance.now());
-    chronoEl.textContent = fmt(remaining);
 
     if(remaining <= 0){
       state.seriesExpired = true;
@@ -481,7 +482,6 @@ body::after{
       state.seriesExpired = false;
       state.seriesWon = false;
     }
-    chronoEl.textContent = fmt(SERIES_DURATION);
     raf = requestAnimationFrame(tick);
   }
 
@@ -718,6 +718,7 @@ body::after{
       el.classList.add('fly');
 
       const done = () => {
+        el.removeEventListener('animationend', done);
         if(el.isConnected) el.remove();
         remaining--;
 
@@ -817,7 +818,6 @@ body::after{
     board.classList.remove('resolving');
     state = null;
     board.replaceChildren();
-    chronoEl.textContent = '00:30.0';
     pointsEl.textContent = '0';
     setButtonState(false);
   }
@@ -856,7 +856,6 @@ body::after{
     }
   }, { passive:true });
 
-  chronoEl.textContent = '00:30.0';
   pointsEl.textContent = '0';
   updateBest();
   setButtonState(false);
