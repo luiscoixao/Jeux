@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>CHESSMATE</title>
 
-<link rel="apple-touch-icon" href="iconchessmemory.png" />
-<link rel="icon" href="iconchessmemory.png" />
+<link rel="apple-touch-icon" href="icon_chessmate.png" />
+<link rel="icon" href="icon_chessmate.png" />
 
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -21,297 +21,54 @@
   --dark:#769656;
   --text:#ffffff;
   --gold:#d4af37;
+  --danger:#d85a5a;
 }
-
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
-
-html,body{
-  margin:0;
-  padding:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
-}
-
-body{
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  padding:0 12px calc(18px + env(safe-area-inset-bottom));
-}
-
-h1{
-  margin:calc(env(safe-area-inset-top) + 18px) 0 12px;
-  font-size:28px;
-  line-height:1.08;
-  font-weight:700;
-  text-align:center;
-}
-
-.app{
-  width:100%;
-  max-width:560px;
-}
-
-.controls-panel,
-.timer-panel{
-  background:var(--panel);
-  padding:14px;
-  margin-bottom:12px;
-  box-shadow:0 8px 20px rgba(0,0,0,.18);
-}
-
-#board-container{
-  position:relative;
-  width:95vw;
-  max-width:500px;
-  aspect-ratio:1 / 1;
-  overflow:hidden;
-  margin-bottom:12px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.35);
-}
-
-#board{
-  display:grid;
-  grid-template-columns:repeat(8,1fr);
-  grid-template-rows:repeat(8,1fr);
-  width:100%;
-  height:100%;
-}
-
-#arrowLayer{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  pointer-events:none;
-  z-index:8;
-}
-
-.square{
-  position:relative;
-  width:100%;
-  height:100%;
-  user-select:none;
-  overflow:hidden;
-  perspective:900px;
-  -webkit-perspective:900px;
-}
-
-.white{ background:var(--light); }
-.black{ background:var(--dark); }
-
-.coord{
-  position:absolute;
-  font-size:10px;
-  opacity:.65;
-  font-weight:700;
-  pointer-events:none;
-  z-index:4;
-}
-
-.coord.file{
-  left:5px;
-  bottom:3px;
-}
-
-.coord.rank{
-  right:4px;
-  top:2px;
-}
-
-.card{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  border:none;
-  background:none;
-  padding:0;
-  margin:0;
-  cursor:pointer;
-  touch-action:manipulation;
-  appearance:none;
-  -webkit-appearance:none;
-}
-
-.card-inner{
-  position:relative;
-  width:100%;
-  height:100%;
-  transition:transform .42s ease;
-  transform-style:preserve-3d;
-  -webkit-transform-style:preserve-3d;
-}
-
-.square.flipped .card-inner{
-  transform:rotateY(180deg);
-  -webkit-transform:rotateY(180deg);
-}
-
-.face{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  backface-visibility:hidden;
-  -webkit-backface-visibility:hidden;
-}
-
-.back{
-  background:transparent;
-}
-
-.back::before{
-  content:"";
-  width:44%;
-  height:44%;
-  border-radius:50%;
-  background:rgba(0,0,0,.10);
-  box-shadow:
-    inset 0 0 0 2px rgba(255,255,255,.08),
-    0 1px 3px rgba(0,0,0,.12);
-}
-
-.front{
-  transform:rotateY(180deg);
-  -webkit-transform:rotateY(180deg);
-}
-
-.piece{
-  line-height:1;
-  position:relative;
-  z-index:2;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:100%;
-  height:100%;
-  filter:drop-shadow(0 1px 0 rgba(0,0,0,.22));
-  transform-origin:center center;
-  font-size:clamp(56px, 11vw, 82px);
-  font-family:"Arial Unicode MS","Segoe UI Symbol","Apple Symbols","Noto Sans Symbols 2",-apple-system,sans-serif;
-}
-
-.piece-K{ transform:scale(1.00); }
-.piece-k{ transform:scale(1.12); }
-.piece-Q{ transform:scale(1.00); }
-.piece-q{ transform:scale(1.02); }
-.piece-R{ transform:scale(0.88); }
-.piece-r{ transform:scale(1.02); }
-.piece-B{ transform:scale(0.98); }
-.piece-b{ transform:scale(1.02); }
-.piece-N{ transform:scale(1.00); }
-.piece-n{ transform:scale(1.00); }
-
-.white-piece{
-  color:#ffffff;
-  text-shadow:
-    0 0 1px #000,
-    0 0 2px #000,
-    0 1px 2px rgba(0,0,0,.55),
-    0 0 6px rgba(255,255,255,.16);
-}
-
-.black-piece{
-  color:#141414;
-  text-shadow:
-    0 0 1px rgba(255,255,255,.18),
-    0 1px 1px rgba(255,255,255,.06);
-}
-
-.square.selected{
-  box-shadow:inset 0 0 0 3px rgba(212,175,55,.95);
-}
-
-.square.hintFrom{
-  box-shadow:inset 0 0 0 3px rgba(212,175,55,.95);
-}
-
-.controls{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:18px;
-  background:var(--panel);
-  flex-wrap:wrap;
-}
-
-.control-btn{
-  width:52px;
-  height:52px;
-  border:none;
-  background:var(--bg);
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  appearance:none;
-  -webkit-appearance:none;
-}
-
-.control-btn.wide{
-  width:auto;
-  min-width:52px;
-  padding:0 14px;
-}
-
-.control-btn span{
-  font-size:24px;
-  line-height:1;
-  display:block;
-}
-
-#memoryStatus{
-  text-align:center;
-  font-size:16px;
-  font-weight:700;
-  margin-bottom:6px;
-}
-
-#memoryTimer{
-  text-align:center;
-  font-size:22px;
-  font-weight:700;
-  color:var(--gold);
-  min-height:28px;
-}
-
-.progress-note{
-  text-align:center;
-  font-size:12px;
-  margin-top:6px;
-  opacity:.82;
-}
-
-.footer-note{
-  text-align:center;
-  font-size:12px;
-  margin-top:4px;
-  opacity:.82;
-}
-
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif}
+body{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 12px calc(18px + env(safe-area-inset-bottom))}
+h1{margin:calc(env(safe-area-inset-top) + 18px) 0 12px;font-size:28px;line-height:1.08;font-weight:700;text-align:center}
+.app{width:100%;max-width:560px}
+.controls-panel,.timer-panel{background:var(--panel);padding:14px;margin-bottom:12px;box-shadow:0 8px 20px rgba(0,0,0,.18)}
+#board-container{position:relative;width:95vw;max-width:500px;aspect-ratio:1 / 1;overflow:hidden;margin-bottom:12px;box-shadow:0 10px 25px rgba(0,0,0,0.35)}
+#board{display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);width:100%;height:100%}
+#arrowLayer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:8}
+.square{position:relative;width:100%;height:100%;user-select:none;overflow:hidden;perspective:900px;-webkit-perspective:900px}
+.white{background:var(--light)}
+.black{background:var(--dark)}
+.coord{position:absolute;font-size:10px;opacity:.65;font-weight:700;pointer-events:none;z-index:4}
+.coord.file{left:5px;bottom:3px}
+.coord.rank{right:4px;top:2px}
+.card{position:absolute;inset:0;width:100%;height:100%;border:none;background:none;padding:0;margin:0;cursor:pointer;touch-action:manipulation;appearance:none;-webkit-appearance:none}
+.card-inner{position:relative;width:100%;height:100%;transition:transform .42s ease;transform-style:preserve-3d;-webkit-transform-style:preserve-3d}
+.square.flipped .card-inner{transform:rotateY(180deg);-webkit-transform:rotateY(180deg)}
+.face{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.back{background:transparent}
+.back::before{content:"";width:44%;height:44%;border-radius:50%;background:rgba(0,0,0,.10);box-shadow:inset 0 0 0 2px rgba(255,255,255,.08),0 1px 3px rgba(0,0,0,.12)}
+.front{transform:rotateY(180deg);-webkit-transform:rotateY(180deg)}
+.piece{line-height:1;position:relative;z-index:2;display:flex;align-items:center;justify-content:center;width:100%;height:100%;filter:drop-shadow(0 1px 0 rgba(0,0,0,.22));transform-origin:center center;font-size:clamp(56px, 11vw, 82px);font-family:"Arial Unicode MS","Segoe UI Symbol","Apple Symbols","Noto Sans Symbols 2",-apple-system,sans-serif}
+.piece-K{transform:scale(1.00)} .piece-k{transform:scale(1.12)}
+.piece-Q{transform:scale(1.00)} .piece-q{transform:scale(1.02)}
+.piece-R{transform:scale(0.88)} .piece-r{transform:scale(1.02)}
+.piece-B{transform:scale(0.98)} .piece-b{transform:scale(1.02)}
+.piece-N{transform:scale(1.00)} .piece-n{transform:scale(1.00)}
+.white-piece{color:#ffffff;text-shadow:0 0 1px #000,0 0 2px #000,0 1px 2px rgba(0,0,0,.55),0 0 6px rgba(255,255,255,.16)}
+.black-piece{color:#141414;text-shadow:0 0 1px rgba(255,255,255,.18),0 1px 1px rgba(255,255,255,.06)}
+.square.selected{box-shadow:inset 0 0 0 3px rgba(212,175,55,.95)}
+.square.hintFrom{box-shadow:inset 0 0 0 3px rgba(212,175,55,.95)}
+.square.wrong{box-shadow:inset 0 0 0 3px rgba(216,90,90,.95)}
+.controls{display:flex;justify-content:center;align-items:center;gap:18px;background:var(--panel);flex-wrap:wrap}
+.control-btn{width:52px;height:52px;border:none;background:var(--bg);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;appearance:none;-webkit-appearance:none}
+.control-btn.wide{width:auto;min-width:52px;padding:0 14px}
+.control-btn span{font-size:24px;line-height:1;display:block}
+#memoryStatus{text-align:center;font-size:16px;font-weight:700;margin-bottom:6px}
+#memoryTimer{text-align:center;font-size:22px;font-weight:700;color:var(--gold);min-height:28px}
+.progress-note{text-align:center;font-size:12px;margin-top:6px;opacity:.82}
+.footer-note{text-align:center;font-size:12px;margin-top:4px;opacity:.82}
 @media (max-width:420px){
-  .piece{
-    font-size:clamp(50px, 11vw, 70px);
-  }
-  .control-btn{
-    width:46px;
-    height:46px;
-  }
-  .control-btn.wide{
-    min-width:46px;
-    padding:0 12px;
-  }
-  .control-btn span{
-    font-size:22px;
-  }
+  .piece{font-size:clamp(50px, 11vw, 70px)}
+  .control-btn{width:46px;height:46px}
+  .control-btn.wide{min-width:46px;padding:0 12px}
+  .control-btn span{font-size:22px}
 }
 </style>
 </head>
@@ -353,55 +110,58 @@ h1{
 </div>
 
 <script>
-const boardEl=document.getElementById("board");
-const restartBtn=document.getElementById("restartBtn");
-const prevBtn=document.getElementById("prevBtn");
-const nextBtn=document.getElementById("nextBtn");
-const solutionBtn=document.getElementById("solutionBtn");
-const memoryStatusEl=document.getElementById("memoryStatus");
-const memoryTimerEl=document.getElementById("memoryTimer");
-const progressNoteEl=document.getElementById("progressNote");
-const solutionArrow=document.getElementById("solutionArrow");
-
-const FILES=["a","b","c","d","e","f","g","h"];
-const PIECES={
+const PUZZLES = [{"title": "Mat en 1", "displayFen": "8/1Q6/2K5/k7/8/8/8/8 w - - 0 1", "line": ["b7b5"], "label": "Position 1"}, {"title": "Mat en 1", "displayFen": "8/8/8/8/8/3K4/3Q4/2k5 w - - 0 1", "line": ["d2c2"], "label": "Position 2"}, {"title": "Mat en 1", "displayFen": "4k3/1Q6/5K2/8/8/8/8/8 w - - 0 1", "line": ["b7c8"], "label": "Position 3"}, {"title": "Mat en 1", "displayFen": "7k/6R1/6K1/8/8/8/8/8 w - - 0 1", "line": ["g7g8"], "label": "Position 4"}, {"title": "Mat en 1", "displayFen": "k7/1R6/K7/8/8/8/8/8 w - - 0 1", "line": ["b7b8"], "label": "Position 5"}, {"title": "Mat en 1", "displayFen": "7k/5K2/6Q1/8/8/8/8/8 w - - 0 1", "line": ["g6g7"], "label": "Position 6"}, {"title": "Mat en 2", "displayFen": "7k/8/5K2/8/8/8/8/R7 w - - 0 1", "line": ["a1a8", "h8h7", "a8h8"], "label": "Position 7"}, {"title": "Mat en 2", "displayFen": "7k/8/5K2/8/8/8/8/Q7 w - - 0 1", "line": ["a1a8", "h8h7", "a8h8"], "label": "Position 8"}, {"title": "Mat en 2", "displayFen": "k7/8/2K5/8/8/8/8/7Q w - - 0 1", "line": ["h1h8", "a8a7", "h8b8"], "label": "Position 9"}, {"title": "Mat en 2", "displayFen": "1k6/8/8/2K5/8/8/8/Q7 w - - 0 1", "line": ["a1b1", "b8a7", "b1b7"], "label": "Position 10"}, {"title": "Mat en 2", "displayFen": "6k1/8/5K2/8/8/8/8/R7 w - - 0 1", "line": ["a1a8", "g8h7", "a8h8"], "label": "Position 11"}, {"title": "Mat en 2", "displayFen": "q5nr/1ppknQpp/3p4/1P2p3/4P3/B1PP1b2/B5PP/5K2 w - - 0 1", "line": ["a2e6", "d7d8", "f7f8"], "label": "Position 12"}, {"title": "Mat en 3", "displayFen": "7k/8/5K2/8/8/8/8/Q7 w - - 0 1", "line": ["a1a8", "h8h7", "a8h1", "h7g8", "h1h8"], "label": "Position 13"}, {"title": "Mat en 3", "displayFen": "k7/8/2K5/8/8/8/8/7Q w - - 0 1", "line": ["h1h8", "a8a7", "h8a1", "a7b8", "a1b7"], "label": "Position 14"}, {"title": "Mat en 3", "displayFen": "4R3/7k/3pQ1pp/p7/1p1q1P2/7P/6PK/3r1B2 b - - 0 1", "line": ["d4f4", "g2g3", "f4f2", "f1g2", "f2g1"], "label": "Position 15"}, {"title": "Mat en 3", "displayFen": "7k/8/5K2/8/8/8/8/R7 w - - 0 1", "line": ["a1a8", "h8h7", "a8h8", "h7g6", "h8h6"], "label": "Position 16"}, {"title": "Mat en 3", "displayFen": "1k6/8/8/2K5/8/8/8/Q7 w - - 0 1", "line": ["a1h1", "b8a7", "h1h7", "a7a8", "h7h8"], "label": "Position 17"}, {"title": "Mat en 3", "displayFen": "6k1/8/5K2/8/8/8/8/Q7 w - - 0 1", "line": ["a1a8", "g8h7", "a8h8", "h7g6", "h8h6"], "label": "Position 18"}];
+const FILES = ["a","b","c","d","e","f","g","h"];
+const PIECES = {
   "P":"♙","N":"♘","B":"♗","R":"♖","Q":"♕","K":"♔",
   "p":"♟","n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
 };
 
-const PUZZLES = [{"id": "m1-01", "title": "Mat en 1", "label": "Position 1", "displayFen": "8/1Q6/2K5/k7/8/8/8/8 w - - 0 1", "line": ["b7b5"]}, {"id": "m1-02", "title": "Mat en 1", "label": "Position 2", "displayFen": "8/8/8/8/8/3K4/3Q4/2k5 w - - 0 1", "line": ["d2c2"]}, {"id": "m1-03", "title": "Mat en 1", "label": "Position 3", "displayFen": "4k3/1Q6/5K2/8/8/8/8/8 w - - 0 1", "line": ["b7c8"]}, {"id": "m1-04", "title": "Mat en 1", "label": "Position 4", "displayFen": "7k/6R1/6K1/8/8/8/8/8 w - - 0 1", "line": ["g7g8"]}, {"id": "m1-05", "title": "Mat en 1", "label": "Position 5", "displayFen": "k7/1R6/K7/8/8/8/8/8 w - - 0 1", "line": ["b7b8"]}, {"id": "m1-06", "title": "Mat en 1", "label": "Position 6", "displayFen": "7k/5K2/6Q1/8/8/8/8/8 w - - 0 1", "line": ["g6g7"]}, {"id": "m2-01", "title": "Mat en 2", "label": "Position 7", "displayFen": "7k/8/5K2/8/8/8/8/R7 w - - 0 1", "line": ["a1a8", "h8h7", "a8h8"]}, {"id": "m2-02", "title": "Mat en 2", "label": "Position 8", "displayFen": "7k/8/5K2/8/8/8/8/Q7 w - - 0 1", "line": ["a1a8", "h8h7", "a8h8"]}, {"id": "m2-03", "title": "Mat en 2", "label": "Position 9", "displayFen": "k7/8/2K5/8/8/8/8/7Q w - - 0 1", "line": ["h1h8", "a8a7", "h8b8"]}, {"id": "m2-04", "title": "Mat en 2", "label": "Position 10", "displayFen": "q5nr/1ppknQpp/3p4/1P2p3/4P3/B1PP1b2/B5PP/5K2 w - - 0 1", "line": ["a2e6", "d7d8", "f7f8"]}, {"id": "m3-01", "title": "Mat en 3", "label": "Position 11", "displayFen": "7k/8/5K2/8/8/8/8/Q7 w - - 0 1", "line": ["a1a8", "h8h7", "a8h1", "h7g8", "h1h8"]}, {"id": "m3-02", "title": "Mat en 3", "label": "Position 12", "displayFen": "k7/8/2K5/8/8/8/8/7Q w - - 0 1", "line": ["h1h8", "a8a7", "h8a1", "a7b8", "a1b7"]}, {"id": "m3-03", "title": "Mat en 3", "label": "Position 13", "displayFen": "4R3/7k/3pQ1pp/p7/1p1q1P2/7P/6PK/3r1B2 b - - 0 1", "line": ["d4f4", "g2g3", "f4f2", "f1g2", "f2g1"]}];
-let currentIndex=0;
-let squares=[];
-let currentTurn="w";
-let selectedIndex=null;
-let currentPly=0;
-let lockBoard=false;
+const boardEl = document.getElementById("board");
+const restartBtn = document.getElementById("restartBtn");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const solutionBtn = document.getElementById("solutionBtn");
+const memoryStatusEl = document.getElementById("memoryStatus");
+const memoryTimerEl = document.getElementById("memoryTimer");
+const progressNoteEl = document.getElementById("progressNote");
+const solutionArrow = document.getElementById("solutionArrow");
 
-function coordsToSquare(file,rank){
-  return FILES[file]+String(rank+1);
+let currentIndex = 0;
+let squares = [];
+let currentTurn = "w";
+let selectedIndex = null;
+let wrongIndex = null;
+let currentPly = 0;
+let lockBoard = false;
+let solved = false;
+let hintVisible = false;
+
+function coordsToSquare(file, rank) {
+  return FILES[file] + String(rank + 1);
 }
 
-function squareToIndex(square){
-  const file=FILES.indexOf(square[0]);
-  const rank=Number(square[1])-1;
-  return rank*8+file;
+function squareToIndex(square) {
+  const file = FILES.indexOf(square[0]);
+  const rank = Number(square[1]) - 1;
+  return rank * 8 + file;
 }
 
-function indexToSquare(index){
-  const file=index%8;
-  const rank=Math.floor(index/8);
-  return FILES[file]+String(rank+1);
+function indexToSquare(index) {
+  const file = index % 8;
+  const rank = Math.floor(index / 8);
+  return FILES[file] + String(rank + 1);
 }
 
-function parseFen(fen){
+function parseFen(fen) {
   const [boardFen, turn] = fen.split(" ");
   const rows = boardFen.split("/");
   const result = [];
-  for(let displayRow=0; displayRow<8; displayRow++) {
-    const fenRow = rows[7-displayRow];
-    for(const ch of fenRow) {
-      if(/[1-8]/.test(ch)) {
-        for(let i=0;i<Number(ch);i++) result.push("");
+  for (let displayRow = 0; displayRow < 8; displayRow++) {
+    const fenRow = rows[7 - displayRow];
+    for (const ch of fenRow) {
+      if (/[1-8]/.test(ch)) {
+        for (let i = 0; i < Number(ch); i++) result.push("");
       } else {
         result.push(ch);
       }
@@ -410,97 +170,32 @@ function parseFen(fen){
   return { squares: result, turn: turn || "w" };
 }
 
-function currentPuzzle(){
+function currentPuzzle() {
   return PUZZLES[currentIndex];
 }
 
-function currentExpectedMove(){
+function currentExpectedMove() {
   return currentPuzzle().line[currentPly] || null;
 }
 
-function loadPuzzle(){
+function isUserTurnPly() {
+  return currentPly % 2 === 0;
+}
+
+function updateLabels() {
   const puzzle = currentPuzzle();
-  const parsed = parseFen(puzzle.displayFen);
-  squares = parsed.squares.slice();
-  currentTurn = parsed.turn;
-  selectedIndex = null;
-  currentPly = 0;
-  lockBoard = false;
-  clearArrow();
-  memoryStatusEl.textContent = puzzle.title;
-  memoryTimerEl.textContent = puzzle.label;
-  progressNoteEl.textContent = (currentIndex + 1) + " / " + PUZZLES.length;
-  renderBoard();
+  memoryStatusEl.textContent = solved ? "Bravo" : puzzle.title;
+  memoryTimerEl.textContent = solved ? "Résolu" : puzzle.label;
+  progressNoteEl.textContent = `${currentIndex + 1} / ${PUZZLES.length}`;
 }
 
-function renderBoard(){
-  boardEl.innerHTML="";
-  const hintMove = solutionArrow.getAttribute("opacity") === "1" ? currentExpectedMove() : null;
-  const hintFrom = hintMove ? squareToIndex(hintMove.slice(0,2)) : null;
-
-  for(let row=7;row>=0;row--){
-    for(let col=0;col<8;col++){
-      const idx=row*8+col;
-      const data=squares[idx];
-
-      const sq=document.createElement("div");
-      sq.className="square "+(((row+col)%2===0)?"white":"black");
-      sq.classList.add("flipped");
-      if(idx===selectedIndex) sq.classList.add("selected");
-      if(idx===hintFrom) sq.classList.add("hintFrom");
-
-      const button=document.createElement("button");
-      button.className="card";
-      button.type="button";
-      button.setAttribute("aria-label", coordsToSquare(col,row));
-
-      const inner=document.createElement("div");
-      inner.className="card-inner";
-
-      const back=document.createElement("div");
-      back.className="face back";
-
-      const front=document.createElement("div");
-      front.className="face front";
-
-      if(data){
-        const piece=document.createElement("span");
-        piece.className="piece "+(data===data.toUpperCase() ? "white-piece " : "black-piece ")+"piece-"+data;
-        piece.textContent=PIECES[data];
-        front.appendChild(piece);
-      }
-
-      inner.appendChild(back);
-      inner.appendChild(front);
-      button.appendChild(inner);
-      button.onclick=()=>handleSquare(idx);
-      sq.appendChild(button);
-
-      if(row===0){
-        const file=document.createElement("span");
-        file.className="coord file";
-        file.textContent=FILES[col];
-        sq.appendChild(file);
-      }
-
-      if(col===7){
-        const rank=document.createElement("span");
-        rank.className="coord rank";
-        rank.textContent=String(row+1);
-        sq.appendChild(rank);
-      }
-
-      boardEl.appendChild(sq);
-    }
-  }
+function clearArrow() {
+  hintVisible = false;
+  solutionArrow.setAttribute("opacity", "0");
 }
 
-function clearArrow(){
-  solutionArrow.setAttribute("opacity","0");
-}
-
-function drawArrow(move){
-  if(!move) return;
+function drawArrow(move) {
+  if (!move || solved) return;
   const from = squareToIndex(move.slice(0,2));
   const to = squareToIndex(move.slice(2,4));
   const fromFile = from % 8;
@@ -517,20 +212,30 @@ function drawArrow(move){
   solutionArrow.setAttribute("y1", y1.toFixed(2));
   solutionArrow.setAttribute("x2", x2.toFixed(2));
   solutionArrow.setAttribute("y2", y2.toFixed(2));
-  solutionArrow.setAttribute("opacity","1");
+  solutionArrow.setAttribute("opacity", "1");
+  hintVisible = true;
   renderBoard();
 }
 
-function toggleTurn(){
+function toggleHint() {
+  if (hintVisible) {
+    clearArrow();
+    renderBoard();
+    return;
+  }
+  drawArrow(currentExpectedMove());
+}
+
+function toggleTurn() {
   currentTurn = currentTurn === "w" ? "b" : "w";
 }
 
-function pieceBelongsToTurn(piece){
-  if(!piece) return false;
+function pieceBelongsToTurn(piece) {
+  if (!piece) return false;
   return currentTurn === "w" ? piece === piece.toUpperCase() : piece === piece.toLowerCase();
 }
 
-function applyMoveUci(uci){
+function applyMoveUci(uci) {
   const from = squareToIndex(uci.slice(0,2));
   const to = squareToIndex(uci.slice(2,4));
   const promotion = uci.length > 4 ? uci[4] : null;
@@ -540,19 +245,135 @@ function applyMoveUci(uci){
   toggleTurn();
 }
 
-function handleSquare(index){
-  if(lockBoard) return;
+function loadPuzzle() {
+  const parsed = parseFen(currentPuzzle().displayFen);
+  squares = parsed.squares.slice();
+  currentTurn = parsed.turn;
+  selectedIndex = null;
+  wrongIndex = null;
+  currentPly = 0;
+  lockBoard = false;
+  solved = false;
+  clearArrow();
+  updateLabels();
+  renderBoard();
+}
+
+function renderBoard() {
+  boardEl.innerHTML = "";
+  const hintMove = hintVisible ? currentExpectedMove() : null;
+  const hintFrom = hintMove ? squareToIndex(hintMove.slice(0,2)) : null;
+
+  for (let row = 7; row >= 0; row--) {
+    for (let col = 0; col < 8; col++) {
+      const idx = row * 8 + col;
+      const data = squares[idx];
+
+      const sq = document.createElement("div");
+      sq.className = "square " + (((row + col) % 2 === 0) ? "white" : "black");
+      sq.classList.add("flipped");
+      if (idx === selectedIndex) sq.classList.add("selected");
+      if (idx === hintFrom) sq.classList.add("hintFrom");
+      if (idx === wrongIndex) sq.classList.add("wrong");
+
+      const button = document.createElement("button");
+      button.className = "card";
+      button.type = "button";
+      button.setAttribute("aria-label", coordsToSquare(col, row));
+
+      const inner = document.createElement("div");
+      inner.className = "card-inner";
+
+      const back = document.createElement("div");
+      back.className = "face back";
+
+      const front = document.createElement("div");
+      front.className = "face front";
+
+      if (data) {
+        const piece = document.createElement("span");
+        piece.className = "piece " + (data === data.toUpperCase() ? "white-piece " : "black-piece ") + "piece-" + data;
+        piece.textContent = PIECES[data];
+        front.appendChild(piece);
+      }
+
+      inner.appendChild(back);
+      inner.appendChild(front);
+      button.appendChild(inner);
+      button.onclick = () => handleSquare(idx);
+      sq.appendChild(button);
+
+      if (row === 0) {
+        const file = document.createElement("span");
+        file.className = "coord file";
+        file.textContent = FILES[col];
+        sq.appendChild(file);
+      }
+
+      if (col === 7) {
+        const rank = document.createElement("span");
+        rank.className = "coord rank";
+        rank.textContent = String(row + 1);
+        sq.appendChild(rank);
+      }
+
+      boardEl.appendChild(sq);
+    }
+  }
+}
+
+function markSolved() {
+  solved = true;
+  lockBoard = true;
+  selectedIndex = null;
+  wrongIndex = null;
+  clearArrow();
+  updateLabels();
+  renderBoard();
+}
+
+function playReplyIfNeeded() {
+  if (currentPly >= currentPuzzle().line.length) {
+    markSolved();
+    return;
+  }
+
+  lockBoard = true;
+  setTimeout(() => {
+    const reply = currentExpectedMove();
+    if (!reply) {
+      markSolved();
+      return;
+    }
+    applyMoveUci(reply);
+    currentPly += 1;
+    lockBoard = false;
+
+    if (currentPly >= currentPuzzle().line.length) {
+      markSolved();
+    } else {
+      updateLabels();
+      renderBoard();
+    }
+  }, 420);
+}
+
+function handleSquare(index) {
+  if (lockBoard || solved || !isUserTurnPly()) return;
+
   const piece = squares[index];
 
-  if(selectedIndex === null){
-    if(!piece || !pieceBelongsToTurn(piece)) return;
+  if (selectedIndex === null) {
+    if (!piece || !pieceBelongsToTurn(piece)) return;
     selectedIndex = index;
+    wrongIndex = null;
     renderBoard();
     return;
   }
 
-  if(index === selectedIndex){
+  if (index === selectedIndex) {
     selectedIndex = null;
+    wrongIndex = null;
     renderBoard();
     return;
   }
@@ -560,65 +381,48 @@ function handleSquare(index){
   const move = indexToSquare(selectedIndex) + indexToSquare(index);
   const expected = currentExpectedMove();
 
-  if(move === expected){
+  if (move === expected) {
     clearArrow();
     applyMoveUci(move);
+    currentPly += 1;
     selectedIndex = null;
-    currentPly++;
-    renderBoard();
+    wrongIndex = null;
 
-    if(currentPly >= currentPuzzle().line.length){
-      memoryStatusEl.textContent = "Bravo";
-      memoryTimerEl.textContent = "Résolu";
+    if (currentPly >= currentPuzzle().line.length) {
+      markSolved();
       return;
     }
 
-    if(currentPly < currentPuzzle().line.length){
-      lockBoard = true;
-      setTimeout(() => {
-        const reply = currentExpectedMove();
-        applyMoveUci(reply);
-        currentPly++;
-        lockBoard = false;
-        renderBoard();
-
-        if(currentPly >= currentPuzzle().line.length){
-          memoryStatusEl.textContent = "Bravo";
-          memoryTimerEl.textContent = "Résolu";
-        } else {
-          memoryStatusEl.textContent = currentPuzzle().title;
-          memoryTimerEl.textContent = currentPuzzle().label;
-        }
-      }, 500);
-    }
-  } else {
-    memoryStatusEl.textContent = "Essaie encore";
-    selectedIndex = index;
     renderBoard();
-    setTimeout(() => {
-      selectedIndex = null;
-      renderBoard();
-      if(memoryStatusEl.textContent === "Essaie encore"){
-        memoryStatusEl.textContent = currentPuzzle().title;
-      }
-    }, 220);
+    playReplyIfNeeded();
+    return;
   }
+
+  wrongIndex = index;
+  memoryStatusEl.textContent = "Essaie encore";
+  renderBoard();
+  setTimeout(() => {
+    wrongIndex = null;
+    selectedIndex = null;
+    if (!solved) updateLabels();
+    renderBoard();
+  }, 260);
 }
 
-function prevPosition(){
+function prevPosition() {
   currentIndex = (currentIndex - 1 + PUZZLES.length) % PUZZLES.length;
   loadPuzzle();
 }
 
-function nextPosition(){
+function nextPosition() {
   currentIndex = (currentIndex + 1) % PUZZLES.length;
   loadPuzzle();
 }
 
-prevBtn.addEventListener("click",prevPosition);
-nextBtn.addEventListener("click",nextPosition);
-restartBtn.addEventListener("click",loadPuzzle);
-solutionBtn.addEventListener("click",()=>drawArrow(currentExpectedMove()));
+prevBtn.addEventListener("click", prevPosition);
+nextBtn.addEventListener("click", nextPosition);
+restartBtn.addEventListener("click", loadPuzzle);
+solutionBtn.addEventListener("click", toggleHint);
 
 loadPuzzle();
 </script>
