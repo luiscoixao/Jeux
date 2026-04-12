@@ -103,6 +103,7 @@ body::after{
   touch-action:manipulation;
   height:100dvh;
   min-height:100dvh;
+  transition:transform .16s ease;
 }
 
 .hud{
@@ -127,6 +128,27 @@ body::after{
     0 4px 0 rgba(24,32,110,.35),
     0 10px 20px rgba(10,16,69,.55),
     0 0 24px rgba(255,255,255,.20);
+}
+
+.combo{
+  position:absolute;
+  top:calc(62px + var(--safe-top));
+  left:0;
+  right:0;
+  text-align:center;
+  font-weight:1000;
+  font-size:clamp(18px,4.6vw,30px);
+  letter-spacing:.04em;
+  text-shadow:0 4px 16px rgba(0,0,0,.35);
+  opacity:0;
+  transform:translateY(-6px) scale(.96);
+  transition:opacity .18s ease, transform .18s ease;
+  pointer-events:none;
+}
+
+.combo.show{
+  opacity:1;
+  transform:translateY(0) scale(1);
 }
 
 .bottomBar{
@@ -212,7 +234,10 @@ body::after{
     0 0 0 1px rgba(255,255,255,.07);
   transition:
     transform .14s ease,
-    opacity .24s ease;
+    opacity .24s ease,
+    filter .14s ease,
+    box-shadow .14s ease;
+  animation:float 6.4s ease-in-out infinite;
 }
 
 .balloon::before{
@@ -238,12 +263,13 @@ body::after{
 }
 
 .balloon.majority{
-  filter:none;
+  transform:translate(-50%,-50%) scale(1.12);
+  filter:brightness(1.25) saturate(1.2);
   box-shadow:
+    0 0 0 3px rgba(255,255,255,.25),
+    0 0 30px rgba(255,255,255,.35),
     inset -10px -14px 22px rgba(0,0,0,.16),
-    inset 7px 10px 12px rgba(255,255,255,.20),
-    0 0 0 2px rgba(255,255,255,.16),
-    0 16px 24px rgba(0,0,0,.16);
+    inset 7px 10px 12px rgba(255,255,255,.20);
 }
 
 .balloon.wrong{
@@ -254,6 +280,15 @@ body::after{
   animation:flyAway 2.2s ease-out forwards;
   pointer-events:none;
   will-change:transform, opacity;
+}
+
+.flash{
+  position:fixed;
+  inset:0;
+  background:rgba(255,255,255,.09);
+  pointer-events:none;
+  z-index:9;
+  animation:flashOut .14s ease forwards;
 }
 
 .endOverlay{
@@ -341,6 +376,16 @@ body::after{
   }
 }
 
+@keyframes float{
+  0%,100%{ translate: 0 0; }
+  50%{ translate: 0 -8px; }
+}
+
+@keyframes flashOut{
+  from{opacity:1}
+  to{opacity:0}
+}
+
 .board.resolving .balloon.majority{
   filter:none !important;
   box-shadow:
@@ -372,6 +417,10 @@ body::after{
     font-size:clamp(18px,5vw,28px);
     padding:0 12px;
   }
+
+  .combo{
+    top:calc(58px + var(--safe-top));
+  }
 }
 </style>
 </head>
@@ -380,6 +429,7 @@ body::after{
   <div class="board" id="board"></div>
   <div class="hud">
     <h1 class="title">BALLOONS</h1>
+    <div class="combo" id="combo"></div>
     <div class="bottomBar" id="bottomBar">
       <div class="stat">
         <div class="label">Points</div>
@@ -409,6 +459,7 @@ body::after{
   const board = document.getElementById('board');
   const pointsEl = document.getElementById('points');
   const bestEl = document.getElementById('best');
+  const comboEl = document.getElementById('combo');
   const toggleBtn = document.getElementById('toggleBtn');
   const bottomBar = document.getElementById('bottomBar');
   const endOverlay = document.getElementById('endOverlay');
@@ -435,15 +486,7 @@ body::after{
   let isResolving = false;
   let raf = 0;
   let seriesDeadline = 0;
-
-  function fmt(ms){
-    const safe = Math.max(0, ms);
-    const totalTenths = Math.ceil(safe / 100);
-    const minutes = Math.floor(totalTenths / 600);
-    const seconds = Math.floor((totalTenths % 600) / 10);
-    const tenths = totalTenths % 10;
-    return `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}.${tenths}`;
-  }
+  let combo = 0;
 
   function updateBest(){
     bestEl.textContent = String(bestScore || 0);
@@ -451,6 +494,16 @@ body::after{
 
   function updatePoints(){
     pointsEl.textContent = String(state ? state.points : 0);
+  }
+
+  function updateCombo(){
+    if(combo > 1){
+      comboEl.textContent = `x${combo}`;
+      comboEl.classList.add('show');
+    }else{
+      comboEl.textContent = '';
+      comboEl.classList.remove('show');
+    }
   }
 
   function setButtonState(running){
@@ -487,6 +540,20 @@ body::after{
 
   function stopTimer(){
     cancelAnimationFrame(raf);
+  }
+
+  function rewardFlash(){
+    const flash = document.createElement('div');
+    flash.className = 'flash';
+    document.body.appendChild(flash);
+    setTimeout(() => flash.remove(), 160);
+  }
+
+  function boardPulse(){
+    board.style.transform = 'scale(0.978)';
+    setTimeout(() => {
+      board.style.transform = 'scale(1)';
+    }, 120);
   }
 
   function computeSeriesCount(series){
@@ -572,11 +639,6 @@ body::after{
 
   function boardZone(){
     const rect = board.getBoundingClientRect();
-    const root = getComputedStyle(document.documentElement);
-    const safeBottom = parseFloat(root.getPropertyValue('--safe-bottom')) || 0;
-    const barRect = bottomBar.getBoundingClientRect();
-    const reservedBottom = rect.height - barRect.top + 10;
-
     return {
       width: rect.width,
       height: rect.height,
@@ -638,7 +700,6 @@ body::after{
 
     visibleEls.forEach(el => {
       const rect = el.getBoundingClientRect();
-
       const visibleW = Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0);
       const visibleH = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
 
@@ -646,7 +707,6 @@ body::after{
 
       const visibleArea = visibleW * visibleH;
       const colorIndex = Number(el.dataset.colorIndex);
-
       counts.set(colorIndex, (counts.get(colorIndex) || 0) + visibleArea);
     });
 
@@ -724,6 +784,8 @@ body::after{
 
         if(remaining === 0){
           if(state.balloons.length === 0){
+            rewardFlash();
+            if(navigator.vibrate) navigator.vibrate([28, 38, 28]);
             advanceSeriesOrFinish(state.seriesWon);
           }else if(state.seriesExpired){
             advanceSeriesOrFinish(false);
@@ -740,9 +802,22 @@ body::after{
   }
 
   function advanceSeriesOrFinish(won){
+    if(won){
+      combo++;
+    }else{
+      combo = 0;
+    }
+    updateCombo();
+
     const nextPoints = state.points + (won ? 1 : 0);
     state.points = nextPoints;
     updatePoints();
+
+    if(nextPoints > bestScore){
+      bestScore = nextPoints;
+      localStorage.setItem(STORAGE_BEST, String(bestScore));
+      updateBest();
+    }
 
     if(state.series >= MAX_SERIES){
       finishGame();
@@ -765,12 +840,15 @@ body::after{
 
     placeIntoLanes(true);
     render();
+    boardPulse();
     startSeriesTimer();
   }
 
   function handleSeriesTimeout(){
     if(!state || !state.running || state.finished) return;
     if(isResolving) return;
+    combo = 0;
+    updateCombo();
     advanceSeriesOrFinish(false);
   }
 
@@ -784,6 +862,8 @@ body::after{
       event.currentTarget.classList.add('wrong');
       setTimeout(() => event.currentTarget.classList.remove('wrong'), 340);
       if(navigator.vibrate) navigator.vibrate(26);
+      combo = 0;
+      updateCombo();
       return;
     }
 
@@ -794,6 +874,8 @@ body::after{
     endOverlay.classList.remove('show');
     isResolving = false;
     board.classList.remove('resolving');
+    combo = 0;
+    updateCombo();
 
     state = {
       series: 1,
@@ -814,6 +896,15 @@ body::after{
 
   function stopGame(){
     stopTimer();
+
+    if(state && state.points > bestScore){
+      bestScore = state.points;
+      localStorage.setItem(STORAGE_BEST, String(bestScore));
+      updateBest();
+    }
+
+    combo = 0;
+    updateCombo();
     isResolving = false;
     board.classList.remove('resolving');
     state = null;
@@ -837,6 +928,9 @@ body::after{
     endTextEl.innerHTML = newBest
       ? 'Nouveau <strong>score</strong> !'
       : `Tu as marqué ${state.points} point${state.points > 1 ? 's' : ''} sur 100 séries.`;
+
+    combo = 0;
+    updateCombo();
     setButtonState(false);
     endOverlay.classList.add('show');
     state = { finished:true, running:false, balloons:[], series:MAX_SERIES, points:state.points };
@@ -858,6 +952,7 @@ body::after{
 
   pointsEl.textContent = '0';
   updateBest();
+  updateCombo();
   setButtonState(false);
   startGame();
 })();
