@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>CHESSMEMORY</title>
+<title>CHESSMATE</title>
 
 <link rel="apple-touch-icon" href="iconchessmemory.png" />
 <link rel="icon" href="iconchessmemory.png" />
 
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="CHESSMEMORY" />
+<meta name="apple-mobile-web-app-title" content="CHESSMATE" />
 <meta name="theme-color" content="#2c2c2c" />
 
 <style>
@@ -200,16 +200,12 @@ h1{
 
 .piece-K{ transform:scale(1.00); }
 .piece-k{ transform:scale(1.12); }
-
 .piece-Q{ transform:scale(1.00); }
 .piece-q{ transform:scale(1.02); }
-
 .piece-R{ transform:scale(0.88); }
 .piece-r{ transform:scale(1.02); }
-
 .piece-B{ transform:scale(0.98); }
 .piece-b{ transform:scale(1.02); }
-
 .piece-N{ transform:scale(1.00); }
 .piece-n{ transform:scale(1.00); }
 
@@ -241,7 +237,7 @@ h1{
   display:flex;
   justify-content:center;
   align-items:center;
-  gap:14px;
+  gap:18px;
   background:var(--panel);
   flex-wrap:wrap;
 }
@@ -287,7 +283,7 @@ h1{
   min-height:28px;
 }
 
-.source-note{
+.progress-note{
   text-align:center;
   font-size:12px;
   margin-top:6px;
@@ -305,17 +301,14 @@ h1{
   .piece{
     font-size:clamp(50px, 11vw, 70px);
   }
-
   .control-btn{
     width:46px;
     height:46px;
   }
-
   .control-btn.wide{
     min-width:46px;
     padding:0 12px;
   }
-
   .control-btn span{
     font-size:22px;
   }
@@ -324,7 +317,7 @@ h1{
 </head>
 <body>
 
-<h1>CHESSMEMORY</h1>
+<h1>CHESSMATE</h1>
 
 <div class="app">
   <div id="board-container">
@@ -344,14 +337,11 @@ h1{
   <div class="timer-panel">
     <div id="memoryStatus">Mat en 1</div>
     <div id="memoryTimer">Position 1</div>
-    <div class="source-note" id="sourceNote"></div>
+    <div class="progress-note" id="progressNote"></div>
   </div>
 
   <div class="controls-panel">
     <div class="controls">
-      <button class="control-btn" id="mate1Btn" type="button" aria-label="Mat en 1"><span>1</span></button>
-      <button class="control-btn" id="mate2Btn" type="button" aria-label="Mat en 2"><span>2</span></button>
-      <button class="control-btn" id="mate3Btn" type="button" aria-label="Mat en 3"><span>3</span></button>
       <button class="control-btn" id="prevBtn" type="button" aria-label="Position précédente"><span>◀</span></button>
       <button class="control-btn" id="restartBtn" type="button" aria-label="Rejouer"><span>🔄</span></button>
       <button class="control-btn wide" id="solutionBtn" type="button" aria-label="Solution"><span>💡</span></button>
@@ -367,13 +357,10 @@ const boardEl=document.getElementById("board");
 const restartBtn=document.getElementById("restartBtn");
 const prevBtn=document.getElementById("prevBtn");
 const nextBtn=document.getElementById("nextBtn");
-const mate1Btn=document.getElementById("mate1Btn");
-const mate2Btn=document.getElementById("mate2Btn");
-const mate3Btn=document.getElementById("mate3Btn");
 const solutionBtn=document.getElementById("solutionBtn");
 const memoryStatusEl=document.getElementById("memoryStatus");
 const memoryTimerEl=document.getElementById("memoryTimer");
-const sourceNoteEl=document.getElementById("sourceNote");
+const progressNoteEl=document.getElementById("progressNote");
 const solutionArrow=document.getElementById("solutionArrow");
 
 const FILES=["a","b","c","d","e","f","g","h"];
@@ -382,8 +369,7 @@ const PIECES={
   "p":"♟","n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
 };
 
-const PUZZLES = {"1": [{"id": "m1-01", "title": "Mat en 1", "label": "Position 1", "source": "Base vérifiée", "displayFen": "8/1Q6/2K5/k7/8/8/8/8 w - - 0 1", "line": ["b7b5"]}, {"id": "m1-02", "title": "Mat en 1", "label": "Position 2", "source": "Base vérifiée", "displayFen": "8/8/8/8/8/3K4/3Q4/2k5 w - - 0 1", "line": ["d2c2"]}, {"id": "m1-03", "title": "Mat en 1", "label": "Position 3", "source": "Base vérifiée", "displayFen": "4k3/1Q6/5K2/8/8/8/8/8 w - - 0 1", "line": ["b7c8"]}], "2": [{"id": "m2-01", "title": "Mat en 2", "label": "Position 1", "source": "Lichess sample", "displayFen": "q5nr/1ppknQpp/3p4/1P2p3/4P3/B1PP1b2/B5PP/5K2 w - - 0 1", "line": ["a2e6", "d7d8", "f7f8"]}, {"id": "m2-02", "title": "Mat en 2", "label": "Position 2", "source": "Base vérifiée", "displayFen": "k7/8/8/K7/8/1Q6/8/8 w - - 0 1", "line": ["a5b6", "a8b8", "b3g8"]}, {"id": "m2-03", "title": "Mat en 2", "label": "Position 3", "source": "Base vérifiée", "displayFen": "8/8/8/8/k7/8/2K5/1Q6 w - - 0 1", "line": ["b1b6", "a4a3", "b6a5"]}], "3": [{"id": "m3-01", "title": "Mat en 3", "label": "Position 1", "source": "Lichess sample", "displayFen": "4R3/7k/3pQ1pp/p7/1p1q1P2/7P/6PK/3r1B2 b - - 0 1", "line": ["d4f4", "g2g3", "f4f2", "f1g2", "f2g1"]}, {"id": "m3-02", "title": "Mat en 3", "label": "Position 2", "source": "Base vérifiée", "displayFen": "4K3/6k1/3Q4/8/8/8/8/8 w - - 0 1", "line": ["d6e6", "g7h8", "e8f7", "h8h7", "e6h3"]}, {"id": "m3-03", "title": "Mat en 3", "label": "Position 3", "source": "Base vérifiée", "displayFen": "2Q5/8/8/8/8/4K3/8/6k1 w - - 0 1", "line": ["c8g4", "g1h2", "e3f3", "h2h1", "g4g2"]}]};
-let currentMode="1";
+const PUZZLES = [{"id": "m1-01", "title": "Mat en 1", "label": "Position 1", "displayFen": "8/1Q6/2K5/k7/8/8/8/8 w - - 0 1", "line": ["b7b5"]}, {"id": "m1-02", "title": "Mat en 1", "label": "Position 2", "displayFen": "8/8/8/8/8/3K4/3Q4/2k5 w - - 0 1", "line": ["d2c2"]}, {"id": "m1-03", "title": "Mat en 1", "label": "Position 3", "displayFen": "4k3/1Q6/5K2/8/8/8/8/8 w - - 0 1", "line": ["b7c8"]}, {"id": "m1-04", "title": "Mat en 1", "label": "Position 4", "displayFen": "7k/6R1/6K1/8/8/8/8/8 w - - 0 1", "line": ["g7g8"]}, {"id": "m1-05", "title": "Mat en 1", "label": "Position 5", "displayFen": "k7/1R6/K7/8/8/8/8/8 w - - 0 1", "line": ["b7b8"]}, {"id": "m1-06", "title": "Mat en 1", "label": "Position 6", "displayFen": "7k/5K2/6Q1/8/8/8/8/8 w - - 0 1", "line": ["g6g7"]}, {"id": "m2-01", "title": "Mat en 2", "label": "Position 7", "displayFen": "7k/8/5K2/8/8/8/8/R7 w - - 0 1", "line": ["a1a8", "h8h7", "a8h8"]}, {"id": "m2-02", "title": "Mat en 2", "label": "Position 8", "displayFen": "7k/8/5K2/8/8/8/8/Q7 w - - 0 1", "line": ["a1a8", "h8h7", "a8h8"]}, {"id": "m2-03", "title": "Mat en 2", "label": "Position 9", "displayFen": "k7/8/2K5/8/8/8/8/7Q w - - 0 1", "line": ["h1h8", "a8a7", "h8b8"]}, {"id": "m2-04", "title": "Mat en 2", "label": "Position 10", "displayFen": "q5nr/1ppknQpp/3p4/1P2p3/4P3/B1PP1b2/B5PP/5K2 w - - 0 1", "line": ["a2e6", "d7d8", "f7f8"]}, {"id": "m3-01", "title": "Mat en 3", "label": "Position 11", "displayFen": "7k/8/5K2/8/8/8/8/Q7 w - - 0 1", "line": ["a1a8", "h8h7", "a8h1", "h7g8", "h1h8"]}, {"id": "m3-02", "title": "Mat en 3", "label": "Position 12", "displayFen": "k7/8/2K5/8/8/8/8/7Q w - - 0 1", "line": ["h1h8", "a8a7", "h8a1", "a7b8", "a1b7"]}, {"id": "m3-03", "title": "Mat en 3", "label": "Position 13", "displayFen": "4R3/7k/3pQ1pp/p7/1p1q1P2/7P/6PK/3r1B2 b - - 0 1", "line": ["d4f4", "g2g3", "f4f2", "f1g2", "f2g1"]}];
 let currentIndex=0;
 let squares=[];
 let currentTurn="w";
@@ -425,7 +411,7 @@ function parseFen(fen){
 }
 
 function currentPuzzle(){
-  return PUZZLES[currentMode][currentIndex];
+  return PUZZLES[currentIndex];
 }
 
 function currentExpectedMove(){
@@ -441,9 +427,9 @@ function loadPuzzle(){
   currentPly = 0;
   lockBoard = false;
   clearArrow();
-  memoryStatusEl.textContent = "Mat en " + currentMode;
+  memoryStatusEl.textContent = puzzle.title;
   memoryTimerEl.textContent = puzzle.label;
-  sourceNoteEl.textContent = puzzle.source;
+  progressNoteEl.textContent = (currentIndex + 1) + " / " + PUZZLES.length;
   renderBoard();
 }
 
@@ -600,44 +586,35 @@ function handleSquare(index){
           memoryStatusEl.textContent = "Bravo";
           memoryTimerEl.textContent = "Résolu";
         } else {
-          memoryStatusEl.textContent = "À vous";
+          memoryStatusEl.textContent = currentPuzzle().title;
           memoryTimerEl.textContent = currentPuzzle().label;
         }
       }, 500);
     }
   } else {
     memoryStatusEl.textContent = "Essaie encore";
-    const oldSelected = selectedIndex;
     selectedIndex = index;
     renderBoard();
     setTimeout(() => {
       selectedIndex = null;
       renderBoard();
+      if(memoryStatusEl.textContent === "Essaie encore"){
+        memoryStatusEl.textContent = currentPuzzle().title;
+      }
     }, 220);
   }
 }
 
-function setMode(mode){
-  currentMode=String(mode);
-  currentIndex=0;
-  loadPuzzle();
-}
-
 function prevPosition(){
-  const list = PUZZLES[currentMode];
-  currentIndex = (currentIndex - 1 + list.length) % list.length;
+  currentIndex = (currentIndex - 1 + PUZZLES.length) % PUZZLES.length;
   loadPuzzle();
 }
 
 function nextPosition(){
-  const list = PUZZLES[currentMode];
-  currentIndex = (currentIndex + 1) % list.length;
+  currentIndex = (currentIndex + 1) % PUZZLES.length;
   loadPuzzle();
 }
 
-mate1Btn.addEventListener("click",()=>setMode(1));
-mate2Btn.addEventListener("click",()=>setMode(2));
-mate3Btn.addEventListener("click",()=>setMode(3));
 prevBtn.addEventListener("click",prevPosition);
 nextBtn.addEventListener("click",nextPosition);
 restartBtn.addEventListener("click",loadPuzzle);
