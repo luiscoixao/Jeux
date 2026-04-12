@@ -128,7 +128,7 @@ body::after{
   right:calc(12px + var(--safe-right));
   bottom:calc(10px + var(--safe-bottom));
   display:grid;
-  grid-template-columns:minmax(100px,1fr) minmax(100px,1fr) minmax(132px,1.32fr);
+  grid-template-columns:minmax(100px,1fr) minmax(100px,1fr) minmax(100px,1fr) minmax(132px,1.32fr);
   gap:10px;
   align-items:stretch;
   pointer-events:auto;
@@ -244,7 +244,7 @@ body::after{
 }
 
 .balloon.fly{
-  animation:flyAway 2.8s ease-out forwards;
+  animation:flyAway 2.2s ease-out forwards;
   pointer-events:none;
   will-change:transform, opacity;
 }
@@ -325,18 +325,11 @@ body::after{
     opacity:1;
     transform:translate(-50%,-50%) scale(1);
   }
-  70%{
-    opacity:1;
-    transform:translate(
-      calc(-50% + var(--driftx) * .55),
-      calc(-50% - 180px)
-    ) scale(1.01);
-  }
   100%{
     opacity:0;
     transform:translate(
       calc(-50% + var(--driftx)),
-      calc(-50% - 420px)
+      calc(-50% - 620px)
     ) scale(1.015);
   }
 }
@@ -356,7 +349,7 @@ body::after{
 
 @media (max-width: 430px){
   .bottomBar{
-    grid-template-columns:minmax(94px,1fr) minmax(94px,1fr) minmax(126px,1.2fr);
+    grid-template-columns:minmax(86px,1fr) minmax(86px,1fr) minmax(86px,1fr) minmax(120px,1.2fr);
     gap:8px;
   }
 
@@ -382,11 +375,15 @@ body::after{
     <h1 class="title">BALLOONS</h1>
     <div class="bottomBar" id="bottomBar">
       <div class="stat">
-        <div class="label">Niveau</div>
-        <div class="value" id="level">1</div>
+        <div class="label">Chrono</div>
+        <div class="value" id="chrono">00:30.0</div>
       </div>
       <div class="stat">
-        <div class="label">Record</div>
+        <div class="label">Points</div>
+        <div class="value" id="points">0</div>
+      </div>
+      <div class="stat">
+        <div class="label">Score</div>
         <div class="value" id="best">0</div>
       </div>
       <button class="toggleBtn play" id="toggleBtn" aria-label="Jouer">JOUER</button>
@@ -398,8 +395,8 @@ body::after{
   <div class="endCard">
     <div class="endMini">Partie terminée</div>
     <div class="endTitle">Bravo</div>
-    <div class="endTime" id="endTime">Niveau 100</div>
-    <p class="endText" id="endText">Tu as vidé les 100 niveaux.</p>
+    <div class="endTime" id="endTime">0 point</div>
+    <p class="endText" id="endText">Tu as terminé les 100 séries.</p>
     <button class="endBtn" id="restartBtn">REJOUER</button>
   </div>
 </div>
@@ -407,7 +404,8 @@ body::after{
 <script>
 (() => {
   const board = document.getElementById('board');
-  const levelEl = document.getElementById('level');
+  const chronoEl = document.getElementById('chrono');
+  const pointsEl = document.getElementById('points');
   const bestEl = document.getElementById('best');
   const toggleBtn = document.getElementById('toggleBtn');
   const bottomBar = document.getElementById('bottomBar');
@@ -416,8 +414,9 @@ body::after{
   const endTextEl = document.getElementById('endText');
   const restartBtn = document.getElementById('restartBtn');
 
-  const STORAGE_BEST = 'balloons-best-level-v1';
+  const STORAGE_BEST = 'balloons-best-score-v1';
   const MAX_SERIES = 100;
+  const SERIES_DURATION = 30000;
   const COLORS = [
     ['#ff8bac','#ff2d67'],
     ['#7bff85','#19bb41'],
@@ -429,12 +428,27 @@ body::after{
     ['#ff8ee3','#ff3dc3']
   ];
 
-  let bestLevel = Number(localStorage.getItem(STORAGE_BEST) || 0);
+  let bestScore = Number(localStorage.getItem(STORAGE_BEST) || 0);
   let state = null;
   let isResolving = false;
+  let raf = 0;
+  let seriesDeadline = 0;
+
+  function fmt(ms){
+    const safe = Math.max(0, ms);
+    const totalTenths = Math.ceil(safe / 100);
+    const minutes = Math.floor(totalTenths / 600);
+    const seconds = Math.floor((totalTenths % 600) / 10);
+    const tenths = totalTenths % 10;
+    return `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}.${tenths}`;
+  }
 
   function updateBest(){
-    bestEl.textContent = String(bestLevel || 0);
+    bestEl.textContent = String(bestScore || 0);
+  }
+
+  function updatePoints(){
+    pointsEl.textContent = String(state ? state.points : 0);
   }
 
   function setButtonState(running){
@@ -443,9 +457,41 @@ body::after{
     toggleBtn.setAttribute('aria-label', running ? 'Arrêter' : 'Jouer');
   }
 
+  function tick(){
+    if(!state || !state.running || state.finished) return;
+
+    const remaining = Math.max(0, seriesDeadline - performance.now());
+    chronoEl.textContent = fmt(remaining);
+
+    if(remaining <= 0){
+      state.seriesExpired = true;
+      if(!isResolving){
+        handleSeriesTimeout();
+        return;
+      }
+    }
+
+    raf = requestAnimationFrame(tick);
+  }
+
+  function startSeriesTimer(){
+    cancelAnimationFrame(raf);
+    seriesDeadline = performance.now() + SERIES_DURATION;
+    if(state){
+      state.seriesExpired = false;
+      state.seriesWon = false;
+    }
+    chronoEl.textContent = fmt(SERIES_DURATION);
+    raf = requestAnimationFrame(tick);
+  }
+
+  function stopTimer(){
+    cancelAnimationFrame(raf);
+  }
+
   function computeSeriesCount(series){
-    const start = 24;
-    const end = 220;
+    const start = 96;
+    const end = 440;
     const t = (series - 1) / Math.max(1, MAX_SERIES - 1);
     const eased = Math.pow(t, 1.18);
     return Math.round(start + (end - start) * eased);
@@ -662,6 +708,10 @@ body::after{
 
     state.balloons = state.balloons.filter(balloon => balloon.colorIndex !== colorIndex);
 
+    if(state.balloons.length === 0 && !state.seriesExpired && performance.now() <= seriesDeadline){
+      state.seriesWon = true;
+    }
+
     let remaining = els.length;
 
     els.forEach((el) => {
@@ -673,7 +723,9 @@ body::after{
 
         if(remaining === 0){
           if(state.balloons.length === 0){
-            advanceSeriesOrFinish();
+            advanceSeriesOrFinish(state.seriesWon);
+          }else if(state.seriesExpired){
+            advanceSeriesOrFinish(false);
           }else{
             isResolving = false;
             board.classList.remove('resolving');
@@ -686,7 +738,11 @@ body::after{
     });
   }
 
-  function advanceSeriesOrFinish(){
+  function advanceSeriesOrFinish(won){
+    const nextPoints = state.points + (won ? 1 : 0);
+    state.points = nextPoints;
+    updatePoints();
+
     if(state.series >= MAX_SERIES){
       finishGame();
       return;
@@ -698,25 +754,27 @@ body::after{
     const nextSeries = state.series + 1;
     state = {
       series: nextSeries,
+      points: nextPoints,
       running: true,
       finished: false,
-      balloons: makeBalloons(nextSeries)
+      balloons: makeBalloons(nextSeries),
+      seriesExpired: false,
+      seriesWon: false
     };
-
-    levelEl.textContent = String(nextSeries);
-
-    if(nextSeries > bestLevel){
-      bestLevel = nextSeries;
-      localStorage.setItem(STORAGE_BEST, String(bestLevel));
-      updateBest();
-    }
 
     placeIntoLanes(true);
     render();
+    startSeriesTimer();
+  }
+
+  function handleSeriesTimeout(){
+    if(!state || !state.running || state.finished) return;
+    if(isResolving) return;
+    advanceSeriesOrFinish(false);
   }
 
   function onBalloonClick(event){
-    if(!state || !state.running || state.finished || isResolving) return;
+    if(!state || !state.running || state.finished || state.seriesExpired) return;
 
     const colorIndex = Number(event.currentTarget.dataset.colorIndex);
     const { winners } = getMajorityData();
@@ -731,10 +789,6 @@ body::after{
     removeColor(colorIndex);
   }
 
-  function tick(){}
-  function startTimer(){}
-  function stopTimer(){}
-
   function startGame(){
     endOverlay.classList.remove('show');
     isResolving = false;
@@ -742,16 +796,19 @@ body::after{
 
     state = {
       series: 1,
+      points: 0,
       running: true,
       finished: false,
-      balloons: makeBalloons(1)
+      balloons: makeBalloons(1),
+      seriesExpired: false,
+      seriesWon: false
     };
 
-    levelEl.textContent = '1';
+    pointsEl.textContent = '0';
     placeIntoLanes(true);
     render();
     setButtonState(true);
-    startTimer();
+    startSeriesTimer();
   }
 
   function stopGame(){
@@ -760,7 +817,8 @@ body::after{
     board.classList.remove('resolving');
     state = null;
     board.replaceChildren();
-    levelEl.textContent = '1';
+    chronoEl.textContent = '00:30.0';
+    pointsEl.textContent = '0';
     setButtonState(false);
   }
 
@@ -768,20 +826,20 @@ body::after{
     stopTimer();
 
     let newBest = false;
-    if(MAX_SERIES > bestLevel){
-      bestLevel = MAX_SERIES;
-      localStorage.setItem(STORAGE_BEST, String(bestLevel));
+    if(state.points > bestScore){
+      bestScore = state.points;
+      localStorage.setItem(STORAGE_BEST, String(bestScore));
       updateBest();
       newBest = true;
     }
 
-    endTimeEl.textContent = 'Niveau 100';
+    endTimeEl.textContent = `${state.points} point${state.points > 1 ? 's' : ''}`;
     endTextEl.innerHTML = newBest
-      ? 'Nouveau <strong>record</strong> !'
-      : 'Partie terminée. Tu as atteint le niveau 100.';
+      ? 'Nouveau <strong>score</strong> !'
+      : `Tu as marqué ${state.points} point${state.points > 1 ? 's' : ''} sur 100 séries.`;
     setButtonState(false);
     endOverlay.classList.add('show');
-    state = { finished:true, running:false, balloons:[], series:MAX_SERIES };
+    state = { finished:true, running:false, balloons:[], series:MAX_SERIES, points:state.points };
   }
 
   toggleBtn.addEventListener('click', () => {
@@ -798,7 +856,8 @@ body::after{
     }
   }, { passive:true });
 
-  levelEl.textContent = '1';
+  chronoEl.textContent = '00:30.0';
+  pointsEl.textContent = '0';
   updateBest();
   setButtonState(false);
   startGame();
