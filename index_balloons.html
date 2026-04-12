@@ -812,15 +812,24 @@ body::after{
     startSeriesTimer();
   }
 
+  
+  
   function stopGame(){
-    stopTimer();
-    isResolving = false;
-    board.classList.remove('resolving');
-    state = null;
-    board.replaceChildren();
-    pointsEl.textContent = '0';
-    setButtonState(false);
+  stopTimer();
+
+  if(state && state.points > bestScore){
+    bestScore = state.points;
+    localStorage.setItem(STORAGE_BEST, String(bestScore));
+    updateBest();
   }
+
+  isResolving = false;
+  board.classList.remove('resolving');
+  state = null;
+  board.replaceChildren();
+  pointsEl.textContent = '0';
+  setButtonState(false);
+}
 
   function finishGame(){
     stopTimer();
