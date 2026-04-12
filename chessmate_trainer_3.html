@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CHESSMATE</title>
+<meta name="theme-color" content="#2c2c2c">
+<style>
+:root{
+  --bg:#2c2c2c;
+  --panel:#3a3a3a;
+  --light:#eeeed2;
+  --dark:#769656;
+  --text:#ffffff;
+  --gold:#d4af37;
+  --danger:#d85a5a;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif}
+body{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 12px 24px}
+h1{margin:20px 0 12px;font-size:28px;line-height:1.08;font-weight:700;text-align:center}
+.app{width:100%;max-width:560px}
+.panel{background:var(--panel);padding:14px;margin-bottom:12px;box-shadow:0 8px 20px rgba(0,0,0,.18)}
+#board-container{position:relative;width:95vw;max-width:500px;aspect-ratio:1/1;overflow:hidden;margin-bottom:12px;box-shadow:0 10px 25px rgba(0,0,0,.35)}
+#board{display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);width:100%;height:100%}
+#arrowLayer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:8}
+.square{position:relative;width:100%;height:100%;user-select:none;overflow:hidden;perspective:900px;-webkit-perspective:900px}
+.white{background:var(--light)}
+.black{background:var(--dark)}
+.coord{position:absolute;font-size:10px;opacity:.65;font-weight:700;pointer-events:none;z-index:4}
+.coord.file{left:5px;bottom:3px}
+.coord.rank{right:4px;top:2px}
+.card{position:absolute;inset:0;width:100%;height:100%;border:none;background:none;padding:0;margin:0;cursor:pointer;touch-action:manipulation;appearance:none;-webkit-appearance:none}
+.card-inner{position:relative;width:100%;height:100%;transition:transform .42s ease;transform-style:preserve-3d;-webkit-transform-style:preserve-3d}
+.square.flipped .card-inner{transform:rotateY(180deg);-webkit-transform:rotateY(180deg)}
+.face{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.back{background:transparent}
+.back::before{content:"";width:44%;height:44%;border-radius:50%;background:rgba(0,0,0,.10);box-shadow:inset 0 0 0 2px rgba(255,255,255,.08),0 1px 3px rgba(0,0,0,.12)}
+.front{transform:rotateY(180deg);-webkit-transform:rotateY(180deg)}
+.piece{line-height:1;position:relative;z-index:2;display:flex;align-items:center;justify-content:center;width:100%;height:100%;filter:drop-shadow(0 1px 0 rgba(0,0,0,.22));transform-origin:center center;font-size:clamp(56px,11vw,82px);font-family:"Arial Unicode MS","Segoe UI Symbol","Apple Symbols","Noto Sans Symbols 2",-apple-system,sans-serif}
+.piece-K{transform:scale(1.00)} .piece-k{transform:scale(1.12)}
+.piece-Q{transform:scale(1.00)} .piece-q{transform:scale(1.02)}
+.piece-R{transform:scale(0.88)} .piece-r{transform:scale(1.02)}
+.piece-B{transform:scale(0.98)} .piece-b{transform:scale(1.02)}
+.piece-N{transform:scale(1.00)} .piece-n{transform:scale(1.00)}
+.white-piece{color:#ffffff;text-shadow:0 0 1px #000,0 0 2px #000,0 1px 2px rgba(0,0,0,.55),0 0 6px rgba(255,255,255,.16)}
+.black-piece{color:#141414;text-shadow:0 0 1px rgba(255,255,255,.18),0 1px 1px rgba(255,255,255,.06)}
+.square.selected{box-shadow:inset 0 0 0 3px rgba(212,175,55,.95)}
+.square.hintFrom{box-shadow:inset 0 0 0 3px rgba(212,175,55,.95)}
+.square.wrong{box-shadow:inset 0 0 0 3px rgba(216,90,90,.95)}
+.controls{display:flex;justify-content:center;align-items:center;gap:18px;flex-wrap:wrap}
+.control-btn{width:52px;height:52px;border:none;background:var(--bg);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;appearance:none;-webkit-appearance:none}
+.control-btn.wide{width:auto;min-width:52px;padding:0 14px}
+.control-btn span{font-size:24px;line-height:1;display:block}
+#status1{text-align:center;font-size:16px;font-weight:700;margin-bottom:6px}
+#status2{text-align:center;font-size:22px;font-weight:700;color:var(--gold);min-height:28px}
+#meta{text-align:center;font-size:12px;margin-top:6px;opacity:.82}
+.footer{text-align:center;font-size:12px;margin-top:4px;opacity:.82}
+@media (max-width:420px){
+  .piece{font-size:clamp(50px,11vw,70px)}
+  .control-btn{width:46px;height:46px}
+  .control-btn.wide{min-width:46px;padding:0 12px}
+  .control-btn span{font-size:22px}
+}
+</style>
+</head>
+<body>
+<h1>CHESSMATE</h1>
+
+<div class="app">
+  <div id="board-container">
+    <div id="board"></div>
+    <svg id="arrowLayer" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <defs>
+        <marker id="arrowHead" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L6,3 L0,6 z" fill="#f5c842"></path>
+        </marker>
+      </defs>
+      <line id="solutionArrow" x1="0" y1="0" x2="0" y2="0"
+            stroke="#f5c842" stroke-width="2.2" stroke-linecap="round"
+            marker-end="url(#arrowHead)" opacity="0"></line>
+    </svg>
+  </div>
+
+  <div class="panel">
+    <div id="status1">Mat en 1</div>
+    <div id="status2">Position 1</div>
+    <div id="meta"></div>
+  </div>
+
+  <div class="panel">
+    <div class="controls">
+      <button class="control-btn" id="prevBtn" type="button" aria-label="Position précédente"><span>◀</span></button>
+      <button class="control-btn" id="restartBtn" type="button" aria-label="Rejouer"><span>🔄</span></button>
+      <button class="control-btn wide" id="solutionBtn" type="button" aria-label="Solution"><span>💡</span></button>
+      <button class="control-btn" id="nextBtn" type="button" aria-label="Position suivante"><span>▶</span></button>
+    </div>
+  </div>
+
+  <div class="footer">Jeu imaginé par Luis et créé par ChatGPT</div>
+</div>
+
+<script>
+const PUZZLES = [
+  { title:"Mat en 1", label:"Position 1", fen:"8/1Q6/2K5/k7/8/8/8/8 w - - 0 1", line:["b7b5"] },
+  { title:"Mat en 1", label:"Position 2", fen:"8/8/8/8/8/3K4/3Q4/2k5 w - - 0 1", line:["d2c2"] },
+  { title:"Mat en 1", label:"Position 3", fen:"4k3/1Q6/5K2/8/8/8/8/8 w - - 0 1", line:["b7c8"] },
+  { title:"Mat en 1", label:"Position 4", fen:"7k/6R1/6K1/8/8/8/8/8 w - - 0 1", line:["g7g8"] }
+];
+
+const FILES = ["a","b","c","d","e","f","g","h"];
+const PIECES = {
+  "P":"♙","N":"♘","B":"♗","R":"♖","Q":"♕","K":"♔",
+  "p":"♟","n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
+};
+
+const boardEl = document.getElementById("board");
+const prevBtn = document.getElementById("prevBtn");
+const restartBtn = document.getElementById("restartBtn");
+const nextBtn = document.getElementById("nextBtn");
+const solutionBtn = document.getElementById("solutionBtn");
+const status1El = document.getElementById("status1");
+const status2El = document.getElementById("status2");
+const metaEl = document.getElementById("meta");
+const solutionArrow = document.getElementById("solutionArrow");
+
+let currentIndex = 0;
+let squares = [];
+let currentTurn = "w";
+let selectedIndex = null;
+let wrongIndex = null;
+let solved = false;
+let hintVisible = false;
+
+function squareToIndex(square){
+  const file = FILES.indexOf(square[0]);
+  const rank = Number(square[1]) - 1;
+  return rank * 8 + file;
+}
+function indexToSquare(index){
+  const file = index % 8;
+  const rank = Math.floor(index / 8);
+  return FILES[file] + String(rank + 1);
+}
+function coordsToSquare(file, rank){
+  return FILES[file] + String(rank + 1);
+}
+function parseFen(fen){
+  const [boardFen, turn] = fen.split(" ");
+  const rows = boardFen.split("/");
+  const result = [];
+  for(let displayRow=0; displayRow<8; displayRow++){
+    const fenRow = rows[7-displayRow];
+    for(const ch of fenRow){
+      if(/[1-8]/.test(ch)){
+        for(let i=0;i<Number(ch);i++) result.push("");
+      }else{
+        result.push(ch);
+      }
+    }
+  }
+  return { squares: result, turn: turn || "w" };
+}
+function currentPuzzle(){
+  return PUZZLES[currentIndex];
+}
+function updateLabels(){
+  const p = currentPuzzle();
+  status1El.textContent = solved ? "Bravo" : p.title;
+  status2El.textContent = solved ? "Résolu" : p.label;
+  metaEl.textContent = (currentIndex + 1) + " / " + PUZZLES.length;
+}
+function clearArrow(){
+  hintVisible = false;
+  solutionArrow.setAttribute("opacity","0");
+}
+function drawArrow(move){
+  if(!move || solved) return;
+  const from = squareToIndex(move.slice(0,2));
+  const to = squareToIndex(move.slice(2,4));
+  const fromFile = from % 8;
+  const fromRank = Math.floor(from / 8);
+  const toFile = to % 8;
+  const toRank = Math.floor(to / 8);
+  const x1 = (fromFile + 0.5) * 12.5;
+  const y1 = (7 - fromRank + 0.5) * 12.5;
+  const x2 = (toFile + 0.5) * 12.5;
+  const y2 = (7 - toRank + 0.5) * 12.5;
+  solutionArrow.setAttribute("x1", x1.toFixed(2));
+  solutionArrow.setAttribute("y1", y1.toFixed(2));
+  solutionArrow.setAttribute("x2", x2.toFixed(2));
+  solutionArrow.setAttribute("y2", y2.toFixed(2));
+  solutionArrow.setAttribute("opacity","1");
+  hintVisible = true;
+  renderBoard();
+}
+function toggleHint(){
+  if(hintVisible){
+    clearArrow();
+    renderBoard();
+  }else{
+    drawArrow(currentPuzzle().line[0]);
+  }
+}
+function pieceBelongsToTurn(piece){
+  if(!piece) return false;
+  return currentTurn === "w" ? piece === piece.toUpperCase() : piece === piece.toLowerCase();
+}
+function loadPuzzle(){
+  const parsed = parseFen(currentPuzzle().fen);
+  squares = parsed.squares.slice();
+  currentTurn = parsed.turn;
+  selectedIndex = null;
+  wrongIndex = null;
+  solved = false;
+  clearArrow();
+  updateLabels();
+  renderBoard();
+}
+function renderBoard(){
+  boardEl.innerHTML = "";
+  const hintMove = hintVisible ? currentPuzzle().line[0] : null;
+  const hintFrom = hintMove ? squareToIndex(hintMove.slice(0,2)) : null;
+
+  for(let row=7; row>=0; row--){
+    for(let col=0; col<8; col++){
+      const idx = row * 8 + col;
+      const data = squares[idx];
+
+      const sq = document.createElement("div");
+      sq.className = "square " + (((row + col) % 2 === 0) ? "white" : "black");
+      sq.classList.add("flipped");
+      if(idx === selectedIndex) sq.classList.add("selected");
+      if(idx === wrongIndex) sq.classList.add("wrong");
+      if(idx === hintFrom) sq.classList.add("hintFrom");
+
+      const button = document.createElement("button");
+      button.className = "card";
+      button.type = "button";
+      button.setAttribute("aria-label", coordsToSquare(col,row));
+
+      const inner = document.createElement("div");
+      inner.className = "card-inner";
+      const back = document.createElement("div");
+      back.className = "face back";
+      const front = document.createElement("div");
+      front.className = "face front";
+
+      if(data){
+        const piece = document.createElement("span");
+        piece.className = "piece " + (data === data.toUpperCase() ? "white-piece " : "black-piece ") + "piece-" + data;
+        piece.textContent = PIECES[data];
+        front.appendChild(piece);
+      }
+
+      inner.appendChild(back);
+      inner.appendChild(front);
+      button.appendChild(inner);
+      button.onclick = () => handleSquare(idx);
+      sq.appendChild(button);
+
+      if(row === 0){
+        const file = document.createElement("span");
+        file.className = "coord file";
+        file.textContent = FILES[col];
+        sq.appendChild(file);
+      }
+      if(col === 7){
+        const rank = document.createElement("span");
+        rank.className = "coord rank";
+        rank.textContent = String(row + 1);
+        sq.appendChild(rank);
+      }
+
+      boardEl.appendChild(sq);
+    }
+  }
+}
+function handleSquare(index){
+  if(solved) return;
+  const piece = squares[index];
+
+  if(selectedIndex === null){
+    if(!piece || !pieceBelongsToTurn(piece)) return;
+    selectedIndex = index;
+    wrongIndex = null;
+    renderBoard();
+    return;
+  }
+
+  if(index === selectedIndex){
+    selectedIndex = null;
+    wrongIndex = null;
+    renderBoard();
+    return;
+  }
+
+  const move = indexToSquare(selectedIndex) + indexToSquare(index);
+  const expected = currentPuzzle().line[0];
+
+  if(move === expected){
+    const from = squareToIndex(move.slice(0,2));
+    const to = squareToIndex(move.slice(2,4));
+    squares[to] = squares[from];
+    squares[from] = "";
+    selectedIndex = null;
+    wrongIndex = null;
+    solved = true;
+    clearArrow();
+    updateLabels();
+    renderBoard();
+    return;
+  }
+
+  wrongIndex = index;
+  status1El.textContent = "Essaie encore";
+  renderBoard();
+  setTimeout(() => {
+    wrongIndex = null;
+    selectedIndex = null;
+    if(!solved) updateLabels();
+    renderBoard();
+  }, 250);
+}
+function prevPosition(){
+  currentIndex = (currentIndex - 1 + PUZZLES.length) % PUZZLES.length;
+  loadPuzzle();
+}
+function nextPosition(){
+  currentIndex = (currentIndex + 1) % PUZZLES.length;
+  loadPuzzle();
+}
+
+prevBtn.addEventListener("click", prevPosition);
+nextBtn.addEventListener("click", nextPosition);
+restartBtn.addEventListener("click", loadPuzzle);
+solutionBtn.addEventListener("click", toggleHint);
+
+loadPuzzle();
+</script>
+</body>
+</html>
