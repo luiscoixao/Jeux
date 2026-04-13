@@ -732,7 +732,7 @@ body::after{
       const el = document.createElement('button');
       const isWinner = !isResolving && winners.includes(balloon.colorIndex);
 
-      el.className = 'balloon' + (isWinner ? ' majority' : '');
+      el.className = 'balloon';
       el.style.width = `${balloon.w}px`;
       el.style.height = `${balloon.h}px`;
       el.style.left = `${balloon.x}px`;
