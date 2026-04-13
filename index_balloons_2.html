@@ -189,7 +189,11 @@ body::after{
   font-size:clamp(20px,5.3vw,34px);
   letter-spacing:.03em;
   text-shadow:0 2px 10px rgba(0,0,0,.18);
-  padding:0 14px;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
 }
 
 .toggleBtn.play{
@@ -370,7 +374,7 @@ body::after{
     min-height:78px;
     border-radius:24px;
     font-size:clamp(18px,5vw,28px);
-    padding:0 12px;
+    padding:0;
   }
 }
 </style>
@@ -492,12 +496,12 @@ body::after{
   }
 
   function startSeriesTimer(){
-  seriesDeadline = performance.now() + SERIES_DURATION;
-  if(state){
-    state.seriesExpired = false;
-    state.seriesWon = false;
+    seriesDeadline = performance.now() + SERIES_DURATION;
+    if(state){
+      state.seriesExpired = false;
+      state.seriesWon = false;
+    }
   }
-}
 
   function startAllTimers(){
     cancelAnimationFrame(raf);
@@ -508,10 +512,10 @@ body::after{
   }
 
   function restartSeriesTimerOnly(){
-  startSeriesTimer();
-  cancelAnimationFrame(raf);
-  raf = requestAnimationFrame(tick);
-}
+    startSeriesTimer();
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(tick);
+  }
 
   function stopTimer(){
     cancelAnimationFrame(raf);
@@ -525,54 +529,57 @@ body::after{
     return Math.round(start + (end - start) * eased);
   }
 
-  
   function makeBalancedCounts(total){
-  const colorCount = COLORS.length;
+    const colorCount = COLORS.length;
+    const activeColors = colorCount;
+    const minGap = total > 260 ? 2 : total > 180 ? 3 : 4;
 
-  let activeColors = Math.min(colorCount, Math.max(3, Math.floor(total / 28)));
-  activeColors = Math.max(3, activeColors);
+    let counts = [];
+    let current = Math.max(6, Math.floor(total / activeColors) + minGap * 3);
 
-  let counts = Array.from({ length: activeColors }, (_, i) => activeColors - i);
-
-  let used = counts.reduce((a,b) => a + b, 0);
-  let remaining = total - used;
-
-  while(remaining > 0){
-    for(let i = 0; i < activeColors && remaining > 0; i++){
-      counts[i]++;
-      remaining--;
+    for(let i = 0; i < activeColors; i++){
+      counts.push(Math.max(2, current));
+      current -= minGap;
     }
-  }
 
-  for(let i = 0; i < counts.length - 1; i++){
-    if(counts[i] <= counts[i + 1]){
-      counts[i] = counts[i + 1] + 1;
-    }
-  }
+    let sum = counts.reduce((a,b) => a + b, 0);
 
-  let sum = counts.reduce((a,b) => a + b, 0);
-
-  while(sum > total){
-    for(let i = counts.length - 1; i >= 0 && sum > total; i--){
-      const minAllowed = i === counts.length - 1 ? 1 : counts[i + 1] + 1;
-      if(counts[i] > minAllowed){
-        counts[i]--;
-        sum--;
+    while(sum < total){
+      for(let i = 0; i < counts.length && sum < total; i++){
+        counts[i]++;
+        sum++;
       }
     }
+
+    while(sum > total){
+      for(let i = counts.length - 1; i >= 0 && sum > total; i--){
+        const minAllowed = i === counts.length - 1 ? 2 : counts[i + 1] + minGap;
+        if(counts[i] > minAllowed){
+          counts[i]--;
+          sum--;
+        }
+      }
+      if(sum > total){
+        break;
+      }
+    }
+
+    for(let i = 0; i < counts.length - 1; i++){
+      if(counts[i] - counts[i + 1] < minGap){
+        counts[i + 1] = Math.max(2, counts[i] - minGap);
+      }
+    }
+
+    const colorIndices = Array.from({ length: colorCount }, (_, i) => i)
+      .sort(() => Math.random() - 0.5);
+
+    const finalCounts = Array(colorCount).fill(0);
+    counts.forEach((count, i) => {
+      finalCounts[colorIndices[i]] = count;
+    });
+
+    return finalCounts;
   }
-
-  const colorIndices = Array.from({ length: colorCount }, (_, i) => i)
-    .sort(() => Math.random() - 0.5)
-    .slice(0, activeColors);
-
-  const finalCounts = Array(colorCount).fill(0);
-  counts.forEach((count, i) => {
-    finalCounts[colorIndices[i]] = count;
-  });
-
-  return finalCounts;
-}
 
   function makeBalloons(series){
     const total = computeSeriesCount(series);
