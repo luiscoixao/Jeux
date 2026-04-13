@@ -197,11 +197,17 @@ body::after{
 }
 
 .toggleBtn.play{
-  background:linear-gradient(180deg,var(--green1),var(--green2));
+  background:linear-gradient(180deg,
+    rgba(72,255,140,.55),
+    rgba(6,179,74,.55)
+  );
 }
 
 .toggleBtn.stop{
-  background:linear-gradient(180deg,var(--red1),var(--red2));
+  background:linear-gradient(180deg,
+    rgba(255,94,133,.55),
+    rgba(207,17,51,.55)
+  );
 }
 
 .balloon{
@@ -394,7 +400,7 @@ body::after{
         <div class="value" id="points">0</div>
       </div>
       <div class="stat">
-        <div class="label">Score</div>
+        <div class="label">Record</div>
         <div class="value" id="best">0</div>
       </div>
       <button class="toggleBtn play" id="toggleBtn" aria-label="Jouer">JOUER</button>
@@ -726,7 +732,7 @@ body::after{
       const el = document.createElement('button');
       const isWinner = !isResolving && winners.includes(balloon.colorIndex);
 
-      el.className = 'balloon' + (isWinner ? ' majority' : '');
+      el.className = 'balloon';
       el.style.width = `${balloon.w}px`;
       el.style.height = `${balloon.h}px`;
       el.style.left = `${balloon.x}px`;
@@ -908,7 +914,7 @@ body::after{
 
     endTimeEl.textContent = `${finalPoints} point${finalPoints > 1 ? 's' : ''}`;
     endTextEl.innerHTML = newBest
-      ? 'Nouveau <strong>score</strong> !'
+      ? 'Nouveau <strong>Record</strong> !'
       : `Tu as marqué ${finalPoints} point${finalPoints > 1 ? 's' : ''} en 5 minutes.`;
 
     timerEl.textContent = '00:00';
