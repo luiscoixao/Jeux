@@ -135,7 +135,7 @@ body::after{
   right:calc(12px + var(--safe-right));
   bottom:calc(10px + var(--safe-bottom));
   display:grid;
-  grid-template-columns:minmax(100px,1fr) minmax(100px,1fr) minmax(132px,1.32fr);
+  grid-template-columns:minmax(86px,1fr) minmax(86px,1fr) minmax(86px,1fr) minmax(126px,1.24fr);
   gap:10px;
   align-items:stretch;
   pointer-events:auto;
@@ -189,7 +189,11 @@ body::after{
   font-size:clamp(20px,5.3vw,34px);
   letter-spacing:.03em;
   text-shadow:0 2px 10px rgba(0,0,0,.18);
-  padding:0 14px;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
 }
 
 .toggleBtn.play{
@@ -356,7 +360,7 @@ body::after{
 
 @media (max-width: 430px){
   .bottomBar{
-    grid-template-columns:minmax(94px,1fr) minmax(94px,1fr) minmax(126px,1.2fr);
+    grid-template-columns:minmax(80px,1fr) minmax(80px,1fr) minmax(80px,1fr) minmax(112px,1.15fr);
     gap:8px;
   }
 
@@ -370,7 +374,7 @@ body::after{
     min-height:78px;
     border-radius:24px;
     font-size:clamp(18px,5vw,28px);
-    padding:0 12px;
+    padding:0;
   }
 }
 </style>
@@ -382,11 +386,15 @@ body::after{
     <h1 class="title">BALLOONS</h1>
     <div class="bottomBar" id="bottomBar">
       <div class="stat">
+        <div class="label">Temps</div>
+        <div class="value" id="timer">05:00</div>
+      </div>
+      <div class="stat">
         <div class="label">Points</div>
         <div class="value" id="points">0</div>
       </div>
       <div class="stat">
-        <div class="label">Score</div>
+        <div class="label">Record</div>
         <div class="value" id="best">0</div>
       </div>
       <button class="toggleBtn play" id="toggleBtn" aria-label="Jouer">JOUER</button>
@@ -407,6 +415,7 @@ body::after{
 <script>
 (() => {
   const board = document.getElementById('board');
+  const timerEl = document.getElementById('timer');
   const pointsEl = document.getElementById('points');
   const bestEl = document.getElementById('best');
   const toggleBtn = document.getElementById('toggleBtn');
@@ -419,8 +428,9 @@ body::after{
   const STORAGE_BEST = 'balloons-best-score-v1';
   const MAX_SERIES = 100;
   const SERIES_DURATION = 30000;
+  const GAME_DURATION = 300000;
   const COLORS = [
-    ['#ff8bac','#ff2d67'],
+    ['#ff5a5a','#e00000'],
     ['#7bff85','#19bb41'],
     ['#ffe86d','#ffbb0f'],
     ['#84dfff','#149dff'],
@@ -435,14 +445,14 @@ body::after{
   let isResolving = false;
   let raf = 0;
   let seriesDeadline = 0;
+  let gameDeadline = 0;
 
   function fmt(ms){
     const safe = Math.max(0, ms);
-    const totalTenths = Math.ceil(safe / 100);
-    const minutes = Math.floor(totalTenths / 600);
-    const seconds = Math.floor((totalTenths % 600) / 10);
-    const tenths = totalTenths % 10;
-    return `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}.${tenths}`;
+    const totalSeconds = Math.ceil(safe / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
   }
 
   function updateBest(){
@@ -462,9 +472,19 @@ body::after{
   function tick(){
     if(!state || !state.running || state.finished) return;
 
-    const remaining = Math.max(0, seriesDeadline - performance.now());
+    const gameRemaining = Math.max(0, gameDeadline - performance.now());
+    timerEl.textContent = fmt(gameRemaining);
 
-    if(remaining <= 0){
+    if(gameRemaining <= 0){
+      state.gameExpired = true;
+      if(!isResolving){
+        finishGame();
+        return;
+      }
+    }
+
+    const seriesRemaining = Math.max(0, seriesDeadline - performance.now());
+    if(seriesRemaining <= 0 && !state.gameExpired){
       state.seriesExpired = true;
       if(!isResolving){
         handleSeriesTimeout();
@@ -476,12 +496,24 @@ body::after{
   }
 
   function startSeriesTimer(){
-    cancelAnimationFrame(raf);
     seriesDeadline = performance.now() + SERIES_DURATION;
     if(state){
       state.seriesExpired = false;
       state.seriesWon = false;
     }
+  }
+
+  function startAllTimers(){
+    cancelAnimationFrame(raf);
+    gameDeadline = performance.now() + GAME_DURATION;
+    startSeriesTimer();
+    timerEl.textContent = fmt(GAME_DURATION);
+    raf = requestAnimationFrame(tick);
+  }
+
+  function restartSeriesTimerOnly(){
+    startSeriesTimer();
+    cancelAnimationFrame(raf);
     raf = requestAnimationFrame(tick);
   }
 
@@ -498,31 +530,55 @@ body::after{
   }
 
   function makeBalancedCounts(total){
-    const colorCount = COLORS.length;
+    const n = COLORS.length;
 
-    let activeColors = Math.floor((Math.sqrt(1 + 4 * total) - 1) / 2);
-    activeColors = Math.max(3, Math.min(colorCount, activeColors));
-
-    let counts = Array.from({ length: activeColors }, (_, i) => 2 * (activeColors - i));
-    let used = counts.reduce((a,b) => a + b, 0);
-    let remaining = total - used;
-
-    while(remaining >= activeColors){
-      counts = counts.map(v => v + 1);
-      remaining -= activeColors;
+    let gap;
+    if(total < 160){
+      gap = 4;
+    }else if(total < 260){
+      gap = 3;
+    }else{
+      gap = 2;
     }
 
-    for(let i = 0; i < activeColors && remaining > 0; i++, remaining--){
-      counts[i] += 1;
+    const staircase = gap * (n * (n - 1) / 2);
+    let base = Math.floor((total - staircase) / n);
+
+    if(base < 2){
+      base = 2;
     }
 
-    const colorIndices = Array.from({ length: colorCount }, (_, i) => i)
-      .sort(() => Math.random() - 0.5)
-      .slice(0, activeColors);
+    const counts = [];
+    for(let i = 0; i < n; i++){
+      counts.push(base + (n - 1 - i) * gap);
+    }
 
-    const finalCounts = Array(colorCount).fill(0);
+    let sum = counts.reduce((a,b) => a + b, 0);
+    let diff = total - sum;
+
+    while(diff > 0){
+      for(let i = 0; i < n && diff > 0; i++){
+        counts[i]++;
+        diff--;
+      }
+    }
+
+    while(diff < 0){
+      for(let i = n - 1; i >= 0 && diff < 0; i--){
+        const minAllowed = (i === n - 1) ? 2 : counts[i + 1] + 1;
+        if(counts[i] > minAllowed){
+          counts[i]--;
+          diff++;
+        }
+      }
+    }
+
+    const shuffledColors = Array.from({ length: n }, (_, i) => i)
+      .sort(() => Math.random() - 0.5);
+
+    const finalCounts = Array(n).fill(0);
     counts.forEach((count, i) => {
-      finalCounts[colorIndices[i]] = count;
+      finalCounts[shuffledColors[i]] = count;
     });
 
     return finalCounts;
@@ -572,11 +628,6 @@ body::after{
 
   function boardZone(){
     const rect = board.getBoundingClientRect();
-    const root = getComputedStyle(document.documentElement);
-    const safeBottom = parseFloat(root.getPropertyValue('--safe-bottom')) || 0;
-    const barRect = bottomBar.getBoundingClientRect();
-    const reservedBottom = rect.height - barRect.top + 10;
-
     return {
       width: rect.width,
       height: rect.height,
@@ -708,7 +759,13 @@ body::after{
 
     state.balloons = state.balloons.filter(balloon => balloon.colorIndex !== colorIndex);
 
-    if(state.balloons.length === 0 && !state.seriesExpired && performance.now() <= seriesDeadline){
+    if(
+      state.balloons.length === 0 &&
+      !state.seriesExpired &&
+      !state.gameExpired &&
+      performance.now() <= seriesDeadline &&
+      performance.now() <= gameDeadline
+    ){
       state.seriesWon = true;
     }
 
@@ -723,7 +780,9 @@ body::after{
         remaining--;
 
         if(remaining === 0){
-          if(state.balloons.length === 0){
+          if(state.gameExpired){
+            finishGame();
+          }else if(state.balloons.length === 0){
             advanceSeriesOrFinish(state.seriesWon);
           }else if(state.seriesExpired){
             advanceSeriesOrFinish(false);
@@ -744,7 +803,7 @@ body::after{
     state.points = nextPoints;
     updatePoints();
 
-    if(state.series >= MAX_SERIES){
+    if(state.series >= MAX_SERIES || state.gameExpired){
       finishGame();
       return;
     }
@@ -760,22 +819,23 @@ body::after{
       finished: false,
       balloons: makeBalloons(nextSeries),
       seriesExpired: false,
-      seriesWon: false
+      seriesWon: false,
+      gameExpired: false
     };
 
     placeIntoLanes(true);
     render();
-    startSeriesTimer();
+    restartSeriesTimerOnly();
   }
 
   function handleSeriesTimeout(){
-    if(!state || !state.running || state.finished) return;
+    if(!state || !state.running || state.finished || state.gameExpired) return;
     if(isResolving) return;
     advanceSeriesOrFinish(false);
   }
 
   function onBalloonClick(event){
-    if(!state || !state.running || state.finished || state.seriesExpired) return;
+    if(!state || !state.running || state.finished || state.seriesExpired || state.gameExpired) return;
 
     const colorIndex = Number(event.currentTarget.dataset.colorIndex);
     const { winners } = getMajorityData();
@@ -802,53 +862,59 @@ body::after{
       finished: false,
       balloons: makeBalloons(1),
       seriesExpired: false,
-      seriesWon: false
+      seriesWon: false,
+      gameExpired: false
     };
 
     pointsEl.textContent = '0';
     placeIntoLanes(true);
     render();
     setButtonState(true);
-    startSeriesTimer();
+    startAllTimers();
   }
 
-  
-  
   function stopGame(){
-  stopTimer();
+    stopTimer();
 
-  if(state && state.points > bestScore){
-    bestScore = state.points;
-    localStorage.setItem(STORAGE_BEST, String(bestScore));
-    updateBest();
+    if(state && state.points > bestScore){
+      bestScore = state.points;
+      localStorage.setItem(STORAGE_BEST, String(bestScore));
+      updateBest();
+    }
+
+    isResolving = false;
+    board.classList.remove('resolving');
+    state = null;
+    board.replaceChildren();
+    pointsEl.textContent = '0';
+    timerEl.textContent = '05:00';
+    setButtonState(false);
   }
-
-  isResolving = false;
-  board.classList.remove('resolving');
-  state = null;
-  board.replaceChildren();
-  pointsEl.textContent = '0';
-  setButtonState(false);
-}
 
   function finishGame(){
     stopTimer();
 
+    if(!state) return;
+
+    const finalPoints = state.points;
     let newBest = false;
-    if(state.points > bestScore){
-      bestScore = state.points;
+
+    if(finalPoints > bestScore){
+      bestScore = finalPoints;
       localStorage.setItem(STORAGE_BEST, String(bestScore));
       updateBest();
       newBest = true;
     }
 
-    endTimeEl.textContent = `${state.points} point${state.points > 1 ? 's' : ''}`;
+    endTimeEl.textContent = `${finalPoints} point${finalPoints > 1 ? 's' : ''}`;
     endTextEl.innerHTML = newBest
-      ? 'Nouveau <strong>score</strong> !'
-      : `Tu as marqué ${state.points} point${state.points > 1 ? 's' : ''} sur 100 séries.`;
+      ? 'Nouveau <strong>Record</strong> !'
+      : `Tu as marqué ${finalPoints} point${finalPoints > 1 ? 's' : ''} en 5 minutes.`;
+
+    timerEl.textContent = '00:00';
     setButtonState(false);
     endOverlay.classList.add('show');
-    state = { finished:true, running:false, balloons:[], series:MAX_SERIES, points:state.points };
+    state = { finished:true, running:false, balloons:[], series:MAX_SERIES, points:finalPoints, gameExpired:true };
   }
 
   toggleBtn.addEventListener('click', () => {
@@ -866,6 +932,7 @@ body::after{
   }, { passive:true });
 
   pointsEl.textContent = '0';
+  timerEl.textContent = '05:00';
   updateBest();
   setButtonState(false);
   startGame();
