@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>CHESSMEMORY</title>
-
 <meta name="theme-color" content="#2c2c2c" />
 
 <style>
@@ -12,47 +11,57 @@
   --bg:#2c2c2c;
   --light:#eeeed2;
   --dark:#769656;
+  --text:#ffffff;
   --gold:#d4af37;
 }
 
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
 
-body{
+html,body{
   margin:0;
+  padding:0;
   background:var(--bg);
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
+}
+
+body{
+  min-height:100vh;
   display:flex;
   flex-direction:column;
   align-items:center;
+  padding:16px 12px calc(16px + env(safe-area-inset-bottom));
+  color:var(--text);
 }
 
 h1{
-  color:#fff;
-  margin:20px 0 10px;
+  margin:calc(env(safe-area-inset-top) + 8px) 0 10px;
   font-size:28px;
+  font-weight:700;
+  text-align:center;
 }
 
 #board{
   width:95vw;
   max-width:500px;
-  aspect-ratio:1;
+  aspect-ratio:1 / 1;
   display:grid;
   grid-template-columns:repeat(8,1fr);
+  grid-template-rows:repeat(8,1fr);
   box-shadow:0 10px 25px rgba(0,0,0,.35);
+  overflow:hidden;
 }
 
 .square{
   position:relative;
+  width:100%;
+  height:100%;
 }
 
-.white{background:var(--light)}
-.black{background:var(--dark)}
-
-.card{
-  position:absolute;
-  inset:0;
-  cursor:pointer;
-}
+.white{ background:var(--light); }
+.black{ background:var(--dark); }
 
 .piece{
   position:absolute;
@@ -60,135 +69,250 @@ h1{
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:clamp(60px,12vw,90px);
+  line-height:1;
+  font-size:clamp(56px, 11vw, 82px);
+  font-family:"Arial Unicode MS","Segoe UI Symbol","Apple Symbols","Noto Sans Symbols 2",-apple-system,sans-serif;
+  user-select:none;
 }
 
-.white-piece{color:#fff;text-shadow:0 0 2px #000}
-.black-piece{color:#111}
+.piece-K{ transform:scale(1.00); }
+.piece-k{ transform:scale(1.12); }
+.piece-Q{ transform:scale(1.00); }
+.piece-q{ transform:scale(1.02); }
+.piece-R{ transform:scale(0.88); }
+.piece-r{ transform:scale(1.02); }
+.piece-B{ transform:scale(0.98); }
+.piece-b{ transform:scale(1.02); }
+.piece-N{ transform:scale(1.00); }
+.piece-n{ transform:scale(1.00); }
 
-.hidden .piece{display:none}
+.white-piece{
+  color:#fff;
+  text-shadow:
+    0 0 1px #000,
+    0 0 2px #000,
+    0 1px 2px rgba(0,0,0,.55);
+}
+
+.black-piece{
+  color:#111;
+  text-shadow:
+    0 0 1px rgba(255,255,255,.18),
+    0 1px 1px rgba(255,255,255,.06);
+}
+
+.hidden-piece{
+  display:none;
+}
 
 #info{
-  color:#fff;
-  margin:10px;
+  margin-top:12px;
+  min-height:28px;
   font-size:18px;
+  font-weight:700;
+  text-align:center;
+}
+
+#timer{
+  margin-top:4px;
+  min-height:26px;
+  font-size:20px;
+  font-weight:700;
+  color:var(--gold);
+  text-align:center;
+}
+
+@media (max-width:420px){
+  .piece{
+    font-size:clamp(50px, 11vw, 70px);
+  }
 }
 </style>
 </head>
-
 <body>
 
 <h1>CHESSMEMORY</h1>
 <div id="board"></div>
 <div id="info">Mémorise…</div>
+<div id="timer">1</div>
 
 <script>
-const board = document.getElementById("board");
-const info = document.getElementById("info");
+const boardEl = document.getElementById("board");
+const infoEl = document.getElementById("info");
+const timerEl = document.getElementById("timer");
 
-const PIECES = ["♔","♕","♖","♗","♘","♚","♛","♜","♝","♞"];
+const WHITE_SET = new Set(["K","Q","R","B","N"]);
+const PIECES = {
+  "K":"♔","Q":"♕","R":"♖","B":"♗","N":"♘",
+  "k":"♚","q":"♛","r":"♜","b":"♝","n":"♞"
+};
+const PAIRS = ["K","Q","R","B","N","k","q","r","b","n"];
+
+const PREVIEW_MS = 1000;
+const ROUND_MS = 10000;
+const BOARD_CELLS = 64;
 
 let cells = [];
-let picks = [];
-let lock = false;
+let selected = [];
+let locked = true;
+let previewTimeout = null;
+let roundTimeout = null;
+let roundInterval = null;
+let roundEndAt = 0;
+let activeToken = 0;
 
-// créer une partie
-function newGame(){
-
-  picks = [];
-  lock = true;
-  info.textContent = "Mémorise…";
-
-  // choisir une paire
-  const symbol = PIECES[Math.floor(Math.random()*PIECES.length)];
-
-  // 64 cases vides
-  cells = Array(64).fill(null);
-
-  // placer 2 cartes
-  let i1 = Math.floor(Math.random()*64);
-  let i2;
-  do { i2 = Math.floor(Math.random()*64); } while(i2===i1);
-
-  cells[i1] = {symbol, id:1};
-  cells[i2] = {symbol, id:2};
-
-  render(true); // visible
-
-  // cacher après 1 seconde
-  setTimeout(()=>{
-    render(false);
-    lock = false;
-    info.textContent = "Trouve la paire";
-  },1000);
+function shuffle(array){
+  const arr = [...array];
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
 }
 
-// affichage
-function render(showAll=false){
-  board.innerHTML="";
+function clearTimers(){
+  if(previewTimeout) clearTimeout(previewTimeout);
+  if(roundTimeout) clearTimeout(roundTimeout);
+  if(roundInterval) clearInterval(roundInterval);
+  previewTimeout = null;
+  roundTimeout = null;
+  roundInterval = null;
+}
 
-  for(let i=0;i<64;i++){
+function randomPairSymbol(){
+  return PAIRS[Math.floor(Math.random() * PAIRS.length)];
+}
+
+function buildBoard(symbol){
+  cells = Array.from({ length: BOARD_CELLS }, () => ({
+    symbol: null,
+    visible: false,
+    found: false
+  }));
+
+  const positions = shuffle([...Array(BOARD_CELLS).keys()]);
+  const a = positions[0];
+  const b = positions[1];
+
+  cells[a] = { symbol, visible: true, found: false };
+  cells[b] = { symbol, visible: true, found: false };
+  selected = [];
+}
+
+function render(){
+  boardEl.innerHTML = "";
+
+  for(let i = 0; i < BOARD_CELLS; i++){
+    const row = Math.floor(i / 8);
+    const col = i % 8;
     const sq = document.createElement("div");
-    sq.className="square "+(((Math.floor(i/8)+i)%2)?"white":"black");
+    sq.className = "square " + (((row + col) % 2 === 0) ? "white" : "black");
 
-    const card = document.createElement("div");
-    card.className="card";
+    const cell = cells[i];
+    if(cell.symbol){
+      const span = document.createElement("div");
+      const pieceClass = WHITE_SET.has(cell.symbol) ? "white-piece" : "black-piece";
+      span.className = "piece piece-" + cell.symbol + " " + pieceClass + (cell.visible || cell.found ? "" : " hidden-piece");
+      span.textContent = PIECES[cell.symbol];
+      sq.appendChild(span);
 
-    const data = cells[i];
-
-    if(data){
-      const piece = document.createElement("div");
-      piece.className="piece "+(data.symbol==="♔"||data.symbol==="♕"||data.symbol==="♖"||data.symbol==="♗"||data.symbol==="♘"?"white-piece":"black-piece");
-      piece.textContent=data.symbol;
-
-      if(!showAll && !data.revealed) piece.parentElement?.classList?.add("hidden");
-
-      if(!showAll && !data.revealed){
-        piece.style.display="none";
-      }
-
-      card.onclick=()=>clickCard(i);
-
-      sq.appendChild(piece);
+      sq.addEventListener("click", () => onCellClick(i));
     }
 
-    board.appendChild(sq);
+    boardEl.appendChild(sq);
   }
 }
 
-// clic
-function clickCard(i){
-  if(lock) return;
-  const card = cells[i];
-  if(!card || card.revealed) return;
+function setRoundCountdown(token){
+  function update(){
+    if(token !== activeToken) return;
+    const remaining = Math.max(0, Math.ceil((roundEndAt - Date.now()) / 1000));
+    timerEl.textContent = remaining > 0 ? String(remaining) : "0";
+  }
 
-  card.revealed=true;
-  picks.push(i);
-  render(false);
+  update();
+  roundInterval = setInterval(update, 200);
+}
 
-  if(picks.length<2) return;
+function startRound(){
+  clearTimers();
+  activeToken++;
+  const token = activeToken;
 
-  lock = true;
+  locked = true;
+  infoEl.textContent = "Mémorise…";
+  timerEl.textContent = "1";
 
-  const [a,b]=picks;
+  const symbol = randomPairSymbol();
+  buildBoard(symbol);
+  render();
+
+  previewTimeout = setTimeout(() => {
+    if(token !== activeToken) return;
+
+    cells.forEach(cell => {
+      if(cell.symbol && !cell.found){
+        cell.visible = false;
+      }
+    });
+
+    render();
+    locked = false;
+    infoEl.textContent = "Trouve la paire";
+    roundEndAt = Date.now() + ROUND_MS;
+    setRoundCountdown(token);
+
+    roundTimeout = setTimeout(() => {
+      if(token !== activeToken) return;
+      locked = true;
+      infoEl.textContent = "Temps écoulé";
+      timerEl.textContent = "0";
+      setTimeout(() => {
+        if(token !== activeToken) return;
+        startRound();
+      }, 700);
+    }, ROUND_MS);
+  }, PREVIEW_MS);
+}
+
+function onCellClick(index){
+  if(locked) return;
+
+  const cell = cells[index];
+  if(!cell.symbol || cell.visible || cell.found) return;
+  if(selected.includes(index)) return;
+
+  cell.visible = true;
+  selected.push(index);
+  render();
+
+  if(selected.length < 2) return;
+
+  locked = true;
+  const [a, b] = selected;
 
   if(cells[a].symbol === cells[b].symbol){
-    info.textContent="Bravo !";
+    cells[a].found = true;
+    cells[b].found = true;
+    infoEl.textContent = "Bravo !";
+    clearTimers();
+    timerEl.textContent = "";
 
-    setTimeout(newGame,1200);
+    setTimeout(() => {
+      startRound();
+    }, 900);
   }else{
-    setTimeout(()=>{
-      cells[a].revealed=false;
-      cells[b].revealed=false;
-      picks=[];
-      lock=false;
-      render(false);
-    },600);
+    setTimeout(() => {
+      cells[a].visible = false;
+      cells[b].visible = false;
+      selected = [];
+      locked = false;
+      render();
+    }, 500);
   }
 }
 
-// lancement auto
-newGame();
+startRound();
 </script>
 
 </body>
