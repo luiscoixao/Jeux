@@ -4,42 +4,26 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>CHESSMEMORY</title>
-<meta name="theme-color" content="#2c2c2c" />
 
 <style>
 :root{
   --bg:#2c2c2c;
   --light:#eeeed2;
   --dark:#769656;
-  --text:#ffffff;
   --gold:#d4af37;
 }
 
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
-
-html,body{
-  margin:0;
-  padding:0;
-  background:var(--bg);
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
-}
-
 body{
-  min-height:100vh;
+  margin:0;
+  background:var(--bg);
+  font-family:-apple-system,sans-serif;
   display:flex;
   flex-direction:column;
   align-items:center;
-  padding:12px;
-  color:var(--text);
+  color:#fff;
 }
 
-h1{
-  margin:10px 0;
-  font-size:26px;
-}
+h1{ margin:10px 0; }
 
 #board{
   width:95vw;
@@ -47,14 +31,9 @@ h1{
   aspect-ratio:1;
   display:grid;
   grid-template-columns:repeat(8,1fr);
-  grid-template-rows:repeat(8,1fr);
-  box-shadow:0 10px 25px rgba(0,0,0,.35);
 }
 
-.square{
-  position:relative;
-}
-
+.square{ position:relative; }
 .white{ background:var(--light); }
 .black{ background:var(--dark); }
 
@@ -64,16 +43,11 @@ h1{
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:clamp(56px,11vw,82px);
-  font-family:"Arial Unicode MS","Segoe UI Symbol","Apple Symbols","Noto Sans Symbols 2",-apple-system,sans-serif;
+  font-size:clamp(60px,11vw,82px);
 }
-
-.white-piece{ color:#fff; }
-.black-piece{ color:#111; }
 
 .hidden{ display:none; }
 
-/* COORDONNÉES */
 .coord{
   position:absolute;
   font-size:10px;
@@ -82,13 +56,17 @@ h1{
 }
 
 .file{ bottom:2px; left:4px; }
-.rank{ top:2px; right:4px; }
+.rank{ top:2px; left:4px; } /* ALIGNÉ À GAUCHE */
 
 #timer{
-  margin-top:8px;
+  margin-top:6px;
   font-size:20px;
-  font-weight:700;
   color:var(--gold);
+}
+
+#score{
+  margin-top:10px;
+  font-size:18px;
 }
 </style>
 </head>
@@ -98,113 +76,108 @@ h1{
 <h1>CHESSMEMORY</h1>
 <div id="board"></div>
 <div id="timer"></div>
+<div id="score">Points : 0 | Record : 0</div>
 
 <script>
 const boardEl = document.getElementById("board");
 const timerEl = document.getElementById("timer");
+const scoreEl = document.getElementById("score");
 
-const PIECES = {
-  "K":"♔","Q":"♕","R":"♖","B":"♗","N":"♘",
-  "k":"♚","q":"♛","r":"♜","b":"♝","n":"♞"
-};
+const PIECES = ["♔","♕","♖","♗","♘","♚","♛","♜","♝","♞"];
 
-const WHITE_SET = new Set(["K","Q","R","B","N"]);
+let cells=[], selected=[];
+let locked=true;
+let score=0;
+let record=localStorage.getItem("chessMemoryRecord") || 0;
 
-let cells = [];
-let selected = [];
-let locked = true;
-let endTime = 0;
-
-function shuffle(a){
-  return a.sort(()=>Math.random()-0.5);
-}
+function shuffle(a){ return a.sort(()=>Math.random()-0.5); }
 
 function randomPiece(){
-  const keys = Object.keys(PIECES);
-  return keys[Math.floor(Math.random()*keys.length)];
+  return PIECES[Math.floor(Math.random()*PIECES.length)];
 }
 
-function buildBoard(){
-  cells = Array(64).fill(null).map(()=>({symbol:null,visible:false}));
+function build(){
+  cells = Array(64).fill(null).map(()=>({piece:null,visible:false}));
 
-  const p1 = randomPiece();
-  let p2;
-  do{ p2 = randomPiece(); } while(p2 === p1);
+  const p = randomPiece();
+  const pos = shuffle([...Array(64).keys()]);
 
-  const positions = shuffle([...Array(64).keys()]);
-
-  // 2 paires
-  cells[positions[0]] = {symbol:p1,visible:true};
-  cells[positions[1]] = {symbol:p1,visible:true};
-  cells[positions[2]] = {symbol:p2,visible:true};
-  cells[positions[3]] = {symbol:p2,visible:true};
+  cells[pos[0]] = {piece:p,visible:true};
+  cells[pos[1]] = {piece:p,visible:true};
 }
 
 function render(){
-  boardEl.innerHTML = "";
+  boardEl.innerHTML="";
 
   for(let i=0;i<64;i++){
-    const row = Math.floor(i/8);
-    const col = i%8;
+    const r=Math.floor(i/8), c=i%8;
+    const sq=document.createElement("div");
+    sq.className="square "+((r+c)%2?"black":"white");
 
-    const sq = document.createElement("div");
-    sq.className = "square "+(((row+col)%2===0)?"white":"black");
+    const cell=cells[i];
 
-    const cell = cells[i];
-
-    if(cell.symbol){
-      const piece = document.createElement("div");
-      const color = WHITE_SET.has(cell.symbol)?"white-piece":"black-piece";
-      piece.className = "piece "+color+(cell.visible?"":" hidden");
-      piece.textContent = PIECES[cell.symbol];
-      sq.appendChild(piece);
-
-      sq.onclick = ()=>clickCell(i);
+    if(cell.piece){
+      const p=document.createElement("div");
+      p.className="piece"+(cell.visible?"":" hidden");
+      p.textContent=cell.piece;
+      sq.appendChild(p);
+      sq.onclick=()=>clickCell(i);
     }
 
-    // lettres
-    if(row===7){
+    if(r===7){
       const f=document.createElement("div");
       f.className="coord file";
-      f.textContent=String.fromCharCode(97+col);
+      f.textContent=String.fromCharCode(97+c);
       sq.appendChild(f);
     }
 
-    // chiffres
-    if(col===0){
-      const r=document.createElement("div");
-      r.className="coord rank";
-      r.textContent=8-row;
-      sq.appendChild(r);
+    if(c===0){
+      const rk=document.createElement("div");
+      rk.className="coord rank";
+      rk.textContent=8-r;
+      sq.appendChild(rk);
     }
 
     boardEl.appendChild(sq);
   }
 }
 
-function start(){
-  buildBoard();
-  render();
-  locked = true;
+function updateScore(){
+  if(score>record){
+    record=score;
+    localStorage.setItem("chessMemoryRecord",record);
+  }
+  scoreEl.textContent="Points : "+score+" | Record : "+record;
+}
 
-  timerEl.textContent = "2";
+function start(){
+  selected=[];
+  locked=true;
+
+  build();
+  render();
+
+  timerEl.textContent="1";
 
   setTimeout(()=>{
     cells.forEach(c=>c.visible=false);
     render();
     locked=false;
     startTimer();
-  },2000);
+  },1000);
 }
 
 function startTimer(){
-  endTime = Date.now()+10000;
+  let end=Date.now()+3000;
 
   const interval=setInterval(()=>{
-    const t=Math.ceil((endTime-Date.now())/1000);
-    timerEl.textContent = t>0 ? t : "0";
+    let t=Math.ceil((end-Date.now())/1000);
+    timerEl.textContent=t>0?t:"0";
+
     if(t<=0){
       clearInterval(interval);
+      score--;
+      updateScore();
       start();
     }
   },200);
@@ -213,31 +186,31 @@ function startTimer(){
 function clickCell(i){
   if(locked) return;
 
-  const cell=cells[i];
-  if(!cell.symbol || cell.visible) return;
+  const c=cells[i];
+  if(!c.piece || c.visible) return;
 
-  cell.visible=true;
+  c.visible=true;
   selected.push(i);
   render();
 
   if(selected.length===2){
     locked=true;
+
     const [a,b]=selected;
 
-    if(cells[a].symbol===cells[b].symbol){
-      setTimeout(start,600);
+    if(cells[a].piece===cells[b].piece){
+      score++;
     }else{
-      setTimeout(()=>{
-        cells[a].visible=false;
-        cells[b].visible=false;
-        selected=[];
-        locked=false;
-        render();
-      },500);
+      score--;
     }
+
+    updateScore();
+
+    setTimeout(start,600);
   }
 }
 
+updateScore();
 start();
 </script>
 
