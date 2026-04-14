@@ -10,7 +10,6 @@
   --bg:#2c2c2c;
   --light:#eeeed2;
   --dark:#769656;
-  --gold:#d4af37;
 }
 
 body{
@@ -37,17 +36,39 @@ h1{ margin:10px 0; }
 .white{ background:var(--light); }
 .black{ background:var(--dark); }
 
+/* PIÈCES PREMIUM */
 .piece{
   position:absolute;
   inset:0;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:clamp(60px,11vw,82px);
+  font-size:clamp(56px,11vw,82px);
+  font-family:"Arial Unicode MS","Segoe UI Symbol","Apple Symbols","Noto Sans Symbols 2",-apple-system,sans-serif;
+  filter:drop-shadow(0 1px 1px rgba(0,0,0,.3));
 }
+
+.piece-K{ transform:scale(1.00); }
+.piece-k{ transform:scale(1.12); }
+
+.piece-Q{ transform:scale(1.00); }
+.piece-q{ transform:scale(1.02); }
+
+.piece-R{ transform:scale(0.88); }
+.piece-r{ transform:scale(1.02); }
+
+.piece-B{ transform:scale(0.98); }
+.piece-b{ transform:scale(1.02); }
+
+.piece-N{ transform:scale(1.00); }
+.piece-n{ transform:scale(1.00); }
+
+.white-piece{ color:#fff; }
+.black-piece{ color:#111; }
 
 .hidden{ display:none; }
 
+/* COORDONNÉES */
 .coord{
   position:absolute;
   font-size:10px;
@@ -58,21 +79,11 @@ h1{ margin:10px 0; }
 .file{ bottom:2px; left:4px; }
 .rank{ top:2px; left:4px; }
 
-#timer{
-  margin-top:6px;
-  font-size:20px;
-  color:var(--gold);
-}
-
+/* SCORE */
 #score{
   margin-top:10px;
   font-size:18px;
 }
-
-#timer{
-  display:none;
-}
-
 </style>
 </head>
 
@@ -80,15 +91,18 @@ h1{ margin:10px 0; }
 
 <h1>CHESSMEMORY</h1>
 <div id="board"></div>
-<div id="timer"></div>
 <div id="score"></div>
 
 <script>
 const boardEl = document.getElementById("board");
-const timerEl = document.getElementById("timer");
 const scoreEl = document.getElementById("score");
 
-const PIECES = ["♔","♕","♖","♗","♘","♚","♛","♜","♝","♞"];
+const PIECES = {
+  "K":"♔","Q":"♕","R":"♖","B":"♗","N":"♘",
+  "k":"♚","q":"♛","r":"♜","b":"♝","n":"♞"
+};
+
+const KEYS = Object.keys(PIECES);
 
 let cells = [];
 let selected = [];
@@ -98,31 +112,27 @@ let score = 0;
 let record = localStorage.getItem("chessMemoryRecord") || 0;
 
 let timerInterval = null;
-let roundTimeout = null;
 
 // ---------- UTILS ----------
 function shuffle(a){ return a.sort(()=>Math.random()-0.5); }
 
 function randomPiece(){
-  return PIECES[Math.floor(Math.random()*PIECES.length)];
+  return KEYS[Math.floor(Math.random()*KEYS.length)];
 }
 
-function clearTimers(){
+function clearTimer(){
   if(timerInterval) clearInterval(timerInterval);
-  if(roundTimeout) clearTimeout(roundTimeout);
-  timerInterval = null;
-  roundTimeout = null;
 }
 
 // ---------- GAME ----------
 function build(){
-  cells = Array(64).fill(null).map(()=>({piece:null,visible:false}));
+  cells = Array(64).fill(null).map(()=>({symbol:null,visible:false}));
 
   const p = randomPiece();
   const pos = shuffle([...Array(64).keys()]);
 
-  cells[pos[0]] = {piece:p,visible:true};
-  cells[pos[1]] = {piece:p,visible:true};
+  cells[pos[0]] = {symbol:p,visible:true};
+  cells[pos[1]] = {symbol:p,visible:true};
 }
 
 function render(){
@@ -135,10 +145,13 @@ function render(){
 
     const cell=cells[i];
 
-    if(cell.piece){
+    if(cell.symbol){
       const p=document.createElement("div");
-      p.className="piece"+(cell.visible?"":" hidden");
-      p.textContent=cell.piece;
+      const color = (cell.symbol === cell.symbol.toUpperCase()) ? "white-piece" : "black-piece";
+
+      p.className="piece piece-"+cell.symbol+" "+color+(cell.visible?"":" hidden");
+      p.textContent=PIECES[cell.symbol];
+
       sq.appendChild(p);
       sq.onclick=()=>clickCell(i);
     }
@@ -170,7 +183,7 @@ function updateScore(){
 }
 
 function start(){
-  clearTimers();
+  clearTimer();
 
   selected = [];
   locked = true;
@@ -178,16 +191,14 @@ function start(){
   build();
   render();
 
-  timerEl.textContent = "1";
-
-  // PHASE MÉMOIRE
+  // mémoire 1 seconde
   setTimeout(()=>{
     cells.forEach(c=>{
-      if(c.piece) c.visible = false;
+      if(c.symbol) c.visible=false;
     });
 
     render();
-    locked = false;
+    locked=false;
 
     startTimer();
 
@@ -196,14 +207,12 @@ function start(){
 
 function startTimer(){
   let timeLeft = 3;
-  timerEl.textContent = timeLeft;
 
   timerInterval = setInterval(()=>{
     timeLeft--;
-    timerEl.textContent = timeLeft;
 
     if(timeLeft <= 0){
-      clearTimers();
+      clearTimer();
       score--;
       updateScore();
       start();
@@ -214,20 +223,20 @@ function startTimer(){
 function clickCell(i){
   if(locked) return;
 
-  const c = cells[i];
-  if(!c.piece || c.visible) return;
+  const c=cells[i];
+  if(!c.symbol || c.visible) return;
 
-  c.visible = true;
+  c.visible=true;
   selected.push(i);
   render();
 
-  if(selected.length === 2){
-    locked = true;
-    clearTimers();
+  if(selected.length===2){
+    locked=true;
+    clearTimer();
 
-    const [a,b] = selected;
+    const [a,b]=selected;
 
-    if(cells[a].piece === cells[b].piece){
+    if(cells[a].symbol===cells[b].symbol){
       score++;
     }else{
       score--;
@@ -235,7 +244,7 @@ function clickCell(i){
 
     updateScore();
 
-    roundTimeout = setTimeout(start,600);
+    setTimeout(start,600);
   }
 }
 
