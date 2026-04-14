@@ -12,7 +12,6 @@
   --bg:#2c2c2c;
   --light:#eeeed2;
   --dark:#769656;
-  --text:#ffffff;
   --gold:#d4af37;
 }
 
@@ -28,27 +27,11 @@ body{
   color:#fff;
 }
 
-h1{
-  margin:20px 0 8px;
-  font-size:28px;
-}
+h1{margin:20px 0 8px;font-size:28px}
 
-#score{
-  font-size:16px;
-  margin-bottom:6px;
-  opacity:.8;
-}
-
-#info{
-  font-size:18px;
-  margin-bottom:6px;
-}
-
-#timer{
-  font-size:20px;
-  color:var(--gold);
-  margin-bottom:10px;
-}
+#score{font-size:16px;opacity:.8}
+#info{font-size:18px;margin:6px 0}
+#timer{font-size:22px;color:var(--gold);margin-bottom:10px}
 
 #board{
   width:95vw;
@@ -58,10 +41,7 @@ h1{
   grid-template-columns:repeat(8,1fr);
 }
 
-.square{
-  position:relative;
-}
-
+.square{position:relative}
 .white{background:var(--light)}
 .black{background:var(--dark)}
 
@@ -103,6 +83,7 @@ const PIECES={
 const ALL=["K","Q","R","B","N","k","q","r","b","n"];
 
 const PREVIEW_MS=2000;
+const TIME_LIMIT=10;
 
 let level=1;
 let pairCount=3;
@@ -110,23 +91,23 @@ let cells=[];
 let selected=[];
 let locked=true;
 
+let timer=TIME_LIMIT;
+let interval=null;
+
 // shuffle
 function shuffle(a){
   return [...a].sort(()=>Math.random()-0.5);
 }
 
-// build board
+// build
 function buildBoard(){
   cells=Array(64).fill(null);
-
   const chosen=shuffle(ALL).slice(0,pairCount);
-
-  let positions=shuffle([...Array(64).keys()]);
+  let pos=shuffle([...Array(64).keys()]);
 
   chosen.forEach(sym=>{
-    let a=positions.pop();
-    let b=positions.pop();
-
+    let a=pos.pop();
+    let b=pos.pop();
     cells[a]={symbol:sym,visible:true};
     cells[b]={symbol:sym,visible:true};
   });
@@ -150,7 +131,6 @@ function render(){
     if(c){
       const piece=document.createElement("div");
       const cls=WHITE_SET.has(c.symbol)?"white-piece":"black-piece";
-
       piece.className="piece "+cls+(c.visible?"":" hidden-piece");
       piece.textContent=PIECES[c.symbol];
 
@@ -162,13 +142,36 @@ function render(){
   }
 }
 
+// timer
+function startTimer(){
+  clearInterval(interval);
+  timer=TIME_LIMIT;
+  timerEl.textContent=timer;
+
+  interval=setInterval(()=>{
+    timer--;
+    timerEl.textContent=timer;
+
+    if(timer<=0){
+      clearInterval(interval);
+      locked=true;
+      infoEl.textContent="Temps écoulé ❌";
+      if(navigator.vibrate) navigator.vibrate(200);
+
+      setTimeout(start,800);
+    }
+  },1000);
+}
+
 // start round
 function start(){
+  clearInterval(interval);
   locked=true;
-  pairCount=Math.min(3+level-1,8);
 
+  pairCount=Math.min(3+level-1,8);
   scoreEl.textContent="Niveau "+level;
   infoEl.textContent="Mémorise…";
+  timerEl.textContent="";
 
   buildBoard();
   render();
@@ -178,6 +181,9 @@ function start(){
     render();
     locked=false;
     infoEl.textContent="Trouve toutes les paires";
+
+    startTimer();
+
   },PREVIEW_MS);
 }
 
@@ -194,7 +200,6 @@ function click(i){
   if(selected.length<2) return;
 
   locked=true;
-
   let [a,b]=selected;
 
   if(cells[a].symbol===cells[b].symbol){
@@ -204,7 +209,9 @@ function click(i){
     selected=[];
 
     if(cells.filter(x=>x && !x.visible).length===0){
+      clearInterval(interval);
       level++;
+      infoEl.textContent="Bravo ✅";
       setTimeout(start,800);
     }else{
       locked=false;
@@ -214,10 +221,9 @@ function click(i){
 
     if(navigator.vibrate) navigator.vibrate(120);
 
-    infoEl.textContent="Erreur";
+    infoEl.textContent="Erreur ❌";
 
     setTimeout(()=>{
-      // reset niveau
       start();
     },600);
   }
