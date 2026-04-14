@@ -157,17 +157,6 @@ h1{
   background:transparent;
 }
 
-.back::before{
-  content:"";
-  width:44%;
-  height:44%;
-  border-radius:50%;
-  background:rgba(0,0,0,.10);
-  box-shadow:
-    inset 0 0 0 2px rgba(255,255,255,.08),
-    0 1px 3px rgba(0,0,0,.12);
-}
-
 .front{
   transform:rotateY(180deg);
   -webkit-transform:rotateY(180deg);
@@ -296,7 +285,7 @@ h1{
 
   <div class="timer-panel">
     <div id="memoryStatus">Mémorisation</div>
-    <div id="memoryTimer">5</div>
+    <div id="memoryTimer">3</div>
   </div>
 
   <div class="controls-panel">
@@ -339,9 +328,9 @@ const ALL_PAIRS = [
   {piece:"n", pairId:"n2"}, {piece:"n", pairId:"n2"}
 ];
 
-const ACTIVE_PAIR_COUNT = 5;
+const ACTIVE_PAIR_COUNT = 1;
 const BOARD_SIZE = 64;
-const PREVIEW_SECONDS = 5;
+const PREVIEW_SECONDS = 3;
 
 let squares = [];
 let picks = [];
@@ -372,39 +361,39 @@ function stopPreviewTimer(){
   }
 }
 
-function pickFivePairs(){
+function pickPairs(count){
   const grouped = {};
   for(const card of ALL_PAIRS){
     if(!grouped[card.pairId]) grouped[card.pairId] = [];
     grouped[card.pairId].push(card);
   }
 
-  const pairKeys = shuffle(Object.keys(grouped)).slice(0, ACTIVE_PAIR_COUNT);
+  const keys = shuffle(Object.keys(grouped)).slice(0, count);
   const chosen = [];
-  pairKeys.forEach((key, idx) => {
+
+  keys.forEach((key, idx) => {
     const pair = grouped[key];
     chosen.push({
       piece: pair[0].piece,
-      pairId: "pair-" + idx
+      pairId: "pair-" + idx,
+      uid: "a-" + idx + "-" + Math.random().toString(36).slice(2,8),
+      state: "hidden"
     });
     chosen.push({
       piece: pair[1].piece,
-      pairId: "pair-" + idx
+      pairId: "pair-" + idx,
+      uid: "b-" + idx + "-" + Math.random().toString(36).slice(2,8),
+      state: "hidden"
     });
   });
 
-  return shuffle(chosen.map((card, index) => ({
-    piece: card.piece,
-    pairId: card.pairId,
-    uid: "u" + index + "-" + Math.random().toString(36).slice(2,8),
-    state: "hidden"
-  })));
+  return chosen;
 }
 
 function createBoard(){
   stopPreviewTimer();
 
-  const activeCards = pickFivePairs();
+  const activeCards = pickPairs(ACTIVE_PAIR_COUNT);
   totalPairs = ACTIVE_PAIR_COUNT;
   matchedPairs = 0;
   picks = [];
@@ -412,12 +401,12 @@ function createBoard(){
   previewMode = true;
   previewSeconds = PREVIEW_SECONDS;
 
-  const emptyCells = Array.from({length: BOARD_SIZE - activeCards.length}, () => ({
+  const empties = Array.from({length: BOARD_SIZE - activeCards.length}, () => ({
     empty: true,
     state: "empty"
   }));
 
-  squares = shuffle([...activeCards, ...emptyCells]);
+  squares = shuffle([...activeCards, ...empties]);
 
   startPreviewPhase();
 }
@@ -439,7 +428,7 @@ function startPreviewPhase(){
     if(previewSeconds <= 0){
       stopPreviewTimer();
       previewMode = false;
-      memoryStatusEl.textContent = "Retrouvez les 5 paires";
+      memoryStatusEl.textContent = "Retrouvez la paire";
       memoryTimerEl.textContent = "";
 
       squares.forEach(card => {
@@ -463,8 +452,12 @@ function renderBoard(){
       const sq = document.createElement("div");
       sq.className = "square " + (((row + col) % 2 === 0) ? "white" : "black");
 
-      if(!data.empty && (data.state === "revealed" || data.state === "matched")) sq.classList.add("flipped");
-      if(!data.empty && data.state === "matched") sq.classList.add("matched");
+      if(!data.empty && (data.state === "revealed" || data.state === "matched")) {
+        sq.classList.add("flipped");
+      }
+      if(!data.empty && data.state === "matched") {
+        sq.classList.add("matched");
+      }
 
       if(!data.empty){
         const button = document.createElement("button");
@@ -482,7 +475,10 @@ function renderBoard(){
         front.className = "face front";
 
         const piece = document.createElement("span");
-        piece.className = "piece " + (data.piece === data.piece.toUpperCase() ? "white-piece " : "black-piece ") + "piece-" + data.piece;
+        piece.className =
+          "piece " +
+          (data.piece === data.piece.toUpperCase() ? "white-piece " : "black-piece ") +
+          "piece-" + data.piece;
         piece.textContent = PIECES[data.piece];
 
         front.appendChild(piece);
@@ -544,7 +540,7 @@ function handleSquare(index){
 
     if(matchedPairs === totalPairs){
       memoryStatusEl.textContent = "Bravo";
-      memoryTimerEl.textContent = "5 paires trouvées";
+      memoryTimerEl.textContent = "Paire trouvée";
     }
     return;
   }
