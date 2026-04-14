@@ -2,30 +2,25 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-<title>BALLOONS</title>
-<meta name="theme-color" content="#345dff" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>CHESSMEMORY</title>
+
+<link rel="apple-touch-icon" href="iconchessmemory.png" />
+<link rel="icon" href="iconchessmemory.png" />
+
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="BALLOONS" />
-<link rel="apple-touch-icon" href="icon_balloons.png" />
-<link rel="icon" type="image/png" href="icon_balloons.png" />
-<link rel="manifest" href="manifest.webmanifest" />
+<meta name="apple-mobile-web-app-title" content="CHESSMEMORY" />
+<meta name="theme-color" content="#2c2c2c" />
 
 <style>
 :root{
-  --safe-top: env(safe-area-inset-top);
-  --safe-bottom: env(safe-area-inset-bottom);
-  --safe-left: env(safe-area-inset-left);
-  --safe-right: env(safe-area-inset-right);
-  --white:#fff;
-  --line:rgba(255,255,255,.22);
-  --shadow:0 18px 42px rgba(7,10,40,.34);
-  --green1:#48ff8c;
-  --green2:#06b34a;
-  --red1:#ff5e85;
-  --red2:#cf1133;
+  --bg:#2c2c2c;
+  --panel:#3a3a3a;
+  --light:#eeeed2;
+  --dark:#769656;
+  --text:#ffffff;
+  --gold:#d4af37;
 }
 
 *{
@@ -35,927 +30,538 @@
 
 html,body{
   margin:0;
-  width:100%;
-  height:100%;
-  min-height:100dvh;
-  overflow:hidden;
-  overscroll-behavior:none;
-}
-
-html{
-  background:
-    radial-gradient(circle at 12% 12%, rgba(255,239,118,.95) 0 0, rgba(255,239,118,0) 17%),
-    radial-gradient(circle at 84% 12%, rgba(74,196,255,.92) 0 0, rgba(74,196,255,0) 18%),
-    radial-gradient(circle at 82% 86%, rgba(86,255,227,.80) 0 0, rgba(86,255,227,0) 22%),
-    radial-gradient(circle at 18% 88%, rgba(255,122,214,.72) 0 0, rgba(255,122,214,0) 22%),
-    radial-gradient(circle at 50% 72%, rgba(181,102,255,.45) 0 0, rgba(181,102,255,0) 30%),
-    linear-gradient(150deg,#5ae8ff 0%, #3a67ff 32%, #7b43ff 63%, #ff58ab 100%);
+  padding:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
 }
 
 body{
-  min-height:100dvh;
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",sans-serif;
-  color:var(--white);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:0 12px calc(18px + env(safe-area-inset-bottom));
+}
+
+h1{
+  margin:calc(env(safe-area-inset-top) + 18px) 0 12px;
+  font-size:28px;
+  line-height:1.08;
+  font-weight:700;
+  text-align:center;
+}
+
+.app{
+  width:100%;
+  max-width:560px;
+}
+
+.controls-panel,
+.timer-panel{
+  background:var(--panel);
+  padding:14px;
+  margin-bottom:12px;
+  box-shadow:0 8px 20px rgba(0,0,0,.18);
+}
+
+#board-container{
+  width:95vw;
+  max-width:500px;
+  aspect-ratio:1 / 1;
+  overflow:hidden;
+  margin-bottom:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.35);
+}
+
+#board{
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  grid-template-rows:repeat(8,1fr);
+  width:100%;
+  height:100%;
+}
+
+.square{
+  position:relative;
+  width:100%;
+  height:100%;
+  user-select:none;
+  overflow:hidden;
+  perspective:900px;
+  -webkit-perspective:900px;
+}
+
+.white{ background:var(--light); }
+.black{ background:var(--dark); }
+
+.coord{
+  position:absolute;
+  font-size:10px;
+  opacity:.65;
+  font-weight:700;
+  pointer-events:none;
+  z-index:4;
+}
+
+.coord.file{
+  left:5px;
+  bottom:3px;
+}
+
+.coord.rank{
+  right:4px;
+  top:2px;
+}
+
+.card{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  border:none;
+  background:none;
+  padding:0;
+  margin:0;
+  cursor:pointer;
+  touch-action:manipulation;
+  appearance:none;
+  -webkit-appearance:none;
+}
+
+.card-inner{
+  position:relative;
+  width:100%;
+  height:100%;
+  transition:transform .42s ease;
+  transform-style:preserve-3d;
+  -webkit-transform-style:preserve-3d;
+}
+
+.square.flipped .card-inner{
+  transform:rotateY(180deg);
+  -webkit-transform:rotateY(180deg);
+}
+
+.face{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+
+.back{
   background:transparent;
 }
 
-body::before,
-body::after{
+.back::before{
   content:"";
-  position:fixed;
+  width:44%;
+  height:44%;
   border-radius:50%;
-  filter:blur(72px);
-  pointer-events:none;
-  opacity:.34;
+  background:rgba(0,0,0,.10);
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,.08),
+    0 1px 3px rgba(0,0,0,.12);
 }
 
-body::before{
-  width:38vw;
-  height:38vw;
-  left:-10vw;
-  bottom:8vh;
-  background:#67ffe4;
+.front{
+  transform:rotateY(180deg);
+  -webkit-transform:rotateY(180deg);
 }
 
-body::after{
-  width:40vw;
-  height:40vw;
-  right:-8vw;
-  top:4vh;
-  background:#ffe660;
-}
-
-.game,.board,.hud,.endOverlay{
-  position:fixed;
-  top:0;
-  left:0;
-  right:0;
-  bottom:0;
-}
-
-.game{
-  min-height:100dvh;
-  padding-bottom:env(safe-area-inset-bottom);
-}
-
-.board{
-  overflow:hidden;
-  touch-action:manipulation;
-  height:100dvh;
-  min-height:100dvh;
-  transition:transform .16s ease;
-}
-
-.hud{
-  pointer-events:none;
-  z-index:5;
-}
-
-.title{
-  position:absolute;
-  top:calc(8px + var(--safe-top));
-  left:calc(10px + var(--safe-left));
-  right:calc(10px + var(--safe-right));
-  margin:0;
-  text-align:center;
-  font-weight:1000;
-  letter-spacing:.12em;
-  line-height:.92;
-  font-size:clamp(30px,8.5vw,56px);
-  color:#fff;
-  text-shadow:
-    0 2px 0 rgba(255,255,255,.18),
-    0 4px 0 rgba(24,32,110,.35),
-    0 10px 20px rgba(10,16,69,.55),
-    0 0 24px rgba(255,255,255,.20);
-}
-
-.combo{
-  position:absolute;
-  top:calc(62px + var(--safe-top));
-  left:0;
-  right:0;
-  text-align:center;
-  font-weight:1000;
-  font-size:clamp(18px,4.6vw,30px);
-  letter-spacing:.04em;
-  text-shadow:0 4px 16px rgba(0,0,0,.35);
-  opacity:0;
-  transform:translateY(-6px) scale(.96);
-  transition:opacity .18s ease, transform .18s ease;
-  pointer-events:none;
-}
-
-.combo.show{
-  opacity:1;
-  transform:translateY(0) scale(1);
-}
-
-.bottomBar{
-  position:absolute;
-  left:calc(12px + var(--safe-left));
-  right:calc(12px + var(--safe-right));
-  bottom:calc(10px + var(--safe-bottom));
-  display:grid;
-  grid-template-columns:minmax(100px,1fr) minmax(100px,1fr) minmax(132px,1.32fr);
-  gap:10px;
-  align-items:stretch;
-  pointer-events:auto;
-  z-index:6;
-}
-
-.stat,.toggleBtn,.endCard{
-  border:1px solid var(--line);
-  box-shadow:var(--shadow);
-  backdrop-filter:blur(16px) saturate(1.15);
-  -webkit-backdrop-filter:blur(16px) saturate(1.15);
-}
-
-.stat{
-  min-height:84px;
-  background:linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.10));
-  border-radius:25px;
-  padding:10px 12px 8px;
-  text-align:center;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-}
-
-.stat .label{
-  font-size:11px;
-  font-weight:900;
-  letter-spacing:.16em;
-  text-transform:uppercase;
-  opacity:.98;
-}
-
-.stat .value{
-  margin-top:7px;
-  font-size:clamp(18px,5.2vw,31px);
+.piece{
   line-height:1;
-  font-weight:1000;
-  font-variant-numeric:tabular-nums;
-  white-space:nowrap;
-  letter-spacing:-.02em;
-}
-
-.toggleBtn{
-  appearance:none;
-  border-radius:29px;
-  min-height:84px;
-  width:100%;
-  min-width:0;
-  color:#fff;
-  font-weight:1000;
-  font-size:clamp(20px,5.3vw,34px);
-  letter-spacing:.03em;
-  text-shadow:0 2px 10px rgba(0,0,0,.18);
-  padding:0 14px;
-}
-
-.toggleBtn.play{
-  background:linear-gradient(180deg,var(--green1),var(--green2));
-}
-
-.toggleBtn.stop{
-  background:linear-gradient(180deg,var(--red1),var(--red2));
-}
-
-.balloon{
-  position:absolute;
-  border:none;
-  border-radius:48% 48% 45% 45% / 43% 43% 57% 57%;
-  transform:translate(-50%,-50%);
-  box-shadow:
-    inset -10px -14px 22px rgba(0,0,0,.16),
-    inset 7px 10px 12px rgba(255,255,255,.20),
-    0 16px 24px rgba(0,0,0,.16),
-    0 0 0 1px rgba(255,255,255,.07);
-  transition:
-    transform .14s ease,
-    opacity .24s ease,
-    filter .14s ease,
-    box-shadow .14s ease;
-  animation:float 6.4s ease-in-out infinite;
-}
-
-.balloon::before{
-  content:"";
-  position:absolute;
-  width:26%;
-  height:12%;
-  left:19%;
-  top:15%;
-  border-radius:50%;
-  background:rgba(255,255,255,.22);
-  transform:rotate(-18deg);
-  filter:blur(.6px);
-}
-
-.balloon:active{
-  transform:translate(-50%,-50%) scale(.95);
-}
-
-.balloon:focus,
-.balloon:focus-visible{
-  outline:none;
-}
-
-.balloon.majority{
-  transform:translate(-50%,-50%) scale(1.12);
-  filter:brightness(1.25) saturate(1.2);
-  box-shadow:
-    0 0 0 3px rgba(255,255,255,.25),
-    0 0 30px rgba(255,255,255,.35),
-    inset -10px -14px 22px rgba(0,0,0,.16),
-    inset 7px 10px 12px rgba(255,255,255,.20);
-}
-
-.balloon.wrong{
-  animation:wrongShake .34s ease;
-}
-
-.balloon.fly{
-  animation:flyAway 2.2s ease-out forwards;
-  pointer-events:none;
-  will-change:transform, opacity;
-}
-
-.flash{
-  position:fixed;
-  inset:0;
-  background:rgba(255,255,255,.09);
-  pointer-events:none;
-  z-index:9;
-  animation:flashOut .14s ease forwards;
-}
-
-.endOverlay{
-  display:none;
+  position:relative;
+  z-index:2;
+  display:flex;
   align-items:center;
   justify-content:center;
-  padding:24px;
-  background:rgba(12,16,36,.18);
-  z-index:8;
+  width:100%;
+  height:100%;
+  filter:drop-shadow(0 1px 0 rgba(0,0,0,.22));
+  transform-origin:center center;
+  font-size:clamp(56px, 11vw, 82px);
+  font-family:"Arial Unicode MS","Segoe UI Symbol","Apple Symbols","Noto Sans Symbols 2",-apple-system,sans-serif;
 }
 
-.endOverlay.show{
+.piece-K{ transform:scale(1.00); }
+.piece-k{ transform:scale(1.12); }
+.piece-Q{ transform:scale(1.00); }
+.piece-q{ transform:scale(1.02); }
+.piece-R{ transform:scale(0.88); }
+.piece-r{ transform:scale(1.02); }
+.piece-B{ transform:scale(0.98); }
+.piece-b{ transform:scale(1.02); }
+.piece-N{ transform:scale(1.00); }
+.piece-n{ transform:scale(1.00); }
+
+.white-piece{
+  color:#ffffff;
+  text-shadow:
+    0 0 1px #000,
+    0 0 2px #000,
+    0 1px 2px rgba(0,0,0,.55),
+    0 0 6px rgba(255,255,255,.16);
+}
+
+.black-piece{
+  color:#141414;
+  text-shadow:
+    0 0 1px rgba(255,255,255,.18),
+    0 1px 1px rgba(255,255,255,.06);
+}
+
+.square.matched{
+  box-shadow:inset 0 0 0 3px rgba(212,175,55,.95);
+}
+
+.controls{
   display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:28px;
+  background:var(--panel);
 }
 
-.endCard{
-  width:min(90vw,520px);
-  background:rgba(255,255,255,.18);
-  border-radius:34px;
-  padding:24px 20px 20px;
-  text-align:center;
-}
-
-.endMini{
-  font-size:12px;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  font-weight:900;
-  opacity:.92;
-}
-
-.endTitle{
-  margin:10px 0 6px;
-  font-size:clamp(28px,8vw,42px);
-  line-height:.95;
-  font-weight:1000;
-}
-
-.endTime{
-  font-size:clamp(34px,9vw,52px);
-  font-weight:1000;
-  line-height:1;
-  margin:8px 0 10px;
-  font-variant-numeric:tabular-nums;
-}
-
-.endText{
-  font-size:16px;
-  line-height:1.35;
-  font-weight:700;
-  margin:0 0 14px;
-}
-
-.endBtn{
-  appearance:none;
+.control-btn{
+  width:52px;
+  height:52px;
   border:none;
-  min-width:180px;
-  min-height:56px;
-  border-radius:20px;
-  font-size:20px;
-  font-weight:1000;
+  background:var(--bg);
   color:#fff;
-  background:linear-gradient(180deg,var(--green1),var(--green2));
-  box-shadow:var(--shadow);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  appearance:none;
+  -webkit-appearance:none;
 }
 
-@keyframes wrongShake{
-  0%,100%{transform:translate(-50%,-50%)}
-  25%{transform:translate(calc(-50% - 7px),-50%)}
-  50%{transform:translate(calc(-50% + 7px),-50%)}
-  75%{transform:translate(calc(-50% - 5px),-50%)}
+.control-btn span{
+  font-size:24px;
+  line-height:1;
+  display:block;
 }
 
-@keyframes flyAway{
-  0%{
-    opacity:1;
-    transform:translate(-50%,-50%) scale(1);
-  }
-  100%{
-    opacity:0;
-    transform:translate(
-      calc(-50% + var(--driftx)),
-      calc(-50% - 620px)
-    ) scale(1.015);
-  }
+#memoryStatus{
+  text-align:center;
+  font-size:16px;
+  font-weight:700;
+  margin-bottom:6px;
 }
 
-@keyframes float{
-  0%,100%{ translate: 0 0; }
-  50%{ translate: 0 -8px; }
+#memoryTimer{
+  text-align:center;
+  font-size:22px;
+  font-weight:700;
+  color:var(--gold);
+  min-height:28px;
 }
 
-@keyframes flashOut{
-  from{opacity:1}
-  to{opacity:0}
+.footer-note{
+  text-align:center;
+  font-size:12px;
+  margin-top:4px;
+  opacity:.82;
 }
 
-.board.resolving .balloon.majority{
-  filter:none !important;
-  box-shadow:
-    inset -10px -14px 22px rgba(0,0,0,.16),
-    inset 7px 10px 12px rgba(255,255,255,.20),
-    0 16px 24px rgba(0,0,0,.16),
-    0 0 0 1px rgba(255,255,255,.07) !important;
-}
-
-.board.resolving .balloon:not(.fly){
-  transition:none;
-}
-
-@media (max-width: 430px){
-  .bottomBar{
-    grid-template-columns:minmax(94px,1fr) minmax(94px,1fr) minmax(126px,1.2fr);
-    gap:8px;
+@media (max-width:420px){
+  .piece{
+    font-size:clamp(50px, 11vw, 70px);
   }
 
-  .stat{
-    min-height:78px;
-    border-radius:22px;
-    padding:10px 10px 8px;
+  .control-btn{
+    width:46px;
+    height:46px;
   }
 
-  .toggleBtn{
-    min-height:78px;
-    border-radius:24px;
-    font-size:clamp(18px,5vw,28px);
-    padding:0 12px;
-  }
-
-  .combo{
-    top:calc(58px + var(--safe-top));
+  .control-btn span{
+    font-size:22px;
   }
 }
 </style>
 </head>
 <body>
-<div class="game">
-  <div class="board" id="board"></div>
-  <div class="hud">
-    <h1 class="title">BALLOONS</h1>
-    <div class="combo" id="combo"></div>
-    <div class="bottomBar" id="bottomBar">
-      <div class="stat">
-        <div class="label">Points</div>
-        <div class="value" id="points">0</div>
-      </div>
-      <div class="stat">
-        <div class="label">Score</div>
-        <div class="value" id="best">0</div>
-      </div>
-      <button class="toggleBtn play" id="toggleBtn" aria-label="Jouer">JOUER</button>
+
+<h1>CHESSMEMORY</h1>
+
+<div class="app">
+  <div id="board-container">
+    <div id="board"></div>
+  </div>
+
+  <div class="timer-panel">
+    <div id="memoryStatus">Mémorisation</div>
+    <div id="memoryTimer">5</div>
+  </div>
+
+  <div class="controls-panel">
+    <div class="controls">
+      <button class="control-btn" id="restartBtn" type="button" aria-label="Rejouer"><span>🔄</span></button>
     </div>
   </div>
-</div>
 
-<div class="endOverlay" id="endOverlay">
-  <div class="endCard">
-    <div class="endMini">Partie terminée</div>
-    <div class="endTitle">Bravo</div>
-    <div class="endTime" id="endTime">0 point</div>
-    <p class="endText" id="endText">Tu as terminé les 100 séries.</p>
-    <button class="endBtn" id="restartBtn">REJOUER</button>
-  </div>
+  <div class="footer-note">Jeu imaginé par Luis et créé par ChatGPT</div>
 </div>
 
 <script>
-(() => {
-  const board = document.getElementById('board');
-  const pointsEl = document.getElementById('points');
-  const bestEl = document.getElementById('best');
-  const comboEl = document.getElementById('combo');
-  const toggleBtn = document.getElementById('toggleBtn');
-  const bottomBar = document.getElementById('bottomBar');
-  const endOverlay = document.getElementById('endOverlay');
-  const endTimeEl = document.getElementById('endTime');
-  const endTextEl = document.getElementById('endText');
-  const restartBtn = document.getElementById('restartBtn');
+const boardEl = document.getElementById("board");
+const restartBtn = document.getElementById("restartBtn");
+const memoryStatusEl = document.getElementById("memoryStatus");
+const memoryTimerEl = document.getElementById("memoryTimer");
 
-  const STORAGE_BEST = 'balloons-best-score-v1';
-  const MAX_SERIES = 100;
-  const SERIES_DURATION = 30000;
-  const COLORS = [
-    ['#ff8bac','#ff2d67'],
-    ['#7bff85','#19bb41'],
-    ['#ffe86d','#ffbb0f'],
-    ['#84dfff','#149dff'],
-    ['#c89cff','#8250ff'],
-    ['#ffbf7f','#ff7315'],
-    ['#71fff0','#07c7b2'],
-    ['#ff8ee3','#ff3dc3']
-  ];
+const FILES = ["a","b","c","d","e","f","g","h"];
+const PIECES = {
+  "N":"♘","B":"♗","R":"♖","Q":"♕","K":"♔",
+  "n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
+};
 
-  let bestScore = Number(localStorage.getItem(STORAGE_BEST) || 0);
-  let state = null;
-  let isResolving = false;
-  let raf = 0;
-  let seriesDeadline = 0;
-  let combo = 0;
+const ALL_PAIRS = [
+  {piece:"K", pairId:"K1"}, {piece:"K", pairId:"K1"},
+  {piece:"k", pairId:"k1"}, {piece:"k", pairId:"k1"},
+  {piece:"Q", pairId:"Q1"}, {piece:"Q", pairId:"Q1"},
+  {piece:"q", pairId:"q1"}, {piece:"q", pairId:"q1"},
+  {piece:"R", pairId:"R1"}, {piece:"R", pairId:"R1"},
+  {piece:"R", pairId:"R2"}, {piece:"R", pairId:"R2"},
+  {piece:"r", pairId:"r1"}, {piece:"r", pairId:"r1"},
+  {piece:"r", pairId:"r2"}, {piece:"r", pairId:"r2"},
+  {piece:"B", pairId:"B1"}, {piece:"B", pairId:"B1"},
+  {piece:"B", pairId:"B2"}, {piece:"B", pairId:"B2"},
+  {piece:"b", pairId:"b1"}, {piece:"b", pairId:"b1"},
+  {piece:"b", pairId:"b2"}, {piece:"b", pairId:"b2"},
+  {piece:"N", pairId:"N1"}, {piece:"N", pairId:"N1"},
+  {piece:"N", pairId:"N2"}, {piece:"N", pairId:"N2"},
+  {piece:"n", pairId:"n1"}, {piece:"n", pairId:"n1"},
+  {piece:"n", pairId:"n2"}, {piece:"n", pairId:"n2"}
+];
 
-  function updateBest(){
-    bestEl.textContent = String(bestScore || 0);
+const ACTIVE_PAIR_COUNT = 5;
+const BOARD_SIZE = 64;
+const PREVIEW_SECONDS = 5;
+
+let squares = [];
+let picks = [];
+let lockBoard = false;
+let previewMode = true;
+let previewSeconds = PREVIEW_SECONDS;
+let previewInterval = null;
+let matchedPairs = 0;
+let totalPairs = ACTIVE_PAIR_COUNT;
+
+function shuffle(array){
+  const arr = [...array];
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function coordsToSquare(file, rank){
+  return FILES[file] + String(rank + 1);
+}
+
+function stopPreviewTimer(){
+  if(previewInterval){
+    clearInterval(previewInterval);
+    previewInterval = null;
+  }
+}
+
+function pickFivePairs(){
+  const grouped = {};
+  for(const card of ALL_PAIRS){
+    if(!grouped[card.pairId]) grouped[card.pairId] = [];
+    grouped[card.pairId].push(card);
   }
 
-  function updatePoints(){
-    pointsEl.textContent = String(state ? state.points : 0);
-  }
-
-  function updateCombo(){
-    if(combo > 1){
-      comboEl.textContent = `x${combo}`;
-      comboEl.classList.add('show');
-    }else{
-      comboEl.textContent = '';
-      comboEl.classList.remove('show');
-    }
-  }
-
-  function setButtonState(running){
-    toggleBtn.className = 'toggleBtn ' + (running ? 'stop' : 'play');
-    toggleBtn.textContent = running ? 'ARRÊTER' : 'JOUER';
-    toggleBtn.setAttribute('aria-label', running ? 'Arrêter' : 'Jouer');
-  }
-
-  function tick(){
-    if(!state || !state.running || state.finished) return;
-
-    const remaining = Math.max(0, seriesDeadline - performance.now());
-
-    if(remaining <= 0){
-      state.seriesExpired = true;
-      if(!isResolving){
-        handleSeriesTimeout();
-        return;
-      }
-    }
-
-    raf = requestAnimationFrame(tick);
-  }
-
-  function startSeriesTimer(){
-    cancelAnimationFrame(raf);
-    seriesDeadline = performance.now() + SERIES_DURATION;
-    if(state){
-      state.seriesExpired = false;
-      state.seriesWon = false;
-    }
-    raf = requestAnimationFrame(tick);
-  }
-
-  function stopTimer(){
-    cancelAnimationFrame(raf);
-  }
-
-  function rewardFlash(){
-    const flash = document.createElement('div');
-    flash.className = 'flash';
-    document.body.appendChild(flash);
-    setTimeout(() => flash.remove(), 160);
-  }
-
-  function boardPulse(){
-    board.style.transform = 'scale(0.978)';
-    setTimeout(() => {
-      board.style.transform = 'scale(1)';
-    }, 120);
-  }
-
-  function computeSeriesCount(series){
-    const start = 96;
-    const end = 440;
-    const t = (series - 1) / Math.max(1, MAX_SERIES - 1);
-    const eased = Math.pow(t, 1.18);
-    return Math.round(start + (end - start) * eased);
-  }
-
-  function makeBalancedCounts(total){
-    const colorCount = COLORS.length;
-
-    let activeColors = Math.floor((Math.sqrt(1 + 4 * total) - 1) / 2);
-    activeColors = Math.max(3, Math.min(colorCount, activeColors));
-
-    let counts = Array.from({ length: activeColors }, (_, i) => 2 * (activeColors - i));
-    let used = counts.reduce((a,b) => a + b, 0);
-    let remaining = total - used;
-
-    while(remaining >= activeColors){
-      counts = counts.map(v => v + 1);
-      remaining -= activeColors;
-    }
-
-    for(let i = 0; i < activeColors && remaining > 0; i++, remaining--){
-      counts[i] += 1;
-    }
-
-    const colorIndices = Array.from({ length: colorCount }, (_, i) => i)
-      .sort(() => Math.random() - 0.5)
-      .slice(0, activeColors);
-
-    const finalCounts = Array(colorCount).fill(0);
-    counts.forEach((count, i) => {
-      finalCounts[colorIndices[i]] = count;
+  const pairKeys = shuffle(Object.keys(grouped)).slice(0, ACTIVE_PAIR_COUNT);
+  const chosen = [];
+  pairKeys.forEach((key, idx) => {
+    const pair = grouped[key];
+    chosen.push({
+      piece: pair[0].piece,
+      pairId: "pair-" + idx
     });
-
-    return finalCounts;
-  }
-
-  function makeBalloons(series){
-    const total = computeSeriesCount(series);
-    const counts = makeBalancedCounts(total);
-    const balloons = [];
-    let id = 1;
-
-    counts.forEach((count, colorIndex) => {
-      for(let i = 0; i < count; i++){
-        const roll = Math.random();
-        let w;
-
-        if(roll < 0.22){
-          w = 40 + Math.random() * 10;
-        }else if(roll < 0.84){
-          w = 52 + Math.random() * 12;
-        }else{
-          w = 66 + Math.random() * 10;
-        }
-
-        const h = w * (1.14 + Math.random() * 0.10);
-
-        balloons.push({
-          id: id++,
-          colorIndex,
-          lane: -1,
-          x: 0,
-          y: 0,
-          w,
-          h,
-          driftX: (Math.random() - 0.5) * 180
-        });
-      }
+    chosen.push({
+      piece: pair[1].piece,
+      pairId: "pair-" + idx
     });
-
-    for(let i = balloons.length - 1; i > 0; i--){
-      const j = Math.floor(Math.random() * (i + 1));
-      [balloons[i], balloons[j]] = [balloons[j], balloons[i]];
-    }
-
-    return balloons;
-  }
-
-  function boardZone(){
-    const rect = board.getBoundingClientRect();
-    return {
-      width: rect.width,
-      height: rect.height,
-      top: 0,
-      bottom: rect.height - 10
-    };
-  }
-
-  function placeIntoLanes(assignLanes = true){
-    const zone = boardZone();
-    const usableWidth = zone.width - 12;
-    const laneCount = Math.max(3, Math.floor(usableWidth / 42));
-    const laneStep = usableWidth / laneCount;
-
-    const lanes = Array.from({ length: laneCount }, (_, i) => ({
-      x: 6 + laneStep * (i + 0.5) + (Math.random() - 0.5) * 10,
-      floor: zone.bottom - 2,
-      items: []
-    }));
-
-    if(assignLanes){
-      const shuffled = [...state.balloons].sort(() => Math.random() - 0.5);
-      shuffled.forEach(balloon => {
-        const candidates = lanes
-          .map((lane, idx) => ({ idx, fill: lane.items.reduce((s,b) => s + b.h, 0) }))
-          .sort((a,b) => a.fill - b.fill)
-          .slice(0, Math.min(7, lanes.length));
-
-        const pick = candidates[Math.floor(Math.random() * candidates.length)].idx;
-        balloon.lane = pick;
-        lanes[pick].items.push(balloon);
-      });
-    }else{
-      state.balloons.forEach(balloon => {
-        const idx = Math.max(0, Math.min(lanes.length - 1, balloon.lane));
-        lanes[idx].items.push(balloon);
-      });
-    }
-
-    lanes.forEach(lane => {
-      let cursor = lane.floor;
-      lane.items.sort((a,b) => (b.y || 0) - (a.y || 0));
-
-      lane.items.forEach((balloon, index) => {
-        const jitterX = (Math.random() - 0.5) * Math.min(22, laneStep * 0.52);
-        const overlap = Math.min(24, balloon.h * 0.26);
-        const y = cursor - balloon.h / 2;
-
-        balloon.x = lane.x + jitterX;
-        balloon.y = y;
-        cursor -= balloon.h - overlap - (index % 3 === 0 ? 3 : 0);
-      });
-    });
-  }
-
-  function getMajorityData(){
-    const counts = new Map();
-    const visibleEls = [...board.querySelectorAll('.balloon')].filter(el => !el.classList.contains('fly'));
-
-    visibleEls.forEach(el => {
-      const rect = el.getBoundingClientRect();
-      const visibleW = Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0);
-      const visibleH = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
-
-      if(visibleW <= 0 || visibleH <= 0) return;
-
-      const visibleArea = visibleW * visibleH;
-      const colorIndex = Number(el.dataset.colorIndex);
-      counts.set(colorIndex, (counts.get(colorIndex) || 0) + visibleArea);
-    });
-
-    let winner = null;
-    let max = -1;
-
-    for(const [colorIndex, area] of counts.entries()){
-      if(area > max){
-        max = area;
-        winner = colorIndex;
-      }
-    }
-
-    return {
-      counts,
-      winners: winner === null ? [] : [winner]
-    };
-  }
-
-  function render(){
-    const frag = document.createDocumentFragment();
-    const { winners } = getMajorityData();
-    const ordered = [...state.balloons].sort((a,b) => (a.y + a.h / 2) - (b.y + b.h / 2));
-
-    ordered.forEach(balloon => {
-      const el = document.createElement('button');
-      const isWinner = !isResolving && winners.includes(balloon.colorIndex);
-
-      el.className = 'balloon' + (isWinner ? ' majority' : '');
-      el.style.width = `${balloon.w}px`;
-      el.style.height = `${balloon.h}px`;
-      el.style.left = `${balloon.x}px`;
-      el.style.top = `${balloon.y}px`;
-      el.style.zIndex = String(Math.round(balloon.y));
-      el.style.setProperty('--driftx', `${balloon.driftX}px`);
-
-      const [c1, c2] = COLORS[balloon.colorIndex];
-      el.style.background = `radial-gradient(circle at 34% 28%, ${c1} 0%, ${c1} 26%, ${c2} 100%)`;
-
-      el.dataset.id = String(balloon.id);
-      el.dataset.colorIndex = String(balloon.colorIndex);
-
-      el.addEventListener('click', onBalloonClick, { passive:true });
-      frag.appendChild(el);
-    });
-
-    board.replaceChildren(frag);
-  }
-
-  function removeColor(colorIndex){
-    const els = [...board.querySelectorAll(`.balloon[data-color-index="${colorIndex}"]`)]
-      .filter(el => !el.classList.contains('fly'));
-
-    if(!els.length) return;
-
-    isResolving = true;
-    board.classList.add('resolving');
-    board.querySelectorAll('.balloon.majority').forEach(el => el.classList.remove('majority'));
-
-    state.balloons = state.balloons.filter(balloon => balloon.colorIndex !== colorIndex);
-
-    if(state.balloons.length === 0 && !state.seriesExpired && performance.now() <= seriesDeadline){
-      state.seriesWon = true;
-    }
-
-    let remaining = els.length;
-
-    els.forEach((el) => {
-      el.classList.add('fly');
-
-      const done = () => {
-        el.removeEventListener('animationend', done);
-        if(el.isConnected) el.remove();
-        remaining--;
-
-        if(remaining === 0){
-          if(state.balloons.length === 0){
-            rewardFlash();
-            if(navigator.vibrate) navigator.vibrate([28, 38, 28]);
-            advanceSeriesOrFinish(state.seriesWon);
-          }else if(state.seriesExpired){
-            advanceSeriesOrFinish(false);
-          }else{
-            isResolving = false;
-            board.classList.remove('resolving');
-            render();
-          }
-        }
-      };
-
-      el.addEventListener('animationend', done, { once:true });
-    });
-  }
-
-  function advanceSeriesOrFinish(won){
-    if(won){
-      combo++;
-    }else{
-      combo = 0;
-    }
-    updateCombo();
-
-    const nextPoints = state.points + (won ? 1 : 0);
-    state.points = nextPoints;
-    updatePoints();
-
-    if(nextPoints > bestScore){
-      bestScore = nextPoints;
-      localStorage.setItem(STORAGE_BEST, String(bestScore));
-      updateBest();
-    }
-
-    if(state.series >= MAX_SERIES){
-      finishGame();
-      return;
-    }
-
-    isResolving = false;
-    board.classList.remove('resolving');
-
-    const nextSeries = state.series + 1;
-    state = {
-      series: nextSeries,
-      points: nextPoints,
-      running: true,
-      finished: false,
-      balloons: makeBalloons(nextSeries),
-      seriesExpired: false,
-      seriesWon: false
-    };
-
-    placeIntoLanes(true);
-    render();
-    boardPulse();
-    startSeriesTimer();
-  }
-
-  function handleSeriesTimeout(){
-    if(!state || !state.running || state.finished) return;
-    if(isResolving) return;
-    combo = 0;
-    updateCombo();
-    advanceSeriesOrFinish(false);
-  }
-
-  function onBalloonClick(event){
-    if(!state || !state.running || state.finished || state.seriesExpired) return;
-
-    const colorIndex = Number(event.currentTarget.dataset.colorIndex);
-    const { winners } = getMajorityData();
-
-    if(!winners.includes(colorIndex)){
-      event.currentTarget.classList.add('wrong');
-      setTimeout(() => event.currentTarget.classList.remove('wrong'), 340);
-      if(navigator.vibrate) navigator.vibrate(26);
-      combo = 0;
-      updateCombo();
-      return;
-    }
-
-    removeColor(colorIndex);
-  }
-
-  function startGame(){
-    endOverlay.classList.remove('show');
-    isResolving = false;
-    board.classList.remove('resolving');
-    combo = 0;
-    updateCombo();
-
-    state = {
-      series: 1,
-      points: 0,
-      running: true,
-      finished: false,
-      balloons: makeBalloons(1),
-      seriesExpired: false,
-      seriesWon: false
-    };
-
-    pointsEl.textContent = '0';
-    placeIntoLanes(true);
-    render();
-    setButtonState(true);
-    startSeriesTimer();
-  }
-
-  function stopGame(){
-    stopTimer();
-
-    if(state && state.points > bestScore){
-      bestScore = state.points;
-      localStorage.setItem(STORAGE_BEST, String(bestScore));
-      updateBest();
-    }
-
-    combo = 0;
-    updateCombo();
-    isResolving = false;
-    board.classList.remove('resolving');
-    state = null;
-    board.replaceChildren();
-    pointsEl.textContent = '0';
-    setButtonState(false);
-  }
-
-  function finishGame(){
-    stopTimer();
-
-    let newBest = false;
-    if(state.points > bestScore){
-      bestScore = state.points;
-      localStorage.setItem(STORAGE_BEST, String(bestScore));
-      updateBest();
-      newBest = true;
-    }
-
-    endTimeEl.textContent = `${state.points} point${state.points > 1 ? 's' : ''}`;
-    endTextEl.innerHTML = newBest
-      ? 'Nouveau <strong>score</strong> !'
-      : `Tu as marqué ${state.points} point${state.points > 1 ? 's' : ''} sur 100 séries.`;
-
-    combo = 0;
-    updateCombo();
-    setButtonState(false);
-    endOverlay.classList.add('show');
-    state = { finished:true, running:false, balloons:[], series:MAX_SERIES, points:state.points };
-  }
-
-  toggleBtn.addEventListener('click', () => {
-    if(state && state.running && !state.finished) stopGame();
-    else startGame();
   });
 
-  restartBtn.addEventListener('click', startGame);
+  return shuffle(chosen.map((card, index) => ({
+    piece: card.piece,
+    pairId: card.pairId,
+    uid: "u" + index + "-" + Math.random().toString(36).slice(2,8),
+    state: "hidden"
+  })));
+}
 
-  window.addEventListener('resize', () => {
-    if(state && state.running && !state.finished && !isResolving){
-      placeIntoLanes(false);
-      render();
+function createBoard(){
+  stopPreviewTimer();
+
+  const activeCards = pickFivePairs();
+  totalPairs = ACTIVE_PAIR_COUNT;
+  matchedPairs = 0;
+  picks = [];
+  lockBoard = false;
+  previewMode = true;
+  previewSeconds = PREVIEW_SECONDS;
+
+  const emptyCells = Array.from({length: BOARD_SIZE - activeCards.length}, () => ({
+    empty: true,
+    state: "empty"
+  }));
+
+  squares = shuffle([...activeCards, ...emptyCells]);
+
+  startPreviewPhase();
+}
+
+function startPreviewPhase(){
+  memoryStatusEl.textContent = "Mémorisation";
+  memoryTimerEl.textContent = previewSeconds;
+
+  squares.forEach(card => {
+    if(!card.empty) card.state = "revealed";
+  });
+  renderBoard();
+
+  stopPreviewTimer();
+  previewInterval = setInterval(() => {
+    previewSeconds--;
+    memoryTimerEl.textContent = previewSeconds;
+
+    if(previewSeconds <= 0){
+      stopPreviewTimer();
+      previewMode = false;
+      memoryStatusEl.textContent = "Retrouvez les 5 paires";
+      memoryTimerEl.textContent = "";
+
+      squares.forEach(card => {
+        if(!card.empty && card.state !== "matched"){
+          card.state = "hidden";
+        }
+      });
+      renderBoard();
     }
-  }, { passive:true });
+  }, 1000);
+}
 
-  pointsEl.textContent = '0';
-  updateBest();
-  updateCombo();
-  setButtonState(false);
-  startGame();
-})();
+function renderBoard(){
+  boardEl.innerHTML = "";
+
+  for(let row = 7; row >= 0; row--){
+    for(let col = 0; col < 8; col++){
+      const idx = row * 8 + col;
+      const data = squares[idx];
+
+      const sq = document.createElement("div");
+      sq.className = "square " + (((row + col) % 2 === 0) ? "white" : "black");
+
+      if(!data.empty && (data.state === "revealed" || data.state === "matched")) sq.classList.add("flipped");
+      if(!data.empty && data.state === "matched") sq.classList.add("matched");
+
+      if(!data.empty){
+        const button = document.createElement("button");
+        button.className = "card";
+        button.type = "button";
+        button.setAttribute("aria-label", coordsToSquare(col, row));
+
+        const inner = document.createElement("div");
+        inner.className = "card-inner";
+
+        const back = document.createElement("div");
+        back.className = "face back";
+
+        const front = document.createElement("div");
+        front.className = "face front";
+
+        const piece = document.createElement("span");
+        piece.className = "piece " + (data.piece === data.piece.toUpperCase() ? "white-piece " : "black-piece ") + "piece-" + data.piece;
+        piece.textContent = PIECES[data.piece];
+
+        front.appendChild(piece);
+        inner.appendChild(back);
+        inner.appendChild(front);
+        button.appendChild(inner);
+        button.onclick = () => handleSquare(idx);
+        sq.appendChild(button);
+      }
+
+      if(row === 0){
+        const file = document.createElement("span");
+        file.className = "coord file";
+        file.textContent = FILES[col];
+        sq.appendChild(file);
+      }
+
+      if(col === 7){
+        const rank = document.createElement("span");
+        rank.className = "coord rank";
+        rank.textContent = String(row + 1);
+        sq.appendChild(rank);
+      }
+
+      boardEl.appendChild(sq);
+    }
+  }
+}
+
+function isPair(a, b){
+  return !a.empty && !b.empty && a.pairId === b.pairId && a.uid !== b.uid;
+}
+
+function handleSquare(index){
+  if(lockBoard || previewMode) return;
+
+  const card = squares[index];
+  if(card.empty || card.state !== "hidden") return;
+
+  card.state = "revealed";
+  picks.push(index);
+  renderBoard();
+
+  if(picks.length < 2) return;
+
+  lockBoard = true;
+
+  const [i1, i2] = picks;
+  const a = squares[i1];
+  const b = squares[i2];
+
+  if(isPair(a, b)){
+    a.state = "matched";
+    b.state = "matched";
+    matchedPairs++;
+    picks = [];
+    lockBoard = false;
+    renderBoard();
+
+    if(matchedPairs === totalPairs){
+      memoryStatusEl.textContent = "Bravo";
+      memoryTimerEl.textContent = "5 paires trouvées";
+    }
+    return;
+  }
+
+  setTimeout(() => {
+    a.state = "hidden";
+    b.state = "hidden";
+    picks = [];
+    lockBoard = false;
+    renderBoard();
+  }, 700);
+}
+
+restartBtn.addEventListener("click", createBoard);
+
+createBoard();
 </script>
+
 </body>
 </html>
