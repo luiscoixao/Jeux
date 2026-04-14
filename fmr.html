@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>CHESSMEMORY</title>
 
 <style>
@@ -56,7 +56,7 @@ h1{ margin:10px 0; }
 }
 
 .file{ bottom:2px; left:4px; }
-.rank{ top:2px; left:4px; } /* ALIGNÉ À GAUCHE */
+.rank{ top:2px; left:4px; }
 
 #timer{
   margin-top:6px;
@@ -76,7 +76,7 @@ h1{ margin:10px 0; }
 <h1>CHESSMEMORY</h1>
 <div id="board"></div>
 <div id="timer"></div>
-<div id="score">Points : 0 | Record : 0</div>
+<div id="score"></div>
 
 <script>
 const boardEl = document.getElementById("board");
@@ -85,17 +85,31 @@ const scoreEl = document.getElementById("score");
 
 const PIECES = ["♔","♕","♖","♗","♘","♚","♛","♜","♝","♞"];
 
-let cells=[], selected=[];
-let locked=true;
-let score=0;
-let record=localStorage.getItem("chessMemoryRecord") || 0;
+let cells = [];
+let selected = [];
+let locked = true;
 
+let score = 0;
+let record = localStorage.getItem("chessMemoryRecord") || 0;
+
+let timerInterval = null;
+let roundTimeout = null;
+
+// ---------- UTILS ----------
 function shuffle(a){ return a.sort(()=>Math.random()-0.5); }
 
 function randomPiece(){
   return PIECES[Math.floor(Math.random()*PIECES.length)];
 }
 
+function clearTimers(){
+  if(timerInterval) clearInterval(timerInterval);
+  if(roundTimeout) clearTimeout(roundTimeout);
+  timerInterval = null;
+  roundTimeout = null;
+}
+
+// ---------- GAME ----------
 function build(){
   cells = Array(64).fill(null).map(()=>({piece:null,visible:false}));
 
@@ -143,62 +157,72 @@ function render(){
 }
 
 function updateScore(){
-  if(score>record){
-    record=score;
-    localStorage.setItem("chessMemoryRecord",record);
+  if(score > record){
+    record = score;
+    localStorage.setItem("chessMemoryRecord", record);
   }
-  scoreEl.textContent="Points : "+score+" | Record : "+record;
+  scoreEl.textContent = "Points : "+score+" | Record : "+record;
 }
 
 function start(){
-  selected=[];
-  locked=true;
+  clearTimers();
+
+  selected = [];
+  locked = true;
 
   build();
   render();
 
-  timerEl.textContent="1";
+  timerEl.textContent = "1";
 
+  // PHASE MÉMOIRE
   setTimeout(()=>{
-    cells.forEach(c=>c.visible=false);
+    cells.forEach(c=>{
+      if(c.piece) c.visible = false;
+    });
+
     render();
-    locked=false;
+    locked = false;
+
     startTimer();
+
   },1000);
 }
 
 function startTimer(){
-  let end=Date.now()+3000;
+  let timeLeft = 3;
+  timerEl.textContent = timeLeft;
 
-  const interval=setInterval(()=>{
-    let t=Math.ceil((end-Date.now())/1000);
-    timerEl.textContent=t>0?t:"0";
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    timerEl.textContent = timeLeft;
 
-    if(t<=0){
-      clearInterval(interval);
+    if(timeLeft <= 0){
+      clearTimers();
       score--;
       updateScore();
       start();
     }
-  },200);
+  },1000);
 }
 
 function clickCell(i){
   if(locked) return;
 
-  const c=cells[i];
+  const c = cells[i];
   if(!c.piece || c.visible) return;
 
-  c.visible=true;
+  c.visible = true;
   selected.push(i);
   render();
 
-  if(selected.length===2){
-    locked=true;
+  if(selected.length === 2){
+    locked = true;
+    clearTimers();
 
-    const [a,b]=selected;
+    const [a,b] = selected;
 
-    if(cells[a].piece===cells[b].piece){
+    if(cells[a].piece === cells[b].piece){
       score++;
     }else{
       score--;
@@ -206,10 +230,11 @@ function clickCell(i){
 
     updateScore();
 
-    setTimeout(start,600);
+    roundTimeout = setTimeout(start,600);
   }
 }
 
+// INIT
 updateScore();
 start();
 </script>
