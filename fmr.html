@@ -5,558 +5,190 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>CHESSMEMORY</title>
 
-<link rel="apple-touch-icon" href="iconchessmemory.png" />
-<link rel="icon" href="iconchessmemory.png" />
-
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="CHESSMEMORY" />
 <meta name="theme-color" content="#2c2c2c" />
 
 <style>
 :root{
   --bg:#2c2c2c;
-  --panel:#3a3a3a;
   --light:#eeeed2;
   --dark:#769656;
-  --text:#ffffff;
   --gold:#d4af37;
 }
 
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
-
-html,body{
-  margin:0;
-  padding:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
-}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
 body{
-  min-height:100vh;
+  margin:0;
+  background:var(--bg);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
   display:flex;
   flex-direction:column;
   align-items:center;
-  padding:0 12px calc(18px + env(safe-area-inset-bottom));
 }
 
 h1{
-  margin:calc(env(safe-area-inset-top) + 18px) 0 12px;
+  color:#fff;
+  margin:20px 0 10px;
   font-size:28px;
-  line-height:1.08;
-  font-weight:700;
-  text-align:center;
-}
-
-.app{
-  width:100%;
-  max-width:560px;
-}
-
-.controls-panel,
-.timer-panel{
-  background:var(--panel);
-  padding:14px;
-  margin-bottom:12px;
-  box-shadow:0 8px 20px rgba(0,0,0,.18);
-}
-
-#board-container{
-  width:95vw;
-  max-width:500px;
-  aspect-ratio:1 / 1;
-  overflow:hidden;
-  margin-bottom:12px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.35);
 }
 
 #board{
+  width:95vw;
+  max-width:500px;
+  aspect-ratio:1;
   display:grid;
   grid-template-columns:repeat(8,1fr);
-  grid-template-rows:repeat(8,1fr);
-  width:100%;
-  height:100%;
+  box-shadow:0 10px 25px rgba(0,0,0,.35);
 }
 
 .square{
   position:relative;
-  width:100%;
-  height:100%;
-  user-select:none;
-  overflow:hidden;
-  perspective:900px;
-  -webkit-perspective:900px;
 }
 
-.white{ background:var(--light); }
-.black{ background:var(--dark); }
-
-.coord{
-  position:absolute;
-  font-size:10px;
-  opacity:.65;
-  font-weight:700;
-  pointer-events:none;
-  z-index:4;
-}
-
-.coord.file{
-  left:5px;
-  bottom:3px;
-}
-
-.coord.rank{
-  right:4px;
-  top:2px;
-}
+.white{background:var(--light)}
+.black{background:var(--dark)}
 
 .card{
   position:absolute;
   inset:0;
-  width:100%;
-  height:100%;
-  border:none;
-  background:none;
-  padding:0;
-  margin:0;
   cursor:pointer;
-  touch-action:manipulation;
-  appearance:none;
-  -webkit-appearance:none;
 }
 
-.card-inner{
-  position:relative;
-  width:100%;
-  height:100%;
-  transition:transform .42s ease;
-  transform-style:preserve-3d;
-  -webkit-transform-style:preserve-3d;
-}
-
-.square.flipped .card-inner{
-  transform:rotateY(180deg);
-  -webkit-transform:rotateY(180deg);
-}
-
-.face{
+.piece{
   position:absolute;
   inset:0;
   display:flex;
   align-items:center;
   justify-content:center;
-  backface-visibility:hidden;
-  -webkit-backface-visibility:hidden;
+  font-size:clamp(60px,12vw,90px);
 }
 
-.back{
-  background:transparent;
-}
+.white-piece{color:#fff;text-shadow:0 0 2px #000}
+.black-piece{color:#111}
 
-.front{
-  transform:rotateY(180deg);
-  -webkit-transform:rotateY(180deg);
-}
+.hidden .piece{display:none}
 
-.piece{
-  line-height:1;
-  position:relative;
-  z-index:2;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:100%;
-  height:100%;
-  filter:drop-shadow(0 1px 0 rgba(0,0,0,.22));
-  transform-origin:center center;
-  font-size:clamp(56px, 11vw, 82px);
-  font-family:"Arial Unicode MS","Segoe UI Symbol","Apple Symbols","Noto Sans Symbols 2",-apple-system,sans-serif;
-}
-
-.piece-K{ transform:scale(1.00); }
-.piece-k{ transform:scale(1.12); }
-.piece-Q{ transform:scale(1.00); }
-.piece-q{ transform:scale(1.02); }
-.piece-R{ transform:scale(0.88); }
-.piece-r{ transform:scale(1.02); }
-.piece-B{ transform:scale(0.98); }
-.piece-b{ transform:scale(1.02); }
-.piece-N{ transform:scale(1.00); }
-.piece-n{ transform:scale(1.00); }
-
-.white-piece{
-  color:#ffffff;
-  text-shadow:
-    0 0 1px #000,
-    0 0 2px #000,
-    0 1px 2px rgba(0,0,0,.55),
-    0 0 6px rgba(255,255,255,.16);
-}
-
-.black-piece{
-  color:#141414;
-  text-shadow:
-    0 0 1px rgba(255,255,255,.18),
-    0 1px 1px rgba(255,255,255,.06);
-}
-
-.square.matched{
-  box-shadow:inset 0 0 0 3px rgba(212,175,55,.95);
-}
-
-.controls{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:28px;
-  background:var(--panel);
-}
-
-.control-btn{
-  width:52px;
-  height:52px;
-  border:none;
-  background:var(--bg);
+#info{
   color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  appearance:none;
-  -webkit-appearance:none;
-}
-
-.control-btn span{
-  font-size:24px;
-  line-height:1;
-  display:block;
-}
-
-#memoryStatus{
-  text-align:center;
-  font-size:16px;
-  font-weight:700;
-  margin-bottom:6px;
-}
-
-#memoryTimer{
-  text-align:center;
-  font-size:22px;
-  font-weight:700;
-  color:var(--gold);
-  min-height:28px;
-}
-
-.footer-note{
-  text-align:center;
-  font-size:12px;
-  margin-top:4px;
-  opacity:.82;
-}
-
-@media (max-width:420px){
-  .piece{
-    font-size:clamp(50px, 11vw, 70px);
-  }
-
-  .control-btn{
-    width:46px;
-    height:46px;
-  }
-
-  .control-btn span{
-    font-size:22px;
-  }
+  margin:10px;
+  font-size:18px;
 }
 </style>
 </head>
+
 <body>
 
 <h1>CHESSMEMORY</h1>
-
-<div class="app">
-  <div id="board-container">
-    <div id="board"></div>
-  </div>
-
-  <div class="timer-panel">
-    <div id="memoryStatus">Mémorisation</div>
-    <div id="memoryTimer">3</div>
-  </div>
-
-  <div class="controls-panel">
-    <div class="controls">
-      <button class="control-btn" id="restartBtn" type="button" aria-label="Rejouer"><span>🔄</span></button>
-    </div>
-  </div>
-
-  <div class="footer-note">Jeu imaginé par Luis et créé par ChatGPT</div>
-</div>
+<div id="board"></div>
+<div id="info">Mémorise…</div>
 
 <script>
-const boardEl = document.getElementById("board");
-const restartBtn = document.getElementById("restartBtn");
-const memoryStatusEl = document.getElementById("memoryStatus");
-const memoryTimerEl = document.getElementById("memoryTimer");
+const board = document.getElementById("board");
+const info = document.getElementById("info");
 
-const FILES = ["a","b","c","d","e","f","g","h"];
-const PIECES = {
-  "N":"♘","B":"♗","R":"♖","Q":"♕","K":"♔",
-  "n":"♞","b":"♝","r":"♜","q":"♛","k":"♚"
-};
+const PIECES = ["♔","♕","♖","♗","♘","♚","♛","♜","♝","♞"];
 
-const ALL_PAIRS = [
-  {piece:"K", pairId:"K1"}, {piece:"K", pairId:"K1"},
-  {piece:"k", pairId:"k1"}, {piece:"k", pairId:"k1"},
-  {piece:"Q", pairId:"Q1"}, {piece:"Q", pairId:"Q1"},
-  {piece:"q", pairId:"q1"}, {piece:"q", pairId:"q1"},
-  {piece:"R", pairId:"R1"}, {piece:"R", pairId:"R1"},
-  {piece:"R", pairId:"R2"}, {piece:"R", pairId:"R2"},
-  {piece:"r", pairId:"r1"}, {piece:"r", pairId:"r1"},
-  {piece:"r", pairId:"r2"}, {piece:"r", pairId:"r2"},
-  {piece:"B", pairId:"B1"}, {piece:"B", pairId:"B1"},
-  {piece:"B", pairId:"B2"}, {piece:"B", pairId:"B2"},
-  {piece:"b", pairId:"b1"}, {piece:"b", pairId:"b1"},
-  {piece:"b", pairId:"b2"}, {piece:"b", pairId:"b2"},
-  {piece:"N", pairId:"N1"}, {piece:"N", pairId:"N1"},
-  {piece:"N", pairId:"N2"}, {piece:"N", pairId:"N2"},
-  {piece:"n", pairId:"n1"}, {piece:"n", pairId:"n1"},
-  {piece:"n", pairId:"n2"}, {piece:"n", pairId:"n2"}
-];
-
-const ACTIVE_PAIR_COUNT = 1;
-const BOARD_SIZE = 64;
-const PREVIEW_SECONDS = 3;
-
-let squares = [];
+let cells = [];
 let picks = [];
-let lockBoard = false;
-let previewMode = true;
-let previewSeconds = PREVIEW_SECONDS;
-let previewInterval = null;
-let matchedPairs = 0;
-let totalPairs = ACTIVE_PAIR_COUNT;
+let lock = false;
 
-function shuffle(array){
-  const arr = [...array];
-  for(let i = arr.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
+// créer une partie
+function newGame(){
 
-function coordsToSquare(file, rank){
-  return FILES[file] + String(rank + 1);
-}
-
-function stopPreviewTimer(){
-  if(previewInterval){
-    clearInterval(previewInterval);
-    previewInterval = null;
-  }
-}
-
-function pickPairs(count){
-  const grouped = {};
-  for(const card of ALL_PAIRS){
-    if(!grouped[card.pairId]) grouped[card.pairId] = [];
-    grouped[card.pairId].push(card);
-  }
-
-  const keys = shuffle(Object.keys(grouped)).slice(0, count);
-  const chosen = [];
-
-  keys.forEach((key, idx) => {
-    const pair = grouped[key];
-    chosen.push({
-      piece: pair[0].piece,
-      pairId: "pair-" + idx,
-      uid: "a-" + idx + "-" + Math.random().toString(36).slice(2,8),
-      state: "hidden"
-    });
-    chosen.push({
-      piece: pair[1].piece,
-      pairId: "pair-" + idx,
-      uid: "b-" + idx + "-" + Math.random().toString(36).slice(2,8),
-      state: "hidden"
-    });
-  });
-
-  return chosen;
-}
-
-function createBoard(){
-  stopPreviewTimer();
-
-  const activeCards = pickPairs(ACTIVE_PAIR_COUNT);
-  totalPairs = ACTIVE_PAIR_COUNT;
-  matchedPairs = 0;
   picks = [];
-  lockBoard = false;
-  previewMode = true;
-  previewSeconds = PREVIEW_SECONDS;
+  lock = true;
+  info.textContent = "Mémorise…";
 
-  const empties = Array.from({length: BOARD_SIZE - activeCards.length}, () => ({
-    empty: true,
-    state: "empty"
-  }));
+  // choisir une paire
+  const symbol = PIECES[Math.floor(Math.random()*PIECES.length)];
 
-  squares = shuffle([...activeCards, ...empties]);
+  // 64 cases vides
+  cells = Array(64).fill(null);
 
-  startPreviewPhase();
+  // placer 2 cartes
+  let i1 = Math.floor(Math.random()*64);
+  let i2;
+  do { i2 = Math.floor(Math.random()*64); } while(i2===i1);
+
+  cells[i1] = {symbol, id:1};
+  cells[i2] = {symbol, id:2};
+
+  render(true); // visible
+
+  // cacher après 1 seconde
+  setTimeout(()=>{
+    render(false);
+    lock = false;
+    info.textContent = "Trouve la paire";
+  },1000);
 }
 
-function startPreviewPhase(){
-  memoryStatusEl.textContent = "Mémorisation";
-  memoryTimerEl.textContent = previewSeconds;
+// affichage
+function render(showAll=false){
+  board.innerHTML="";
 
-  squares.forEach(card => {
-    if(!card.empty) card.state = "revealed";
-  });
-  renderBoard();
+  for(let i=0;i<64;i++){
+    const sq = document.createElement("div");
+    sq.className="square "+(((Math.floor(i/8)+i)%2)?"white":"black");
 
-  stopPreviewTimer();
-  previewInterval = setInterval(() => {
-    previewSeconds--;
-    memoryTimerEl.textContent = previewSeconds;
+    const card = document.createElement("div");
+    card.className="card";
 
-    if(previewSeconds <= 0){
-      stopPreviewTimer();
-      previewMode = false;
-      memoryStatusEl.textContent = "Retrouvez la paire";
-      memoryTimerEl.textContent = "";
+    const data = cells[i];
 
-      squares.forEach(card => {
-        if(!card.empty && card.state !== "matched"){
-          card.state = "hidden";
-        }
-      });
-      renderBoard();
+    if(data){
+      const piece = document.createElement("div");
+      piece.className="piece "+(data.symbol==="♔"||data.symbol==="♕"||data.symbol==="♖"||data.symbol==="♗"||data.symbol==="♘"?"white-piece":"black-piece");
+      piece.textContent=data.symbol;
+
+      if(!showAll && !data.revealed) piece.parentElement?.classList?.add("hidden");
+
+      if(!showAll && !data.revealed){
+        piece.style.display="none";
+      }
+
+      card.onclick=()=>clickCard(i);
+
+      sq.appendChild(piece);
     }
-  }, 1000);
-}
 
-function renderBoard(){
-  boardEl.innerHTML = "";
-
-  for(let row = 7; row >= 0; row--){
-    for(let col = 0; col < 8; col++){
-      const idx = row * 8 + col;
-      const data = squares[idx];
-
-      const sq = document.createElement("div");
-      sq.className = "square " + (((row + col) % 2 === 0) ? "white" : "black");
-
-      if(!data.empty && (data.state === "revealed" || data.state === "matched")) {
-        sq.classList.add("flipped");
-      }
-      if(!data.empty && data.state === "matched") {
-        sq.classList.add("matched");
-      }
-
-      if(!data.empty){
-        const button = document.createElement("button");
-        button.className = "card";
-        button.type = "button";
-        button.setAttribute("aria-label", coordsToSquare(col, row));
-
-        const inner = document.createElement("div");
-        inner.className = "card-inner";
-
-        const back = document.createElement("div");
-        back.className = "face back";
-
-        const front = document.createElement("div");
-        front.className = "face front";
-
-        const piece = document.createElement("span");
-        piece.className =
-          "piece " +
-          (data.piece === data.piece.toUpperCase() ? "white-piece " : "black-piece ") +
-          "piece-" + data.piece;
-        piece.textContent = PIECES[data.piece];
-
-        front.appendChild(piece);
-        inner.appendChild(back);
-        inner.appendChild(front);
-        button.appendChild(inner);
-        button.onclick = () => handleSquare(idx);
-        sq.appendChild(button);
-      }
-
-      if(row === 0){
-        const file = document.createElement("span");
-        file.className = "coord file";
-        file.textContent = FILES[col];
-        sq.appendChild(file);
-      }
-
-      if(col === 7){
-        const rank = document.createElement("span");
-        rank.className = "coord rank";
-        rank.textContent = String(row + 1);
-        sq.appendChild(rank);
-      }
-
-      boardEl.appendChild(sq);
-    }
+    board.appendChild(sq);
   }
 }
 
-function isPair(a, b){
-  return !a.empty && !b.empty && a.pairId === b.pairId && a.uid !== b.uid;
-}
+// clic
+function clickCard(i){
+  if(lock) return;
+  const card = cells[i];
+  if(!card || card.revealed) return;
 
-function handleSquare(index){
-  if(lockBoard || previewMode) return;
+  card.revealed=true;
+  picks.push(i);
+  render(false);
 
-  const card = squares[index];
-  if(card.empty || card.state !== "hidden") return;
+  if(picks.length<2) return;
 
-  card.state = "revealed";
-  picks.push(index);
-  renderBoard();
+  lock = true;
 
-  if(picks.length < 2) return;
+  const [a,b]=picks;
 
-  lockBoard = true;
+  if(cells[a].symbol === cells[b].symbol){
+    info.textContent="Bravo !";
 
-  const [i1, i2] = picks;
-  const a = squares[i1];
-  const b = squares[i2];
-
-  if(isPair(a, b)){
-    a.state = "matched";
-    b.state = "matched";
-    matchedPairs++;
-    picks = [];
-    lockBoard = false;
-    renderBoard();
-
-    if(matchedPairs === totalPairs){
-      memoryStatusEl.textContent = "Bravo";
-      memoryTimerEl.textContent = "Paire trouvée";
-    }
-    return;
+    setTimeout(newGame,1200);
+  }else{
+    setTimeout(()=>{
+      cells[a].revealed=false;
+      cells[b].revealed=false;
+      picks=[];
+      lock=false;
+      render(false);
+    },600);
   }
-
-  setTimeout(() => {
-    a.state = "hidden";
-    b.state = "hidden";
-    picks = [];
-    lockBoard = false;
-    renderBoard();
-  }, 700);
 }
 
-restartBtn.addEventListener("click", createBoard);
-
-createBoard();
+// lancement auto
+newGame();
 </script>
 
 </body>
