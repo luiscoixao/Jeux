@@ -12,6 +12,7 @@
   --bg:#2c2c2c;
   --light:#eeeed2;
   --dark:#769656;
+  --text:#ffffff;
   --gold:#d4af37;
 }
 
@@ -28,8 +29,14 @@ body{
 }
 
 h1{
-  margin:20px 0 10px;
+  margin:20px 0 8px;
   font-size:28px;
+}
+
+#score{
+  font-size:16px;
+  margin-bottom:6px;
+  opacity:.8;
 }
 
 #info{
@@ -37,10 +44,10 @@ h1{
   margin-bottom:6px;
 }
 
-#score{
-  font-size:16px;
+#timer{
+  font-size:20px;
+  color:var(--gold);
   margin-bottom:10px;
-  opacity:.8;
 }
 
 #board{
@@ -70,134 +77,153 @@ h1{
 .white-piece{color:#fff;text-shadow:0 0 2px #000}
 .black-piece{color:#111}
 
-.hidden{display:none}
-
-.flash{
-  animation:flash .25s;
-}
-
-@keyframes flash{
-  0%{background:#d4af37}
-  100%{background:inherit}
-}
+.hidden-piece{display:none}
 </style>
 </head>
 
 <body>
 
 <h1>CHESSMEMORY</h1>
-<div id="info">Mémorise…</div>
 <div id="score">Niveau 1</div>
+<div id="info">Mémorise…</div>
+<div id="timer"></div>
 <div id="board"></div>
 
 <script>
-const board=document.getElementById("board");
-const info=document.getElementById("info");
+const boardEl=document.getElementById("board");
+const infoEl=document.getElementById("info");
+const timerEl=document.getElementById("timer");
 const scoreEl=document.getElementById("score");
 
-const PIECES=["♔","♕","♖","♗","♘","♚","♛","♜","♝","♞"];
+const WHITE_SET=new Set(["K","Q","R","B","N"]);
+const PIECES={
+  "K":"♔","Q":"♕","R":"♖","B":"♗","N":"♘",
+  "k":"♚","q":"♛","r":"♜","b":"♝","n":"♞"
+};
+const ALL=["K","Q","R","B","N","k","q","r","b","n"];
+
+const PREVIEW_MS=2000;
 
 let level=1;
 let pairCount=3;
-let cards=[];
-let picks=[];
-let lock=true;
+let cells=[];
+let selected=[];
+let locked=true;
 
+// shuffle
 function shuffle(a){
-  return a.sort(()=>Math.random()-0.5);
+  return [...a].sort(()=>Math.random()-0.5);
 }
 
-function newGame(){
-  lock=true;
-  picks=[];
-  pairCount=Math.min(3+level-1,8);
+// build board
+function buildBoard(){
+  cells=Array(64).fill(null);
 
-  scoreEl.textContent="Niveau "+level;
+  const chosen=shuffle(ALL).slice(0,pairCount);
 
-  let selected=shuffle(PIECES).slice(0,pairCount);
+  let positions=shuffle([...Array(64).keys()]);
 
-  cards=[];
-  selected.forEach(p=>{
-    cards.push({p,id:Math.random()});
-    cards.push({p,id:Math.random()});
+  chosen.forEach(sym=>{
+    let a=positions.pop();
+    let b=positions.pop();
+
+    cells[a]={symbol:sym,visible:true};
+    cells[b]={symbol:sym,visible:true};
   });
 
-  while(cards.length<64) cards.push(null);
-
-  cards=shuffle(cards);
-
-  render(true);
-
-  setTimeout(()=>{
-    render(false);
-    lock=false;
-    info.textContent="Trouve toutes les paires";
-  },2000);
+  selected=[];
 }
 
-function render(show){
-  board.innerHTML="";
+// render
+function render(){
+  boardEl.innerHTML="";
 
-  cards.forEach((c,i)=>{
+  for(let i=0;i<64;i++){
+    const row=Math.floor(i/8);
+    const col=i%8;
+
     const sq=document.createElement("div");
-    sq.className="square "+(((Math.floor(i/8)+i)%2?"white":"black"));
+    sq.className="square "+(((row+col)%2?"white":"black"));
+
+    const c=cells[i];
 
     if(c){
       const piece=document.createElement("div");
-      piece.className="piece "+(show||c.show?"":"hidden");
-      piece.textContent=c.p;
+      const cls=WHITE_SET.has(c.symbol)?"white-piece":"black-piece";
+
+      piece.className="piece "+cls+(c.visible?"":" hidden-piece");
+      piece.textContent=PIECES[c.symbol];
+
       sq.appendChild(piece);
-
-      sq.onclick=()=>click(i,sq);
+      sq.onclick=()=>click(i);
     }
 
-    board.appendChild(sq);
-  });
-}
-
-function click(i,sq){
-  if(lock) return;
-  const c=cards[i];
-  if(!c||c.show) return;
-
-  c.show=true;
-  picks.push(i);
-  render(false);
-
-  if(picks.length<2) return;
-
-  lock=true;
-
-  let [a,b]=picks;
-
-  if(cards[a].p===cards[b].p){
-    if(navigator.vibrate) navigator.vibrate(50);
-
-    document.querySelectorAll(".square")[a].classList.add("flash");
-    document.querySelectorAll(".square")[b].classList.add("flash");
-
-    picks=[];
-    lock=false;
-
-    if(cards.filter(c=>c&&!c.show).length===0){
-      level++;
-      setTimeout(newGame,800);
-    }
-
-  }else{
-    if(navigator.vibrate) navigator.vibrate(120);
-
-    setTimeout(()=>{
-      cards[a].show=false;
-      cards[b].show=false;
-      picks=[];
-      lock=false;
-      render(false);
-    },500);
+    boardEl.appendChild(sq);
   }
 }
 
-newGame();
+// start round
+function start(){
+  locked=true;
+  pairCount=Math.min(3+level-1,8);
+
+  scoreEl.textContent="Niveau "+level;
+  infoEl.textContent="Mémorise…";
+
+  buildBoard();
+  render();
+
+  setTimeout(()=>{
+    cells.forEach(c=>{if(c)c.visible=false});
+    render();
+    locked=false;
+    infoEl.textContent="Trouve toutes les paires";
+  },PREVIEW_MS);
+}
+
+// click
+function click(i){
+  if(locked) return;
+  const c=cells[i];
+  if(!c || c.visible) return;
+
+  c.visible=true;
+  selected.push(i);
+  render();
+
+  if(selected.length<2) return;
+
+  locked=true;
+
+  let [a,b]=selected;
+
+  if(cells[a].symbol===cells[b].symbol){
+
+    if(navigator.vibrate) navigator.vibrate(40);
+
+    selected=[];
+
+    if(cells.filter(x=>x && !x.visible).length===0){
+      level++;
+      setTimeout(start,800);
+    }else{
+      locked=false;
+    }
+
+  }else{
+
+    if(navigator.vibrate) navigator.vibrate(120);
+
+    infoEl.textContent="Erreur";
+
+    setTimeout(()=>{
+      // reset niveau
+      start();
+    },600);
+  }
+}
+
+start();
 </script>
 
 </body>
