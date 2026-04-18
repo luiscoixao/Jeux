@@ -394,7 +394,7 @@
         <div class="mode-icon" style="color:#cc44ff;">🧠</div>
         <div class="mode-info">
           <div class="mode-title">MEMORY</div>
-          <div class="mode-desc">Les cases s'allument une par une — reproduis la séquence dans le bon ordre !</div>
+          <div class="mode-desc">Les cases s'allument une par une puis s'éteignent — reproduis la séquence de mémoire !</div>
         </div>
         <div class="mode-best" id="best-memory">--</div>
       </div>
@@ -422,9 +422,10 @@
         <div style="font-family:'Orbitron',sans-serif;font-weight:700;color:var(--purple);font-size:.9rem;margin-bottom:10px;">🧠 MODE MEMORY</div>
         <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;font-size:.85rem;color:var(--dim);line-height:1.4;">
           <li>• Les cases s'allument <strong style="color:var(--text);">une par une</strong> pour montrer la séquence</li>
-          <li>• Mémorise l'ordre, puis <strong style="color:var(--text);">reproduis-le</strong> en tapant dans le même ordre</li>
-          <li>• La case à taper suivante est <strong style="color:var(--text);">indiquée en haut</strong></li>
-          <li>• Mauvais ordre = <strong style="color:var(--red);">+1 s</strong> de pénalité et recommencer le niveau</li>
+          <li>• Elles <strong style="color:var(--text);">s'éteignent toutes</strong> — tu joues de mémoire !</li>
+          <li>• Tape les cases <strong style="color:var(--text);">dans le même ordre</strong> qu'elles se sont allumées</li>
+          <li>• Pas de chrono — ton score est le <strong style="color:var(--purple);">nombre de cases trouvées</strong></li>
+          <li>• Mauvais tap = la séquence est <strong style="color:var(--red);">rejouée</strong> et le niveau recommence</li>
         </ul>
       </div>
     </div>
@@ -435,9 +436,13 @@
   <!-- ══════════ GAME ══════════ -->
   <div id="screen-game" class="screen">
     <div id="hud">
-      <div class="hud-block">
+      <div class="hud-block" id="hud-timer-block">
         <span class="hud-label">Temps</span>
         <span class="hud-value" id="hud-timer">0.00s</span>
+      </div>
+      <div class="hud-block" id="hud-score-block" style="display:none;">
+        <span class="hud-label">Score</span>
+        <span class="hud-value" id="hud-score" style="color:var(--purple);">0</span>
       </div>
       <div><span id="hud-mode-badge" class="speed">RAPIDITÉ</span></div>
       <div class="hud-block">
@@ -458,7 +463,7 @@
   <!-- ══════════ RESULT ══════════ -->
   <div id="screen-result" class="screen">
     <div class="result-title" id="result-title">Terminé !</div>
-    <div class="stats-grid">
+    <div class="stats-grid" id="res-speed-stats">
       <div class="stat-box hi">
         <div class="s-label">Temps total</div>
         <div class="s-value" id="res-time">--</div>
@@ -474,6 +479,24 @@
       <div class="stat-box">
         <div class="s-label">Pénalités</div>
         <div class="s-value" id="res-penalties">--</div>
+      </div>
+    </div>
+    <div class="stats-grid" id="res-memory-stats" style="display:none;">
+      <div class="stat-box hi">
+        <div class="s-label">Score</div>
+        <div class="s-value" id="res-mem-score" style="color:var(--purple);">--</div>
+      </div>
+      <div class="stat-box" id="res-mem-best-box">
+        <div class="s-label">Record</div>
+        <div class="s-value" id="res-mem-best" style="color:var(--purple);">--</div>
+      </div>
+      <div class="stat-box">
+        <div class="s-label">Niveaux</div>
+        <div class="s-value" id="res-mem-rounds">--</div>
+      </div>
+      <div class="stat-box">
+        <div class="s-label">Erreurs</div>
+        <div class="s-value" id="res-mem-errors" style="color:var(--red);">--</div>
       </div>
     </div>
     <div class="btn-row">
@@ -497,9 +520,9 @@ const TOTAL_ROUNDS  = 20;
 const GRID_SIZE     = 5;
 const TOTAL_TILES   = GRID_SIZE * GRID_SIZE; // 25
 const PENALTY_SPEED = 500;   // ms per wrong tap (rapidité)
-const PENALTY_MEM   = 1000;  // ms per wrong order (memory)
-const MEM_SHOW_MS   = 600;   // ms each tile shown during memory sequence
-const MEM_GAP_MS    = 180;   // gap between tiles in memory sequence
+const MEM_SHOW_MS   = 700;   // ms each tile shown during memory sequence
+const MEM_GAP_MS    = 200;   // gap between tiles in memory sequence
+const MEM_DARK_MS   = 600;   // pause after last tile before input phase
 
 // ── DOM ──────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
@@ -533,23 +556,29 @@ let pendingHits     = new Set();
 // Memory mode
 let memSequence     = [];   // ordered list of tile indices
 let memExpected     = 0;    // next index in sequence to tap
+let memScore        = 0;    // total correct taps across all rounds
+let memErrors       = 0;    // total wrong taps
 
 // ── Persistence ───────────────────────────────────────────────
 function loadBest(mode) {
   const v = localStorage.getItem(`lightning_best_${mode}`);
   return v ? parseFloat(v) : null;
 }
-function saveBest(mode, ms) {
-  localStorage.setItem(`lightning_best_${mode}`, ms);
+function saveBest(mode, val) {
+  localStorage.setItem(`lightning_best_${mode}`, val);
 }
 function fmtTime(ms) {
   if (ms === null || ms === undefined || isNaN(ms)) return '--';
   return (ms / 1000).toFixed(2) + 's';
 }
+function fmtScore(n) {
+  if (n === null || n === undefined) return '--';
+  return n + ' case' + (n > 1 ? 's' : '');
+}
 function refreshHomeBests() {
   const bs = loadBest(0), bm = loadBest(1);
   $('best-speed').textContent  = bs !== null ? fmtTime(bs) : '--';
-  $('best-memory').textContent = bm !== null ? fmtTime(bm) : '--';
+  $('best-memory').textContent = bm !== null ? fmtScore(bm) : '--';
 }
 
 // ── Screen nav ────────────────────────────────────────────────
@@ -629,6 +658,10 @@ function updateHUD() {
   hudModeBadge.textContent = isSpeed ? 'RAPIDITÉ' : 'MEMORY';
   hudModeBadge.className   = isSpeed ? 'speed' : 'memory';
   progressBar.className    = isSpeed ? 'speed' : 'memory';
+  // Show timer for speed, score for memory
+  $('hud-timer-block').style.display = isSpeed ? '' : 'none';
+  $('hud-score-block').style.display = isSpeed ? 'none' : '';
+  if (!isSpeed) $('hud-score').textContent = memScore;
 }
 
 // ── Status ────────────────────────────────────────────────────
@@ -702,12 +735,16 @@ function memShowSequence(sequence, cb) {
   // Dim all
   tiles.forEach(t => { t.classList.remove('lit','hit','wrong','showing','next-hit'); t.classList.add('dim'); });
 
-  // Show tiles one by one
+  // Show tiles one by one, then extinguish ALL before calling cb
   let i = 0;
   function showNext() {
     if (i > 0) dimTile(sequence[i - 1]);
     if (i >= sequence.length) {
-      setTimeout(cb, 300);
+      // All shown — make sure last tile is also dimmed, then dark pause
+      setTimeout(() => {
+        tiles.forEach(t => { t.classList.remove('lit','showing','next-hit'); t.classList.add('dim'); });
+        setTimeout(cb, MEM_DARK_MS);
+      }, MEM_SHOW_MS);
       return;
     }
     setTileState(sequence[i], 'showing');
@@ -754,20 +791,27 @@ function memStartInput(sequence) {
   phase = 'input';
   memSequence = sequence;
   memExpected = 0;
+  // All tiles dark — no visual hint on the grid
+  tiles.forEach(t => { t.classList.remove('lit','showing','next-hit','hit','wrong'); t.classList.add('dim'); });
   memBuildOrderTrack(sequence);
-  memHighlightNext(0);
-  setStatus('Reproduis la séquence !', '');
+  // Show only the count of remaining taps, no tile highlighted
+  orderTrack.querySelectorAll('.order-dot').forEach((d, i) => {
+    d.className = 'order-dot pending';
+  });
+  setStatus(`Reproduis les ${sequence.length} case${sequence.length>1?'s':''} !`, '');
 }
 
 function memOnTap(idx) {
   const expected = memSequence[memExpected];
 
   if (idx === expected) {
-    // Correct
+    // Correct tap
     memUpdateTrack(memExpected, 'done');
     setTileState(idx, 'hit');
     if (navigator.vibrate) navigator.vibrate(16);
     setTimeout(() => dimTile(idx), 240);
+    memScore++;
+    $('hud-score').textContent = memScore;
     memExpected++;
 
     if (memExpected >= memSequence.length) {
@@ -775,26 +819,27 @@ function memOnTap(idx) {
       roundsCompleted++;
       setStatus('✓ Séquence parfaite !', 'ok');
       showFlash('good');
-      tiles.forEach(t => t.classList.remove('next-hit'));
       setTimeout(() => nextRound(), 420);
     } else {
-      memHighlightNext(memExpected);
+      // Update dot track only (no tile highlight)
+      orderTrack.querySelectorAll('.order-dot').forEach((d, i) => {
+        if (i < memExpected)       d.className = 'order-dot done';
+        else                       d.className = 'order-dot pending';
+      });
+      setStatus(`Encore ${memSequence.length - memExpected} case${memSequence.length - memExpected > 1 ? 's' : ''} !`, '');
     }
   } else {
-    // Wrong order — penalty + restart input for this round
-    penaltyMs += PENALTY_MEM;
+    // Wrong tap — replay sequence then restart
+    memErrors++;
     memUpdateTrack(memExpected, 'wrong');
     setTileState(idx, 'wrong');
     setTimeout(() => dimTile(idx), 300);
     showFlash('bad');
     if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
-    setStatus(`Mauvais ordre ! +${(PENALTY_MEM/1000).toFixed(1)}s`, 'bad');
+    setStatus('Raté ! Regarde bien…', 'bad');
 
-    // Brief pause then restart input from beginning
     phase = 'paused';
-    tiles.forEach(t => t.classList.remove('next-hit'));
     setTimeout(() => {
-      // Replay the sequence as a reminder, then restart input
       memShowSequence(memSequence, () => memStartInput(memSequence));
     }, 700);
   }
@@ -829,25 +874,44 @@ function endGame(completed) {
   stopTimer();
   phase = 'idle';
 
-  const totalMs   = elapsedMs + penaltyMs;
-  const prevBest  = loadBest(currentMode);
-  const isRecord  = completed && (prevBest === null || totalMs < prevBest);
-  if (isRecord) saveBest(currentMode, totalMs);
+  if (currentMode === 0) {
+    // ── RAPIDITÉ results ──
+    const totalMs  = elapsedMs + penaltyMs;
+    const prevBest = loadBest(0);
+    const isRecord = completed && (prevBest === null || totalMs < prevBest);
+    if (isRecord) saveBest(0, totalMs);
 
-  $('result-title').textContent = completed ? '⚡ Terminé !' : 'Partie terminée';
-  $('result-title').className   = 'result-title ' + (completed ? 'win' : 'lose');
-  $('res-time').textContent      = fmtTime(totalMs);
-  $('res-best').textContent      = (isRecord ? totalMs : (prevBest !== null ? prevBest : totalMs)) !== null ? fmtTime(isRecord ? totalMs : prevBest) : '--';
-  $('res-rounds').textContent    = `${roundsCompleted} / ${TOTAL_ROUNDS}`;
-  $('res-penalties').textContent = fmtTime(penaltyMs);
+    $('res-speed-stats').style.display  = '';
+    $('res-memory-stats').style.display = 'none';
+    $('result-title').className = 'result-title ' + (completed ? 'win' : 'lose');
+    $('result-title').textContent = completed ? '⚡ Terminé !' : 'Partie terminée';
+    $('res-time').textContent      = fmtTime(totalMs);
+    $('res-best').textContent      = fmtTime(isRecord ? totalMs : (prevBest !== null ? prevBest : totalMs));
+    $('res-rounds').textContent    = `${roundsCompleted} / ${TOTAL_ROUNDS}`;
+    $('res-penalties').textContent = fmtTime(penaltyMs);
+    const bestBox = $('res-best-box');
+    bestBox.className = 'stat-box' + (isRecord ? ' rec' : '');
+    bestBox.querySelector('.s-label').textContent = isRecord ? '🏆 Nouveau record !' : 'Meilleur';
+  } else {
+    // ── MEMORY results ──
+    const prevBest = loadBest(1);  // stored as integer (score)
+    const isRecord = completed && (prevBest === null || memScore > prevBest);
+    if (isRecord) saveBest(1, memScore);
 
-  const bestBox = $('res-best-box');
-  bestBox.className = 'stat-box' + (isRecord ? ' rec' : '');
-  bestBox.querySelector('.s-label').textContent = isRecord ? '🏆 Nouveau record !' : 'Meilleur';
+    $('res-speed-stats').style.display  = 'none';
+    $('res-memory-stats').style.display = '';
+    $('result-title').className = 'result-title ' + (completed ? 'win' : 'lose');
+    $('result-title').textContent = completed ? '🧠 Bravo !' : 'Partie terminée';
+    $('res-mem-score').textContent  = fmtScore(memScore);
+    $('res-mem-best').textContent   = fmtScore(isRecord ? memScore : (prevBest !== null ? prevBest : memScore));
+    $('res-mem-rounds').textContent = `${roundsCompleted} / ${TOTAL_ROUNDS}`;
+    $('res-mem-errors').textContent = memErrors;
+    const bestBox = $('res-mem-best-box');
+    bestBox.className = 'stat-box' + (isRecord ? ' rec' : '');
+    bestBox.querySelector('.s-label').textContent = isRecord ? '🏆 Nouveau record !' : 'Record';
+  }
 
-  // Update retry button colour to match mode
   $('btn-retry').className = `btn btn-lg ${currentMode === 0 ? 'btn-yellow' : 'btn-purple'}`;
-
   showScreen('result');
   refreshHomeBests();
 }
@@ -858,6 +922,8 @@ function startGame(mode) {
   elapsedMs       = 0;
   penaltyMs       = 0;
   roundsCompleted = 0;
+  memScore        = 0;
+  memErrors       = 0;
   phase           = 'idle';
   memSequence     = [];
   memExpected     = 0;
@@ -868,7 +934,7 @@ function startGame(mode) {
 
   runCountdown(() => {
     gameRunning = true;
-    startTimer();
+    if (mode === 0) startTimer(); // timer only for speed mode
     nextRound();
   });
 }
