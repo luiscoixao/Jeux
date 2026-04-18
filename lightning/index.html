@@ -190,6 +190,14 @@
     }
     #hud-mode-badge.speed  { background: rgba(255,229,0,.15); color: var(--accent); border: 1px solid rgba(255,229,0,.3); }
     #hud-mode-badge.memory { background: rgba(204,68,255,.15); color: var(--purple); border: 1px solid rgba(204,68,255,.3); }
+    #btn-hud-home {
+      background: none; border: 1.5px solid rgba(255,255,255,.18); border-radius: 8px;
+      color: var(--dim); font-size: 1rem; width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: color .15s, border-color .15s, background .15s;
+      flex-shrink: 0; padding: 0;
+    }
+    #btn-hud-home:active { background: rgba(255,255,255,.08); color: var(--text); border-color: rgba(255,255,255,.4); }
 
     /* ─── Progress ──────────────────────────────────────────────── */
     #progress-wrap {
@@ -436,6 +444,7 @@
   <!-- ══════════ GAME ══════════ -->
   <div id="screen-game" class="screen">
     <div id="hud">
+      <button id="btn-hud-home" title="Accueil">&#8962;</button>
       <div class="hud-block" id="hud-timer-block">
         <span class="hud-label">Temps</span>
         <span class="hud-value" id="hud-timer">0.00s</span>
@@ -959,6 +968,10 @@ addBtn('btn-rules',      () => showScreen('rules'));
 addBtn('btn-rules-back', () => showScreen('home'));
 addBtn('btn-retry',      () => startGame(currentMode));
 addBtn('btn-home',       () => {
+  gameRunning = false; stopTimer(); phase = 'idle';
+  refreshHomeBests(); showScreen('home');
+});
+addBtn('btn-hud-home',   () => {
   gameRunning = false; stopTimer(); phase = 'idle';
   refreshHomeBests(); showScreen('home');
 });
