@@ -441,7 +441,7 @@
         <span class="hud-value" id="hud-timer">0.00s</span>
       </div>
       <div class="hud-block" id="hud-score-block" style="display:none;">
-        <span class="hud-label">Score</span>
+        <span class="hud-label">Séries</span>
         <span class="hud-value" id="hud-score" style="color:var(--purple);">0</span>
       </div>
       <div><span id="hud-mode-badge" class="speed">RAPIDITÉ</span></div>
@@ -483,7 +483,7 @@
     </div>
     <div class="stats-grid" id="res-memory-stats" style="display:none;">
       <div class="stat-box hi">
-        <div class="s-label">Score</div>
+        <div class="s-label">Séries réussies</div>
         <div class="s-value" id="res-mem-score" style="color:var(--purple);">--</div>
       </div>
       <div class="stat-box" id="res-mem-best-box">
@@ -573,12 +573,12 @@ function fmtTime(ms) {
 }
 function fmtScore(n) {
   if (n === null || n === undefined) return '--';
-  return n + ' case' + (n > 1 ? 's' : '');
+  return n + ' série' + (n > 1 ? 's' : '');
 }
 function refreshHomeBests() {
   const bs = loadBest(0), bm = loadBest(1);
   $('best-speed').textContent  = bs !== null ? fmtTime(bs) : '--';
-  $('best-memory').textContent = bm !== null ? fmtScore(bm) : '--';
+  $('best-memory').textContent = bm !== null ? fmtScore(Number(bm)) : '--';
 }
 
 // ── Screen nav ────────────────────────────────────────────────
@@ -810,14 +810,14 @@ function memOnTap(idx) {
     setTileState(idx, 'hit');
     if (navigator.vibrate) navigator.vibrate(16);
     setTimeout(() => dimTile(idx), 240);
-    memScore++;
-    $('hud-score').textContent = memScore;
     memExpected++;
 
     if (memExpected >= memSequence.length) {
-      // Sequence complete!
+      // Sequence complete — count this series as a success
       roundsCompleted++;
-      setStatus('✓ Séquence parfaite !', 'ok');
+      memScore = roundsCompleted;  // score = series completed
+      $('hud-score').textContent = memScore;
+      setStatus('✓ Série réussie !', 'ok');
       showFlash('good');
       setTimeout(() => nextRound(), 420);
     } else {
@@ -895,15 +895,15 @@ function endGame(completed) {
   } else {
     // ── MEMORY results ──
     const prevBest = loadBest(1);  // stored as integer (score)
-    const isRecord = completed && (prevBest === null || memScore > prevBest);
-    if (isRecord) saveBest(1, memScore);
+    const isRecord = completed && (prevBest === null || roundsCompleted > prevBest);
+    if (isRecord) saveBest(1, roundsCompleted);
 
     $('res-speed-stats').style.display  = 'none';
     $('res-memory-stats').style.display = '';
     $('result-title').className = 'result-title ' + (completed ? 'win' : 'lose');
     $('result-title').textContent = completed ? '🧠 Bravo !' : 'Partie terminée';
-    $('res-mem-score').textContent  = fmtScore(memScore);
-    $('res-mem-best').textContent   = fmtScore(isRecord ? memScore : (prevBest !== null ? prevBest : memScore));
+    $('res-mem-score').textContent  = fmtScore(roundsCompleted);
+    $('res-mem-best').textContent   = fmtScore(isRecord ? roundsCompleted : (prevBest !== null ? prevBest : roundsCompleted));
     $('res-mem-rounds').textContent = `${roundsCompleted} / ${TOTAL_ROUNDS}`;
     $('res-mem-errors').textContent = memErrors;
     const bestBox = $('res-mem-best-box');
@@ -922,7 +922,7 @@ function startGame(mode) {
   elapsedMs       = 0;
   penaltyMs       = 0;
   roundsCompleted = 0;
-  memScore        = 0;
+  memScore        = 0;  // mirrors roundsCompleted for memory mode
   memErrors       = 0;
   phase           = 'idle';
   memSequence     = [];
