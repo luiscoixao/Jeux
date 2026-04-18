@@ -15,64 +15,58 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
-    /* ─── Reset & Base ─────────────────────────────────────────── */
+    /* ─── Reset ─────────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0a0a1a;
-      --bg2:       #0f0f2a;
-      --surface:   #12122a;
-      --border:    #1e1e4a;
-      --accent:    #ffe500;
-      --accent2:   #00d4ff;
-      --text:      #e8e8ff;
-      --text-dim:  #7070a0;
-      --success:   #00ff88;
-      --danger:    #ff3366;
-      --radius:    14px;
+      --bg:       #0a0a1a;
+      --surface:  #12122a;
+      --border:   #1e1e4a;
+      --accent:   #ffe500;
+      --cyan:     #00d4ff;
+      --green:    #00ff88;
+      --red:      #ff3366;
+      --purple:   #cc44ff;
+      --text:     #e8e8ff;
+      --dim:      #7070a0;
+      --radius:   14px;
     }
 
     html, body {
-      height: 100%;
-      background: var(--bg);
-      color: var(--text);
+      height: 100%; background: var(--bg); color: var(--text);
       font-family: 'Rajdhani', sans-serif;
-      overflow: hidden;
-      touch-action: manipulation;
+      overflow: hidden; touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      -webkit-user-select: none;
+      user-select: none; -webkit-user-select: none;
     }
 
-    /* ─── Starfield background ──────────────────────────────────── */
+    /* ─── Stars ─────────────────────────────────────────────────── */
     #stars {
       position: fixed; inset: 0; z-index: 0;
       background: radial-gradient(ellipse at 50% 0%, #1a0a3a 0%, #0a0a1a 70%);
-      overflow: hidden;
     }
-    #stars::before, #stars::after {
+    #stars::before {
       content: '';
       position: absolute; inset: 0;
       background-image:
-        radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,.6) 0%, transparent 100%),
-        radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,.4) 0%, transparent 100%),
-        radial-gradient(1px 1px at 40% 10%, rgba(255,255,255,.5) 0%, transparent 100%),
-        radial-gradient(1px 1px at 60% 30%, rgba(255,255,255,.3) 0%, transparent 100%),
-        radial-gradient(1px 1px at 75% 55%, rgba(255,255,255,.5) 0%, transparent 100%),
-        radial-gradient(1px 1px at 85% 20%, rgba(255,255,255,.4) 0%, transparent 100%),
-        radial-gradient(1px 1px at 90% 70%, rgba(255,255,255,.3) 0%, transparent 100%),
-        radial-gradient(1px 1px at 15% 80%, rgba(255,255,255,.4) 0%, transparent 100%),
-        radial-gradient(1px 1px at 50% 90%, rgba(255,255,255,.3) 0%, transparent 100%),
-        radial-gradient(1px 1px at 35% 65%, rgba(255,255,255,.5) 0%, transparent 100%);
+        radial-gradient(1px 1px at 8%  12%, rgba(255,255,255,.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 22% 38%, rgba(255,255,255,.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 38%  8%, rgba(255,255,255,.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 58% 28%, rgba(255,255,255,.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 73% 52%, rgba(255,255,255,.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 83% 18%, rgba(255,255,255,.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 91% 68%, rgba(255,255,255,.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 14% 78%, rgba(255,255,255,.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 48% 88%, rgba(255,255,255,.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 33% 62%, rgba(255,255,255,.5) 0%, transparent 100%);
     }
 
-    /* ─── App shell ─────────────────────────────────────────────── */
+    /* ─── App ───────────────────────────────────────────────────── */
     #app {
       position: relative; z-index: 1;
       display: flex; flex-direction: column; align-items: center;
       height: 100dvh; min-height: -webkit-fill-available;
       padding: env(safe-area-inset-top, 12px) 12px env(safe-area-inset-bottom, 12px);
-      gap: 0;
     }
 
     /* ─── Screens ───────────────────────────────────────────────── */
@@ -81,282 +75,261 @@
       flex-direction: column; align-items: center; justify-content: center;
       width: 100%; height: 100%;
       position: relative; z-index: 2;
-      animation: fadeIn .35s ease;
+      animation: fadeIn .3s ease;
     }
     .screen.active { display: flex; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
     /* ─── Logo ──────────────────────────────────────────────────── */
     .logo {
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 900;
-      font-size: clamp(2.4rem, 10vw, 4rem);
+      font-family: 'Orbitron', sans-serif; font-weight: 900;
+      font-size: clamp(2.2rem, 9vw, 3.6rem);
       letter-spacing: .12em;
       background: linear-gradient(135deg, #ffe500 0%, #ff9500 40%, #ff3366 70%, #cc00ff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-shadow: none;
-      filter: drop-shadow(0 0 18px rgba(255,229,0,.55));
-      margin-bottom: 4px;
-    }
-    .logo-bolt {
-      display: inline-block;
-      margin-right: 6px;
-      filter: drop-shadow(0 0 10px #ffe500);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      filter: drop-shadow(0 0 18px rgba(255,229,0,.5));
     }
     .tagline {
-      font-size: .95rem;
-      color: var(--text-dim);
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      margin-bottom: 32px;
+      font-size: .88rem; color: var(--dim); letter-spacing: .18em;
+      text-transform: uppercase; margin: 4px 0 28px;
     }
 
     /* ─── Buttons ───────────────────────────────────────────────── */
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 14px 36px;
-      border: none; border-radius: 50px;
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 700; font-size: 1rem;
-      letter-spacing: .1em;
-      cursor: pointer;
-      position: relative; z-index: 10;
-      touch-action: manipulation;
+      padding: 13px 32px; border: none; border-radius: 50px;
+      font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: .9rem;
+      letter-spacing: .08em; cursor: pointer;
+      position: relative; z-index: 10; touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
-      transition: transform .12s, box-shadow .12s, filter .12s;
+      transition: transform .1s, filter .1s;
     }
-    .btn:active { transform: scale(.94); }
+    .btn:active { transform: scale(.92); }
 
-    .btn-primary {
+    .btn-yellow {
       background: linear-gradient(135deg, #ffe500, #ff9500);
       color: #0a0a1a;
-      box-shadow: 0 0 24px rgba(255,229,0,.45), 0 4px 16px rgba(0,0,0,.4);
+      box-shadow: 0 0 22px rgba(255,229,0,.4), 0 4px 14px rgba(0,0,0,.4);
     }
-    .btn-primary:hover { filter: brightness(1.1); box-shadow: 0 0 36px rgba(255,229,0,.65), 0 4px 20px rgba(0,0,0,.5); }
+    .btn-yellow:hover { filter: brightness(1.1); }
 
-    .btn-secondary {
-      background: transparent;
-      border: 2px solid var(--accent2);
-      color: var(--accent2);
-      box-shadow: 0 0 14px rgba(0,212,255,.25);
+    .btn-cyan {
+      background: linear-gradient(135deg, #00d4ff, #0088ff);
+      color: #0a0a1a;
+      box-shadow: 0 0 22px rgba(0,212,255,.35), 0 4px 14px rgba(0,0,0,.4);
     }
-    .btn-secondary:hover { background: rgba(0,212,255,.08); }
+    .btn-cyan:hover { filter: brightness(1.1); }
 
-    .btn-sm {
-      padding: 9px 22px;
-      font-size: .78rem;
+    .btn-purple {
+      background: linear-gradient(135deg, #cc44ff, #7700cc);
+      color: #fff;
+      box-shadow: 0 0 22px rgba(204,68,255,.35), 0 4px 14px rgba(0,0,0,.4);
     }
+    .btn-purple:hover { filter: brightness(1.1); }
 
-    /* ─── Cards ─────────────────────────────────────────────────── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px 22px;
-      width: 100%;
-      max-width: 420px;
+    .btn-outline {
+      background: transparent; border: 2px solid var(--dim); color: var(--dim);
     }
+    .btn-outline:hover { border-color: var(--text); color: var(--text); }
 
-    /* ─── Best score display ────────────────────────────────────── */
-    .best-score-badge {
-      display: flex; align-items: center; gap: 10px;
-      background: linear-gradient(135deg, rgba(255,229,0,.08), rgba(255,149,0,.08));
-      border: 1px solid rgba(255,229,0,.25);
-      border-radius: 50px;
-      padding: 10px 22px;
-      margin-bottom: 28px;
-    }
-    .best-score-badge .label {
-      font-size: .75rem; letter-spacing: .15em; text-transform: uppercase; color: var(--text-dim);
-    }
-    .best-score-badge .value {
-      font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1.15rem;
-      color: var(--accent);
-    }
+    .btn-lg { padding: 16px 44px; font-size: 1.05rem; }
+    .btn-sm { padding: 9px 20px; font-size: .75rem; }
 
-    /* ─── HUD (in-game header) ──────────────────────────────────── */
+    /* ─── Mode cards ────────────────────────────────────────────── */
+    .mode-cards {
+      display: flex; flex-direction: column; gap: 14px;
+      width: 100%; max-width: 380px; margin-bottom: 24px;
+    }
+    .mode-card {
+      display: flex; align-items: center; gap: 16px;
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 16px; padding: 16px 20px;
+      cursor: pointer; touch-action: manipulation;
+      transition: border-color .15s, box-shadow .15s, transform .1s;
+      position: relative; z-index: 10;
+    }
+    .mode-card:active { transform: scale(.97); }
+    .mode-card.speed { border-color: rgba(255,229,0,.3); }
+    .mode-card.speed:hover { border-color: rgba(255,229,0,.7); box-shadow: 0 0 20px rgba(255,229,0,.2); }
+    .mode-card.memory { border-color: rgba(204,68,255,.3); }
+    .mode-card.memory:hover { border-color: rgba(204,68,255,.7); box-shadow: 0 0 20px rgba(204,68,255,.2); }
+
+    .mode-icon {
+      font-size: 2.2rem; flex-shrink: 0; width: 52px; text-align: center;
+      filter: drop-shadow(0 0 8px currentColor);
+    }
+    .mode-info { flex: 1; }
+    .mode-title {
+      font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1rem;
+      letter-spacing: .06em; margin-bottom: 3px;
+    }
+    .mode-card.speed  .mode-title { color: var(--accent); }
+    .mode-card.memory .mode-title { color: var(--purple); }
+    .mode-desc { font-size: .82rem; color: var(--dim); line-height: 1.35; }
+    .mode-best {
+      font-family: 'Orbitron', sans-serif; font-size: .72rem; font-weight: 700;
+      color: var(--dim); white-space: nowrap;
+    }
+    .mode-card.speed  .mode-best { color: var(--accent); }
+    .mode-card.memory .mode-best { color: var(--purple); }
+
+    /* ─── HUD ───────────────────────────────────────────────────── */
     #hud {
       width: 100%; max-width: 480px;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 8px 4px 6px;
-      flex-shrink: 0;
+      padding: 8px 2px 4px; flex-shrink: 0;
     }
-    .hud-block {
-      display: flex; flex-direction: column; align-items: center; gap: 1px;
-      min-width: 80px;
+    .hud-block { display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 72px; }
+    .hud-label { font-size: .6rem; letter-spacing: .18em; text-transform: uppercase; color: var(--dim); }
+    .hud-value { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1rem; }
+    #hud-timer  { color: var(--accent); }
+    #hud-round  { color: var(--cyan); }
+    #hud-mode-badge {
+      font-family: 'Orbitron', sans-serif; font-size: .62rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 20px; letter-spacing: .08em;
     }
-    .hud-label {
-      font-size: .62rem; letter-spacing: .18em; text-transform: uppercase; color: var(--text-dim);
-    }
-    .hud-value {
-      font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1.1rem;
-      color: var(--text);
-    }
-    #hud-timer { color: var(--accent); }
-    #hud-round { color: var(--accent2); }
+    #hud-mode-badge.speed  { background: rgba(255,229,0,.15); color: var(--accent); border: 1px solid rgba(255,229,0,.3); }
+    #hud-mode-badge.memory { background: rgba(204,68,255,.15); color: var(--purple); border: 1px solid rgba(204,68,255,.3); }
 
-    /* ─── Progress bar ──────────────────────────────────────────── */
+    /* ─── Progress ──────────────────────────────────────────────── */
     #progress-wrap {
-      width: 100%; max-width: 480px;
-      height: 4px; background: var(--border);
-      border-radius: 2px; overflow: hidden;
-      flex-shrink: 0; margin-bottom: 8px;
+      width: 100%; max-width: 480px; height: 4px;
+      background: var(--border); border-radius: 2px; overflow: hidden;
+      flex-shrink: 0; margin-bottom: 6px;
     }
     #progress-bar {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent2), var(--accent));
-      border-radius: 2px;
+      height: 100%; border-radius: 2px;
       transition: width .3s ease;
     }
+    #progress-bar.speed  { background: linear-gradient(90deg, var(--cyan), var(--accent)); }
+    #progress-bar.memory { background: linear-gradient(90deg, var(--purple), var(--cyan)); }
 
-    /* ─── Status message ────────────────────────────────────────── */
+    /* ─── Status ────────────────────────────────────────────────── */
     #status-msg {
-      font-size: .82rem; letter-spacing: .12em; text-transform: uppercase;
-      color: var(--text-dim); min-height: 1.2em;
-      flex-shrink: 0; margin-bottom: 6px;
-      transition: color .2s;
+      font-size: .8rem; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--dim); min-height: 1.2em; flex-shrink: 0; margin-bottom: 4px;
+      transition: color .15s;
     }
-    #status-msg.ok  { color: var(--success); }
-    #status-msg.bad { color: var(--danger); }
+    #status-msg.ok   { color: var(--green); }
+    #status-msg.bad  { color: var(--red); }
+    #status-msg.info { color: var(--cyan); }
+
+    /* ─── Memory order indicators ───────────────────────────────── */
+    #order-track {
+      display: flex; gap: 5px; flex-wrap: wrap; justify-content: center;
+      width: 100%; max-width: 480px; min-height: 28px;
+      flex-shrink: 0; margin-bottom: 4px;
+      align-items: center;
+    }
+    .order-dot {
+      width: 18px; height: 18px; border-radius: 4px;
+      border: 1.5px solid rgba(255,255,255,.15);
+      transition: all .15s;
+      flex-shrink: 0;
+    }
+    .order-dot.pending  { opacity: .35; }
+    .order-dot.next     { opacity: 1; box-shadow: 0 0 8px currentColor; transform: scale(1.15); }
+    .order-dot.done     { opacity: .6; }
+    .order-dot.wrong    { background: var(--red) !important; box-shadow: 0 0 8px var(--red); }
 
     /* ─── Grid ──────────────────────────────────────────────────── */
     #grid-wrap {
-      flex: 1 1 auto;
-      display: flex; align-items: center; justify-content: center;
-      width: 100%; max-width: 480px;
-      padding: 4px 0;
+      flex: 1 1 auto; display: flex; align-items: center; justify-content: center;
+      width: 100%; max-width: 480px; padding: 2px 0;
+      min-height: 0;
     }
     #grid {
-      display: grid;
-      gap: 6px;
-      width: 100%;
-      aspect-ratio: 1;
+      display: grid; gap: 6px;
+      /* Taille maximale = viewport - espace réservé au HUD, status, order-track */
+      width: min(100%, 90vw, calc(100dvh - 160px));
+      max-height: calc(100dvh - 160px);
+      aspect-ratio: 1 / 1;
     }
 
     /* ─── Tiles ─────────────────────────────────────────────────── */
     .tile {
-      border-radius: 10px;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      transition: transform .08s;
+      border-radius: 10px; cursor: pointer;
+      position: relative; overflow: hidden;
+      transition: transform .07s;
       -webkit-tap-highlight-color: transparent;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
+      background: var(--surface); border: 1.5px solid var(--border);
     }
-    .tile::after {
-      content: '';
-      position: absolute; inset: 0;
-      border-radius: inherit;
-      opacity: 0;
-      transition: opacity .15s;
-    }
-    .tile:active { transform: scale(.88); }
+    .tile:active { transform: scale(.86); }
 
-    /* Dim state (default) */
-    .tile.dim {
-      opacity: .28;
-      filter: saturate(.3) brightness(.6);
-      box-shadow: none;
-    }
-
-    /* Lit state */
-    .tile.lit {
-      opacity: 1;
-      filter: saturate(1.4) brightness(1.2);
-      animation: pulse-tile .55s ease-in-out infinite alternate;
-    }
-
-    /* Hit state */
-    .tile.hit {
-      opacity: 1;
-      filter: brightness(2) saturate(1.5);
-      animation: hit-flash .25s ease-out forwards;
-    }
-
-    /* Wrong state */
-    .tile.wrong {
-      animation: shake .3s ease-out forwards;
-      filter: brightness(1.5) saturate(0) sepia(1) hue-rotate(-20deg);
-    }
+    .tile.dim     { opacity: .25; filter: saturate(.25) brightness(.55); box-shadow: none; }
+    .tile.lit     { opacity: 1; filter: saturate(1.4) brightness(1.15); animation: pulse-tile .5s ease-in-out infinite alternate; }
+    .tile.next-hit { opacity: 1; filter: saturate(1.6) brightness(1.3); animation: pulse-next .4s ease-in-out infinite alternate; }
+    .tile.hit     { opacity: 1; filter: brightness(2.2) saturate(1.6); animation: hit-flash .22s ease-out forwards; }
+    .tile.wrong   { animation: shake .28s ease-out forwards; }
+    .tile.showing { opacity: 1; filter: saturate(1.5) brightness(1.4); animation: show-pop .18s ease-out; }
 
     @keyframes pulse-tile {
-      from { transform: scale(1);    box-shadow: var(--tile-glow); }
-      to   { transform: scale(1.04); box-shadow: var(--tile-glow-big); }
+      from { transform: scale(1);    box-shadow: var(--glow); }
+      to   { transform: scale(1.04); box-shadow: var(--glow-big); }
+    }
+    @keyframes pulse-next {
+      from { transform: scale(1.02); box-shadow: var(--glow-big); }
+      to   { transform: scale(1.07); box-shadow: var(--glow-big), 0 0 0 3px rgba(255,255,255,.15); }
     }
     @keyframes hit-flash {
-      0%   { transform: scale(1.12); opacity: 1; }
-      100% { transform: scale(1);    opacity: .35; }
+      0%   { transform: scale(1.14); opacity: 1; }
+      100% { transform: scale(1);    opacity: .25; }
     }
     @keyframes shake {
       0%,100% { transform: translateX(0); }
-      20%     { transform: translateX(-5px); }
-      40%     { transform: translateX(5px); }
-      60%     { transform: translateX(-4px); }
-      80%     { transform: translateX(4px); }
+      20%     { transform: translateX(-6px); }
+      50%     { transform: translateX(6px); }
+      80%     { transform: translateX(-4px); }
+    }
+    @keyframes show-pop {
+      0%   { transform: scale(.85); opacity: .5; }
+      60%  { transform: scale(1.08); }
+      100% { transform: scale(1);   opacity: 1; }
     }
 
-    /* Tile colours — 20 distinct vivid hues */
-    .tile[data-c="0"]  { background: #ff2244; --tile-glow: 0 0 12px #ff2244aa; --tile-glow-big: 0 0 28px #ff2244cc, 0 0 8px #ff2244; }
-    .tile[data-c="1"]  { background: #ff6600; --tile-glow: 0 0 12px #ff6600aa; --tile-glow-big: 0 0 28px #ff6600cc, 0 0 8px #ff6600; }
-    .tile[data-c="2"]  { background: #ffcc00; --tile-glow: 0 0 12px #ffcc00aa; --tile-glow-big: 0 0 28px #ffcc00cc, 0 0 8px #ffcc00; }
-    .tile[data-c="3"]  { background: #aaff00; --tile-glow: 0 0 12px #aaff00aa; --tile-glow-big: 0 0 28px #aaff00cc, 0 0 8px #aaff00; }
-    .tile[data-c="4"]  { background: #00ff66; --tile-glow: 0 0 12px #00ff66aa; --tile-glow-big: 0 0 28px #00ff66cc, 0 0 8px #00ff66; }
-    .tile[data-c="5"]  { background: #00ffcc; --tile-glow: 0 0 12px #00ffccaa; --tile-glow-big: 0 0 28px #00ffcccc, 0 0 8px #00ffcc; }
-    .tile[data-c="6"]  { background: #00d4ff; --tile-glow: 0 0 12px #00d4ffaa; --tile-glow-big: 0 0 28px #00d4ffcc, 0 0 8px #00d4ff; }
-    .tile[data-c="7"]  { background: #0088ff; --tile-glow: 0 0 12px #0088ffaa; --tile-glow-big: 0 0 28px #0088ffcc, 0 0 8px #0088ff; }
-    .tile[data-c="8"]  { background: #4422ff; --tile-glow: 0 0 12px #4422ffaa; --tile-glow-big: 0 0 28px #4422ffcc, 0 0 8px #4422ff; }
-    .tile[data-c="9"]  { background: #aa00ff; --tile-glow: 0 0 12px #aa00ffaa; --tile-glow-big: 0 0 28px #aa00ffcc, 0 0 8px #aa00ff; }
-    .tile[data-c="10"] { background: #ff00cc; --tile-glow: 0 0 12px #ff00ccaa; --tile-glow-big: 0 0 28px #ff00cccc, 0 0 8px #ff00cc; }
-    .tile[data-c="11"] { background: #ff0066; --tile-glow: 0 0 12px #ff0066aa; --tile-glow-big: 0 0 28px #ff0066cc, 0 0 8px #ff0066; }
-    .tile[data-c="12"] { background: #ff4488; --tile-glow: 0 0 12px #ff4488aa; --tile-glow-big: 0 0 28px #ff4488cc, 0 0 8px #ff4488; }
-    .tile[data-c="13"] { background: #ff8844; --tile-glow: 0 0 12px #ff8844aa; --tile-glow-big: 0 0 28px #ff8844cc, 0 0 8px #ff8844; }
-    .tile[data-c="14"] { background: #eeff44; --tile-glow: 0 0 12px #eeff44aa; --tile-glow-big: 0 0 28px #eeff44cc, 0 0 8px #eeff44; }
-    .tile[data-c="15"] { background: #44ffaa; --tile-glow: 0 0 12px #44ffaaaa; --tile-glow-big: 0 0 28px #44ffaacc, 0 0 8px #44ffaa; }
-    .tile[data-c="16"] { background: #44ddff; --tile-glow: 0 0 12px #44ddffaa; --tile-glow-big: 0 0 28px #44ddffcc, 0 0 8px #44ddff; }
-    .tile[data-c="17"] { background: #ff44aa; --tile-glow: 0 0 12px #ff44aaaa; --tile-glow-big: 0 0 28px #ff44aacc, 0 0 8px #ff44aa; }
-    .tile[data-c="18"] { background: #88ff44; --tile-glow: 0 0 12px #88ff44aa; --tile-glow-big: 0 0 28px #88ff44cc, 0 0 8px #88ff44; }
-    .tile[data-c="19"] { background: #ff8800; --tile-glow: 0 0 12px #ff8800aa; --tile-glow-big: 0 0 28px #ff8800cc, 0 0 8px #ff8800; }
+    /* 20 tile colours */
+    .tile[data-c="0"]  { background:#ff2244; --glow:0 0 10px #ff2244aa; --glow-big:0 0 24px #ff2244cc,0 0 6px #ff2244; }
+    .tile[data-c="1"]  { background:#ff6600; --glow:0 0 10px #ff6600aa; --glow-big:0 0 24px #ff6600cc,0 0 6px #ff6600; }
+    .tile[data-c="2"]  { background:#ffcc00; --glow:0 0 10px #ffcc00aa; --glow-big:0 0 24px #ffcc00cc,0 0 6px #ffcc00; }
+    .tile[data-c="3"]  { background:#aaff00; --glow:0 0 10px #aaff00aa; --glow-big:0 0 24px #aaff00cc,0 0 6px #aaff00; }
+    .tile[data-c="4"]  { background:#00ff66; --glow:0 0 10px #00ff66aa; --glow-big:0 0 24px #00ff66cc,0 0 6px #00ff66; }
+    .tile[data-c="5"]  { background:#00ffcc; --glow:0 0 10px #00ffccaa; --glow-big:0 0 24px #00ffcccc,0 0 6px #00ffcc; }
+    .tile[data-c="6"]  { background:#00d4ff; --glow:0 0 10px #00d4ffaa; --glow-big:0 0 24px #00d4ffcc,0 0 6px #00d4ff; }
+    .tile[data-c="7"]  { background:#0088ff; --glow:0 0 10px #0088ffaa; --glow-big:0 0 24px #0088ffcc,0 0 6px #0088ff; }
+    .tile[data-c="8"]  { background:#4422ff; --glow:0 0 10px #4422ffaa; --glow-big:0 0 24px #4422ffcc,0 0 6px #4422ff; }
+    .tile[data-c="9"]  { background:#aa00ff; --glow:0 0 10px #aa00ffaa; --glow-big:0 0 24px #aa00ffcc,0 0 6px #aa00ff; }
+    .tile[data-c="10"] { background:#ff00cc; --glow:0 0 10px #ff00ccaa; --glow-big:0 0 24px #ff00cccc,0 0 6px #ff00cc; }
+    .tile[data-c="11"] { background:#ff0066; --glow:0 0 10px #ff0066aa; --glow-big:0 0 24px #ff0066cc,0 0 6px #ff0066; }
+    .tile[data-c="12"] { background:#ff4488; --glow:0 0 10px #ff4488aa; --glow-big:0 0 24px #ff4488cc,0 0 6px #ff4488; }
+    .tile[data-c="13"] { background:#ff8844; --glow:0 0 10px #ff8844aa; --glow-big:0 0 24px #ff8844cc,0 0 6px #ff8844; }
+    .tile[data-c="14"] { background:#eeff44; --glow:0 0 10px #eeff44aa; --glow-big:0 0 24px #eeff44cc,0 0 6px #eeff44; }
+    .tile[data-c="15"] { background:#44ffaa; --glow:0 0 10px #44ffaaaa; --glow-big:0 0 24px #44ffaacc,0 0 6px #44ffaa; }
+    .tile[data-c="16"] { background:#44ddff; --glow:0 0 10px #44ddffaa; --glow-big:0 0 24px #44ddffcc,0 0 6px #44ddff; }
+    .tile[data-c="17"] { background:#ff44aa; --glow:0 0 10px #ff44aaaa; --glow-big:0 0 24px #ff44aacc,0 0 6px #ff44aa; }
+    .tile[data-c="18"] { background:#88ff44; --glow:0 0 10px #88ff44aa; --glow-big:0 0 24px #88ff44cc,0 0 6px #88ff44; }
+    .tile[data-c="19"] { background:#ff8800; --glow:0 0 10px #ff8800aa; --glow-big:0 0 24px #ff8800cc,0 0 6px #ff8800; }
 
-    /* ─── Results screen ────────────────────────────────────────── */
-    #screen-result { gap: 20px; }
+    /* ─── Result screen ─────────────────────────────────────────── */
+    #screen-result { gap: 18px; }
     .result-title {
       font-family: 'Orbitron', sans-serif; font-weight: 900;
-      font-size: clamp(1.6rem, 7vw, 2.4rem);
-      letter-spacing: .08em;
-      text-align: center;
+      font-size: clamp(1.5rem, 6.5vw, 2.2rem); letter-spacing: .08em; text-align: center;
     }
-    .result-title.win {
-      background: linear-gradient(135deg, #ffe500, #00ff88);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      filter: drop-shadow(0 0 16px rgba(0,255,136,.4));
-    }
-    .result-title.lose {
-      background: linear-gradient(135deg, #ff3366, #ff8800);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      filter: drop-shadow(0 0 16px rgba(255,51,102,.4));
-    }
+    .result-title.win  { background: linear-gradient(135deg,#ffe500,#00ff88); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; filter:drop-shadow(0 0 14px rgba(0,255,136,.4)); }
+    .result-title.lose { background: linear-gradient(135deg,#ff3366,#ff8800); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; filter:drop-shadow(0 0 14px rgba(255,51,102,.4)); }
 
-    .stats-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 10px; width: 100%; max-width: 360px;
-    }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 340px; }
     .stat-box {
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 14px 10px; text-align: center;
+      border-radius: 12px; padding: 13px 10px; text-align: center;
     }
-    .stat-box .s-label { font-size: .65rem; letter-spacing: .16em; text-transform: uppercase; color: var(--text-dim); }
-    .stat-box .s-value { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1.3rem; margin-top: 4px; }
-    .stat-box.highlight { border-color: rgba(255,229,0,.4); background: rgba(255,229,0,.06); }
-    .stat-box.highlight .s-value { color: var(--accent); }
-    .stat-box.new-record { border-color: rgba(0,255,136,.5); background: rgba(0,255,136,.07); animation: record-glow 1.2s ease-in-out infinite alternate; }
-    .stat-box.new-record .s-value { color: var(--success); }
-    @keyframes record-glow {
-      from { box-shadow: 0 0 8px rgba(0,255,136,.3); }
-      to   { box-shadow: 0 0 22px rgba(0,255,136,.6); }
-    }
+    .stat-box .s-label { font-size: .62rem; letter-spacing: .15em; text-transform: uppercase; color: var(--dim); }
+    .stat-box .s-value { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1.2rem; margin-top: 4px; }
+    .stat-box.hi   { border-color: rgba(255,229,0,.35); background: rgba(255,229,0,.05); }
+    .stat-box.hi   .s-value { color: var(--accent); }
+    .stat-box.rec  { border-color: rgba(0,255,136,.45); background: rgba(0,255,136,.06); animation: rec-glow 1.1s ease-in-out infinite alternate; }
+    .stat-box.rec  .s-value { color: var(--green); }
+    @keyframes rec-glow { from { box-shadow:0 0 6px rgba(0,255,136,.25); } to { box-shadow:0 0 20px rgba(0,255,136,.55); } }
 
     .btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 
@@ -364,54 +337,37 @@
     #countdown-overlay {
       position: fixed; inset: 0; z-index: 100;
       display: flex; align-items: center; justify-content: center;
-      background: rgba(10,10,26,.85);
-      backdrop-filter: blur(4px);
-      pointer-events: all;
+      background: rgba(10,10,26,.88); backdrop-filter: blur(4px);
     }
     #countdown-overlay.hidden { display: none !important; pointer-events: none; }
     #countdown-num {
       font-family: 'Orbitron', sans-serif; font-weight: 900;
-      font-size: clamp(5rem, 25vw, 9rem);
+      font-size: clamp(5rem, 24vw, 9rem);
       background: linear-gradient(135deg, #ffe500, #ff9500);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      filter: drop-shadow(0 0 30px rgba(255,229,0,.7));
-      animation: count-pop .7s ease-out;
+      filter: drop-shadow(0 0 28px rgba(255,229,0,.65));
+      animation: count-pop .65s ease-out;
     }
     @keyframes count-pop {
-      0%   { transform: scale(1.8); opacity: 0; }
-      40%  { transform: scale(.9);  opacity: 1; }
+      0%   { transform: scale(1.9); opacity: 0; }
+      45%  { transform: scale(.88); opacity: 1; }
       100% { transform: scale(1);   opacity: 1; }
     }
 
-    /* ─── Flash overlay (wrong tap) ────────────────────────────── */
+    /* ─── Flash overlay ─────────────────────────────────────────── */
     #flash-overlay {
-      position: fixed; inset: 0; z-index: 90;
-      pointer-events: none;
-      background: rgba(255,51,102,.18);
-      opacity: 0;
-      transition: opacity .15s;
+      position: fixed; inset: 0; z-index: 90; pointer-events: none;
+      opacity: 0; transition: opacity .12s;
     }
-    #flash-overlay.show { opacity: 1; }
+    #flash-overlay.bad  { background: rgba(255,51,102,.18); opacity: 1; }
+    #flash-overlay.good { background: rgba(0,255,136,.12); opacity: 1; }
 
-    /* ─── Scrollable rules ──────────────────────────────────────── */
-    .rules-list {
-      list-style: none; display: flex; flex-direction: column; gap: 8px;
-      width: 100%; max-width: 380px;
-    }
-    .rules-list li {
-      display: flex; align-items: flex-start; gap: 10px;
-      font-size: .9rem; line-height: 1.4; color: var(--text-dim);
-    }
-    .rules-list li .icon {
-      font-size: 1.1rem; flex-shrink: 0; margin-top: 1px;
-    }
-    .rules-list li strong { color: var(--text); }
-
-    /* ─── Responsive tweaks ─────────────────────────────────────── */
-    @media (max-height: 680px) {
-      .logo { font-size: 2rem; margin-bottom: 2px; }
-      .tagline { margin-bottom: 16px; font-size: .8rem; }
-      .best-score-badge { margin-bottom: 16px; padding: 8px 16px; }
+    /* ─── Responsive ────────────────────────────────────────────── */
+    @media (max-height: 660px) {
+      .logo { font-size: 1.9rem; }
+      .tagline { margin-bottom: 14px; }
+      .mode-cards { gap: 10px; margin-bottom: 16px; }
+      .mode-card { padding: 12px 16px; }
     }
   </style>
 </head>
@@ -419,68 +375,91 @@
 <div id="stars"></div>
 <div id="app">
 
-  <!-- ══════════════════ HOME SCREEN ══════════════════ -->
+  <!-- ══════════ HOME ══════════ -->
   <div id="screen-home" class="screen active">
-    <div class="logo"><span class="logo-bolt">⚡</span>LIGHTNING</div>
-    <div class="tagline">Tap the light — beat the clock</div>
+    <div class="logo">⚡ LIGHTNING</div>
+    <div class="tagline">Choisis ton mode de jeu</div>
 
-    <div class="best-score-badge" id="home-best">
-      <span class="label">Meilleur temps</span>
-      <span class="value" id="home-best-val">--</span>
+    <div class="mode-cards">
+      <div class="mode-card speed" id="card-speed">
+        <div class="mode-icon" style="color:#ffe500;">⚡</div>
+        <div class="mode-info">
+          <div class="mode-title">RAPIDITÉ</div>
+          <div class="mode-desc">Les cases s'allument toutes en même temps — éteins-les le plus vite possible !</div>
+        </div>
+        <div class="mode-best" id="best-speed">--</div>
+      </div>
+
+      <div class="mode-card memory" id="card-memory">
+        <div class="mode-icon" style="color:#cc44ff;">🧠</div>
+        <div class="mode-info">
+          <div class="mode-title">MEMORY</div>
+          <div class="mode-desc">Les cases s'allument une par une — reproduis la séquence dans le bon ordre !</div>
+        </div>
+        <div class="mode-best" id="best-memory">--</div>
+      </div>
     </div>
 
-    <button class="btn btn-primary" id="btn-play" style="margin-bottom:14px;font-size:1.1rem;padding:16px 48px;">
-      ⚡ JOUER
-    </button>
-    <button class="btn btn-secondary btn-sm" id="btn-rules">Règles du jeu</button>
+    <button class="btn btn-outline btn-sm" id="btn-rules">Règles du jeu</button>
   </div>
 
-  <!-- ══════════════════ RULES SCREEN ══════════════════ -->
+  <!-- ══════════ RULES ══════════ -->
   <div id="screen-rules" class="screen">
-    <div class="logo" style="font-size:1.8rem;margin-bottom:20px;">Règles</div>
-    <ul class="rules-list">
-      <li><span class="icon">⚡</span><span>Des cases <strong>s'illuminent</strong> sur la grille — appuie dessus le plus vite possible !</span></li>
-      <li><span class="icon">📈</span><span>La série commence à <strong>1 case</strong> et monte jusqu'à <strong>20 cases</strong> simultanées.</span></li>
-      <li><span class="icon">⏱</span><span>Le <strong>chronomètre</strong> tourne dès le début. Chaque mauvais tap ajoute <strong>+0,5 s</strong> de pénalité.</span></li>
-      <li><span class="icon">🎯</span><span><strong>Éteins toutes les cases allumées</strong> en les tapant — elles restent allumées jusqu'à ce que tu les touches.</span></li>
-      <li><span class="icon">🏆</span><span>Ton <strong>meilleur temps total</strong> est sauvegardé localement.</span></li>
-    </ul>
-    <button class="btn btn-primary" id="btn-rules-back" style="margin-top:28px;">Retour</button>
+    <div class="logo" style="font-size:1.6rem;margin-bottom:18px;">Règles</div>
+
+    <div style="width:100%;max-width:380px;display:flex;flex-direction:column;gap:18px;">
+      <div style="background:var(--surface);border:1.5px solid rgba(255,229,0,.25);border-radius:14px;padding:16px 18px;">
+        <div style="font-family:'Orbitron',sans-serif;font-weight:700;color:var(--accent);font-size:.9rem;margin-bottom:10px;">⚡ MODE RAPIDITÉ</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;font-size:.85rem;color:var(--dim);line-height:1.4;">
+          <li>• Plusieurs cases <strong style="color:var(--text);">s'allument simultanément</strong></li>
+          <li>• <strong style="color:var(--text);">Éteins-les toutes</strong> en les tapant, dans n'importe quel ordre</li>
+          <li>• Le chrono mesure ta vitesse sur les 20 niveaux</li>
+          <li>• Mauvais tap = <strong style="color:var(--red);">+0,5 s</strong> de pénalité</li>
+        </ul>
+      </div>
+
+      <div style="background:var(--surface);border:1.5px solid rgba(204,68,255,.25);border-radius:14px;padding:16px 18px;">
+        <div style="font-family:'Orbitron',sans-serif;font-weight:700;color:var(--purple);font-size:.9rem;margin-bottom:10px;">🧠 MODE MEMORY</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;font-size:.85rem;color:var(--dim);line-height:1.4;">
+          <li>• Les cases s'allument <strong style="color:var(--text);">une par une</strong> pour montrer la séquence</li>
+          <li>• Mémorise l'ordre, puis <strong style="color:var(--text);">reproduis-le</strong> en tapant dans le même ordre</li>
+          <li>• La case à taper suivante est <strong style="color:var(--text);">indiquée en haut</strong></li>
+          <li>• Mauvais ordre = <strong style="color:var(--red);">+1 s</strong> de pénalité et recommencer le niveau</li>
+        </ul>
+      </div>
+    </div>
+
+    <button class="btn btn-yellow" id="btn-rules-back" style="margin-top:22px;">Retour</button>
   </div>
 
-  <!-- ══════════════════ GAME SCREEN ══════════════════ -->
+  <!-- ══════════ GAME ══════════ -->
   <div id="screen-game" class="screen">
     <div id="hud">
       <div class="hud-block">
         <span class="hud-label">Temps</span>
         <span class="hud-value" id="hud-timer">0.00s</span>
       </div>
+      <div><span id="hud-mode-badge" class="speed">RAPIDITÉ</span></div>
       <div class="hud-block">
         <span class="hud-label">Niveau</span>
         <span class="hud-value" id="hud-round">1 / 20</span>
       </div>
-      <div class="hud-block">
-        <span class="hud-label">Record</span>
-        <span class="hud-value" id="hud-best">--</span>
-      </div>
     </div>
 
-    <div id="progress-wrap">
-      <div id="progress-bar" style="width:5%;"></div>
-    </div>
+    <div id="progress-wrap"><div id="progress-bar" class="speed" style="width:5%;"></div></div>
 
     <div id="status-msg">Prêt…</div>
 
-    <div id="grid-wrap">
-      <div id="grid"></div>
-    </div>
+    <div id="order-track"></div>
+
+    <div id="grid-wrap"><div id="grid"></div></div>
   </div>
 
-  <!-- ══════════════════ RESULT SCREEN ══════════════════ -->
+  <!-- ══════════ RESULT ══════════ -->
   <div id="screen-result" class="screen">
-    <div class="result-title" id="result-title">Bravo !</div>
+    <div class="result-title" id="result-title">Terminé !</div>
     <div class="stats-grid">
-      <div class="stat-box highlight">
+      <div class="stat-box hi">
         <div class="s-label">Temps total</div>
         <div class="s-value" id="res-time">--</div>
       </div>
@@ -489,7 +468,7 @@
         <div class="s-value" id="res-best">--</div>
       </div>
       <div class="stat-box">
-        <div class="s-label">Niveaux réussis</div>
+        <div class="s-label">Niveaux</div>
         <div class="s-value" id="res-rounds">--</div>
       </div>
       <div class="stat-box">
@@ -498,94 +477,96 @@
       </div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-primary" id="btn-retry">⚡ Rejouer</button>
-      <button class="btn btn-secondary btn-sm" id="btn-home">Accueil</button>
+      <button class="btn btn-yellow btn-lg" id="btn-retry">⚡ Rejouer</button>
+      <button class="btn btn-outline btn-sm" id="btn-home">Accueil</button>
     </div>
   </div>
 
 </div><!-- #app -->
 
-<!-- Countdown overlay — hidden by default, shown only during game start -->
-<div id="countdown-overlay" class="hidden">
-  <div id="countdown-num">3</div>
-</div>
-
-<!-- Flash overlay (wrong tap) -->
+<div id="countdown-overlay" class="hidden"><div id="countdown-num">3</div></div>
 <div id="flash-overlay"></div>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   LIGHTNING — Game Logic
+   LIGHTNING — Dual Mode Game Engine
+   Mode 0 = RAPIDITÉ  |  Mode 1 = MEMORY
 ═══════════════════════════════════════════════════════════════ */
 
-const TOTAL_ROUNDS   = 20;
-const GRID_COLS      = 5;
-const GRID_ROWS      = 5;
-const TOTAL_TILES    = GRID_COLS * GRID_ROWS; // 25
-const PENALTY_MS     = 500;   // ms added per wrong tap
-// Les cases restent allumées jusqu'au tap — pas de timeout
+const TOTAL_ROUNDS  = 20;
+const GRID_SIZE     = 5;
+const TOTAL_TILES   = GRID_SIZE * GRID_SIZE; // 25
+const PENALTY_SPEED = 500;   // ms per wrong tap (rapidité)
+const PENALTY_MEM   = 1000;  // ms per wrong order (memory)
+const MEM_SHOW_MS   = 600;   // ms each tile shown during memory sequence
+const MEM_GAP_MS    = 180;   // gap between tiles in memory sequence
 
-// ── DOM refs ──────────────────────────────────────────────────
-const screens = {
-  home:   document.getElementById('screen-home'),
-  rules:  document.getElementById('screen-rules'),
-  game:   document.getElementById('screen-game'),
-  result: document.getElementById('screen-result'),
-};
-const grid           = document.getElementById('grid');
-const hudTimer       = document.getElementById('hud-timer');
-const hudRound       = document.getElementById('hud-round');
-const hudBest        = document.getElementById('hud-best');
-const progressBar    = document.getElementById('progress-bar');
-const statusMsg      = document.getElementById('status-msg');
-const countdownOverlay = document.getElementById('countdown-overlay');
-const countdownNum   = document.getElementById('countdown-num');
-const flashOverlay   = document.getElementById('flash-overlay');
-const homeBestVal    = document.getElementById('home-best-val');
-const resBestBox     = document.getElementById('res-best-box');
+// ── DOM ──────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const screens       = { home: $('screen-home'), rules: $('screen-rules'), game: $('screen-game'), result: $('screen-result') };
+const grid          = $('grid');
+const hudTimer      = $('hud-timer');
+const hudRound      = $('hud-round');
+const hudModeBadge  = $('hud-mode-badge');
+const progressBar   = $('progress-bar');
+const statusMsg     = $('status-msg');
+const orderTrack    = $('order-track');
+const countdownEl   = $('countdown-overlay');
+const countdownNum  = $('countdown-num');
+const flashOverlay  = $('flash-overlay');
 
 // ── State ─────────────────────────────────────────────────────
-let tiles        = [];
-let currentRound = 0;
-let litIndices   = [];
-let pendingHits  = new Set();
-let gameRunning  = false;
-let phase        = 'idle'; // 'showing' | 'input' | 'idle'
-let startTime    = 0;
-let elapsedMs    = 0;
-let penaltyMs    = 0;
-let timerRAF     = null;
-let bestTime     = null;
+let currentMode     = 0;   // 0=speed, 1=memory
+let tiles           = [];
+let currentRound    = 0;
+let gameRunning     = false;
+let phase           = 'idle';
+let startTime       = 0;
+let elapsedMs       = 0;
+let penaltyMs       = 0;
+let timerRAF        = null;
 let roundsCompleted = 0;
 
+// Speed mode
+let pendingHits     = new Set();
+
+// Memory mode
+let memSequence     = [];   // ordered list of tile indices
+let memExpected     = 0;    // next index in sequence to tap
+
 // ── Persistence ───────────────────────────────────────────────
-function loadBest() {
-  const v = localStorage.getItem('lightning_best');
-  bestTime = v ? parseFloat(v) : null;
+function loadBest(mode) {
+  const v = localStorage.getItem(`lightning_best_${mode}`);
+  return v ? parseFloat(v) : null;
 }
-function saveBest(ms) {
-  localStorage.setItem('lightning_best', ms);
+function saveBest(mode, ms) {
+  localStorage.setItem(`lightning_best_${mode}`, ms);
 }
 function fmtTime(ms) {
   if (ms === null || ms === undefined || isNaN(ms)) return '--';
   return (ms / 1000).toFixed(2) + 's';
 }
+function refreshHomeBests() {
+  const bs = loadBest(0), bm = loadBest(1);
+  $('best-speed').textContent  = bs !== null ? fmtTime(bs) : '--';
+  $('best-memory').textContent = bm !== null ? fmtTime(bm) : '--';
+}
 
-// ── Screen navigation ─────────────────────────────────────────
+// ── Screen nav ────────────────────────────────────────────────
 function showScreen(name) {
   Object.values(screens).forEach(s => s.classList.remove('active'));
   screens[name].classList.add('active');
 }
 
-// ── Grid setup ────────────────────────────────────────────────
+// ── Grid ──────────────────────────────────────────────────────
 function buildGrid() {
   grid.innerHTML = '';
-  grid.style.gridTemplateColumns = `repeat(${GRID_COLS}, 1fr)`;
+  grid.style.gridTemplateColumns = `repeat(${GRID_SIZE}, 1fr)`;
   tiles = [];
   for (let i = 0; i < TOTAL_TILES; i++) {
     const t = document.createElement('div');
     t.className = 'tile dim';
-    t.dataset.c = i % 20;
+    t.dataset.c   = i % 20;
     t.dataset.idx = i;
     t.addEventListener('pointerdown', onTileTap);
     grid.appendChild(t);
@@ -596,13 +577,12 @@ function buildGrid() {
 // ── Timer ─────────────────────────────────────────────────────
 function startTimer() {
   startTime = performance.now() - elapsedMs;
-  function tick() {
+  (function tick() {
     if (!gameRunning) return;
     elapsedMs = performance.now() - startTime;
     hudTimer.textContent = fmtTime(elapsedMs + penaltyMs);
     timerRAF = requestAnimationFrame(tick);
-  }
-  timerRAF = requestAnimationFrame(tick);
+  })();
 }
 function stopTimer() {
   if (timerRAF) cancelAnimationFrame(timerRAF);
@@ -611,39 +591,29 @@ function stopTimer() {
 
 // ── Countdown ─────────────────────────────────────────────────
 function runCountdown(cb) {
-  countdownOverlay.classList.remove('hidden');
+  countdownEl.classList.remove('hidden');
   let n = 3;
   countdownNum.textContent = n;
-  // force re-animation
-  countdownNum.style.animation = 'none';
-  void countdownNum.offsetWidth;
-  countdownNum.style.animation = '';
-
+  reanimNum();
   const iv = setInterval(() => {
     n--;
     if (n === 0) {
-      countdownNum.textContent = 'GO!';
-      countdownNum.style.animation = 'none';
-      void countdownNum.offsetWidth;
-      countdownNum.style.animation = '';
-      setTimeout(() => {
-        countdownOverlay.classList.add('hidden');
-        clearInterval(iv);
-        cb();
-      }, 700);
+      countdownNum.textContent = 'GO!'; reanimNum();
+      setTimeout(() => { countdownEl.classList.add('hidden'); clearInterval(iv); cb(); }, 650);
     } else {
-      countdownNum.textContent = n;
-      countdownNum.style.animation = 'none';
-      void countdownNum.offsetWidth;
-      countdownNum.style.animation = '';
+      countdownNum.textContent = n; reanimNum();
     }
-  }, 800);
+  }, 780);
+}
+function reanimNum() {
+  countdownNum.style.animation = 'none';
+  void countdownNum.offsetWidth;
+  countdownNum.style.animation = '';
 }
 
-// ── Pick random tiles ─────────────────────────────────────────
+// ── Shuffle ───────────────────────────────────────────────────
 function pickRandom(n) {
-  const pool = Array.from({length: TOTAL_TILES}, (_, i) => i);
-  // Fisher-Yates shuffle
+  const pool = Array.from({ length: TOTAL_TILES }, (_, i) => i);
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
@@ -651,140 +621,246 @@ function pickRandom(n) {
   return pool.slice(0, n);
 }
 
-// ── Show phase: illuminate all tiles at once, then go to input ─
-function showPhase(indices, cb) {
-  phase = 'showing';
-  setStatus('Mémorise !', '');
-  // dim all first
-  tiles.forEach(t => { t.classList.remove('lit','hit','wrong'); t.classList.add('dim'); });
-
-  // Light all target tiles simultaneously
-  indices.forEach(idx => {
-    tiles[idx].classList.remove('dim');
-    tiles[idx].classList.add('lit');
-  });
-
-  // Short preview window so the player sees them, then immediately enter input phase
-  // (tiles stay lit — player taps them to extinguish)
-  setTimeout(cb, 400);
-}
-
-// ── Input phase — cases restent allumées jusqu'au tap ─────────
-function inputPhase(indices) {
-  phase = 'input';
-  pendingHits = new Set(indices);
-  // Les cases sont déjà allumées depuis showPhase — le joueur doit les éteindre
-  setStatus('Éteins les cases !', '');
-  // Pas de timeout : le joueur joue à son rythme, le chrono mesure la vitesse
-}
-
-// ── Tile tap handler ──────────────────────────────────────────
-function onTileTap(e) {
-  if (phase !== 'input') return;
-  const idx = parseInt(e.currentTarget.dataset.idx);
-
-  if (pendingHits.has(idx)) {
-    // Correct tap — la case s'éteint immédiatement
-    pendingHits.delete(idx);
-    tiles[idx].classList.remove('lit');
-    tiles[idx].classList.add('hit');
-    // vibrate
-    if (navigator.vibrate) navigator.vibrate(18);
-    // Repasser en dim après l'animation de flash
-    setTimeout(() => {
-      tiles[idx].classList.remove('hit');
-      tiles[idx].classList.add('dim');
-    }, 260);
-
-    if (pendingHits.size === 0) {
-      // Round complete!
-      roundsCompleted++;
-      setStatus('✓ Parfait !', 'ok');
-      setTimeout(() => nextRound(), 400);
-    }
-  } else {
-    // Wrong tap
-    penaltyMs += PENALTY_MS;
-    tiles[idx].classList.add('wrong');
-    setTimeout(() => { tiles[idx].classList.remove('wrong'); tiles[idx].classList.add('dim'); }, 350);
-    showFlash();
-    if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
-    setStatus(`+${(PENALTY_MS/1000).toFixed(1)}s pénalité`, 'bad');
-    setTimeout(() => { if (phase === 'input') setStatus('Appuie !', ''); }, 600);
-  }
-}
-
-// ── Next round ────────────────────────────────────────────────
-function nextRound() {
-  currentRound++;
-  if (currentRound > TOTAL_ROUNDS) {
-    endGame(true);
-    return;
-  }
-  updateHUD();
-  const indices = pickRandom(currentRound);
-  litIndices = indices;
-  showPhase(indices, () => inputPhase(indices));
-}
-
-// ── HUD update ────────────────────────────────────────────────
+// ── HUD ───────────────────────────────────────────────────────
 function updateHUD() {
   hudRound.textContent = `${currentRound} / ${TOTAL_ROUNDS}`;
   progressBar.style.width = `${(currentRound / TOTAL_ROUNDS) * 100}%`;
-  hudBest.textContent = bestTime !== null ? fmtTime(bestTime) : '--';
+  const isSpeed = currentMode === 0;
+  hudModeBadge.textContent = isSpeed ? 'RAPIDITÉ' : 'MEMORY';
+  hudModeBadge.className   = isSpeed ? 'speed' : 'memory';
+  progressBar.className    = isSpeed ? 'speed' : 'memory';
 }
 
 // ── Status ────────────────────────────────────────────────────
 function setStatus(msg, cls) {
   statusMsg.textContent = msg;
-  statusMsg.className = cls || '';
+  statusMsg.className   = cls || '';
 }
 
-// ── Flash overlay ─────────────────────────────────────────────
-function showFlash() {
-  flashOverlay.classList.add('show');
-  setTimeout(() => flashOverlay.classList.remove('show'), 180);
+// ── Flash ─────────────────────────────────────────────────────
+function showFlash(type) {
+  flashOverlay.className = type;
+  setTimeout(() => { flashOverlay.className = ''; }, 160);
 }
 
-// ── End game ──────────────────────────────────────────────────
+// ── Tile state helpers ────────────────────────────────────────
+function setTileState(idx, state) {
+  const t = tiles[idx];
+  t.classList.remove('dim', 'lit', 'next-hit', 'hit', 'wrong', 'showing');
+  t.classList.add(state);
+}
+function dimTile(idx) { setTileState(idx, 'dim'); }
+
+// ═══════════════════════════════════════════════════════════════
+//  MODE 0 — RAPIDITÉ
+// ═══════════════════════════════════════════════════════════════
+
+function speedStartRound(indices) {
+  phase = 'input';
+  pendingHits = new Set(indices);
+  orderTrack.innerHTML = '';
+
+  // Light all tiles at once
+  tiles.forEach(t => { t.classList.remove('lit','hit','wrong','showing'); t.classList.add('dim'); });
+  indices.forEach(idx => setTileState(idx, 'lit'));
+  setStatus('Éteins les cases !', '');
+}
+
+function speedOnTap(idx) {
+  if (pendingHits.has(idx)) {
+    pendingHits.delete(idx);
+    setTileState(idx, 'hit');
+    if (navigator.vibrate) navigator.vibrate(16);
+    setTimeout(() => dimTile(idx), 240);
+
+    if (pendingHits.size === 0) {
+      roundsCompleted++;
+      setStatus('✓ Parfait !', 'ok');
+      showFlash('good');
+      setTimeout(() => nextRound(), 380);
+    }
+  } else {
+    penaltyMs += PENALTY_SPEED;
+    setTileState(idx, 'wrong');
+    setTimeout(() => dimTile(idx), 300);
+    showFlash('bad');
+    if (navigator.vibrate) navigator.vibrate([25, 15, 25]);
+    setStatus(`+${(PENALTY_SPEED/1000).toFixed(1)}s pénalité`, 'bad');
+    setTimeout(() => { if (phase === 'input') setStatus('Éteins les cases !', ''); }, 550);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MODE 1 — MEMORY
+// ═══════════════════════════════════════════════════════════════
+
+function memShowSequence(sequence, cb) {
+  phase = 'showing';
+  setStatus('Mémorise la séquence…', 'info');
+  orderTrack.innerHTML = '';
+
+  // Dim all
+  tiles.forEach(t => { t.classList.remove('lit','hit','wrong','showing','next-hit'); t.classList.add('dim'); });
+
+  // Show tiles one by one
+  let i = 0;
+  function showNext() {
+    if (i > 0) dimTile(sequence[i - 1]);
+    if (i >= sequence.length) {
+      setTimeout(cb, 300);
+      return;
+    }
+    setTileState(sequence[i], 'showing');
+    i++;
+    setTimeout(showNext, MEM_SHOW_MS + MEM_GAP_MS);
+  }
+  setTimeout(showNext, 200);
+}
+
+function memBuildOrderTrack(sequence) {
+  orderTrack.innerHTML = '';
+  sequence.forEach((idx, pos) => {
+    const dot = document.createElement('div');
+    dot.className = 'order-dot pending';
+    // use tile colour
+    const tileColor = getComputedStyle(tiles[idx]).backgroundColor;
+    dot.style.background = tileColor;
+    dot.style.color = tileColor;
+    dot.dataset.pos = pos;
+    orderTrack.appendChild(dot);
+  });
+}
+
+function memUpdateTrack(pos, state) {
+  const dot = orderTrack.querySelector(`[data-pos="${pos}"]`);
+  if (dot) { dot.className = `order-dot ${state}`; }
+}
+
+function memHighlightNext(pos) {
+  // Reset all to pending/done
+  orderTrack.querySelectorAll('.order-dot').forEach((d, i) => {
+    if (i < pos)       d.className = 'order-dot done';
+    else if (i === pos) d.className = 'order-dot next';
+    else               d.className = 'order-dot pending';
+  });
+  // Highlight the next tile on the grid
+  tiles.forEach(t => t.classList.remove('next-hit'));
+  if (pos < memSequence.length) {
+    setTileState(memSequence[pos], 'next-hit');
+  }
+}
+
+function memStartInput(sequence) {
+  phase = 'input';
+  memSequence = sequence;
+  memExpected = 0;
+  memBuildOrderTrack(sequence);
+  memHighlightNext(0);
+  setStatus('Reproduis la séquence !', '');
+}
+
+function memOnTap(idx) {
+  const expected = memSequence[memExpected];
+
+  if (idx === expected) {
+    // Correct
+    memUpdateTrack(memExpected, 'done');
+    setTileState(idx, 'hit');
+    if (navigator.vibrate) navigator.vibrate(16);
+    setTimeout(() => dimTile(idx), 240);
+    memExpected++;
+
+    if (memExpected >= memSequence.length) {
+      // Sequence complete!
+      roundsCompleted++;
+      setStatus('✓ Séquence parfaite !', 'ok');
+      showFlash('good');
+      tiles.forEach(t => t.classList.remove('next-hit'));
+      setTimeout(() => nextRound(), 420);
+    } else {
+      memHighlightNext(memExpected);
+    }
+  } else {
+    // Wrong order — penalty + restart input for this round
+    penaltyMs += PENALTY_MEM;
+    memUpdateTrack(memExpected, 'wrong');
+    setTileState(idx, 'wrong');
+    setTimeout(() => dimTile(idx), 300);
+    showFlash('bad');
+    if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
+    setStatus(`Mauvais ordre ! +${(PENALTY_MEM/1000).toFixed(1)}s`, 'bad');
+
+    // Brief pause then restart input from beginning
+    phase = 'paused';
+    tiles.forEach(t => t.classList.remove('next-hit'));
+    setTimeout(() => {
+      // Replay the sequence as a reminder, then restart input
+      memShowSequence(memSequence, () => memStartInput(memSequence));
+    }, 700);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SHARED — Tap dispatcher + Round management
+// ═══════════════════════════════════════════════════════════════
+
+function onTileTap(e) {
+  if (phase !== 'input') return;
+  const idx = parseInt(e.currentTarget.dataset.idx);
+  if (currentMode === 0) speedOnTap(idx);
+  else                   memOnTap(idx);
+}
+
+function nextRound() {
+  currentRound++;
+  if (currentRound > TOTAL_ROUNDS) { endGame(true); return; }
+  updateHUD();
+  const indices = pickRandom(currentRound);
+
+  if (currentMode === 0) {
+    speedStartRound(indices);
+  } else {
+    memShowSequence(indices, () => memStartInput(indices));
+  }
+}
+
 function endGame(completed) {
   gameRunning = false;
   stopTimer();
   phase = 'idle';
 
-  const totalMs = elapsedMs + penaltyMs;
-  const isNewRecord = bestTime === null || totalMs < bestTime;
-  if (isNewRecord && completed) {
-    bestTime = totalMs;
-    saveBest(totalMs);
-  }
+  const totalMs   = elapsedMs + penaltyMs;
+  const prevBest  = loadBest(currentMode);
+  const isRecord  = completed && (prevBest === null || totalMs < prevBest);
+  if (isRecord) saveBest(currentMode, totalMs);
 
-  // Populate result screen
-  document.getElementById('result-title').textContent = completed ? '⚡ Terminé !' : 'Partie terminée';
-  document.getElementById('result-title').className = 'result-title ' + (completed ? 'win' : 'lose');
-  document.getElementById('res-time').textContent = fmtTime(totalMs);
-  document.getElementById('res-best').textContent = bestTime !== null ? fmtTime(bestTime) : '--';
-  document.getElementById('res-rounds').textContent = `${roundsCompleted} / ${TOTAL_ROUNDS}`;
-  document.getElementById('res-penalties').textContent = fmtTime(penaltyMs);
+  $('result-title').textContent = completed ? '⚡ Terminé !' : 'Partie terminée';
+  $('result-title').className   = 'result-title ' + (completed ? 'win' : 'lose');
+  $('res-time').textContent      = fmtTime(totalMs);
+  $('res-best').textContent      = (isRecord ? totalMs : (prevBest !== null ? prevBest : totalMs)) !== null ? fmtTime(isRecord ? totalMs : prevBest) : '--';
+  $('res-rounds').textContent    = `${roundsCompleted} / ${TOTAL_ROUNDS}`;
+  $('res-penalties').textContent = fmtTime(penaltyMs);
 
-  resBestBox.className = 'stat-box' + (isNewRecord && completed ? ' new-record' : '');
-  if (isNewRecord && completed) {
-    document.getElementById('res-best').parentElement.querySelector('.s-label').textContent = '🏆 Nouveau record !';
-  } else {
-    document.getElementById('res-best').parentElement.querySelector('.s-label').textContent = 'Meilleur';
-  }
+  const bestBox = $('res-best-box');
+  bestBox.className = 'stat-box' + (isRecord ? ' rec' : '');
+  bestBox.querySelector('.s-label').textContent = isRecord ? '🏆 Nouveau record !' : 'Meilleur';
+
+  // Update retry button colour to match mode
+  $('btn-retry').className = `btn btn-lg ${currentMode === 0 ? 'btn-yellow' : 'btn-purple'}`;
 
   showScreen('result');
+  refreshHomeBests();
 }
 
-// ── Start game ────────────────────────────────────────────────
-function startGame() {
-  loadBest();
-  currentRound  = 0;
-  elapsedMs     = 0;
-  penaltyMs     = 0;
+function startGame(mode) {
+  currentMode     = mode;
+  currentRound    = 0;
+  elapsedMs       = 0;
+  penaltyMs       = 0;
   roundsCompleted = 0;
-  phase         = 'idle';
+  phase           = 'idle';
+  memSequence     = [];
+  memExpected     = 0;
 
   buildGrid();
   updateHUD();
@@ -797,46 +873,37 @@ function startGame() {
   });
 }
 
-// ── Button wiring — utilise touchstart pour réactivité immédiate sur iOS ──
-function addBtnHandler(id, fn) {
+// ── Button wiring ─────────────────────────────────────────────
+function addBtn(id, fn) {
   const el = document.getElementById(id);
   let tapped = false;
-  el.addEventListener('touchstart', (e) => {
-    e.stopPropagation();
-    tapped = true;
-    fn();
-  }, { passive: true });
-  el.addEventListener('click', (e) => {
-    if (tapped) { tapped = false; return; } // évite double déclenchement
-    fn();
-  });
+  el.addEventListener('touchstart', e => { e.stopPropagation(); tapped = true; fn(); }, { passive: true });
+  el.addEventListener('click', () => { if (tapped) { tapped = false; return; } fn(); });
 }
 
-addBtnHandler('btn-play', startGame);
-addBtnHandler('btn-retry', startGame);
-addBtnHandler('btn-rules', () => showScreen('rules'));
-addBtnHandler('btn-rules-back', () => showScreen('home'));
-addBtnHandler('btn-home', () => {
-  gameRunning = false;
-  stopTimer();
-  phase = 'idle';
-  loadBest();
-  homeBestVal.textContent = bestTime !== null ? fmtTime(bestTime) : '--';
-  showScreen('home');
+// Mode card tap
+['card-speed', 'card-memory'].forEach((id, mode) => {
+  const el = document.getElementById(id);
+  let tapped = false;
+  el.addEventListener('touchstart', e => { e.stopPropagation(); tapped = true; startGame(mode); }, { passive: true });
+  el.addEventListener('click', () => { if (tapped) { tapped = false; return; } startGame(mode); });
+});
+
+addBtn('btn-rules',      () => showScreen('rules'));
+addBtn('btn-rules-back', () => showScreen('home'));
+addBtn('btn-retry',      () => startGame(currentMode));
+addBtn('btn-home',       () => {
+  gameRunning = false; stopTimer(); phase = 'idle';
+  refreshHomeBests(); showScreen('home');
 });
 
 // ── Init ──────────────────────────────────────────────────────
-loadBest();
-homeBestVal.textContent = bestTime !== null ? fmtTime(bestTime) : '--';
-countdownOverlay.classList.add('hidden');
+refreshHomeBests();
 
-// Prevent double-tap zoom on iOS — only on game tiles, not on buttons
+// Prevent double-tap zoom — spare buttons and cards
 document.addEventListener('touchend', e => {
-  // Only block default on non-interactive elements to avoid killing button clicks
   const tag = e.target.tagName.toLowerCase();
-  if (tag !== 'button' && tag !== 'a' && tag !== 'input') {
-    e.preventDefault();
-  }
+  if (tag !== 'button' && !e.target.closest('.mode-card')) e.preventDefault();
 }, { passive: false });
 </script>
 </body>
