@@ -1,1 +1,840 @@
-teste
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="LIGHTNING" />
+  <meta name="theme-color" content="#0a0a1a" />
+  <title>LIGHTNING</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0a0a1a;
+      --bg2:       #0f0f2a;
+      --surface:   #12122a;
+      --border:    #1e1e4a;
+      --accent:    #ffe500;
+      --accent2:   #00d4ff;
+      --text:      #e8e8ff;
+      --text-dim:  #7070a0;
+      --success:   #00ff88;
+      --danger:    #ff3366;
+      --radius:    14px;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      overflow: hidden;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    /* ─── Starfield background ──────────────────────────────────── */
+    #stars {
+      position: fixed; inset: 0; z-index: 0;
+      background: radial-gradient(ellipse at 50% 0%, #1a0a3a 0%, #0a0a1a 70%);
+      overflow: hidden;
+    }
+    #stars::before, #stars::after {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 40% 10%, rgba(255,255,255,.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 60% 30%, rgba(255,255,255,.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 75% 55%, rgba(255,255,255,.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 85% 20%, rgba(255,255,255,.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 70%, rgba(255,255,255,.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 15% 80%, rgba(255,255,255,.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 50% 90%, rgba(255,255,255,.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 35% 65%, rgba(255,255,255,.5) 0%, transparent 100%);
+    }
+
+    /* ─── App shell ─────────────────────────────────────────────── */
+    #app {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column; align-items: center;
+      height: 100dvh;
+      padding: env(safe-area-inset-top, 12px) 12px env(safe-area-inset-bottom, 12px);
+      gap: 0;
+    }
+
+    /* ─── Screens ───────────────────────────────────────────────── */
+    .screen {
+      display: none;
+      flex-direction: column; align-items: center; justify-content: center;
+      width: 100%; height: 100%;
+      animation: fadeIn .35s ease;
+    }
+    .screen.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+    /* ─── Logo ──────────────────────────────────────────────────── */
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: clamp(2.4rem, 10vw, 4rem);
+      letter-spacing: .12em;
+      background: linear-gradient(135deg, #ffe500 0%, #ff9500 40%, #ff3366 70%, #cc00ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+      filter: drop-shadow(0 0 18px rgba(255,229,0,.55));
+      margin-bottom: 4px;
+    }
+    .logo-bolt {
+      display: inline-block;
+      margin-right: 6px;
+      filter: drop-shadow(0 0 10px #ffe500);
+    }
+    .tagline {
+      font-size: .95rem;
+      color: var(--text-dim);
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+
+    /* ─── Buttons ───────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 14px 36px;
+      border: none; border-radius: 50px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700; font-size: 1rem;
+      letter-spacing: .1em;
+      cursor: pointer;
+      transition: transform .12s, box-shadow .12s, filter .12s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active { transform: scale(.94); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ffe500, #ff9500);
+      color: #0a0a1a;
+      box-shadow: 0 0 24px rgba(255,229,0,.45), 0 4px 16px rgba(0,0,0,.4);
+    }
+    .btn-primary:hover { filter: brightness(1.1); box-shadow: 0 0 36px rgba(255,229,0,.65), 0 4px 20px rgba(0,0,0,.5); }
+
+    .btn-secondary {
+      background: transparent;
+      border: 2px solid var(--accent2);
+      color: var(--accent2);
+      box-shadow: 0 0 14px rgba(0,212,255,.25);
+    }
+    .btn-secondary:hover { background: rgba(0,212,255,.08); }
+
+    .btn-sm {
+      padding: 9px 22px;
+      font-size: .78rem;
+    }
+
+    /* ─── Cards ─────────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 22px;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    /* ─── Best score display ────────────────────────────────────── */
+    .best-score-badge {
+      display: flex; align-items: center; gap: 10px;
+      background: linear-gradient(135deg, rgba(255,229,0,.08), rgba(255,149,0,.08));
+      border: 1px solid rgba(255,229,0,.25);
+      border-radius: 50px;
+      padding: 10px 22px;
+      margin-bottom: 28px;
+    }
+    .best-score-badge .label {
+      font-size: .75rem; letter-spacing: .15em; text-transform: uppercase; color: var(--text-dim);
+    }
+    .best-score-badge .value {
+      font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1.15rem;
+      color: var(--accent);
+    }
+
+    /* ─── HUD (in-game header) ──────────────────────────────────── */
+    #hud {
+      width: 100%; max-width: 480px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 4px 6px;
+      flex-shrink: 0;
+    }
+    .hud-block {
+      display: flex; flex-direction: column; align-items: center; gap: 1px;
+      min-width: 80px;
+    }
+    .hud-label {
+      font-size: .62rem; letter-spacing: .18em; text-transform: uppercase; color: var(--text-dim);
+    }
+    .hud-value {
+      font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1.1rem;
+      color: var(--text);
+    }
+    #hud-timer { color: var(--accent); }
+    #hud-round { color: var(--accent2); }
+
+    /* ─── Progress bar ──────────────────────────────────────────── */
+    #progress-wrap {
+      width: 100%; max-width: 480px;
+      height: 4px; background: var(--border);
+      border-radius: 2px; overflow: hidden;
+      flex-shrink: 0; margin-bottom: 8px;
+    }
+    #progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      border-radius: 2px;
+      transition: width .3s ease;
+    }
+
+    /* ─── Status message ────────────────────────────────────────── */
+    #status-msg {
+      font-size: .82rem; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--text-dim); min-height: 1.2em;
+      flex-shrink: 0; margin-bottom: 6px;
+      transition: color .2s;
+    }
+    #status-msg.ok  { color: var(--success); }
+    #status-msg.bad { color: var(--danger); }
+
+    /* ─── Grid ──────────────────────────────────────────────────── */
+    #grid-wrap {
+      flex: 1 1 auto;
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; max-width: 480px;
+      padding: 4px 0;
+    }
+    #grid {
+      display: grid;
+      gap: 6px;
+      width: 100%;
+      aspect-ratio: 1;
+    }
+
+    /* ─── Tiles ─────────────────────────────────────────────────── */
+    .tile {
+      border-radius: 10px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform .08s;
+      -webkit-tap-highlight-color: transparent;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+    }
+    .tile::after {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: inherit;
+      opacity: 0;
+      transition: opacity .15s;
+    }
+    .tile:active { transform: scale(.88); }
+
+    /* Dim state (default) */
+    .tile.dim {
+      opacity: .28;
+      filter: saturate(.3) brightness(.6);
+      box-shadow: none;
+    }
+
+    /* Lit state */
+    .tile.lit {
+      opacity: 1;
+      filter: saturate(1.4) brightness(1.2);
+      animation: pulse-tile .55s ease-in-out infinite alternate;
+    }
+
+    /* Hit state */
+    .tile.hit {
+      opacity: 1;
+      filter: brightness(2) saturate(1.5);
+      animation: hit-flash .25s ease-out forwards;
+    }
+
+    /* Wrong state */
+    .tile.wrong {
+      animation: shake .3s ease-out forwards;
+      filter: brightness(1.5) saturate(0) sepia(1) hue-rotate(-20deg);
+    }
+
+    @keyframes pulse-tile {
+      from { transform: scale(1);    box-shadow: var(--tile-glow); }
+      to   { transform: scale(1.04); box-shadow: var(--tile-glow-big); }
+    }
+    @keyframes hit-flash {
+      0%   { transform: scale(1.12); opacity: 1; }
+      100% { transform: scale(1);    opacity: .35; }
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%     { transform: translateX(-5px); }
+      40%     { transform: translateX(5px); }
+      60%     { transform: translateX(-4px); }
+      80%     { transform: translateX(4px); }
+    }
+
+    /* Tile colours — 20 distinct vivid hues */
+    .tile[data-c="0"]  { background: #ff2244; --tile-glow: 0 0 12px #ff2244aa; --tile-glow-big: 0 0 28px #ff2244cc, 0 0 8px #ff2244; }
+    .tile[data-c="1"]  { background: #ff6600; --tile-glow: 0 0 12px #ff6600aa; --tile-glow-big: 0 0 28px #ff6600cc, 0 0 8px #ff6600; }
+    .tile[data-c="2"]  { background: #ffcc00; --tile-glow: 0 0 12px #ffcc00aa; --tile-glow-big: 0 0 28px #ffcc00cc, 0 0 8px #ffcc00; }
+    .tile[data-c="3"]  { background: #aaff00; --tile-glow: 0 0 12px #aaff00aa; --tile-glow-big: 0 0 28px #aaff00cc, 0 0 8px #aaff00; }
+    .tile[data-c="4"]  { background: #00ff66; --tile-glow: 0 0 12px #00ff66aa; --tile-glow-big: 0 0 28px #00ff66cc, 0 0 8px #00ff66; }
+    .tile[data-c="5"]  { background: #00ffcc; --tile-glow: 0 0 12px #00ffccaa; --tile-glow-big: 0 0 28px #00ffcccc, 0 0 8px #00ffcc; }
+    .tile[data-c="6"]  { background: #00d4ff; --tile-glow: 0 0 12px #00d4ffaa; --tile-glow-big: 0 0 28px #00d4ffcc, 0 0 8px #00d4ff; }
+    .tile[data-c="7"]  { background: #0088ff; --tile-glow: 0 0 12px #0088ffaa; --tile-glow-big: 0 0 28px #0088ffcc, 0 0 8px #0088ff; }
+    .tile[data-c="8"]  { background: #4422ff; --tile-glow: 0 0 12px #4422ffaa; --tile-glow-big: 0 0 28px #4422ffcc, 0 0 8px #4422ff; }
+    .tile[data-c="9"]  { background: #aa00ff; --tile-glow: 0 0 12px #aa00ffaa; --tile-glow-big: 0 0 28px #aa00ffcc, 0 0 8px #aa00ff; }
+    .tile[data-c="10"] { background: #ff00cc; --tile-glow: 0 0 12px #ff00ccaa; --tile-glow-big: 0 0 28px #ff00cccc, 0 0 8px #ff00cc; }
+    .tile[data-c="11"] { background: #ff0066; --tile-glow: 0 0 12px #ff0066aa; --tile-glow-big: 0 0 28px #ff0066cc, 0 0 8px #ff0066; }
+    .tile[data-c="12"] { background: #ff4488; --tile-glow: 0 0 12px #ff4488aa; --tile-glow-big: 0 0 28px #ff4488cc, 0 0 8px #ff4488; }
+    .tile[data-c="13"] { background: #ff8844; --tile-glow: 0 0 12px #ff8844aa; --tile-glow-big: 0 0 28px #ff8844cc, 0 0 8px #ff8844; }
+    .tile[data-c="14"] { background: #eeff44; --tile-glow: 0 0 12px #eeff44aa; --tile-glow-big: 0 0 28px #eeff44cc, 0 0 8px #eeff44; }
+    .tile[data-c="15"] { background: #44ffaa; --tile-glow: 0 0 12px #44ffaaaa; --tile-glow-big: 0 0 28px #44ffaacc, 0 0 8px #44ffaa; }
+    .tile[data-c="16"] { background: #44ddff; --tile-glow: 0 0 12px #44ddffaa; --tile-glow-big: 0 0 28px #44ddffcc, 0 0 8px #44ddff; }
+    .tile[data-c="17"] { background: #ff44aa; --tile-glow: 0 0 12px #ff44aaaa; --tile-glow-big: 0 0 28px #ff44aacc, 0 0 8px #ff44aa; }
+    .tile[data-c="18"] { background: #88ff44; --tile-glow: 0 0 12px #88ff44aa; --tile-glow-big: 0 0 28px #88ff44cc, 0 0 8px #88ff44; }
+    .tile[data-c="19"] { background: #ff8800; --tile-glow: 0 0 12px #ff8800aa; --tile-glow-big: 0 0 28px #ff8800cc, 0 0 8px #ff8800; }
+
+    /* ─── Results screen ────────────────────────────────────────── */
+    #screen-result { gap: 20px; }
+    .result-title {
+      font-family: 'Orbitron', sans-serif; font-weight: 900;
+      font-size: clamp(1.6rem, 7vw, 2.4rem);
+      letter-spacing: .08em;
+      text-align: center;
+    }
+    .result-title.win {
+      background: linear-gradient(135deg, #ffe500, #00ff88);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      filter: drop-shadow(0 0 16px rgba(0,255,136,.4));
+    }
+    .result-title.lose {
+      background: linear-gradient(135deg, #ff3366, #ff8800);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      filter: drop-shadow(0 0 16px rgba(255,51,102,.4));
+    }
+
+    .stats-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; width: 100%; max-width: 360px;
+    }
+    .stat-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 10px; text-align: center;
+    }
+    .stat-box .s-label { font-size: .65rem; letter-spacing: .16em; text-transform: uppercase; color: var(--text-dim); }
+    .stat-box .s-value { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1.3rem; margin-top: 4px; }
+    .stat-box.highlight { border-color: rgba(255,229,0,.4); background: rgba(255,229,0,.06); }
+    .stat-box.highlight .s-value { color: var(--accent); }
+    .stat-box.new-record { border-color: rgba(0,255,136,.5); background: rgba(0,255,136,.07); animation: record-glow 1.2s ease-in-out infinite alternate; }
+    .stat-box.new-record .s-value { color: var(--success); }
+    @keyframes record-glow {
+      from { box-shadow: 0 0 8px rgba(0,255,136,.3); }
+      to   { box-shadow: 0 0 22px rgba(0,255,136,.6); }
+    }
+
+    .btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+    /* ─── Countdown overlay ─────────────────────────────────────── */
+    #countdown-overlay {
+      position: fixed; inset: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(10,10,26,.85);
+      backdrop-filter: blur(4px);
+    }
+    #countdown-overlay.hidden { display: none; }
+    #countdown-num {
+      font-family: 'Orbitron', sans-serif; font-weight: 900;
+      font-size: clamp(5rem, 25vw, 9rem);
+      background: linear-gradient(135deg, #ffe500, #ff9500);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      filter: drop-shadow(0 0 30px rgba(255,229,0,.7));
+      animation: count-pop .7s ease-out;
+    }
+    @keyframes count-pop {
+      0%   { transform: scale(1.8); opacity: 0; }
+      40%  { transform: scale(.9);  opacity: 1; }
+      100% { transform: scale(1);   opacity: 1; }
+    }
+
+    /* ─── Flash overlay (wrong tap) ────────────────────────────── */
+    #flash-overlay {
+      position: fixed; inset: 0; z-index: 90;
+      pointer-events: none;
+      background: rgba(255,51,102,.18);
+      opacity: 0;
+      transition: opacity .15s;
+    }
+    #flash-overlay.show { opacity: 1; }
+
+    /* ─── Scrollable rules ──────────────────────────────────────── */
+    .rules-list {
+      list-style: none; display: flex; flex-direction: column; gap: 8px;
+      width: 100%; max-width: 380px;
+    }
+    .rules-list li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: .9rem; line-height: 1.4; color: var(--text-dim);
+    }
+    .rules-list li .icon {
+      font-size: 1.1rem; flex-shrink: 0; margin-top: 1px;
+    }
+    .rules-list li strong { color: var(--text); }
+
+    /* ─── Responsive tweaks ─────────────────────────────────────── */
+    @media (max-height: 680px) {
+      .logo { font-size: 2rem; margin-bottom: 2px; }
+      .tagline { margin-bottom: 16px; font-size: .8rem; }
+      .best-score-badge { margin-bottom: 16px; padding: 8px 16px; }
+    }
+  </style>
+</head>
+<body>
+<div id="stars"></div>
+<div id="app">
+
+  <!-- ══════════════════ HOME SCREEN ══════════════════ -->
+  <div id="screen-home" class="screen active">
+    <div class="logo"><span class="logo-bolt">⚡</span>LIGHTNING</div>
+    <div class="tagline">Tap the light — beat the clock</div>
+
+    <div class="best-score-badge" id="home-best">
+      <span class="label">Meilleur temps</span>
+      <span class="value" id="home-best-val">--</span>
+    </div>
+
+    <button class="btn btn-primary" id="btn-play" style="margin-bottom:14px;font-size:1.1rem;padding:16px 48px;">
+      ⚡ JOUER
+    </button>
+    <button class="btn btn-secondary btn-sm" id="btn-rules">Règles du jeu</button>
+  </div>
+
+  <!-- ══════════════════ RULES SCREEN ══════════════════ -->
+  <div id="screen-rules" class="screen">
+    <div class="logo" style="font-size:1.8rem;margin-bottom:20px;">Règles</div>
+    <ul class="rules-list">
+      <li><span class="icon">⚡</span><span>Des cases <strong>s'illuminent</strong> sur la grille — appuie dessus le plus vite possible !</span></li>
+      <li><span class="icon">📈</span><span>La série commence à <strong>1 case</strong> et monte jusqu'à <strong>20 cases</strong> simultanées.</span></li>
+      <li><span class="icon">⏱</span><span>Le <strong>chronomètre</strong> tourne dès le début. Chaque erreur ajoute <strong>+0,5 s</strong> de pénalité.</span></li>
+      <li><span class="icon">🎯</span><span>Tu dois taper <strong>toutes les cases allumées</strong> pour passer au niveau suivant.</span></li>
+      <li><span class="icon">🏆</span><span>Ton <strong>meilleur temps total</strong> est sauvegardé localement.</span></li>
+    </ul>
+    <button class="btn btn-primary" id="btn-rules-back" style="margin-top:28px;">Retour</button>
+  </div>
+
+  <!-- ══════════════════ GAME SCREEN ══════════════════ -->
+  <div id="screen-game" class="screen">
+    <div id="hud">
+      <div class="hud-block">
+        <span class="hud-label">Temps</span>
+        <span class="hud-value" id="hud-timer">0.00s</span>
+      </div>
+      <div class="hud-block">
+        <span class="hud-label">Niveau</span>
+        <span class="hud-value" id="hud-round">1 / 20</span>
+      </div>
+      <div class="hud-block">
+        <span class="hud-label">Record</span>
+        <span class="hud-value" id="hud-best">--</span>
+      </div>
+    </div>
+
+    <div id="progress-wrap">
+      <div id="progress-bar" style="width:5%;"></div>
+    </div>
+
+    <div id="status-msg">Prêt…</div>
+
+    <div id="grid-wrap">
+      <div id="grid"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ RESULT SCREEN ══════════════════ -->
+  <div id="screen-result" class="screen">
+    <div class="result-title" id="result-title">Bravo !</div>
+    <div class="stats-grid">
+      <div class="stat-box highlight">
+        <div class="s-label">Temps total</div>
+        <div class="s-value" id="res-time">--</div>
+      </div>
+      <div class="stat-box" id="res-best-box">
+        <div class="s-label">Meilleur</div>
+        <div class="s-value" id="res-best">--</div>
+      </div>
+      <div class="stat-box">
+        <div class="s-label">Niveaux réussis</div>
+        <div class="s-value" id="res-rounds">--</div>
+      </div>
+      <div class="stat-box">
+        <div class="s-label">Pénalités</div>
+        <div class="s-value" id="res-penalties">--</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btn-retry">⚡ Rejouer</button>
+      <button class="btn btn-secondary btn-sm" id="btn-home">Accueil</button>
+    </div>
+  </div>
+
+</div><!-- #app -->
+
+<!-- Countdown overlay -->
+<div id="countdown-overlay">
+  <div id="countdown-num">3</div>
+</div>
+
+<!-- Flash overlay (wrong tap) -->
+<div id="flash-overlay"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   LIGHTNING — Game Logic
+═══════════════════════════════════════════════════════════════ */
+
+const TOTAL_ROUNDS   = 20;
+const GRID_COLS      = 5;
+const GRID_ROWS      = 5;
+const TOTAL_TILES    = GRID_COLS * GRID_ROWS; // 25
+const PENALTY_MS     = 500;   // ms added per wrong tap
+const LIT_DURATION   = 1800;  // ms tiles stay lit before auto-fail (increases with round)
+const SHOW_DURATION  = 600;   // ms each tile is shown during the "show" phase
+
+// ── DOM refs ──────────────────────────────────────────────────
+const screens = {
+  home:   document.getElementById('screen-home'),
+  rules:  document.getElementById('screen-rules'),
+  game:   document.getElementById('screen-game'),
+  result: document.getElementById('screen-result'),
+};
+const grid           = document.getElementById('grid');
+const hudTimer       = document.getElementById('hud-timer');
+const hudRound       = document.getElementById('hud-round');
+const hudBest        = document.getElementById('hud-best');
+const progressBar    = document.getElementById('progress-bar');
+const statusMsg      = document.getElementById('status-msg');
+const countdownOverlay = document.getElementById('countdown-overlay');
+const countdownNum   = document.getElementById('countdown-num');
+const flashOverlay   = document.getElementById('flash-overlay');
+const homeBestVal    = document.getElementById('home-best-val');
+const resBestBox     = document.getElementById('res-best-box');
+
+// ── State ─────────────────────────────────────────────────────
+let tiles        = [];
+let currentRound = 0;
+let litIndices   = [];
+let pendingHits  = new Set();
+let gameRunning  = false;
+let phase        = 'idle'; // 'showing' | 'input' | 'idle'
+let startTime    = 0;
+let elapsedMs    = 0;
+let penaltyMs    = 0;
+let timerRAF     = null;
+let bestTime     = null;
+let roundsCompleted = 0;
+
+// ── Persistence ───────────────────────────────────────────────
+function loadBest() {
+  const v = localStorage.getItem('lightning_best');
+  bestTime = v ? parseFloat(v) : null;
+}
+function saveBest(ms) {
+  localStorage.setItem('lightning_best', ms);
+}
+function fmtTime(ms) {
+  if (ms === null || ms === undefined || isNaN(ms)) return '--';
+  return (ms / 1000).toFixed(2) + 's';
+}
+
+// ── Screen navigation ─────────────────────────────────────────
+function showScreen(name) {
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[name].classList.add('active');
+}
+
+// ── Grid setup ────────────────────────────────────────────────
+function buildGrid() {
+  grid.innerHTML = '';
+  grid.style.gridTemplateColumns = `repeat(${GRID_COLS}, 1fr)`;
+  tiles = [];
+  for (let i = 0; i < TOTAL_TILES; i++) {
+    const t = document.createElement('div');
+    t.className = 'tile dim';
+    t.dataset.c = i % 20;
+    t.dataset.idx = i;
+    t.addEventListener('pointerdown', onTileTap);
+    grid.appendChild(t);
+    tiles.push(t);
+  }
+}
+
+// ── Timer ─────────────────────────────────────────────────────
+function startTimer() {
+  startTime = performance.now() - elapsedMs;
+  function tick() {
+    if (!gameRunning) return;
+    elapsedMs = performance.now() - startTime;
+    hudTimer.textContent = fmtTime(elapsedMs + penaltyMs);
+    timerRAF = requestAnimationFrame(tick);
+  }
+  timerRAF = requestAnimationFrame(tick);
+}
+function stopTimer() {
+  if (timerRAF) cancelAnimationFrame(timerRAF);
+  timerRAF = null;
+}
+
+// ── Countdown ─────────────────────────────────────────────────
+function runCountdown(cb) {
+  countdownOverlay.classList.remove('hidden');
+  let n = 3;
+  countdownNum.textContent = n;
+  // force re-animation
+  countdownNum.style.animation = 'none';
+  void countdownNum.offsetWidth;
+  countdownNum.style.animation = '';
+
+  const iv = setInterval(() => {
+    n--;
+    if (n === 0) {
+      countdownNum.textContent = 'GO!';
+      countdownNum.style.animation = 'none';
+      void countdownNum.offsetWidth;
+      countdownNum.style.animation = '';
+      setTimeout(() => {
+        countdownOverlay.classList.add('hidden');
+        clearInterval(iv);
+        cb();
+      }, 700);
+    } else {
+      countdownNum.textContent = n;
+      countdownNum.style.animation = 'none';
+      void countdownNum.offsetWidth;
+      countdownNum.style.animation = '';
+    }
+  }, 800);
+}
+
+// ── Pick random tiles ─────────────────────────────────────────
+function pickRandom(n) {
+  const pool = Array.from({length: TOTAL_TILES}, (_, i) => i);
+  // Fisher-Yates shuffle
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, n);
+}
+
+// ── Show phase: illuminate tiles one by one ───────────────────
+function showPhase(indices, cb) {
+  phase = 'showing';
+  setStatus('Regarde…', '');
+  // dim all
+  tiles.forEach(t => { t.classList.remove('lit','hit','wrong'); t.classList.add('dim'); });
+
+  let i = 0;
+  function showNext() {
+    if (i >= indices.length) {
+      // all shown — brief pause then input phase
+      setTimeout(cb, 300);
+      return;
+    }
+    const idx = indices[i];
+    tiles[idx].classList.remove('dim');
+    tiles[idx].classList.add('lit');
+    i++;
+    setTimeout(() => {
+      // keep lit until all shown
+      showNext();
+    }, SHOW_DURATION);
+  }
+  showNext();
+}
+
+// ── Input phase ───────────────────────────────────────────────
+function inputPhase(indices) {
+  phase = 'input';
+  pendingHits = new Set(indices);
+  setStatus('Appuie !', '');
+
+  // Timeout: if player doesn't tap all in time → fail
+  const timeLimit = Math.max(1500, 4000 - currentRound * 80);
+  const failTimeout = setTimeout(() => {
+    if (phase === 'input' && pendingHits.size > 0) {
+      // Missed — add penalty per missed tile
+      penaltyMs += pendingHits.size * PENALTY_MS;
+      setStatus(`+${(pendingHits.size * PENALTY_MS / 1000).toFixed(1)}s pénalité`, 'bad');
+      // Flash remaining lit tiles red
+      pendingHits.forEach(idx => {
+        tiles[idx].classList.remove('lit');
+        tiles[idx].classList.add('wrong');
+      });
+      setTimeout(() => nextRound(), 700);
+    }
+  }, timeLimit);
+
+  // Store timeout ref so we can cancel on success
+  inputPhase._timeout = failTimeout;
+}
+
+// ── Tile tap handler ──────────────────────────────────────────
+function onTileTap(e) {
+  if (phase !== 'input') return;
+  const idx = parseInt(e.currentTarget.dataset.idx);
+
+  if (pendingHits.has(idx)) {
+    // Correct tap
+    pendingHits.delete(idx);
+    tiles[idx].classList.remove('lit');
+    tiles[idx].classList.add('hit');
+    // vibrate
+    if (navigator.vibrate) navigator.vibrate(18);
+
+    if (pendingHits.size === 0) {
+      // Round complete!
+      clearTimeout(inputPhase._timeout);
+      roundsCompleted++;
+      setStatus('✓ Parfait !', 'ok');
+      setTimeout(() => nextRound(), 400);
+    }
+  } else {
+    // Wrong tap
+    penaltyMs += PENALTY_MS;
+    tiles[idx].classList.add('wrong');
+    setTimeout(() => { tiles[idx].classList.remove('wrong'); tiles[idx].classList.add('dim'); }, 350);
+    showFlash();
+    if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
+    setStatus(`+${(PENALTY_MS/1000).toFixed(1)}s pénalité`, 'bad');
+    setTimeout(() => { if (phase === 'input') setStatus('Appuie !', ''); }, 600);
+  }
+}
+
+// ── Next round ────────────────────────────────────────────────
+function nextRound() {
+  currentRound++;
+  if (currentRound > TOTAL_ROUNDS) {
+    endGame(true);
+    return;
+  }
+  updateHUD();
+  const indices = pickRandom(currentRound);
+  litIndices = indices;
+  showPhase(indices, () => inputPhase(indices));
+}
+
+// ── HUD update ────────────────────────────────────────────────
+function updateHUD() {
+  hudRound.textContent = `${currentRound} / ${TOTAL_ROUNDS}`;
+  progressBar.style.width = `${(currentRound / TOTAL_ROUNDS) * 100}%`;
+  hudBest.textContent = bestTime !== null ? fmtTime(bestTime) : '--';
+}
+
+// ── Status ────────────────────────────────────────────────────
+function setStatus(msg, cls) {
+  statusMsg.textContent = msg;
+  statusMsg.className = cls || '';
+}
+
+// ── Flash overlay ─────────────────────────────────────────────
+function showFlash() {
+  flashOverlay.classList.add('show');
+  setTimeout(() => flashOverlay.classList.remove('show'), 180);
+}
+
+// ── End game ──────────────────────────────────────────────────
+function endGame(completed) {
+  gameRunning = false;
+  stopTimer();
+  phase = 'idle';
+
+  const totalMs = elapsedMs + penaltyMs;
+  const isNewRecord = bestTime === null || totalMs < bestTime;
+  if (isNewRecord && completed) {
+    bestTime = totalMs;
+    saveBest(totalMs);
+  }
+
+  // Populate result screen
+  document.getElementById('result-title').textContent = completed ? '⚡ Terminé !' : 'Partie terminée';
+  document.getElementById('result-title').className = 'result-title ' + (completed ? 'win' : 'lose');
+  document.getElementById('res-time').textContent = fmtTime(totalMs);
+  document.getElementById('res-best').textContent = bestTime !== null ? fmtTime(bestTime) : '--';
+  document.getElementById('res-rounds').textContent = `${roundsCompleted} / ${TOTAL_ROUNDS}`;
+  document.getElementById('res-penalties').textContent = fmtTime(penaltyMs);
+
+  resBestBox.className = 'stat-box' + (isNewRecord && completed ? ' new-record' : '');
+  if (isNewRecord && completed) {
+    document.getElementById('res-best').parentElement.querySelector('.s-label').textContent = '🏆 Nouveau record !';
+  } else {
+    document.getElementById('res-best').parentElement.querySelector('.s-label').textContent = 'Meilleur';
+  }
+
+  showScreen('result');
+}
+
+// ── Start game ────────────────────────────────────────────────
+function startGame() {
+  loadBest();
+  currentRound  = 0;
+  elapsedMs     = 0;
+  penaltyMs     = 0;
+  roundsCompleted = 0;
+  phase         = 'idle';
+
+  buildGrid();
+  updateHUD();
+  showScreen('game');
+
+  runCountdown(() => {
+    gameRunning = true;
+    startTimer();
+    nextRound();
+  });
+}
+
+// ── Button wiring ─────────────────────────────────────────────
+document.getElementById('btn-play').addEventListener('click', startGame);
+document.getElementById('btn-retry').addEventListener('click', startGame);
+document.getElementById('btn-home').addEventListener('click', () => {
+  gameRunning = false;
+  stopTimer();
+  phase = 'idle';
+  loadBest();
+  homeBestVal.textContent = bestTime !== null ? fmtTime(bestTime) : '--';
+  showScreen('home');
+});
+document.getElementById('btn-rules').addEventListener('click', () => showScreen('rules'));
+document.getElementById('btn-rules-back').addEventListener('click', () => showScreen('home'));
+
+// ── Init ──────────────────────────────────────────────────────
+loadBest();
+homeBestVal.textContent = bestTime !== null ? fmtTime(bestTime) : '--';
+countdownOverlay.classList.add('hidden');
+
+// Prevent double-tap zoom on iOS
+document.addEventListener('touchend', e => e.preventDefault(), { passive: false });
+</script>
+</body>
+</html>
