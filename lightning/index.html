@@ -531,7 +531,7 @@ const TOTAL_TILES   = GRID_SIZE * GRID_SIZE; // 25
 const PENALTY_SPEED = 500;   // ms per wrong tap (rapidité)
 const MEM_SHOW_MS   = 700;   // ms each tile shown during memory sequence
 const MEM_GAP_MS    = 200;   // gap between tiles in memory sequence
-const MEM_DARK_MS   = 600;   // pause after last tile before input phase
+const MEM_DARK_MS   = 0;     // no pause — input starts immediately after last tile
 
 // ── DOM ──────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
@@ -749,10 +749,10 @@ function memShowSequence(sequence, cb) {
   function showNext() {
     if (i > 0) dimTile(sequence[i - 1]);
     if (i >= sequence.length) {
-      // All shown — make sure last tile is also dimmed, then dark pause
+      // All shown — dim last tile immediately, then start input with no delay
       setTimeout(() => {
         tiles.forEach(t => { t.classList.remove('lit','showing','next-hit'); t.classList.add('dim'); });
-        setTimeout(cb, MEM_DARK_MS);
+        cb();
       }, MEM_SHOW_MS);
       return;
     }
