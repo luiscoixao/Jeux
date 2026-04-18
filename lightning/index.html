@@ -441,8 +441,8 @@
     <ul class="rules-list">
       <li><span class="icon">⚡</span><span>Des cases <strong>s'illuminent</strong> sur la grille — appuie dessus le plus vite possible !</span></li>
       <li><span class="icon">📈</span><span>La série commence à <strong>1 case</strong> et monte jusqu'à <strong>20 cases</strong> simultanées.</span></li>
-      <li><span class="icon">⏱</span><span>Le <strong>chronomètre</strong> tourne dès le début. Chaque erreur ajoute <strong>+0,5 s</strong> de pénalité.</span></li>
-      <li><span class="icon">🎯</span><span>Tu dois taper <strong>toutes les cases allumées</strong> pour passer au niveau suivant.</span></li>
+      <li><span class="icon">⏱</span><span>Le <strong>chronomètre</strong> tourne dès le début. Chaque mauvais tap ajoute <strong>+0,5 s</strong> de pénalité.</span></li>
+      <li><span class="icon">🎯</span><span><strong>Éteins toutes les cases allumées</strong> en les tapant — elles restent allumées jusqu'à ce que tu les touches.</span></li>
       <li><span class="icon">🏆</span><span>Ton <strong>meilleur temps total</strong> est sauvegardé localement.</span></li>
     </ul>
     <button class="btn btn-primary" id="btn-rules-back" style="margin-top:28px;">Retour</button>
@@ -523,8 +523,7 @@ const GRID_COLS      = 5;
 const GRID_ROWS      = 5;
 const TOTAL_TILES    = GRID_COLS * GRID_ROWS; // 25
 const PENALTY_MS     = 500;   // ms added per wrong tap
-const LIT_DURATION   = 1800;  // ms tiles stay lit before auto-fail (increases with round)
-const SHOW_DURATION  = 600;   // ms each tile is shown during the "show" phase
+// Les cases restent allumées jusqu'au tap — pas de timeout
 
 // ── DOM refs ──────────────────────────────────────────────────
 const screens = {
@@ -652,56 +651,31 @@ function pickRandom(n) {
   return pool.slice(0, n);
 }
 
-// ── Show phase: illuminate tiles one by one ───────────────────
+// ── Show phase: illuminate all tiles at once, then go to input ─
 function showPhase(indices, cb) {
   phase = 'showing';
-  setStatus('Regarde…', '');
-  // dim all
+  setStatus('Mémorise !', '');
+  // dim all first
   tiles.forEach(t => { t.classList.remove('lit','hit','wrong'); t.classList.add('dim'); });
 
-  let i = 0;
-  function showNext() {
-    if (i >= indices.length) {
-      // all shown — brief pause then input phase
-      setTimeout(cb, 300);
-      return;
-    }
-    const idx = indices[i];
+  // Light all target tiles simultaneously
+  indices.forEach(idx => {
     tiles[idx].classList.remove('dim');
     tiles[idx].classList.add('lit');
-    i++;
-    setTimeout(() => {
-      // keep lit until all shown
-      showNext();
-    }, SHOW_DURATION);
-  }
-  showNext();
+  });
+
+  // Short preview window so the player sees them, then immediately enter input phase
+  // (tiles stay lit — player taps them to extinguish)
+  setTimeout(cb, 400);
 }
 
-// ── Input phase ───────────────────────────────────────────────
+// ── Input phase — cases restent allumées jusqu'au tap ─────────
 function inputPhase(indices) {
   phase = 'input';
   pendingHits = new Set(indices);
-  setStatus('Appuie !', '');
-
-  // Timeout: if player doesn't tap all in time → fail
-  const timeLimit = Math.max(1500, 4000 - currentRound * 80);
-  const failTimeout = setTimeout(() => {
-    if (phase === 'input' && pendingHits.size > 0) {
-      // Missed — add penalty per missed tile
-      penaltyMs += pendingHits.size * PENALTY_MS;
-      setStatus(`+${(pendingHits.size * PENALTY_MS / 1000).toFixed(1)}s pénalité`, 'bad');
-      // Flash remaining lit tiles red
-      pendingHits.forEach(idx => {
-        tiles[idx].classList.remove('lit');
-        tiles[idx].classList.add('wrong');
-      });
-      setTimeout(() => nextRound(), 700);
-    }
-  }, timeLimit);
-
-  // Store timeout ref so we can cancel on success
-  inputPhase._timeout = failTimeout;
+  // Les cases sont déjà allumées depuis showPhase — le joueur doit les éteindre
+  setStatus('Éteins les cases !', '');
+  // Pas de timeout : le joueur joue à son rythme, le chrono mesure la vitesse
 }
 
 // ── Tile tap handler ──────────────────────────────────────────
@@ -710,16 +684,20 @@ function onTileTap(e) {
   const idx = parseInt(e.currentTarget.dataset.idx);
 
   if (pendingHits.has(idx)) {
-    // Correct tap
+    // Correct tap — la case s'éteint immédiatement
     pendingHits.delete(idx);
     tiles[idx].classList.remove('lit');
     tiles[idx].classList.add('hit');
     // vibrate
     if (navigator.vibrate) navigator.vibrate(18);
+    // Repasser en dim après l'animation de flash
+    setTimeout(() => {
+      tiles[idx].classList.remove('hit');
+      tiles[idx].classList.add('dim');
+    }, 260);
 
     if (pendingHits.size === 0) {
       // Round complete!
-      clearTimeout(inputPhase._timeout);
       roundsCompleted++;
       setStatus('✓ Parfait !', 'ok');
       setTimeout(() => nextRound(), 400);
