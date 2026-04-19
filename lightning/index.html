@@ -755,11 +755,10 @@ function memShowSequence(sequence, cb) {
   function showNext() {
     if (i > 0) dimTile(sequence[i - 1]);
     if (i >= sequence.length) {
-      // All shown — dim last tile immediately, then start input with no delay
-      setTimeout(() => {
-        tiles.forEach(t => { t.classList.remove('lit','showing','next-hit'); t.classList.add('dim'); });
-        cb();
-      }, MEM_SHOW_MS);
+      // All shown — dim last tile and start input immediately
+      dimTile(sequence[i - 1]);
+      tiles.forEach(t => { t.classList.remove('lit','showing','next-hit'); t.classList.add('dim'); });
+      cb();
       return;
     }
     setTileState(sequence[i], 'showing');
