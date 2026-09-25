@@ -431,7 +431,10 @@ footer{
     <div id="palette"></div>
     <p class="hint">Les cases entourées en rouge sont incertaines. Choisissez une pièce (ou la gomme) puis touchez une case pour corriger. Une correction s'applique aussi aux pièces identiques de l'image.</p>
     <div class="row" style="margin-top:10px">
-      <button class="btn" id="flipBtn">🔄 Retourner</button>
+      <button class="btn" id="viewBtn">🔄 Retourner la vue</button>
+      <button class="btn" id="flipBtn">⇅ Inverser les camps</button>
+    </div>
+    <div class="row">
       <button class="btn" id="clearBtn">🧹 Vider</button>
       <button class="btn" id="startBtn">♔ Départ</button>
     </div>
@@ -444,6 +447,11 @@ footer{
     <div class="opts">
       <label><input type="radio" name="turn" value="w" checked> Trait aux Blancs</label>
       <label><input type="radio" name="turn" value="b"> Trait aux Noirs</label>
+    </div>
+    <div class="opts">
+      <span>Vue :</span>
+      <label><input type="radio" name="view" value="white" checked> Blancs en bas</label>
+      <label><input type="radio" name="view" value="black"> Noirs en bas</label>
     </div>
     <div class="opts">
       <span>Roques :</span>
@@ -511,6 +519,7 @@ let crop = null;              // {x,y,w,h} en pixels de l'image source
 let board = emptyBoard();     // board[r][c], r=0 = 8e rangée
 let cells = null;             // caractéristiques extraites par case (ordre image)
 let flipped = false;          // l'image est vue côté Noirs
+let view = "white";           // camp affiché en bas (ici et sur Lichess)
 let doubt = new Set();        // cases incertaines ("r,c" en coordonnées plateau)
 let tool = null;              // pièce sélectionnée dans la palette ("" = gomme)
 let templates = null;
@@ -1095,7 +1104,9 @@ function extractCells(){
           }
         }
       }
-      const cellInfo = {r, c: col, bg, n};
+      // case surlignée (dernier coup) : fond nettement différent de la
+      // couleur habituelle des cases de même parité
+      const cellInfo = {r, c: col, bg, n, highlight: colorDist(bg, pc) > 30};
       if(n / (CELL * CELL) > 0.05){
         // fermeture morphologique : referme les contours mal tracés
         // puis on ne garde que la plus grande tache (élimine les coordonnées)
@@ -1175,14 +1186,47 @@ async function recognize(){
   flipped = score < -0.5;
 
   assignTypes(occ);
+
+  // Trait : d'après le dernier coup surligné, sinon le camp du bas de l'image
+  const t = guessTurn();
+  setTurn(t.turn);
+  setView(t.turn === "w" ? "white" : "black");
+
   applyCells();
   showBoardPanels();
   const nDoubt = doubt.size;
   setStatus(
     `${occ.length} pièce${occ.length > 1 ? "s" : ""} reconnue${occ.length > 1 ? "s" : ""}` +
-    (nDoubt ? ` — ${nDoubt} case${nDoubt > 1 ? "s" : ""} à vérifier.` : "."),
+    (nDoubt ? ` — ${nDoubt} case${nDoubt > 1 ? "s" : ""} à vérifier` : "") +
+    `. Trait aux ${t.turn === "w" ? "Blancs" : "Noirs"}` +
+    (t.fromMove ? " (dernier coup détecté)." : " (à vérifier)."),
     nDoubt ? "" : "ok"
   );
+}
+
+function guessTurn(){
+  const hl = cells.filter(o => o.highlight);
+  if(hl.length >= 1 && hl.length <= 4){
+    const moved = hl.filter(o => o.shape);
+    // une seule pièce sur les cases surlignées : c'est elle qui vient de jouer
+    if(moved.length === 1) return {turn: moved[0].white ? "b" : "w", fromMove: true};
+    // pièce jouée + roi en échec (case rouge) : le roi en échec a le trait
+    if(moved.length === 2 && moved[0].white !== moved[1].white){
+      const king = moved.find(o => o.type === "K");
+      if(king) return {turn: king.white ? "w" : "b", fromMove: true};
+    }
+  }
+  // capture d'écran de sa propre partie : on joue en général le camp du bas
+  return {turn: flipped ? "b" : "w", fromMove: false};
+}
+
+function setTurn(t){
+  document.querySelector(`input[name="turn"][value="${t}"]`).checked = true;
+}
+
+function setView(v){
+  view = v;
+  document.querySelector(`input[name="view"][value="${v}"]`).checked = true;
 }
 
 function setType(o, type){
@@ -1332,17 +1376,18 @@ function render(){
   boardEl.innerHTML = "";
   for(let vr = 0; vr < 8; vr++){
     for(let vc = 0; vc < 8; vc++){
-      const r = vr, c = vc;   // affichage toujours côté Blancs
+      const black = view === "black";
+      const r = black ? 7 - vr : vr, c = black ? 7 - vc : vc;
       const sq = document.createElement("div");
       sq.className = "square " + ((r + c) % 2 ? "d" : "l");
       const p = board[r][c];
       if(p) sq.style.backgroundImage = `url("${PIECE_IMG[p]}")`;
       if(doubt.has(r + "," + c)) sq.classList.add("doubt");
-      if(c === 0){
+      if(vc === 0){
         const s = document.createElement("span");
         s.className = "coord rank"; s.textContent = 8 - r; sq.appendChild(s);
       }
-      if(r === 7){
+      if(vr === 7){
         const s = document.createElement("span");
         s.className = "coord file"; s.textContent = "abcdefgh"[c]; sq.appendChild(s);
       }
@@ -1422,6 +1467,11 @@ function buildPalette(){
     pal.appendChild(b);
   }
 }
+
+$("viewBtn").onclick = () => {
+  setView(view === "white" ? "black" : "white");
+  render();
+};
 
 $("flipBtn").onclick = () => {
   flipped = !flipped;
@@ -1515,7 +1565,7 @@ function updateFen(){
   const fen = fullFen();
   if(document.activeElement !== $("fenField")) $("fenField").value = fen;
   const path = fen.replace(/ /g, "_");
-  const color = turn() === "w" ? "white" : "black";
+  const color = view;
   $("analysisLink").href = `https://lichess.org/analysis/standard/${path}?color=${color}`;
   $("editorLink").href = `https://lichess.org/editor/${path}?color=${color}`;
   $("playLink").href = `https://lichess.org/?fen=${encodeURIComponent(fen)}#ai`;
@@ -1526,7 +1576,15 @@ function updateFen(){
   if(fen !== lastEvalFen) $("evalBox").innerHTML = "";
 }
 
-document.querySelectorAll('input[name="turn"]').forEach(i => i.onchange = updateFen);
+// changer le trait place par défaut ce camp en bas
+document.querySelectorAll('input[name="turn"]').forEach(i => i.onchange = () => {
+  setView(turn() === "w" ? "white" : "black");
+  render();
+});
+document.querySelectorAll('input[name="view"]').forEach(i => i.onchange = () => {
+  view = i.value;
+  render();
+});
 ["cK","cQ","ck","cq"].forEach(id => $(id).onchange = updateFen);
 
 $("fenField").addEventListener("input", e => {
@@ -1537,7 +1595,8 @@ $("fenField").addEventListener("input", e => {
   cells = null;
   doubt.clear();
   if(parts[1] === "w" || parts[1] === "b"){
-    document.querySelector(`input[name="turn"][value="${parts[1]}"]`).checked = true;
+    setTurn(parts[1]);
+    setView(parts[1] === "w" ? "white" : "black");
   }
   const cs = parts[2] || "";
   ["K","Q","k","q"].forEach(ch => $("c" + ch).checked = cs.includes(ch));
