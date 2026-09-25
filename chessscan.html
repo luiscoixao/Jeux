@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>CHESSSCAN</title>
+
+<link rel="apple-touch-icon" href="iconchessfen.png" />
+<link rel="icon" href="iconchessfen.png" />
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="CHESSSCAN" />
+<meta name="theme-color" content="#2c2c2c" />
+
+<style>
+:root{
+  --bg:#2c2c2c;
+  --panel:#3a3a3a;
+  --field:#4a4a4a;
+  --light:#f0d9b5;
+  --dark:#b58863;
+  --text:#ffffff;
+  --muted:#c9c9c9;
+  --accent:#d4af37;
+  --danger:#ff745e;
+  --ok:#a9d18e;
+}
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;
+}
+
+body{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:0 12px calc(18px + env(safe-area-inset-bottom));
+}
+
+h1{
+  margin:calc(env(safe-area-inset-top) + 18px) 0 4px;
+  font-size:28px;
+  line-height:1.08;
+  font-weight:700;
+  text-align:center;
+}
+
+.subtitle{
+  margin:0 0 14px;
+  color:var(--muted);
+  font-size:14px;
+  text-align:center;
+}
+
+.app{
+  width:100%;
+  max-width:560px;
+}
+
+.panel{
+  background:var(--panel);
+  padding:14px;
+  margin-bottom:12px;
+  box-shadow:0 8px 20px rgba(0,0,0,.18);
+}
+
+.panel h2{
+  margin:0 0 10px;
+  font-size:16px;
+  font-weight:700;
+  color:var(--accent);
+  letter-spacing:.02em;
+}
+
+.row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.row + .row{ margin-top:10px; }
+
+.btn{
+  flex:1;
+  min-height:46px;
+  border:none;
+  background:var(--field);
+  color:#fff;
+  font-size:15px;
+  font-weight:700;
+  padding:0 12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  text-align:center;
+  cursor:pointer;
+  text-decoration:none;
+  appearance:none;
+  -webkit-appearance:none;
+  border-radius:0;
+  font-family:inherit;
+}
+
+.btn:active{ filter:brightness(1.15); }
+.btn:disabled{ opacity:.45; cursor:default; }
+
+.btn.primary,
+.btn.active{
+  background:var(--accent);
+  color:#1d1d1d;
+}
+
+.btn.lichess{
+  background:#fff;
+  color:#1d1d1d;
+}
+
+.hidden{ display:none !important; }
+
+#dropZone{
+  border:2px dashed #666;
+  padding:18px 12px;
+  text-align:center;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.4;
+  margin-bottom:10px;
+}
+
+#dropZone.over{
+  border-color:var(--accent);
+  color:#fff;
+}
+
+/* ---------- Recadrage ---------- */
+
+#cropWrap{
+  position:relative;
+  width:100%;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+  line-height:0;
+}
+
+#srcCanvas{
+  width:100%;
+  height:auto;
+  display:block;
+}
+
+#cropBox{
+  position:absolute;
+  border:2px solid var(--accent);
+  box-shadow:0 0 0 9999px rgba(0,0,0,.45);
+  cursor:move;
+  background-image:
+    linear-gradient(to right, rgba(212,175,55,.55) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(212,175,55,.55) 1px, transparent 1px);
+  background-size:12.5% 12.5%;
+}
+
+#cropWrap{ overflow:hidden; }
+
+.handle{
+  position:absolute;
+  width:26px;
+  height:26px;
+  background:var(--accent);
+  border:2px solid #1d1d1d;
+  border-radius:50%;
+}
+
+.handle.tl{ left:-13px; top:-13px; cursor:nwse-resize; }
+.handle.tr{ right:-13px; top:-13px; cursor:nesw-resize; }
+.handle.bl{ left:-13px; bottom:-13px; cursor:nesw-resize; }
+.handle.br{ right:-13px; bottom:-13px; cursor:nwse-resize; }
+
+.hint{
+  margin:10px 0 0;
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.4;
+}
+
+/* ---------- Échiquier ---------- */
+
+#board-container{
+  width:100%;
+  aspect-ratio:1 / 1;
+  box-shadow:0 10px 25px rgba(0,0,0,0.35);
+}
+
+#board{
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  grid-template-rows:repeat(8,1fr);
+  width:100%;
+  height:100%;
+  touch-action:manipulation;
+}
+
+.square{
+  position:relative;
+  cursor:pointer;
+  user-select:none;
+  -webkit-user-select:none;
+  background-size:100% 100%;
+}
+
+.square.l{ background-color:var(--light); }
+.square.d{ background-color:var(--dark); }
+
+.square.doubt::after{
+  content:"";
+  position:absolute;
+  inset:2px;
+  border:3px dashed var(--danger);
+  pointer-events:none;
+}
+
+.square .coord{
+  position:absolute;
+  font-size:10px;
+  font-weight:700;
+  pointer-events:none;
+  opacity:.8;
+}
+
+.square.l .coord{ color:var(--dark); }
+.square.d .coord{ color:var(--light); }
+.coord.file{ right:3px; bottom:1px; }
+.coord.rank{ left:3px; top:1px; }
+
+#palette{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:6px;
+  margin-top:12px;
+}
+
+.pal{
+  aspect-ratio:1 / 1;
+  border:none;
+  background:var(--field);
+  background-size:86% 86%;
+  background-position:center;
+  background-repeat:no-repeat;
+  cursor:pointer;
+  color:#fff;
+  font-size:20px;
+  font-weight:700;
+  padding:0;
+  border-radius:0;
+  font-family:inherit;
+}
+
+.pal.active{
+  background-color:var(--accent);
+  color:#1d1d1d;
+}
+
+/* ---------- FEN ---------- */
+
+#fenField{
+  width:100%;
+  border:none;
+  background:var(--field);
+  color:#fff;
+  font-size:15px;
+  padding:12px;
+  outline:none;
+  border-radius:0;
+  font-family:ui-monospace,Menlo,Consolas,monospace;
+  appearance:none;
+  -webkit-appearance:none;
+}
+
+.opts{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px 16px;
+  font-size:14px;
+  margin-top:10px;
+  color:var(--muted);
+}
+
+.opts label{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  cursor:pointer;
+}
+
+.opts input{ accent-color:var(--accent); width:18px; height:18px; }
+
+#warnings{
+  margin:10px 0 0;
+  padding:0;
+  list-style:none;
+  font-size:13px;
+  color:var(--danger);
+  line-height:1.45;
+}
+
+#status{
+  position:fixed;
+  left:50%;
+  bottom:calc(16px + env(safe-area-inset-bottom));
+  transform:translate(-50%, 20px);
+  max-width:calc(100% - 32px);
+  background:#1d1d1d;
+  color:#fff;
+  font-size:14px;
+  font-weight:600;
+  line-height:1.35;
+  padding:10px 16px;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+  border-left:4px solid var(--accent);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s, transform .25s;
+  z-index:10;
+}
+
+#status.show{ opacity:1; transform:translate(-50%, 0); }
+#status.ok{ border-left-color:var(--ok); }
+#status.err{ border-left-color:var(--danger); }
+
+.links-title{
+  margin:14px 0 8px;
+  font-size:13px;
+  color:var(--muted);
+}
+
+#evalBox{
+  margin-top:10px;
+  font-size:14px;
+  line-height:1.5;
+  color:var(--muted);
+}
+
+#evalBox b{ color:#fff; }
+
+.eval-bar{
+  height:10px;
+  background:#1d1d1d;
+  margin:6px 0;
+  position:relative;
+}
+
+.eval-bar span{
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  background:#fff;
+  transition:width .3s;
+}
+
+.mono{ font-family:ui-monospace,Menlo,Consolas,monospace; }
+
+footer{
+  font-size:11px;
+  color:#8a8a8a;
+  text-align:center;
+  margin-top:4px;
+  line-height:1.4;
+}
+</style>
+</head>
+
+<body>
+
+<h1>CHESSSCAN</h1>
+<p class="subtitle">Image d'échiquier → FEN → Lichess</p>
+
+<div class="app">
+
+  <!-- 1. Import -->
+  <section class="panel" id="importPanel">
+    <h2>1 · Image</h2>
+    <div id="dropZone">
+      Déposez une capture d'écran ou un diagramme ici,<br>
+      ou collez-la (Ctrl/⌘ + V).
+    </div>
+    <div class="row">
+      <button class="btn primary" id="pickBtn">🖼️ Fichier</button>
+      <button class="btn" id="cameraBtn">📷 Photo</button>
+      <button class="btn" id="pasteBtn">📋 Coller</button>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" class="hidden" />
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden" />
+  </section>
+
+  <!-- 2. Recadrage -->
+  <section class="panel hidden" id="cropPanel">
+    <h2>2 · Cadrage de l'échiquier</h2>
+    <div id="cropWrap">
+      <canvas id="srcCanvas"></canvas>
+      <div id="cropBox">
+        <div class="handle tl" data-h="tl"></div>
+        <div class="handle tr" data-h="tr"></div>
+        <div class="handle bl" data-h="bl"></div>
+        <div class="handle br" data-h="br"></div>
+      </div>
+    </div>
+    <p class="hint">Le cadre a été placé automatiquement. Ajustez-le si besoin pour que la grille corresponde exactement aux 64 cases, puis lancez la reconnaissance.</p>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="autoBtn">🎯 Détection auto</button>
+      <button class="btn primary" id="recognizeBtn">♟️ Reconnaître</button>
+    </div>
+  </section>
+
+  <!-- 3. Vérification -->
+  <section class="panel hidden" id="boardPanel">
+    <h2>3 · Vérification</h2>
+    <div id="board-container"><div id="board"></div></div>
+    <div id="palette"></div>
+    <p class="hint">Les cases entourées en rouge sont incertaines. Choisissez une pièce (ou la gomme) puis touchez une case pour corriger. Une correction s'applique aussi aux pièces identiques de l'image.</p>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="flipBtn">🔄 Retourner</button>
+      <button class="btn" id="clearBtn">🧹 Vider</button>
+      <button class="btn" id="startBtn">♔ Départ</button>
+    </div>
+  </section>
+
+  <!-- 4. FEN & Lichess -->
+  <section class="panel hidden" id="fenPanel">
+    <h2>4 · FEN &amp; Lichess</h2>
+    <input id="fenField" spellcheck="false" autocomplete="off" autocapitalize="off" />
+    <div class="opts">
+      <label><input type="radio" name="turn" value="w" checked> Trait aux Blancs</label>
+      <label><input type="radio" name="turn" value="b"> Trait aux Noirs</label>
+    </div>
+    <div class="opts">
+      <span>Roques :</span>
+      <label><input type="checkbox" id="cK"> O-O ♔</label>
+      <label><input type="checkbox" id="cQ"> O-O-O ♔</label>
+      <label><input type="checkbox" id="ck"> O-O ♚</label>
+      <label><input type="checkbox" id="cq"> O-O-O ♚</label>
+    </div>
+    <ul id="warnings"></ul>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" id="copyBtn">📋 Copier le FEN</button>
+      <button class="btn" id="shareBtn">📤 Partager</button>
+    </div>
+    <p class="links-title">Ouvrir sur Lichess :</p>
+    <div class="row">
+      <a class="btn lichess" id="analysisLink" target="_blank" rel="noopener">🔍 Analyser</a>
+      <a class="btn lichess" id="editorLink" target="_blank" rel="noopener">✏️ Éditeur</a>
+      <a class="btn lichess" id="playLink" target="_blank" rel="noopener">🤖 Jouer</a>
+    </div>
+    <div class="row">
+      <button class="btn" id="evalBtn">☁️ Évaluation Lichess (cloud)</button>
+    </div>
+    <div id="evalBox"></div>
+  </section>
+
+  <div id="status"></div>
+
+  <footer>
+    Reconnaissance locale dans le navigateur — aucune image n'est envoyée.<br>
+    Idéal pour les captures d'écran et diagrammes (Lichess, Chess.com, livres…).<br>
+    Pièces « cburnett » © Colin M.L. Burnett (GPLv2+).
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+/* =========================================================
+   Pièces cburnett (issues de chessground, lichess)
+   ========================================================= */
+const PIECE_IMG={
+  P:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PHBhdGggZD0iTTIyLjUgOWMtMi4yMSAwLTQgMS43OS00IDQgMCAuODkuMjkgMS43MS43OCAyLjM4QzE3LjMzIDE2LjUgMTYgMTguNTkgMTYgMjFjMCAyLjAzLjk0IDMuODQgMi40MSA1LjAzLTMgMS4wNi03LjQxIDUuNTUtNy40MSAxMy40N2gyM2MwLTcuOTItNC40MS0xMi40MS03LjQxLTEzLjQ3IDEuNDctMS4xOSAyLjQxLTMgMi40MS01LjAzIDAtMi40MS0xLjMzLTQuNS0zLjI4LTUuNjIuNDktLjY3Ljc4LTEuNDkuNzgtMi4zOCAwLTIuMjEtMS43OS00LTQtNHoiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==",
+  B:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxnIGZpbGw9IiNmZmYiIHN0cm9rZS1saW5lY2FwPSJidXR0Ij48cGF0aCBkPSJNOSAzNmMzLjM5LS45NyAxMC4xMS40MyAxMy41LTIgMy4zOSAyLjQzIDEwLjExIDEuMDMgMTMuNSAyIDAgMCAxLjY1LjU0IDMgMi0uNjguOTctMS42NS45OS0zIC41LTMuMzktLjk3LTEwLjExLjQ2LTEzLjUtMS0zLjM5IDEuNDYtMTAuMTEuMDMtMTMuNSAxLTEuMzU0LjQ5LTIuMzIzLjQ3LTMtLjUgMS4zNTQtMS45NCAzLTIgMy0yeiIvPjxwYXRoIGQ9Ik0xNSAzMmMyLjUgMi41IDEyLjUgMi41IDE1IDAgLjUtMS41IDAtMiAwLTIgMC0yLjUtMi41LTQtMi41LTQgNS41LTEuNSA2LTExLjUtNS0xNS41LTExIDQtMTAuNSAxNC01IDE1LjUgMCAwLTIuNSAxLjUtMi41IDQgMCAwLS41LjUgMCAyeiIvPjxwYXRoIGQ9Ik0yNSA4YTIuNSAyLjUgMCAxIDEtNSAwIDIuNSAyLjUgMCAxIDEgNSAweiIvPjwvZz48cGF0aCBkPSJNMTcuNSAyNmgxME0xNSAzMGgxNW0tNy41LTE0LjV2NU0yMCAxOGg1IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PC9nPjwvc3ZnPg==",
+  N:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxMGMxMC41IDEgMTYuNSA4IDE2IDI5SDE1YzAtOSAxMC02LjUgOC0yMSIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0yNCAxOGMuMzggMi45MS01LjU1IDcuMzctOCA5LTMgMi0yLjgyIDQuMzQtNSA0LTEuMDQyLS45NCAxLjQxLTMuMDQgMC0zLTEgMCAuMTkgMS4yMy0xIDItMSAwLTQuMDAzIDEtNC00IDAtMiA2LTEyIDYtMTJzMS44OS0xLjkgMi0zLjVjLS43My0uOTk0LS41LTItLjUtMyAxLTEgMyAyLjUgMyAyLjVoMnMuNzgtMS45OTIgMi41LTNjMSAwIDEgMyAxIDMiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNOS41IDI1LjVhLjUuNSAwIDEgMS0xIDAgLjUuNSAwIDEgMSAxIDB6bTUuNDMzLTkuNzVhLjUgMS41IDMwIDEgMS0uODY2LS41LjUgMS41IDMwIDEgMSAuODY2LjV6IiBmaWxsPSIjMDAwIi8+PC9nPjwvc3ZnPg==",
+  R:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0iI2ZmZiIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik05IDM5aDI3di0zSDl2M3ptMy0zdi00aDIxdjRIMTJ6bS0xLTIyVjloNHYyaDVWOWg1djJoNVY5aDR2NSIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiLz48cGF0aCBkPSJNMzQgMTRsLTMgM0gxNGwtMy0zIi8+PHBhdGggZD0iTTMxIDE3djEyLjVIMTRWMTciIHN0cm9rZS1saW5lY2FwPSJidXR0IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PHBhdGggZD0iTTMxIDI5LjVsMS41IDIuNWgtMjBsMS41LTIuNSIvPjxwYXRoIGQ9Ik0xMSAxNGgyMyIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIvPjwvZz48L3N2Zz4=",
+  Q:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0iI2ZmZiIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik04IDEyYTIgMiAwIDEgMS00IDAgMiAyIDAgMSAxIDQgMHptMTYuNS00LjVhMiAyIDAgMSAxLTQgMCAyIDIgMCAxIDEgNCAwek00MSAxMmEyIDIgMCAxIDEtNCAwIDIgMiAwIDEgMSA0IDB6TTE2IDguNWEyIDIgMCAxIDEtNCAwIDIgMiAwIDEgMSA0IDB6TTMzIDlhMiAyIDAgMSAxLTQgMCAyIDIgMCAxIDEgNCAweiIvPjxwYXRoIGQ9Ik05IDI2YzguNS0xLjUgMjEtMS41IDI3IDBsMi0xMi03IDExVjExbC01LjUgMTMuNS0zLTE1LTMgMTUtNS41LTE0VjI1TDcgMTRsMiAxMnoiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTkgMjZjMCAyIDEuNSAyIDIuNSA0IDEgMS41IDEgMSAuNSAzLjUtMS41IDEtMS41IDIuNS0xLjUgMi41LTEuNSAxLjUuNSAyLjUuNSAyLjUgNi41IDEgMTYuNSAxIDIzIDAgMCAwIDEuNS0xIDAtMi41IDAgMCAuNS0xLjUtMS0yLjUtLjUtMi41LS41LTIgLjUtMy41IDEtMiAyLjUtMiAyLjUtNC04LjUtMS41LTE4LjUtMS41LTI3IDB6IiBzdHJva2UtbGluZWNhcD0iYnV0dCIvPjxwYXRoIGQ9Ik0xMS41IDMwYzMuNS0xIDE4LjUtMSAyMiAwTTEyIDMzLjVjNi0xIDE1LTEgMjEgMCIgZmlsbD0ibm9uZSIvPjwvZz48L3N2Zz4=",
+  K:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMi41IDExLjYzVjZNMjAgOGg1IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PHBhdGggZD0iTTIyLjUgMjVzNC41LTcuNSAzLTEwLjVjMCAwLTEtMi41LTMtMi41cy0zIDIuNS0zIDIuNWMtMS41IDMgMyAxMC41IDMgMTAuNSIgZmlsbD0iI2ZmZiIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48cGF0aCBkPSJNMTEuNSAzN2M1LjUgMy41IDE1LjUgMy41IDIxIDB2LTdzOS00LjUgNi0xMC41Yy00LTYuNS0xMy41LTMuNS0xNiA0VjI3di0zLjVjLTMuNS03LjUtMTMtMTAuNS0xNi00LTMgNiA1IDEwIDUgMTBWMzd6IiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTExLjUgMzBjNS41LTMgMTUuNS0zIDIxIDBtLTIxIDMuNWM1LjUtMyAxNS41LTMgMjEgMG0tMjEgMy41YzUuNS0zIDE1LjUtMyAyMSAwIi8+PC9nPjwvc3ZnPg==",
+  p:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PHBhdGggZD0iTTIyLjUgOWMtMi4yMSAwLTQgMS43OS00IDQgMCAuODkuMjkgMS43MS43OCAyLjM4QzE3LjMzIDE2LjUgMTYgMTguNTkgMTYgMjFjMCAyLjAzLjk0IDMuODQgMi40MSA1LjAzLTMgMS4wNi03LjQxIDUuNTUtNy40MSAxMy40N2gyM2MwLTcuOTItNC40MS0xMi40MS03LjQxLTEzLjQ3IDEuNDctMS4xOSAyLjQxLTMgMi40MS01LjAzIDAtMi40MS0xLjMzLTQuNS0zLjI4LTUuNjIuNDktLjY3Ljc4LTEuNDkuNzgtMi4zOCAwLTIuMjEtMS43OS00LTQtNHoiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==",
+  b:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxnIGZpbGw9IiMwMDAiIHN0cm9rZS1saW5lY2FwPSJidXR0Ij48cGF0aCBkPSJNOSAzNmMzLjM5LS45NyAxMC4xMS40MyAxMy41LTIgMy4zOSAyLjQzIDEwLjExIDEuMDMgMTMuNSAyIDAgMCAxLjY1LjU0IDMgMi0uNjguOTctMS42NS45OS0zIC41LTMuMzktLjk3LTEwLjExLjQ2LTEzLjUtMS0zLjM5IDEuNDYtMTAuMTEuMDMtMTMuNSAxLTEuMzU0LjQ5LTIuMzIzLjQ3LTMtLjUgMS4zNTQtMS45NCAzLTIgMy0yeiIvPjxwYXRoIGQ9Ik0xNSAzMmMyLjUgMi41IDEyLjUgMi41IDE1IDAgLjUtMS41IDAtMiAwLTIgMC0yLjUtMi41LTQtMi41LTQgNS41LTEuNSA2LTExLjUtNS0xNS41LTExIDQtMTAuNSAxNC01IDE1LjUgMCAwLTIuNSAxLjUtMi41IDQgMCAwLS41LjUgMCAyeiIvPjxwYXRoIGQ9Ik0yNSA4YTIuNSAyLjUgMCAxIDEtNSAwIDIuNSAyLjUgMCAxIDEgNSAweiIvPjwvZz48cGF0aCBkPSJNMTcuNSAyNmgxME0xNSAzMGgxNW0tNy41LTE0LjV2NU0yMCAxOGg1IiBzdHJva2U9IiNlY2VjZWMiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48L2c+PC9zdmc+",
+  n:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxMGMxMC41IDEgMTYuNSA4IDE2IDI5SDE1YzAtOSAxMC02LjUgOC0yMSIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik0yNCAxOGMuMzggMi45MS01LjU1IDcuMzctOCA5LTMgMi0yLjgyIDQuMzQtNSA0LTEuMDQyLS45NCAxLjQxLTMuMDQgMC0zLTEgMCAuMTkgMS4yMy0xIDItMSAwLTQuMDAzIDEtNC00IDAtMiA2LTEyIDYtMTJzMS44OS0xLjkgMi0zLjVjLS43My0uOTk0LS41LTItLjUtMyAxLTEgMyAyLjUgMyAyLjVoMnMuNzgtMS45OTIgMi41LTNjMSAwIDEgMyAxIDMiIGZpbGw9IiMwMDAiLz48cGF0aCBkPSJNOS41IDI1LjVhLjUuNSAwIDEgMS0xIDAgLjUuNSAwIDEgMSAxIDB6bTUuNDMzLTkuNzVhLjUgMS41IDMwIDEgMS0uODY2LS41LjUgMS41IDMwIDEgMSAuODY2LjV6IiBmaWxsPSIjZWNlY2VjIiBzdHJva2U9IiNlY2VjZWMiLz48cGF0aCBkPSJNMjQuNTUgMTAuNGwtLjQ1IDEuNDUuNS4xNWMzLjE1IDEgNS42NSAyLjQ5IDcuOSA2Ljc1UzM1Ljc1IDI5LjA2IDM1LjI1IDM5bC0uMDUuNWgyLjI1bC4wNS0uNWMuNS0xMC4wNi0uODgtMTYuODUtMy4yNS0yMS4zNC0yLjM3LTQuNDktNS43OS02LjY0LTkuMTktNy4xNmwtLjUxLS4xeiIgZmlsbD0iI2VjZWNlYyIgc3Ryb2tlPSJub25lIi8+PC9nPjwvc3ZnPg==",
+  r:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik05IDM5aDI3di0zSDl2M3ptMy41LTdsMS41LTIuNWgxN2wxLjUgMi41aC0yMHptLS41IDR2LTRoMjF2NEgxMnoiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTE0IDI5LjV2LTEzaDE3djEzSDE0eiIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48cGF0aCBkPSJNMTQgMTYuNUwxMSAxNGgyM2wtMyAyLjVIMTR6TTExIDE0VjloNHYyaDVWOWg1djJoNVY5aDR2NUgxMXoiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTEyIDM1LjVoMjFtLTIwLTRoMTltLTE4LTJoMTdtLTE3LTEzaDE3TTExIDE0aDIzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlY2VjZWMiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIvPjwvZz48L3N2Zz4=",
+  q:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxnIHN0cm9rZT0ibm9uZSI+PGNpcmNsZSBjeD0iNiIgY3k9IjEyIiByPSIyLjc1Ii8+PGNpcmNsZSBjeD0iMTQiIGN5PSI5IiByPSIyLjc1Ii8+PGNpcmNsZSBjeD0iMjIuNSIgY3k9IjgiIHI9IjIuNzUiLz48Y2lyY2xlIGN4PSIzMSIgY3k9IjkiIHI9IjIuNzUiLz48Y2lyY2xlIGN4PSIzOSIgY3k9IjEyIiByPSIyLjc1Ii8+PC9nPjxwYXRoIGQ9Ik05IDI2YzguNS0xLjUgMjEtMS41IDI3IDBsMi41LTEyLjVMMzEgMjVsLS4zLTE0LjEtNS4yIDEzLjYtMy0xNC41LTMgMTQuNS01LjItMTMuNkwxNCAyNSA2LjUgMTMuNSA5IDI2eiIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiLz48cGF0aCBkPSJNOSAyNmMwIDIgMS41IDIgMi41IDQgMSAxLjUgMSAxIC41IDMuNS0xLjUgMS0xLjUgMi41LTEuNSAyLjUtMS41IDEuNS41IDIuNS41IDIuNSA2LjUgMSAxNi41IDEgMjMgMCAwIDAgMS41LTEgMC0yLjUgMCAwIC41LTEuNS0xLTIuNS0uNS0yLjUtLjUtMiAuNS0zLjUgMS0yIDIuNS0yIDIuNS00LTguNS0xLjUtMTguNS0xLjUtMjcgMHoiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTExIDM4LjVhMzUgMzUgMSAwIDAgMjMgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiLz48cGF0aCBkPSJNMTEgMjlhMzUgMzUgMSAwIDEgMjMgMG0tMjEuNSAyLjVoMjBtLTIxIDNhMzUgMzUgMSAwIDAgMjIgMG0tMjMgM2EzNSAzNSAxIDAgMCAyNCAwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlY2VjZWMiLz48L2c+PC9zdmc+",
+  k:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMi41IDExLjYzVjYiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48cGF0aCBkPSJNMjIuNSAyNXM0LjUtNy41IDMtMTAuNWMwIDAtMS0yLjUtMy0yLjVzLTMgMi41LTMgMi41Yy0xLjUgMyAzIDEwLjUgMyAxMC41IiBmaWxsPSIjMDAwIiBzdHJva2UtbGluZWNhcD0iYnV0dCIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIvPjxwYXRoIGQ9Ik0xMS41IDM3YzUuNSAzLjUgMTUuNSAzLjUgMjEgMHYtN3M5LTQuNSA2LTEwLjVjLTQtNi41LTEzLjUtMy41LTE2IDRWMjd2LTMuNWMtMy41LTcuNS0xMy0xMC41LTE2LTQtMyA2IDUgMTAgNSAxMFYzN3oiIGZpbGw9IiMwMDAiLz48cGF0aCBkPSJNMjAgOGg1IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PHBhdGggZD0iTTMyIDI5LjVzOC41LTQgNi4wMy05LjY1QzM0LjE1IDE0IDI1IDE4IDIyLjUgMjQuNWwuMDEgMi4xLS4wMS0yLjFDMjAgMTggOS45MDYgMTQgNi45OTcgMTkuODVjLTIuNDk3IDUuNjUgNC44NTMgOSA0Ljg1MyA5IiBzdHJva2U9IiNlY2VjZWMiLz48cGF0aCBkPSJNMTEuNSAzMGM1LjUtMyAxNS41LTMgMjEgMG0tMjEgMy41YzUuNS0zIDE1LjUtMyAyMSAwbS0yMSAzLjVjNS41LTMgMTUuNS0zIDIxIDAiIHN0cm9rZT0iI2VjZWNlYyIvPjwvZz48L3N2Zz4="
+};
+
+const PIECES = ["K","Q","R","B","N","P","k","q","r","b","n","p"];
+const START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+const CELL = 48;              // taille d'une case à l'analyse
+const SHAPE = 20;             // résolution des silhouettes normalisées
+const LEARN_KEY = "chessscan.learned.v1";
+
+/* ---------- État ---------- */
+let srcImg = null;            // canvas contenant l'image source (taille réelle)
+let crop = null;              // {x,y,w,h} en pixels de l'image source
+let board = emptyBoard();     // board[r][c], r=0 = 8e rangée
+let cells = null;             // caractéristiques extraites par case (ordre image)
+let flipped = false;          // l'image est vue côté Noirs
+let doubt = new Set();        // cases incertaines ("r,c" en coordonnées plateau)
+let tool = null;              // pièce sélectionnée dans la palette ("" = gomme)
+let templates = null;
+
+const $ = id => document.getElementById(id);
+
+function emptyBoard(){
+  return Array.from({length:8},()=>Array(8).fill(""));
+}
+
+let statusTimer = 0;
+function setStatus(msg, cls){
+  const s = $("status");
+  clearTimeout(statusTimer);
+  if(!msg){ s.className = ""; return; }
+  s.textContent = msg;
+  s.className = "show " + (cls || "");
+  statusTimer = setTimeout(() => s.classList.remove("show"), 4000);
+}
+
+/* =========================================================
+   1. Import de l'image
+   ========================================================= */
+
+$("pickBtn").onclick = () => $("fileInput").click();
+$("cameraBtn").onclick = () => $("cameraInput").click();
+$("fileInput").onchange = e => e.target.files[0] && loadFile(e.target.files[0]);
+$("cameraInput").onchange = e => e.target.files[0] && loadFile(e.target.files[0]);
+
+$("pasteBtn").onclick = async () => {
+  try{
+    const items = await navigator.clipboard.read();
+    for(const it of items){
+      const type = it.types.find(t => t.startsWith("image/"));
+      if(type){ loadFile(await it.getType(type)); return; }
+    }
+    setStatus("Aucune image dans le presse-papiers.", "err");
+  }catch(err){
+    setStatus("Collage impossible ici : utilisez Ctrl/⌘ + V ou choisissez un fichier.", "err");
+  }
+};
+
+document.addEventListener("paste", e => {
+  const items = e.clipboardData ? [...e.clipboardData.items] : [];
+  const it = items.find(i => i.type.startsWith("image/"));
+  if(it){
+    e.preventDefault();
+    loadFile(it.getAsFile());
+  }
+});
+
+const dz = $("dropZone");
+["dragenter","dragover"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add("over"); }));
+["dragleave","drop"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove("over"); }));
+dz.addEventListener("drop", e => {
+  const f = [...e.dataTransfer.files].find(f => f.type.startsWith("image/"));
+  if(f) loadFile(f);
+});
+
+function loadFile(file){
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    URL.revokeObjectURL(url);
+    // Limite la taille pour garder l'analyse rapide
+    const scale = Math.min(1, 1600 / Math.max(img.width, img.height));
+    const c = document.createElement("canvas");
+    c.width = Math.round(img.width * scale);
+    c.height = Math.round(img.height * scale);
+    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+    srcImg = c;
+    showCropper();
+  };
+  img.onerror = () => setStatus("Impossible de lire cette image.", "err");
+  img.src = url;
+}
+
+/* =========================================================
+   2. Détection automatique de l'échiquier
+   ========================================================= */
+
+// Image intégrale de la luminance pour des moyennes de zones en O(1)
+function integralLuma(canvas, scale){
+  const w = Math.max(1, Math.round(canvas.width * scale));
+  const h = Math.max(1, Math.round(canvas.height * scale));
+  const c = document.createElement("canvas");
+  c.width = w; c.height = h;
+  const ctx = c.getContext("2d");
+  ctx.drawImage(canvas, 0, 0, w, h);
+  const d = ctx.getImageData(0, 0, w, h).data;
+  const I = new Float64Array((w + 1) * (h + 1));
+  for(let y = 0; y < h; y++){
+    let row = 0;
+    for(let x = 0; x < w; x++){
+      const i = (y * w + x) * 4;
+      row += 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+      I[(y + 1) * (w + 1) + x + 1] = I[y * (w + 1) + x + 1] + row;
+    }
+  }
+  return {I, w, h};
+}
+
+function boxMean(S, x, y, bw, bh){
+  const W = S.w + 1;
+  const x0 = Math.max(0, Math.floor(x)), y0 = Math.max(0, Math.floor(y));
+  const x1 = Math.min(S.w, Math.floor(x + bw)), y1 = Math.min(S.h, Math.floor(y + bh));
+  const a = (x1 - x0) * (y1 - y0);
+  if(a <= 0) return 0;
+  return (S.I[y1 * W + x1] - S.I[y0 * W + x1] - S.I[y1 * W + x0] + S.I[y0 * W + x0]) / a;
+}
+
+// Score « damier » d'un carré candidat : on échantillonne les coins de chaque
+// case (rarement couverts par les pièces) et on mesure le contraste entre
+// cases claires et foncées rapporté à la dispersion interne.
+function boardScore(S, x, y, sw, sh){
+  const cw = sw / 8, ch = sh / 8;
+  const p = Math.max(1, cw * 0.14), q = Math.max(1, ch * 0.14);
+  const m = 0.06;
+  let s0 = 0, s1 = 0, ss0 = 0, ss1 = 0;
+  const v = new Array(4);
+  for(let r = 0; r < 8; r++){
+    for(let c = 0; c < 8; c++){
+      const cx = x + c * cw, cy = y + r * ch;
+      v[0] = boxMean(S, cx + cw * m, cy + ch * m, p, q);
+      v[1] = boxMean(S, cx + cw * (1 - m) - p, cy + ch * m, p, q);
+      v[2] = boxMean(S, cx + cw * m, cy + ch * (1 - m) - q, p, q);
+      v[3] = boxMean(S, cx + cw * (1 - m) - p, cy + ch * (1 - m) - q, p, q);
+      v.sort((a, b) => a - b);
+      const med = (v[1] + v[2]) / 2;
+      if((r + c) & 1){ s1 += med; ss1 += med * med; }
+      else { s0 += med; ss0 += med * med; }
+    }
+  }
+  const m0 = s0 / 32, m1 = s1 / 32;
+  const var0 = ss0 / 32 - m0 * m0, var1 = ss1 / 32 - m1 * m1;
+  const sd = Math.sqrt(Math.max(0, var0) + Math.max(0, var1)) + 4;
+  return Math.abs(m0 - m1) / sd;
+}
+
+function quickScore(S, x, y, size){
+  const cw = size / 8, p = Math.max(1, cw * 0.14), a = cw * 0.06, b = cw * 0.8;
+  let s0 = 0, s1 = 0, q0 = 0, q1 = 0;
+  for(let r = 0; r < 8; r++){
+    for(let c = 0; c < 8; c++){
+      const cx = x + c * cw, cy = y + r * cw;
+      const v = (boxMean(S, cx + a, cy + a, p, p) + boxMean(S, cx + b, cy + b, p, p)) / 2;
+      if((r + c) & 1){ s1 += v; q1 += v * v; } else { s0 += v; q0 += v * v; }
+    }
+  }
+  const m0 = s0 / 32, m1 = s1 / 32;
+  const sd = Math.sqrt(Math.max(0, q0 / 32 - m0 * m0) + Math.max(0, q1 / 32 - m1 * m1)) + 4;
+  return Math.abs(m0 - m1) / sd;
+}
+
+function detectBoard(canvas){
+  // Passe grossière sur une image réduite
+  const target = 150;
+  const sc = Math.min(1, target / Math.max(canvas.width, canvas.height));
+  const S = integralLuma(canvas, sc);
+  const minDim = Math.min(S.w, S.h);
+  const minSize = Math.max(40, Math.round(minDim * 0.25));
+  // Présélection rapide (2 échantillons par case), puis score complet
+  // sur les meilleurs candidats
+  const TOP = 40;
+  let top = [];
+  let floor = -1;
+  for(let size = minDim; size >= minSize; size -= Math.max(1, Math.round(size * 0.03))){
+    const step = Math.max(1, Math.round(size / 48));
+    const bonus = 1 + 0.15 * size / minDim;   // évite de choisir un sous-damier
+    for(let y = 0; y + size <= S.h; y += step){
+      for(let x = 0; x + size <= S.w; x += step){
+        const f = quickScore(S, x, y, size) * bonus;
+        if(f <= floor) continue;
+        top.push({f, x, y, size, step});
+        if(top.length > TOP * 3){
+          top.sort((a, b) => b.f - a.f);
+          top.length = TOP;
+          floor = top[TOP - 1].f;
+        }
+      }
+    }
+  }
+  let best = {score: -1};
+  for(const t of top){
+    for(let dy = -t.step; dy <= t.step; dy++) for(let dx = -t.step; dx <= t.step; dx++){
+      const x = t.x + dx, y = t.y + dy;
+      if(x < 0 || y < 0 || x + t.size > S.w || y + t.size > S.h) continue;
+      const sc2 = boardScore(S, x, y, t.size, t.size) * (1 + 0.15 * t.size / minDim);
+      if(sc2 > best.score) best = {score: sc2, x, y, w: t.size, h: t.size};
+    }
+  }
+  if(best.score < 0) return null;
+
+  // Affinage : on aligne la grille sur les bords des cases (gradients)
+  const fs = Math.min(1, 900 / Math.max(canvas.width, canvas.height));
+  const G = gradients(canvas, fs);
+  const k = fs;
+  const b = {x: best.x / sc * k, y: best.y / sc * k, w: best.w / sc * k, h: best.h / sc * k};
+  const [x, w] = fitLines(G.gx, G.w, G.h, b.x, b.w, b.y, b.h, true);
+  const [y, h] = fitLines(G.gy, G.w, G.h, b.y, b.h, x, w, false);
+  return {x: x / k, y: y / k, w: w / k, h: h / k, score: best.score};
+}
+
+// Gradients horizontaux (gx) et verticaux (gy) de la luminance
+function gradients(canvas, scale){
+  const w = Math.max(2, Math.round(canvas.width * scale));
+  const h = Math.max(2, Math.round(canvas.height * scale));
+  const c = document.createElement("canvas");
+  c.width = w; c.height = h;
+  const ctx = c.getContext("2d");
+  ctx.drawImage(canvas, 0, 0, w, h);
+  const d = ctx.getImageData(0, 0, w, h).data;
+  const L = new Float32Array(w * h);
+  for(let i = 0; i < w * h; i++) L[i] = 0.299 * d[i*4] + 0.587 * d[i*4+1] + 0.114 * d[i*4+2];
+  const gx = new Float32Array(w * h), gy = new Float32Array(w * h);
+  for(let y = 1; y < h; y++) for(let x = 1; x < w; x++){
+    const i = y * w + x;
+    gx[i] = Math.abs(L[i] - L[i - 1]);
+    gy[i] = Math.abs(L[i] - L[i - w]);
+  }
+  return {gx, gy, w, h};
+}
+
+// Recherche exhaustive de la position/taille qui place les 7 lignes internes
+// (et, avec un poids moindre, les 2 bords) sur les contours les plus forts.
+function fitLines(g, W, H, pos, len, opos, olen, vertical){
+  const cell = len / 8;
+  const range = Math.max(3, Math.round(cell * 0.35));
+  const samples = [];
+  for(let t = 0.03; t < 1; t += 0.01) samples.push(Math.round(opos + t * olen));
+  const lineEnergy = X => {
+    const xi = Math.round(X);
+    if(xi < 1 || xi >= (vertical ? W : H)) return 0;
+    let e = 0;
+    for(const o of samples){
+      if(o < 0 || o >= (vertical ? H : W)) continue;
+      e += vertical ? g[o * W + xi] : g[xi * W + o];
+    }
+    return e;
+  };
+  let best = {e: -1, p: pos, l: len};
+  for(let dp = -range; dp <= range; dp++){
+    for(let dl = -2 * range; dl <= 2 * range; dl++){
+      const p = pos + dp, l = len + dl;
+      if(l < 16) continue;
+      let e = 0;
+      for(let i = 0; i <= 8; i++){
+        const wgt = (i === 0 || i === 8) ? 0.5 : 1;
+        e += wgt * lineEnergy(p + i * l / 8);
+      }
+      if(e > best.e) best = {e, p, l};
+    }
+  }
+  return [best.p, best.l];
+}
+
+/* =========================================================
+   Recadrage manuel
+   ========================================================= */
+
+function showCropper(){
+  const cv = $("srcCanvas");
+  cv.width = srcImg.width;
+  cv.height = srcImg.height;
+  cv.getContext("2d").drawImage(srcImg, 0, 0);
+  $("cropPanel").classList.remove("hidden");
+  setStatus("Recherche de l'échiquier…");
+  requestAnimationFrame(() => setTimeout(() => {
+    autoDetect();
+    $("cropPanel").scrollIntoView({behavior: "smooth", block: "start"});
+    recognize();
+  }, 30));
+}
+
+function autoDetect(){
+  const found = detectBoard(srcImg);
+  if(found && found.score > 1.5){
+    crop = found;
+    setStatus("Échiquier détecté.", "ok");
+  }else{
+    const s = Math.min(srcImg.width, srcImg.height);
+    crop = {x: (srcImg.width - s) / 2, y: (srcImg.height - s) / 2, w: s, h: s};
+    setStatus("Échiquier non détecté avec certitude : ajustez le cadre.", "err");
+  }
+  drawCrop();
+}
+
+$("autoBtn").onclick = () => { autoDetect(); recognize(); };
+
+function drawCrop(){
+  const cv = $("srcCanvas");
+  const k = cv.clientWidth / srcImg.width;
+  const box = $("cropBox");
+  box.style.left = crop.x * k + "px";
+  box.style.top = crop.y * k + "px";
+  box.style.width = crop.w * k + "px";
+  box.style.height = crop.h * k + "px";
+}
+
+window.addEventListener("resize", () => { if(crop) drawCrop(); });
+
+(function setupDrag(){
+  const box = $("cropBox");
+  let drag = null;
+  box.addEventListener("pointerdown", e => {
+    e.preventDefault();
+    box.setPointerCapture(e.pointerId);
+    drag = {mode: e.target.dataset.h || "move", sx: e.clientX, sy: e.clientY, start: {...crop}};
+  });
+  box.addEventListener("pointermove", e => {
+    if(!drag) return;
+    const k = srcImg.width / $("srcCanvas").clientWidth;
+    const dx = (e.clientX - drag.sx) * k, dy = (e.clientY - drag.sy) * k;
+    const s = drag.start, W = srcImg.width, H = srcImg.height, min = 32;
+    let {x, y, w, h} = s;
+    if(drag.mode === "move"){
+      x = Math.min(Math.max(0, s.x + dx), W - s.w);
+      y = Math.min(Math.max(0, s.y + dy), H - s.h);
+    }else{
+      if(drag.mode.includes("l")){ x = Math.min(Math.max(0, s.x + dx), s.x + s.w - min); w = s.x + s.w - x; }
+      if(drag.mode.includes("r")){ w = Math.min(Math.max(min, s.w + dx), W - s.x); }
+      if(drag.mode.includes("t")){ y = Math.min(Math.max(0, s.y + dy), s.y + s.h - min); h = s.y + s.h - y; }
+      if(drag.mode.includes("b")){ h = Math.min(Math.max(min, s.h + dy), H - s.y); }
+    }
+    crop = {x, y, w, h};
+    drawCrop();
+  });
+  const end = () => { if(drag){ drag = null; recognize(); } };
+  box.addEventListener("pointerup", end);
+  box.addEventListener("pointercancel", end);
+})();
+
+$("recognizeBtn").onclick = () => {
+  recognize();
+  $("boardPanel").scrollIntoView({behavior: "smooth", block: "start"});
+};
+
+/* =========================================================
+   3. Reconnaissance des pièces
+   ========================================================= */
+
+// Silhouette normalisée : on recadre sur la boîte englobante, on centre dans
+// un carré et on réduit à SHAPE×SHAPE.
+function shapeFeatures(mask, size){
+  let x0 = size, y0 = size, x1 = -1, y1 = -1, n = 0;
+  for(let y = 0; y < size; y++) for(let x = 0; x < size; x++){
+    if(mask[y * size + x]){
+      n++;
+      if(x < x0) x0 = x; if(x > x1) x1 = x;
+      if(y < y0) y0 = y; if(y > y1) y1 = y;
+    }
+  }
+  if(n === 0) return null;
+  const bw = x1 - x0 + 1, bh = y1 - y0 + 1, side = Math.max(bw, bh);
+  const ox = x0 - (side - bw) / 2, oy = y0 - (side - bh) / 2;
+  // échantillonnage 4×4 points par cellule : pas d'effet de rayures
+  const v = new Float32Array(SHAPE * SHAPE);
+  const k = side / SHAPE, sub = 4;
+  for(let gy = 0; gy < SHAPE; gy++) for(let gx = 0; gx < SHAPE; gx++){
+    let acc = 0;
+    for(let sy = 0; sy < sub; sy++) for(let sx = 0; sx < sub; sx++){
+      const x = Math.floor(ox + (gx + (sx + 0.5) / sub) * k);
+      const y = Math.floor(oy + (gy + (sy + 0.5) / sub) * k);
+      if(x >= 0 && y >= 0 && x < size && y < size) acc += mask[y * size + x];
+    }
+    v[gy * SHAPE + gx] = acc / (sub * sub);
+  }
+  return {v, h: bh / size, w: bw / size, fill: n / (bw * bh)};
+}
+
+// Bouche les trous : tout ce qui n'est pas atteignable depuis le bord
+// en passant par le fond devient pièce.
+function fillHoles(mask, size){
+  const out = new Uint8Array(size * size).fill(1);
+  const stack = [];
+  for(let i = 0; i < size; i++){
+    stack.push(i, (size - 1) * size + i, i * size, i * size + size - 1);
+  }
+  while(stack.length){
+    const p = stack.pop();
+    if(!out[p] || mask[p]) continue;
+    out[p] = 0;
+    const x = p % size, y = (p / size) | 0;
+    if(x > 0) stack.push(p - 1);
+    if(x < size - 1) stack.push(p + 1);
+    if(y > 0) stack.push(p - size);
+    if(y < size - 1) stack.push(p + size);
+  }
+  return out;
+}
+
+function dilate(m, size){
+  const o = new Uint8Array(m.length);
+  for(let y = 0; y < size; y++) for(let x = 0; x < size; x++){
+    const i = y * size + x;
+    o[i] = m[i] || (x > 0 && m[i-1]) || (x < size-1 && m[i+1]) ||
+           (y > 0 && m[i-size]) || (y < size-1 && m[i+size]) ? 1 : 0;
+  }
+  return o;
+}
+
+function erode(m, size){
+  const o = new Uint8Array(m.length);
+  for(let y = 1; y < size - 1; y++) for(let x = 1; x < size - 1; x++){
+    const i = y * size + x;
+    o[i] = m[i] && m[i-1] && m[i+1] && m[i-size] && m[i+size] ? 1 : 0;
+  }
+  return o;
+}
+
+function largestBlob(m, size){
+  const lab = new Int32Array(m.length);
+  let best = 0, bestN = 0, id = 0;
+  for(let s = 0; s < m.length; s++){
+    if(!m[s] || lab[s]) continue;
+    id++;
+    let n = 0;
+    const st = [s];
+    lab[s] = id;
+    while(st.length){
+      const p = st.pop();
+      n++;
+      const x = p % size;
+      for(const q of [x > 0 ? p - 1 : -1, x < size - 1 ? p + 1 : -1, p - size, p + size]){
+        if(q >= 0 && q < m.length && m[q] && !lab[q]){ lab[q] = id; st.push(q); }
+      }
+    }
+    if(n > bestN){ bestN = n; best = id; }
+  }
+  const o = new Uint8Array(m.length);
+  for(let i = 0; i < m.length; i++) o[i] = lab[i] === best ? 1 : 0;
+  return o;
+}
+
+function loadImage(src){
+  return new Promise((res, rej) => {
+    const i = new Image();
+    i.onload = () => res(i);
+    i.onerror = rej;
+    i.src = src;
+  });
+}
+
+// Gabarits : pièces cburnett + glyphes Unicode + corrections apprises
+async function buildTemplates(){
+  const list = [];
+  const S2 = CELL * 2;   // marge : les glyphes ne sont jamais rognés
+  const c = document.createElement("canvas");
+  c.width = c.height = S2;
+  const ctx = c.getContext("2d", {willReadFrequently: true});
+
+  function addFromCanvas(type, set){
+    const d = ctx.getImageData(0, 0, S2, S2).data;
+    const m = new Uint8Array(S2 * S2);
+    for(let i = 0; i < m.length; i++) m[i] = d[i * 4 + 3] > 100 ? 1 : 0;
+    const f = shapeFeatures(erode(fillHoles(dilate(m, S2), S2), S2), S2);
+    if(f){ f.type = type; f.set = set; list.push(f); }
+  }
+
+  for(const p of ["K","Q","R","B","N","P"]){
+    const img = await loadImage(PIECE_IMG[p]);
+    ctx.clearRect(0, 0, S2, S2);
+    ctx.drawImage(img, CELL / 2, CELL / 2, CELL, CELL);
+    addFromCanvas(p, "cburnett");
+  }
+
+  const glyphs = {K:"♚", Q:"♛", R:"♜", B:"♝", N:"♞", P:"♟︎"};
+  const fonts = ['"DejaVu Sans"', '"Segoe UI Symbol"', '"Apple Symbols"', "serif"];
+  for(const font of fonts){
+    for(const p in glyphs){
+      ctx.clearRect(0, 0, S2, S2);
+      ctx.fillStyle = "#000";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.font = `${CELL * 0.85}px ${font}`;
+      ctx.fillText(glyphs[p], S2 / 2, S2 / 2);
+      addFromCanvas(p, "unicode " + font);
+    }
+  }
+
+  // Cavaliers tournés vers la droite dans certains jeux
+  for(const t of list.filter(t => t.type === "N").slice()){
+    list.push({...t, v: mirror(t.v), mirrored: true});
+  }
+
+  // Relative heights inside each set (the king is usually the tallest piece)
+  const bySet = {};
+  for(const t of list) (bySet[t.set] = bySet[t.set] || []).push(t);
+  for(const s in bySet){
+    const mh = Math.max(...bySet[s].map(t => t.h));
+    for(const t of bySet[s]) t.rh = t.h / mh;
+  }
+
+  for(const l of loadLearned()) list.push({...l, v: Float32Array.from(l.v), set: "appris"});
+  return list;
+}
+
+function mirror(v){
+  const o = new Float32Array(v.length);
+  for(let y = 0; y < SHAPE; y++) for(let x = 0; x < SHAPE; x++){
+    o[y * SHAPE + x] = v[y * SHAPE + SHAPE - 1 - x];
+  }
+  return o;
+}
+
+function shapeDist(a, b){
+  let s = 0;
+  for(let i = 0; i < a.v.length; i++) s += Math.abs(a.v[i] - b.v[i]);
+  s /= a.v.length;
+  const ar = Math.log((a.w / a.h) / (b.w / b.h));
+  return s + 0.12 * Math.abs(ar) + 0.35 * Math.abs(a.rh - b.rh);
+}
+
+function colorDist(a, b){
+  return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+}
+
+function median(arr){
+  const s = arr.slice().sort((a, b) => a - b);
+  return s[s.length >> 1];
+}
+
+// Découpe l'échiquier en 64 cases et extrait les caractéristiques de chacune
+function extractCells(){
+  const size = CELL * 8;
+  const c = document.createElement("canvas");
+  c.width = c.height = size;
+  const ctx = c.getContext("2d", {willReadFrequently: true});
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(srcImg, crop.x, crop.y, crop.w, crop.h, 0, 0, size, size);
+  const data = ctx.getImageData(0, 0, size, size).data;
+
+  // Couleurs de référence des cases claires / foncées (échantillons des coins)
+  const par = [[[],[],[]],[[],[],[]]];
+  for(let r = 0; r < 8; r++) for(let col = 0; col < 8; col++){
+    for(const [px, py] of [[3,3],[CELL-4,3],[3,CELL-4],[CELL-4,CELL-4]]){
+      const i = ((r * CELL + py) * size + col * CELL + px) * 4;
+      for(let k = 0; k < 3; k++) par[(r + col) & 1][k].push(data[i + k]);
+    }
+  }
+  const parColor = par.map(ch => ch.map(median));
+
+  const out = [];
+  for(let r = 0; r < 8; r++){
+    for(let col = 0; col < 8; col++){
+      const px = (x, y) => ((r * CELL + y) * size + col * CELL + x) * 4;
+
+      // Couleur de fond de la case : médiane de l'anneau extérieur
+      const ring = [[],[],[]];
+      for(let t = 3; t < CELL - 3; t += 2){
+        for(const [x, y] of [[t,3],[t,CELL-4],[3,t],[CELL-4,t]]){
+          const i = px(x, y);
+          for(let k = 0; k < 3; k++) ring[k].push(data[i + k]);
+        }
+      }
+      let bg = ring.map(median);
+      const pc = parColor[(r + col) & 1];
+      // si l'anneau est trop différent du fond attendu (pièce débordante),
+      // on revient à la couleur générale — sauf case surlignée uniforme
+      if(colorDist(bg, pc) > 60){
+        let spread = 0;
+        for(let k = 0; k < 3; k++){
+          const s = ring[k].slice().sort((a, b) => a - b);
+          spread += s[Math.floor(s.length * 0.8)] - s[Math.floor(s.length * 0.2)];
+        }
+        if(spread > 60) bg = pc;
+      }
+
+      // Masque des pixels « pièce », hors coins (coordonnées imprimées)
+      const m = new Uint8Array(CELL * CELL);
+      const corner = Math.round(CELL * 0.2), edge = 2;
+      let n = 0;
+      for(let y = edge; y < CELL - edge; y++){
+        for(let x = edge; x < CELL - edge; x++){
+          const inCornerX = x < corner || x >= CELL - corner;
+          const inCornerY = y < corner || y >= CELL - corner;
+          if(inCornerX && inCornerY) continue;
+          const i = px(x, y);
+          if(colorDist([data[i], data[i+1], data[i+2]], bg) > 30){
+            m[y * CELL + x] = 1;
+            n++;
+          }
+        }
+      }
+      const cellInfo = {r, c: col, bg, n};
+      if(n / (CELL * CELL) > 0.05){
+        // fermeture morphologique : referme les contours mal tracés
+        // puis on ne garde que la plus grande tache (élimine les coordonnées)
+        const filled = largestBlob(erode(fillHoles(dilate(m, CELL), CELL), CELL), CELL);
+        const f = shapeFeatures(filled, CELL);
+        if(f && f.h > 0.3){
+          // Couleur : proportion de pixels clairs à l'intérieur de la
+          // silhouette (contour exclu par érosion)
+          let inner = erode(erode(filled, CELL), CELL);
+          if(inner.reduce((a, b) => a + b, 0) < 30) inner = filled;
+          let tot = 0, light = 0;
+          for(let y = 0; y < CELL; y++) for(let x = 0; x < CELL; x++){
+            if(!inner[y * CELL + x]) continue;
+            const i = px(x, y);
+            tot++;
+            if(0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2] > 150) light++;
+          }
+          cellInfo.shape = f;
+          cellInfo.lightFrac = light / tot;
+        }
+      }
+      out.push(cellInfo);
+    }
+  }
+
+  // Hauteur relative : rapportée à la plus grande pièce de l'image
+  const occ = out.filter(o => o.shape);
+  if(occ.length){
+    const hs = occ.map(o => o.shape.h).sort((a, b) => b - a);
+    const ref = hs[Math.min(1, hs.length - 1)];   // robustesse : 2e plus haute
+    for(const o of occ) o.shape.rh = Math.min(1.1, o.shape.h / ref);
+  }
+  return out;
+}
+
+// Couleur des pièces : séparation en deux groupes (méthode d'Otsu) selon la
+// proportion de pixels clairs à l'intérieur de chaque pièce
+function classifyColors(occ){
+  if(!occ.length) return;
+  const vals = occ.map(o => o.lightFrac).sort((a, b) => a - b);
+  let bestT = 0.4, bestV = -1;
+  for(let i = 1; i < vals.length; i++){
+    const A = vals.slice(0, i), B = vals.slice(i);
+    const ma = A.reduce((x, y) => x + y, 0) / A.length;
+    const mb = B.reduce((x, y) => x + y, 0) / B.length;
+    const v = A.length * B.length * (mb - ma) * (mb - ma);
+    if(v > bestV){ bestV = v; bestT = (vals[i - 1] + vals[i]) / 2; }
+  }
+  // un seul camp présent : on garde un seuil fixe
+  if(vals[vals.length - 1] - vals[0] < 0.3) bestT = 0.4;
+  for(const o of occ){
+    o.white = o.lightFrac > bestT;
+    o.colorConf = Math.min(1, Math.abs(o.lightFrac - bestT) * 5);
+  }
+}
+
+async function recognize(){
+  if(!srcImg || !crop) return;
+  if(!templates) templates = await buildTemplates();
+  cells = extractCells();
+  const occ = cells.filter(o => o.shape);
+  classifyColors(occ);
+
+  board = emptyBoard();
+  doubt = new Set();
+  for(const o of occ){
+    const ranked = templates
+      .map(t => ({t, d: shapeDist(o.shape, t)}))
+      .sort((a, b) => a.d - b.d);
+    o.dist = {};
+    for(const x of ranked) if(!(x.t.type in o.dist)) o.dist[x.t.type] = x.d;
+  }
+
+  // Orientation : pièces blanches en bas normalement
+  let score = 0;
+  for(const o of occ) score += (o.white ? 1 : -1) * (o.r - 3.5);
+  flipped = score < -0.5;
+
+  assignTypes(occ);
+  applyCells();
+  showBoardPanels();
+  const nDoubt = doubt.size;
+  setStatus(
+    `${occ.length} pièce${occ.length > 1 ? "s" : ""} reconnue${occ.length > 1 ? "s" : ""}` +
+    (nDoubt ? ` — ${nDoubt} case${nDoubt > 1 ? "s" : ""} à vérifier.` : "."),
+    nDoubt ? "" : "ok"
+  );
+}
+
+function setType(o, type){
+  o.type = type;
+  const others = Object.entries(o.dist).filter(([t]) => t !== type).map(([, d]) => d);
+  const margin = others.length ? Math.min(...others) - o.dist[type] : 1;
+  o.conf = Math.min(margin * 12, o.colorConf);
+  o.label = o.white ? type : type.toLowerCase();
+}
+
+// Regroupe les pièces de même silhouette (même dessin dans l'image),
+// quelle que soit leur couleur — liaison moyenne.
+function clusterShapes(occ){
+  let groups = occ.map(o => [o]);
+  const avg = (A, B) => {
+    let s = 0;
+    for(const a of A) for(const b of B) s += shapeDist(a.shape, b.shape);
+    return s / (A.length * B.length);
+  };
+  for(;;){
+    let best = null, bd = 0.075;
+    for(let i = 0; i < groups.length; i++) for(let j = i + 1; j < groups.length; j++){
+      const d = avg(groups[i], groups[j]);
+      if(d < bd){ bd = d; best = [i, j]; }
+    }
+    if(!best) break;
+    groups[best[0]] = groups[best[0]].concat(groups[best[1]]);
+    groups.splice(best[1], 1);
+  }
+  groups.forEach((g, i) => g.forEach(o => o.cluster = i));
+  return groups;
+}
+
+// Choisit le type de chaque groupe : ressemblance aux gabarits + règles du jeu
+// (un roi par camp, 8 pions au plus, pas de pion sur les rangées 1 et 8…).
+function assignTypes(occ){
+  if(!occ.length) return;
+  const groups = clusterShapes(occ);
+  const types = ["K","Q","R","B","N","P"];
+  const cost = groups.map(g => {
+    const c = {};
+    for(const t of types) c[t] = g.reduce((s, o) => s + o.dist[t], 0);
+    return c;
+  });
+  const edge = groups.map(g => g.filter(o => {
+    const [r] = toBoard(o.r, o.c);
+    return r === 0 || r === 7;
+  }).length);
+  const limits = {Q: 1, R: 2, B: 2, N: 2, P: 8};
+
+  const energy = A => {
+    let e = 0;
+    const cnt = {true: {}, false: {}};
+    A.forEach((t, i) => {
+      e += cost[i][t];
+      for(const o of groups[i]) cnt[o.white][t] = (cnt[o.white][t] || 0) + 1;
+      if(t === "P") e += 0.6 * edge[i];
+    });
+    for(const w of [true, false]){
+      const c = cnt[w];
+      if(!Object.keys(c).length) continue;
+      e += 1.0 * Math.abs((c.K || 0) - 1);
+      for(const t in limits) e += (t === "P" ? 0.6 : 0.25) * Math.max(0, (c[t] || 0) - limits[t]);
+    }
+    const seen = {};
+    for(const t of A) seen[t] = (seen[t] || 0) + 1;
+    for(const t in seen) e += 0.05 * (seen[t] - 1);
+    return e;
+  };
+
+  let A = cost.map(c => types.reduce((a, b) => c[a] <= c[b] ? a : b));
+  let E = energy(A);
+  for(let improved = true; improved;){
+    improved = false;
+    for(let i = 0; i < A.length; i++){
+      for(const t of types){
+        if(t === A[i]) continue;
+        const B = A.slice(); B[i] = t;
+        const e = energy(B);
+        if(e < E - 1e-9){ A = B; E = e; improved = true; }
+      }
+      for(let j = i + 1; j < A.length; j++){
+        if(A[i] === A[j]) continue;
+        const B = A.slice(); B[i] = A[j]; B[j] = A[i];
+        const e = energy(B);
+        if(e < E - 1e-9){ A = B; E = e; improved = true; }
+      }
+    }
+  }
+  groups.forEach((g, i) => {
+    // confiance du groupe : écart entre le type retenu et le suivant
+    const others = types.filter(t => t !== A[i]).map(t => cost[i][t]);
+    const margin = (Math.min(...others) - cost[i][A[i]]) / g.length;
+    g.forEach(o => {
+      setType(o, A[i]);
+      o.conf = Math.min(margin * 12, o.colorConf);
+    });
+  });
+}
+
+// Reporte les résultats par case (ordre image) sur le plateau (ordre FEN)
+function applyCells(){
+  board = emptyBoard();
+  doubt = new Set();
+  for(const o of cells){
+    const [r, c] = toBoard(o.r, o.c);
+    board[r][c] = o.label || "";
+    if(o.label && o.conf < 0.35) doubt.add(r + "," + c);
+  }
+  guessCastling();
+  render();
+}
+
+function toBoard(r, c){
+  return flipped ? [7 - r, 7 - c] : [r, c];
+}
+
+function showBoardPanels(){
+  $("boardPanel").classList.remove("hidden");
+  $("fenPanel").classList.remove("hidden");
+}
+
+/* ---------- Apprentissage des corrections ---------- */
+
+function loadLearned(){
+  try{ return JSON.parse(localStorage.getItem(LEARN_KEY)) || []; }
+  catch(e){ return []; }
+}
+
+function learn(shape, type){
+  try{
+    const l = loadLearned();
+    l.push({type, v: Array.from(shape.v, x => Math.round(x * 100) / 100), w: shape.w, h: shape.h, rh: shape.rh});
+    while(l.length > 150) l.shift();
+    localStorage.setItem(LEARN_KEY, JSON.stringify(l));
+  }catch(e){ /* stockage indisponible : on ignore */ }
+  if(templates) templates.push({type, v: shape.v, w: shape.w, h: shape.h, rh: shape.rh, set: "appris"});
+}
+
+/* =========================================================
+   Plateau éditable
+   ========================================================= */
+
+const boardEl = $("board");
+
+function render(){
+  boardEl.innerHTML = "";
+  for(let vr = 0; vr < 8; vr++){
+    for(let vc = 0; vc < 8; vc++){
+      const r = vr, c = vc;   // affichage toujours côté Blancs
+      const sq = document.createElement("div");
+      sq.className = "square " + ((r + c) % 2 ? "d" : "l");
+      const p = board[r][c];
+      if(p) sq.style.backgroundImage = `url("${PIECE_IMG[p]}")`;
+      if(doubt.has(r + "," + c)) sq.classList.add("doubt");
+      if(c === 0){
+        const s = document.createElement("span");
+        s.className = "coord rank"; s.textContent = 8 - r; sq.appendChild(s);
+      }
+      if(r === 7){
+        const s = document.createElement("span");
+        s.className = "coord file"; s.textContent = "abcdefgh"[c]; sq.appendChild(s);
+      }
+      sq.onclick = () => onSquare(r, c);
+      boardEl.appendChild(sq);
+    }
+  }
+  updateFen();
+}
+
+function onSquare(r, c){
+  if(tool === null){
+    setStatus("Choisissez d'abord une pièce ou la gomme dans la palette.");
+    return;
+  }
+  const newP = (tool === board[r][c]) ? "" : tool;
+  const old = board[r][c];
+  board[r][c] = newP;
+  doubt.delete(r + "," + c);
+
+  // Propagation aux pièces identiques de l'image + apprentissage
+  if(cells){
+    const [ir, ic] = toBoard(r, c);   // symétrique : même transformation
+    const src = cells.find(o => o.r === ir && o.c === ic);
+    if(src){
+      src.label = newP;
+      src.conf = 1;
+      if(newP && src.shape){
+        learn(src.shape, newP.toUpperCase());
+        // même dessin dans l'image, même ancien type → même correction
+        const oldT = old.toUpperCase(), newT = newP.toUpperCase();
+        // (une simple correction de couleur ne concerne que cette case)
+        src.white = newP === newT;
+        if(oldT !== newT){
+          for(const o of cells){
+            if(o === src || !o.shape || o.cluster !== src.cluster) continue;
+            if(o.label && o.label.toUpperCase() === oldT){
+              o.label = o.white ? newT : newT.toLowerCase();
+              o.conf = 1;
+            }
+          }
+        }
+        // un seul roi par camp : l'ancien « roi » prend le type remplacé
+        if(newT === "K" && oldT && oldT !== "K"){
+          for(const o of cells){
+            if(!o.label || o.label.toUpperCase() !== "K" || o.cluster === src.cluster) continue;
+            if(o === src) continue;
+            o.label = o.white ? oldT : oldT.toLowerCase();
+            o.conf = 1;
+          }
+        }
+      }
+      applyCells();
+      return;
+    }
+  }
+  render();
+}
+
+function buildPalette(){
+  const pal = $("palette");
+  const order = ["K","Q","R","B","N","P","","k","q","r","b","n","p",null];
+  for(const p of order){
+    const b = document.createElement("button");
+    b.className = "pal";
+    if(p === ""){ b.textContent = "⌫"; b.title = "Gomme"; }
+    else if(p === null){ b.textContent = "✋"; b.title = "Aucun outil"; }
+    else{
+      b.style.backgroundImage = `url("${PIECE_IMG[p]}")`;
+      b.title = p;
+    }
+    b.onclick = () => {
+      tool = p;
+      pal.querySelectorAll(".pal").forEach(x => x.classList.toggle("active", x === b));
+    };
+    if(p === null) b.classList.add("active");
+    pal.appendChild(b);
+  }
+}
+
+$("flipBtn").onclick = () => {
+  flipped = !flipped;
+  if(cells) applyCells();
+  else{ board = board.map(row => row.slice().reverse()).reverse(); render(); }
+};
+
+$("clearBtn").onclick = () => {
+  cells = null;
+  board = emptyBoard();
+  doubt.clear();
+  render();
+};
+
+$("startBtn").onclick = () => {
+  cells = null;
+  board = parsePlacement(START_FEN);
+  doubt.clear();
+  guessCastling();
+  render();
+};
+
+/* =========================================================
+   4. FEN, validation et Lichess
+   ========================================================= */
+
+function placement(){
+  return board.map(row => {
+    let s = "", e = 0;
+    for(const p of row){
+      if(!p){ e++; continue; }
+      if(e){ s += e; e = 0; }
+      s += p;
+    }
+    return s + (e || "");
+  }).join("/");
+}
+
+function parsePlacement(str){
+  const rows = str.split("/");
+  if(rows.length !== 8) return null;
+  const b = [];
+  for(const row of rows){
+    const out = [];
+    for(const ch of row){
+      if(/[1-8]/.test(ch)) for(let i = 0; i < +ch; i++) out.push("");
+      else if(PIECES.includes(ch)) out.push(ch);
+      else return null;
+    }
+    if(out.length !== 8) return null;
+    b.push(out);
+  }
+  return b;
+}
+
+function guessCastling(){
+  $("cK").checked = board[7][4] === "K" && board[7][7] === "R";
+  $("cQ").checked = board[7][4] === "K" && board[7][0] === "R";
+  $("ck").checked = board[0][4] === "k" && board[0][7] === "r";
+  $("cq").checked = board[0][4] === "k" && board[0][0] === "r";
+}
+
+function turn(){
+  return document.querySelector('input[name="turn"]:checked').value;
+}
+
+function fullFen(){
+  let cs = "";
+  if($("cK").checked && board[7][4] === "K" && board[7][7] === "R") cs += "K";
+  if($("cQ").checked && board[7][4] === "K" && board[7][0] === "R") cs += "Q";
+  if($("ck").checked && board[0][4] === "k" && board[0][7] === "r") cs += "k";
+  if($("cq").checked && board[0][4] === "k" && board[0][0] === "r") cs += "q";
+  return `${placement()} ${turn()} ${cs || "-"} - 0 1`;
+}
+
+function validate(){
+  const w = [];
+  const count = p => board.flat().filter(x => x === p).length;
+  if(count("K") !== 1) w.push(`Il faut exactement un roi blanc (trouvé : ${count("K")}).`);
+  if(count("k") !== 1) w.push(`Il faut exactement un roi noir (trouvé : ${count("k")}).`);
+  if([...board[0], ...board[7]].some(p => p === "P" || p === "p")) w.push("Un pion est sur la 1re ou la 8e rangée.");
+  if(count("P") > 8 || count("p") > 8) w.push("Plus de 8 pions d'une même couleur.");
+  if(board.flat().filter(p => p && p === p.toUpperCase()).length > 16) w.push("Plus de 16 pièces blanches.");
+  if(board.flat().filter(p => p && p === p.toLowerCase()).length > 16) w.push("Plus de 16 pièces noires.");
+  return w;
+}
+
+let lastEvalFen = "";
+
+function updateFen(){
+  const fen = fullFen();
+  if(document.activeElement !== $("fenField")) $("fenField").value = fen;
+  const path = fen.replace(/ /g, "_");
+  const color = turn() === "w" ? "white" : "black";
+  $("analysisLink").href = `https://lichess.org/analysis/standard/${path}?color=${color}`;
+  $("editorLink").href = `https://lichess.org/editor/${path}?color=${color}`;
+  $("playLink").href = `https://lichess.org/?fen=${encodeURIComponent(fen)}#ai`;
+
+  const warns = validate();
+  $("warnings").innerHTML = warns.map(t => `<li>⚠️ ${t}</li>`).join("");
+  $("playLink").style.opacity = warns.length ? .5 : 1;
+  if(fen !== lastEvalFen) $("evalBox").innerHTML = "";
+}
+
+document.querySelectorAll('input[name="turn"]').forEach(i => i.onchange = updateFen);
+["cK","cQ","ck","cq"].forEach(id => $(id).onchange = updateFen);
+
+$("fenField").addEventListener("input", e => {
+  const parts = e.target.value.trim().split(/\s+/);
+  const b = parsePlacement(parts[0] || "");
+  if(!b) return;
+  board = b;
+  cells = null;
+  doubt.clear();
+  if(parts[1] === "w" || parts[1] === "b"){
+    document.querySelector(`input[name="turn"][value="${parts[1]}"]`).checked = true;
+  }
+  const cs = parts[2] || "";
+  ["K","Q","k","q"].forEach(ch => $("c" + ch).checked = cs.includes(ch));
+  render();
+});
+
+$("fenField").addEventListener("blur", updateFen);
+
+$("copyBtn").onclick = async () => {
+  const fen = fullFen();
+  try{
+    await navigator.clipboard.writeText(fen);
+    setStatus("FEN copié !", "ok");
+  }catch(e){
+    $("fenField").select();
+    document.execCommand("copy");
+    setStatus("FEN copié.", "ok");
+  }
+};
+
+$("shareBtn").onclick = async () => {
+  const fen = fullFen();
+  const url = $("analysisLink").href;
+  if(navigator.share){
+    try{ await navigator.share({title: "Position d'échecs", text: fen, url}); }catch(e){}
+  }else{
+    try{
+      await navigator.clipboard.writeText(url);
+      setStatus("Lien d'analyse Lichess copié.", "ok");
+    }catch(e){ setStatus(url); }
+  }
+};
+
+/* ---------- Évaluation cloud Lichess ---------- */
+
+$("evalBtn").onclick = async () => {
+  const fen = fullFen();
+  const box = $("evalBox");
+  if(validate().length){
+    box.innerHTML = "Corrigez d'abord la position (voir les avertissements).";
+    return;
+  }
+  lastEvalFen = fen;
+  box.innerHTML = "Interrogation de Lichess…";
+  try{
+    const res = await fetch(`https://lichess.org/api/cloud-eval?multiPv=3&fen=${encodeURIComponent(fen)}`);
+    if(res.status === 404){
+      box.innerHTML = "Position absente de la base d'analyses cloud de Lichess. " +
+        `<a href="${$("analysisLink").href}" target="_blank" rel="noopener" style="color:var(--accent)">Ouvrez l'analyse Lichess</a> pour lancer Stockfish.`;
+      return;
+    }
+    if(!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    const pvs = data.pvs || [];
+    if(!pvs.length){ box.textContent = "Aucune ligne disponible."; return; }
+    const fmt = pv => pv.mate !== undefined
+      ? `#${pv.mate}`
+      : (pv.cp >= 0 ? "+" : "") + (pv.cp / 100).toFixed(2);
+    const top = pvs[0];
+    const cp = top.mate !== undefined ? (top.mate > 0 ? 1000 : -1000) : top.cp;
+    const pct = 50 + 50 * (2 / (1 + Math.exp(-0.004 * cp)) - 1);
+    box.innerHTML =
+      `<div class="eval-bar"><span style="width:${pct.toFixed(1)}%"></span></div>` +
+      `Profondeur ${data.depth} · ${Math.round(data.knodes / 1000)} M nœuds<br>` +
+      pvs.map(pv => `<b>${fmt(pv)}</b> <span class="mono">${uciLineToSan(fen, pv.moves.split(" ").slice(0, 8)).join(" ")}</span>`).join("<br>");
+  }catch(err){
+    box.textContent = "Lichess est injoignable pour le moment (" + err.message + ").";
+  }
+};
+
+// Conversion UCI → notation algébrique (suffisante pour afficher une ligne)
+function uciLineToSan(fen, moves){
+  const b = parsePlacement(fen.split(" ")[0]).map(r => r.slice());
+  let white = fen.split(" ")[1] === "w";
+  const out = [];
+  const sq = s => [8 - +s[1], s.charCodeAt(0) - 97];
+  const name = (r, c) => "abcdefgh"[c] + (8 - r);
+  let moveNo = 1;
+  for(const m of moves){
+    const [fr, fc] = sq(m.slice(0, 2));
+    const [tr, tc] = sq(m.slice(2, 4));
+    const p = b[fr][fc];
+    if(!p) break;
+    const P = p.toUpperCase();
+    const capture = !!b[tr][tc] || (P === "P" && fc !== tc);
+    let san;
+    if(P === "K" && Math.abs(tc - fc) === 2){
+      san = tc > fc ? "O-O" : "O-O-O";
+      const rookFrom = tc > fc ? 7 : 0, rookTo = tc > fc ? 5 : 3;
+      b[tr][rookTo] = b[tr][rookFrom];
+      b[tr][rookFrom] = "";
+    }else if(P === "P"){
+      san = (capture ? "abcdefgh"[fc] + "x" : "") + name(tr, tc);
+      if(m[4]) san += "=" + m[4].toUpperCase();
+      if(capture && !b[tr][tc]) b[fr][tc] = "";   // prise en passant
+    }else{
+      // désambiguïsation simple : même pièce pouvant aller sur la case
+      const others = [];
+      for(let r = 0; r < 8; r++) for(let c = 0; c < 8; c++){
+        if((r !== fr || c !== fc) && b[r][c] === p && canReach(b, P, r, c, tr, tc)) others.push([r, c]);
+      }
+      let dis = "";
+      if(others.length){
+        if(!others.some(([, c]) => c === fc)) dis = "abcdefgh"[fc];
+        else if(!others.some(([r]) => r === fr)) dis = String(8 - fr);
+        else dis = name(fr, fc);
+      }
+      san = P + dis + (capture ? "x" : "") + name(tr, tc);
+    }
+    b[tr][tc] = m[4] ? (white ? m[4].toUpperCase() : m[4]) : p;
+    b[fr][fc] = "";
+    out.push(white ? `${moveNo}.${san}` : (out.length === 0 ? `${moveNo}…${san}` : san));
+    if(!white) moveNo++;
+    white = !white;
+  }
+  return out;
+}
+
+function canReach(b, P, r, c, tr, tc){
+  const dr = tr - r, dc = tc - c;
+  const adr = Math.abs(dr), adc = Math.abs(dc);
+  if(P === "N") return (adr === 1 && adc === 2) || (adr === 2 && adc === 1);
+  if(P === "K") return adr <= 1 && adc <= 1;
+  const straight = dr === 0 || dc === 0, diag = adr === adc;
+  if(P === "R" && !straight) return false;
+  if(P === "B" && !diag) return false;
+  if(P === "Q" && !straight && !diag) return false;
+  const sr = Math.sign(dr), sc = Math.sign(dc);
+  for(let i = 1; i < Math.max(adr, adc); i++){
+    if(b[r + sr * i][c + sc * i]) return false;
+  }
+  return true;
+}
+
+/* ---------- Démarrage ---------- */
+buildPalette();
+render();
+</script>
+</body>
+</html>
