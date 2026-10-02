@@ -125,6 +125,63 @@ h1{
   line-height:1.4;
 }
 
+#dropZone .demo{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+}
+
+#dropZone figure{
+  margin:0;
+  flex:1;
+  max-width:170px;
+}
+
+#dropZone svg{
+  display:block;
+  width:100%;
+  height:auto;
+  box-shadow:0 6px 16px rgba(0,0,0,.35);
+}
+
+#dropZone figcaption{
+  margin-top:8px;
+  font-size:13px;
+  font-weight:700;
+  color:var(--muted);
+}
+
+#dropZone .arrow{
+  font-size:30px;
+  color:var(--accent);
+  flex:none;
+}
+
+#dropZone .explain{
+  margin:16px auto 0;
+  max-width:34ch;
+  font-size:15px;
+  font-weight:500;
+  line-height:1.45;
+  color:#e6e6e6;
+}
+
+#dropZone .pick{
+  display:inline-block;
+  margin-top:16px;
+  padding:12px 22px;
+  background:var(--accent);
+  color:#1d1d1d;
+  font-weight:700;
+  font-size:15px;
+}
+
+#dropZone.compact .demo,
+#dropZone.compact .explain{ display:none; }
+#dropZone.compact{ padding:12px; border-style:solid; }
+#dropZone.compact .pick{ margin-top:0; }
+
 #dropZone.over{
   border-color:var(--accent);
   color:#fff;
@@ -249,7 +306,15 @@ h1{
 <div class="app">
 
   <section class="panel">
-    <div id="dropZone" role="button" tabindex="0">Image</div>
+    <div id="dropZone" role="button" tabindex="0">
+      <div class="demo" aria-hidden="true">
+        <figure><svg id="demoFrom" viewBox="0 0 8 8"></svg><figcaption>Capture Chess.com</figcaption></figure>
+        <span class="arrow">➜</span>
+        <figure><svg id="demoTo" viewBox="0 0 8 8"></svg><figcaption>Analyse Lichess</figcaption></figure>
+      </div>
+      <p class="explain">Prenez une capture d'écran d'une partie Chess.com (ou de tout diagramme). La position est reconnue puis s'ouvre dans l'analyse Lichess.</p>
+      <span class="pick">Choisir une capture</span>
+    </div>
     <input type="file" id="fileInput" accept="image/*" class="hidden" />
   </section>
 
@@ -358,6 +423,8 @@ function loadFile(file){
     c.height = Math.round(img.height * scale);
     c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
     srcImg = c;
+    dz.classList.add("compact");
+    dz.querySelector(".pick").textContent = "Autre capture";
     showCropper();
   };
   img.onerror = () => setStatus("Impossible de lire cette image.", "err");
@@ -1150,6 +1217,37 @@ function updateFen(){
   const path = fullFen().replace(/ /g, "_");
   $("analysisLink").href = `https://lichess.org/analysis/standard/${path}?color=${view}`;
 }
+
+/* ---------- Schéma d'accueil ---------- */
+function drawDemo(id, light, dark, hl){
+  const svg = $(id), NS = "http://www.w3.org/2000/svg";
+  const pos = "r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/3P1N2/PPP2PPP/RNBQK2R";
+  pos.split("/").forEach((row, r) => {
+    let c = 0;
+    for(const ch of row){
+      const n = /\d/.test(ch) ? +ch : 1;
+      for(let i = 0; i < n; i++, c++){
+        const sq = document.createElementNS(NS, "rect");
+        const key = "abcdefgh"[c] + (8 - r);
+        sq.setAttribute("x", c); sq.setAttribute("y", r);
+        sq.setAttribute("width", 1); sq.setAttribute("height", 1);
+        sq.setAttribute("fill", hl && hl[key] ? hl[key][(r + c) % 2] : ((r + c) % 2 ? dark : light));
+        svg.appendChild(sq);
+        if(n === 1 && !/\d/.test(ch)){
+          const im = document.createElementNS(NS, "image");
+          im.setAttribute("href", PIECE_IMG[ch]);
+          im.setAttribute("x", c); im.setAttribute("y", r);
+          im.setAttribute("width", 1); im.setAttribute("height", 1);
+          svg.appendChild(im);
+        }
+      }
+    }
+  });
+}
+// Chess.com : cases vertes, dernier coup surligné en jaune (d2-d3)
+const lastMove = {d2: ["#f5f682", "#b9ca43"], d3: ["#f5f682", "#b9ca43"]};
+drawDemo("demoFrom", "#eeeed2", "#769656", lastMove);
+drawDemo("demoTo", "#f0d9b5", "#b58863");
 
 /* ---------- Démarrage ---------- */
 render();
