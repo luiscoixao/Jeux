@@ -1,0 +1,140 @@
+'use strict';
+const SUBJECTS=[
+ ['Algèbre','x²','#ffae63','Transformer et démontrer'],['Fonctions','ƒ','#8aafff','Courbes, dérivées, optimisation'],['Géométrie','△','#8ce89d','Construire et se repérer'],['Probabilités','P','#61dfda','Arbres, événements, lois'],['Suites','∞','#ff91bb','Reconnaître et prévoir'],['Exponentielle','eˣ','#c6a0ff','Puissances et croissance'],['Intégrales','∫','#7fbeff','Aires, primitives, équations'],['Logique & données','{ }','#ffce6e','Algorithmes et raisonnement']];
+const MISSIONS=[];
+function mission(id,t,level,title,concept,stages){MISSIONS.push({id,t,level,title,concept,stages});}
+const num=(prompt,answer,explain,hint,scene)=>({type:'number',prompt,answer,explain,hint,scene});
+const pick=(prompt,options,answer,explain,hint,scene)=>({type:'pick',prompt,options,answer,explain,hint,scene});
+mission('a-machine',0,0,'Démonter la machine','Retrouver une entrée en inversant les opérations.',[
+ {type:'order',prompt:'La machine fait ×2, puis +3. Elle affiche 11. Remets les opérations inverses dans l’ordre.',items:['Diviser par 2','Soustraire 3'],answer:[1,0],hint:'Pour revenir en arrière, commence par la dernière opération.',explain:'On annule d’abord +3 par −3, puis ×2 par ÷2.',scene:'machine'},
+ {type:'equation',prompt:'Isole x en appliquant des opérations aux deux membres de 2x + 3 = 11.',answer:4,hint:'Soustrais 3 des deux côtés, puis divise par 2.',explain:'2x + 3 = 11 → 2x = 8 → x = 4. Chaque transformation conserve les solutions.'}
+]);
+mission('a-mosaic',0,1,'La mosaïque algébrique','Lire un produit comme une somme de surfaces.',[
+ {type:'fill',prompt:'Assemble les quatre zones de (x + 2)(x + 3) : quels coefficients dans x² + ax + b ?',labels:['a : coefficient de x','b : constante'],answer:[5,6],hint:'Les bandes valent 3x et 2x ; le coin vaut 2 × 3.',explain:'x² + 3x + 2x + 6 = x² + 5x + 6.',scene:'mosaic'},
+ num('La même expression vaut 30. Quelle solution positive vérifie (x + 2)(x + 3) = 30 ?',3,'x = 3 donne 5 × 6 = 30. On pourrait aussi résoudre x² + 5x − 24 = 0.','Cherche deux entiers consécutifs dont le produit vaut 30.','mosaic')
+]);
+mission('a-roots',0,1,'Trois courbes, trois verdicts','Relier le discriminant aux intersections avec l’axe.',[
+ {type:'match',prompt:'Associe chaque parabole à son nombre de racines réelles.',rows:['x² − 1','x²','x² + 1'],choices:['0 racine','1 racine double','2 racines'],answer:[2,1,0],explain:'Une parabole peut couper l’axe deux fois, le toucher une fois ou rester au-dessus.',hint:'Regarde où chaque courbe rencontre y = 0.',scene:'parabolas'},
+ num('Pour 2x² − 4x + 5, combien vaut Δ = b² − 4ac ?',-24,'Δ = (−4)² − 4 × 2 × 5 = 16 − 40 = −24 : aucune racine réelle.','Le carré de −4 est positif.')
+]);
+mission('a-signs',0,2,'Traverser les signes','Résoudre une inéquation grâce aux facteurs.',[
+ {type:'match',prompt:'Pour (x − 1)(x − 3), attribue le signe du produit dans chaque intervalle.',rows:['x < 1','1 < x < 3','x > 3'],choices:['−','+'],answer:[1,0,1],hint:'Deux facteurs négatifs donnent un produit positif.',explain:'Avant 1 : −×− = +. Entre 1 et 3 : +×− = −. Après 3 : +×+ = +.',scene:'signs'},
+ {type:'interval',prompt:'Sélectionne toute la zone où (x − 1)(x − 3) ≤ 0, bornes comprises.',answer:[1],explain:'La solution est [1 ; 3]. Les deux racines sont incluses parce que l’inégalité est large.',hint:'Prends l’intervalle où le produit est négatif, et ses deux extrémités.'}
+]);
+mission('f-points',1,0,'Lire une courbe','Distinguer image et antécédent.',[
+ {type:'point',prompt:'Sur la courbe y = x² − 1, touche le point qui donne l’image de 2.',points:[[0,-1],[1,0],[2,3],[-2,3]],answer:2,hint:'Pars de x = 2 sur l’axe horizontal.',explain:'Le point (2 ; 3) signifie que f(2) = 3.',scene:'quadratic'},
+ {type:'multi',prompt:'Quels sont tous les antécédents de 3 pour cette fonction ?',options:['−2','−1','0','2'],answer:[0,3],hint:'Résous x² − 1 = 3.',explain:'x² = 4 donne x = −2 et x = 2. Une image peut avoir plusieurs antécédents.',scene:'quadratic'}
+]);
+mission('f-slope',1,1,'La pente cachée','Reconstruire une droite depuis deux points.',[
+ {type:'linebuild',prompt:'Choisis la pente et l’ordonnée à l’origine pour relier A(−1 ; −1) à B(2 ; 5).',answer:[2,1],hint:'m = (5 − (−1))/(2 − (−1)). Puis utilise les coordonnées d’un point.',explain:'m = 6/3 = 2. Dans y = 2x + b, le point A donne −1 = −2 + b : b = 1.'},
+ num('Si x augmente de 3 sur cette droite, de combien y augmente-t-il ?',6,'Δy = m × Δx = 2 × 3 = 6. La pente est un rapport de variations.','Utilise la pente 2.')
+]);
+mission('f-variation',1,1,'Le relief et sa dérivée','Lire les signes de f′ sur la courbe de f.',[
+ {type:'match',prompt:'f(x) = x³ − 3x : règle les signes de f′ selon que la courbe monte ou descend.',rows:['x < −1','−1 < x < 1','x > 1'],choices:['f′ < 0','f′ > 0'],answer:[1,0,1],hint:'Lis de gauche à droite. Une pente montante donne une dérivée positive.',explain:'f′(x) = 3x² − 3 = 3(x − 1)(x + 1), de signes +, −, +.',scene:'cubic'},
+ {type:'fill',prompt:'Donne l’abscisse du maximum local, puis celle du minimum local.',labels:['Maximum local : x =','Minimum local : x ='],answer:[-1,1],hint:'Le maximum correspond au passage de + à − pour f′.',explain:'En −1, f′ passe de + à − : maximum local. En 1, elle passe de − à + : minimum local.',scene:'cubic'}
+]);
+mission('f-optimum',1,2,'Le coût minimal','Étudier une fonction au-delà d’un simple calcul.',[
+ pick('Un coût est C(x) = x + 9/x pour x > 0. Quelle est sa dérivée ?',['1 + 9/x²','1 − 9/x²','1 − 9/x','9/x²'],1,'(1/x)′ = −1/x², donc C′(x) = 1 − 9/x².','Dérive chaque terme.'),
+ num('Pour quelle valeur positive de x la dérivée s’annule-t-elle ?',3,'1 − 9/x² = 0 implique x² = 9. Comme x > 0, on garde 3.','N’oublie pas le domaine x > 0.'),
+ {type:'fill',prompt:'C′ est négative avant 3 et positive après. Donne le coût minimal et C(6).',labels:['Coût minimal','C(6)'],answer:[6,7.5],hint:'Calcule C(3), puis 6 + 9/6.',explain:'Le minimum vaut C(3) = 3 + 3 = 6. C(6) = 7,5 : doubler x ne divise pas nécessairement le coût.'}
+]);
+mission('g-path',2,0,'Le trajet des vecteurs','Additionner des déplacements, pas des distances.',[
+ {type:'vector',prompt:'Pars de O. Effectue u = (2 ; 1), puis v = (−1 ; 2). Touche le point d’arrivée.',points:[[3,3],[1,3],[1,-1],[2,2]],answer:1,hint:'Additionne séparément les abscisses et les ordonnées.',explain:'u + v = (2 − 1 ; 1 + 2) = (1 ; 3).'},
+ num('Quel est le carré de la longueur du déplacement total ?',10,'||(1 ; 3)||² = 1² + 3² = 10. Les longueurs ne s’additionnent pas comme les coordonnées.','Utilise x² + y².')
+]);
+mission('g-pythagoras',2,1,'Les carrés de Pythagore','Passer des aires aux longueurs.',[
+ {type:'fill',prompt:'Un triangle rectangle a des côtés de l’angle droit de 5 et 12. Complète les aires des carrés.',labels:['Aire du carré sur le côté 5','Aire du carré sur le côté 12'],answer:[25,144],hint:'Le carré construit sur un côté de longueur a a pour aire a².',explain:'Les aires sont 25 et 144. Leur somme donne l’aire du carré sur l’hypoténuse.',scene:'pythagoras'},
+ num('Quelle est la longueur de l’hypoténuse ?',13,'c² = 25 + 144 = 169, donc c = √169 = 13. Une aire de 169 ne signifie pas une longueur de 169.','Cherche la racine carrée de 169.','pythagoras')
+]);
+mission('g-circle',2,1,'Le bon quadrant','Relier angle, cosinus et sinus.',[
+ {type:'circle',prompt:'Choisis un angle entre 0° et 360° : sinus = √3/2 et cosinus négatif.',answer:120,hint:'Le sinus est l’ordonnée. Une abscisse négative et une ordonnée positive placent le point dans le deuxième quadrant.',explain:'L’angle vaut 120° : son sinus est √3/2 et son cosinus est −1/2.'},
+ pick('Quelle est la mesure de cet angle en radians ?',['π/3','2π/3','3π/2','5π/6'],1,'120° × π/180° = 2π/3.','180° correspond à π radians.')
+]);
+mission('g-space',2,2,'Le plan dans l’espace','Utiliser le vecteur normal et le produit scalaire.',[
+ pick('Le plan est 2x − y + 3z = 5. Choisis un vecteur normal.',['(2 ; −1 ; 3)','(2 ; 1 ; 3)','(5 ; 5 ; 5)','(1 ; −2 ; 3)'],0,'Les coefficients de x, y et z donnent un vecteur normal : (2 ; −1 ; 3).','Un plan ax + by + cz = d admet (a ; b ; c) comme vecteur normal.','space'),
+ num('Pour u = (1 ; 2 ; 0), calcule u · n.',0,'1 × 2 + 2 × (−1) + 0 × 3 = 0. Le vecteur u est parallèle au plan.','Multiplie les coordonnées correspondantes, puis additionne.','space'),
+ num('Le point A(1 ; 0 ; 1) appartient-il au plan ? Calcule 2x − y + 3z en A.',5,'2 × 1 − 0 + 3 × 1 = 5. A appartient donc au plan.','Remplace x, y et z par les coordonnées de A.')
+]);
+mission('p-venn',3,0,'Les zones des événements','Comprendre « ou » et « et » sans compter deux fois.',[
+ {type:'venn',prompt:'Sélectionne les zones correspondant à A ∪ B (« A ou B »).',answer:[0,1,2],hint:'L’union contient tout ce qui est dans A, dans B ou dans les deux.',explain:'L’union contient les deux parties exclusives et l’intersection. L’extérieur n’en fait pas partie.'},
+ num('Dans 10 issues équiprobables : A seul = 2, A ∩ B = 3, B seul = 1, extérieur = 4. Combien vaut P(A ∪ B) ?',.6,'(2 + 3 + 1)/10 = 6/10 = 0,6. L’intersection n’est comptée qu’une fois.','Additionne les trois zones sélectionnées et divise par 10.','venn')
+]);
+mission('p-urn',3,1,'Le deuxième tirage','Adapter les probabilités après un tirage sans remise.',[
+ {type:'fill',prompt:'Une urne contient 3 rouges et 2 bleues. On tire deux fois sans remise. Donne P(R₁), puis P(R₂ | R₁).',labels:['P(R₁)','P(R₂ | R₁)'],answer:[.6,.5],hint:'Après une rouge, il reste 2 rouges sur 4 boules.',explain:'P(R₁) = 3/5 ; P(R₂ | R₁) = 2/4. Le deuxième tirage dépend du premier.',scene:'urn'},
+ num('Quelle est la probabilité de tirer deux rouges ?',.3,'P(R₁ ∩ R₂) = (3/5) × (2/4) = 3/10. Utiliser deux fois 3/5 serait faux.','Multiplie les probabilités le long de la branche.', 'urn')
+]);
+mission('p-bayes',3,2,'Remonter l’arbre','Distinguer probabilité directe et probabilité conditionnelle inverse.',[
+ num('L’atelier A fabrique 60 % des pièces, dont 2 % sont défectueuses. B fabrique 40 %, dont 5 % défectueuses. Quelle est P(A ∩ D) ?',.012,'P(A ∩ D) = 0,6 × 0,02 = 0,012.','Le long de la branche A puis D, multiplie.', 'tree'),
+ num('Quelle est P(D), tous ateliers confondus ?',.032,'P(D) = 0,6 × 0,02 + 0,4 × 0,05 = 0,032.','Additionne les deux chemins qui conduisent à D.', 'tree'),
+ num('Une pièce est défectueuse. Quelle est la probabilité qu’elle vienne de A ?',.375,'P(A | D) = P(A ∩ D)/P(D) = 0,012/0,032 = 0,375 = 3/8.','Cette fois, on se restreint à l’ensemble des pièces défectueuses.', 'tree')
+]);
+mission('p-binomial',3,2,'Compter les chemins','Retrouver le coefficient binomial avant de calculer.',[
+ {type:'multi',prompt:'Quelles suites de 4 essais contiennent exactement deux succès S ?',options:['SSÉÉ','SÉSÉ','SÉÉS','ÉSSÉ','ÉSÉS','ÉÉSS','SSSÉ','SÉÉÉ'],answer:[0,1,2,3,4,5],hint:'Il faut deux S et deux É, dans n’importe quel ordre.',explain:'Il y a 6 chemins : C(4,2) = 6. Ils ont la même probabilité si les essais sont indépendants avec le même p.'},
+ num('Si p = 1/4, calcule P(X = 2) pour X ∼ B(4 ; 1/4). Une fraction est acceptée.',27/128,'6 × (1/4)² × (3/4)² = 54/256 = 27/128.','Chaque chemin a pour probabilité p²(1 − p)².')
+]);
+mission('s-dots',4,0,'Les motifs qui grandissent','Reconnaître un ajout constant.',[
+ {type:'sequence',prompt:'Chaque motif ajoute trois points. Complète la suite 2, 5, 8, …',answer:11,explain:'La différence vaut toujours 3. Le quatrième terme est 8 + 3 = 11.',hint:'Compare deux motifs voisins.',scene:'dots'},
+ num('Si u₀ = 2 et uₙ = 2 + 3n, quelle est la valeur de u₁₀ ?',32,'u₁₀ = 2 + 3 × 10 = 32. L’indice commence à 0.','Attention au premier indice.')
+]);
+mission('s-double',4,1,'Doubler ou additionner ?','Distinguer croissance linéaire et géométrique.',[
+ {type:'match',prompt:'Associe chaque évolution à son modèle.',rows:['1, 2, 4, 8, 16…','1, 3, 5, 7, 9…','1, 4, 9, 16, 25…'],choices:['Arithmétique','Géométrique','Ni l’un ni l’autre'],answer:[1,0,2],explain:'La première multiplie par 2 ; la deuxième ajoute 2 ; les carrés n’ont ni différence ni rapport constants.',hint:'Cherche un ajout constant ou un multiplicateur constant.'},
+ pick('Pour u₀ = 1 et uₙ₊₁ = 2uₙ, quelle formule donne uₙ ?',['2n','2ⁿ','n²','2ⁿ⁺¹'],1,'Après n multiplications par 2, uₙ = 2ⁿ.','Teste la formule en n = 0.')
+]);
+mission('s-fixed',4,1,'Vers le point fixe','Comprendre la limite d’une récurrence affine.',[
+ {type:'fill',prompt:'u₀ = 0 et uₙ₊₁ = 0,5uₙ + 3. Prévois u₁ et u₂.',labels:['u₁','u₂'],answer:[3,4.5],hint:'Calcule le deuxième terme à partir du premier.',explain:'u₁ = 3 et u₂ = 0,5 × 3 + 3 = 4,5.',scene:'fixed'},
+ num('Si la suite converge vers L, résous L = 0,5L + 3.',6,'0,5L = 3, donc L = 6. Ici uₙ = 6 − 6(0,5)ⁿ, ce qui prouve aussi la convergence vers 6.','Soustrais 0,5L des deux côtés.', 'fixed')
+]);
+mission('s-induction',4,2,'Le domino de la preuve','Organiser une récurrence sans supposer le résultat.',[
+ {type:'order',prompt:'Remets la preuve de 2ⁿ ≥ n + 1 (n ≥ 0) dans l’ordre.',items:['Conclure pour tout n ≥ 0 par récurrence.','Vérifier n = 0 : 1 ≥ 1.','Supposer 2ᵏ ≥ k + 1 pour un entier k ≥ 0.','Déduire 2ᵏ⁺¹ ≥ 2k + 2 ≥ k + 2.'],answer:[1,2,3,0],explain:'Initialisation, hypothèse de récurrence, hérédité, conclusion : chaque étape a un rôle.',hint:'Commence par le premier domino, puis montre comment un domino entraîne le suivant.'},
+ num('Dans l’hérédité, (2k + 2) − (k + 2) vaut ak. Quel est a ?',1,'La différence vaut k, positive ou nulle pour k ≥ 0. Cela justifie la seconde inégalité.','Soustrais les deux expressions.')
+]);
+mission('e-powers',5,0,'Assembler les puissances','Comprendre le rôle des exposants.',[
+ {type:'fill',prompt:'Complète 2³ × 2⁴ = 2ᵃ et (2³)⁴ = 2ᵇ.',labels:['a','b'],answer:[7,12],hint:'Produit de puissances : addition. Puissance d’une puissance : multiplication.',explain:'2³ × 2⁴ = 2⁷ ; (2³)⁴ = 2¹². Les deux opérations sont différentes.',scene:'powers'},
+ num('Combien vaut 2⁻³ ? Une fraction est acceptée.',.125,'2⁻³ = 1/2³ = 1/8. Un exposant négatif indique un inverse.','a⁻ⁿ = 1/aⁿ.')
+]);
+mission('e-domain',5,1,'Le piège du logarithme','Vérifier le domaine avant toute transformation.',[
+ {type:'multi',prompt:'Quels nombres peut-on remplacer par x dans ln(x − 2) ?',options:['−1','1','2','3','5'],answer:[3,4],hint:'L’argument du logarithme doit être strictement positif.',explain:'x − 2 > 0, donc x > 2. La valeur 2 est exclue.'},
+ num('Résous ln(x − 2) = 0.',3,'ln(1) = 0 : x − 2 = 1, donc x = 3, bien dans le domaine.','Quel nombre a pour logarithme zéro ?')
+]);
+mission('e-growth',5,1,'Franchir le seuil','Identifier le premier entier dans une croissance exponentielle.',[
+ {type:'growth',prompt:'Une quantité part de 100 et augmente de 8 % par an. Arrête la simulation à la première année où elle atteint 200.',answer:10,explain:'100 × 1,08⁹ ≈ 199,90 < 200 ; 100 × 1,08¹⁰ ≈ 215,89. Le premier entier est 10.',hint:'Il faut vérifier l’année précédente : l’arrondi 199,90 n’atteint pas 200.'},
+ pick('Quelle inégalité permet de retrouver ce seuil ?',['n ≥ ln(2)/ln(1,08)','n ≥ 2/1,08','n ≥ ln(1,08)/ln(2)','n ≥ 100/8'],0,'1,08ⁿ ≥ 2 donne n ln(1,08) ≥ ln 2. Le dénominateur est positif.','Prends le logarithme des deux côtés.')
+]);
+mission('e-chain',5,2,'La dérivée en chaîne','Tenir compte de la fonction intérieure.',[
+ {type:'fill',prompt:'f(x) = e⁻²ˣ⁺¹. Complète f′(x) = a × e⁻²ˣ⁺¹, puis donne f(0).',labels:['Coefficient a','f(0) : donner l’exposant dans eᵇ'],answer:[-2,1],hint:'(eᵘ)′ = u′eᵘ. Pour f(0), remplace x par 0.',explain:'u′ = −2, donc f′ = −2e⁻²ˣ⁺¹. Et f(0) = e¹.'},
+ pick('Que peut-on conclure sur ℝ ?',['f est croissante','f est décroissante','f change de sens en 0','f est constante'],1,'L’exponentielle est positive ; multiplier par −2 rend f′ strictement négative.','Étudie le signe de f′, pas celui de l’exposant.')
+]);
+mission('i-pixels',6,0,'Une aire en pixels','Encadrer une aire en affinant une approximation.',[
+ {type:'riemann',prompt:'Sous y = x² sur [0 ; 2], double le nombre de rectangles. Arrête au premier découpage où l’écart entre les deux sommes est strictement inférieur à 1.',answer:16,hint:'Pour une fonction croissante, les rectangles à gauche sont en dessous, ceux à droite au-dessus.',explain:'L’écart vaut 8/n : pour n = 8 il vaut 1, pour n = 16 il vaut 0,5. Ici la borne est stricte.'},
+ pick('Quand on affine indéfiniment, vers quoi tendent les deux sommes ?',['Vers 2','Vers 8/3','Vers 4','Vers 8'],1,'L’intégrale de x² entre 0 et 2 vaut [x³/3]₀² = 8/3.','Une primitive de x² est x³/3.')
+]);
+mission('i-signed',6,1,'Aire ou intégrale ?','Distinguer aire géométrique et aire algébrique.',[
+ {type:'fill',prompt:'La zone au-dessus de l’axe a une aire de 3 ; celle en dessous une aire de 2. Donne l’intégrale puis l’aire totale.',labels:['Intégrale','Aire géométrique totale'],answer:[1,5],explain:'L’intégrale soustrait la partie négative : 3 − 2 = 1. L’aire géométrique additionne : 3 + 2 = 5.',hint:'Une intégrale peut soustraire des aires.',scene:'signed'},
+ pick('Pour obtenir l’aire géométrique totale par intégration, on intègre…',['f','−f','|f|','f²'],2,'La valeur absolue rend positive chaque contribution.','On veut compter positivement les deux zones.', 'signed')
+]);
+mission('i-primitive',6,1,'La bonne primitive','Vérifier par dérivation, puis utiliser les bornes.',[
+ pick('Quelle est une primitive de x² sur ℝ ?',['2x','x³','x³/3','x²/2'],2,'(x³/3)′ = x². Vérifier en dérivant évite de choisir au hasard.','La dérivée de x³ est 3x².'),
+ num('Calcule l’intégrale de x² entre 1 et 2. Une fraction est acceptée.',7/3,'[x³/3]₁² = 8/3 − 1/3 = 7/3. La borne basse doit être soustraite.','Évalue la primitive en 2, puis en 1.')
+]);
+mission('i-equation',6,2,'Retrouver la fonction','Utiliser une équation différentielle et une condition initiale.',[
+ num('y′ = 2y et y(0) = 3. Dans y(x) = Ce²ˣ, détermine C.',3,'En x = 0, e⁰ = 1, donc C = 3.','Remplace x par 0.'),
+ num('Pour y(x) = 3e²ˣ, quel coefficient k donne y′(x) = ke²ˣ ?',6,'y′ = 3 × 2e²ˣ = 6e²ˣ = 2y. On retrouve bien l’équation différentielle.','Dérive l’exponentielle composée.'),
+ pick('Sur ℝ, cette solution est…',['Positive et croissante','Positive et décroissante','Négative et croissante','De signe variable'],0,'3e²ˣ > 0 et sa dérivée 6e²ˣ > 0.','Le signe de e²ˣ est toujours positif.')
+]);
+mission('l-trace',7,0,'Prévoir la boucle','Anticiper une instruction avant de l’exécuter.',[
+ {type:'fill',prompt:'x démarre à 1. On répète trois fois x ← 2x + 1. Prévois les trois valeurs successives.',labels:['Après le 1er tour','Après le 2e tour','Après le 3e tour'],answer:[3,7,15],hint:'Utilise chaque nouveau résultat pour le tour suivant.',explain:'1 → 3 → 7 → 15. La variable est mise à jour à chaque tour.',scene:'code'},
+ pick('Quel invariant relie x après n tours à une puissance de 2 ?',['x = 2n + 1','x = 2ⁿ⁺¹ − 1','x = 2ⁿ − 1','x = n² + 1'],1,'Pour n = 0, on retrouve 1 ; la relation x ← 2x + 1 conserve la formule.','Teste n = 0, puis n = 1.')
+]);
+mission('l-bug',7,1,'Réparer le programme','Comprendre la borne exclue de range en Python.',[
+ pick('Ce programme doit additionner 1 à n inclus. Quelle ligne corrige la boucle ?',['range(1, n)','range(1, n+1)','range(0, n)','range(n, 1)'],1,'La borne de fin est exclue en Python : range(1, n+1) contient 1, …, n.','Le dernier entier n doit appartenir à la boucle.','bug'),
+ num('Pour n = 5, quelle somme renvoie le programme corrigé ?',15,'1 + 2 + 3 + 4 + 5 = 15. Le programme initial renvoyait seulement 10.','Compare les cinq termes.', 'bug')
+]);
+mission('l-bisect',7,1,'Piéger une racine','Conserver un intervalle qui encadre √2.',[
+ {type:'bisect',prompt:'Encadre la racine de f(x) = x² − 2. À chaque tour, conserve la moitié où f change de signe.',answer:['left','right','right'],hint:'Les deux bornes conservées doivent avoir des signes opposés.',explain:'[1 ; 2] → [1 ; 1,5] → [1,25 ; 1,5] → [1,375 ; 1,5]. La racine reste piégée.'},
+ num('Après ces trois divisions, quelle est la largeur de l’intervalle ?',.125,'La largeur initiale est 1. Après trois divisions par 2 : 1/8 = 0,125.','La largeur est divisée par 2 à chaque tour.')
+]);
+mission('l-stats',7,2,'Le centre et la dispersion','Calculer l’espérance, puis la variance.',[
+ num('X prend les valeurs 0, 1 et 2 avec probabilités 1/4, 1/2 et 1/4. Quelle est E(X) ?',1,'E(X) = 0 × 1/4 + 1 × 1/2 + 2 × 1/4 = 1.','C’est une moyenne pondérée.', 'histogram'),
+ num('Quelle est E(X²) ?',1.5,'E(X²) = 0² × 1/4 + 1² × 1/2 + 2² × 1/4 = 1,5.','Élève les valeurs au carré, pas les probabilités.', 'histogram'),
+ num('Calcule V(X).',.5,'V(X) = E(X²) − E(X)² = 1,5 − 1 = 0,5.','Utilise les deux résultats précédents.', 'histogram')
+]);
