@@ -10,8 +10,8 @@ mission('a-machine',0,0,'Démonter la machine','Retrouver une entrée en inversa
  {type:'equation',prompt:'Isole x en appliquant des opérations aux deux membres de 2x + 3 = 11.',answer:4,hint:'Soustrais 3 des deux côtés, puis divise par 2.',explain:'2x + 3 = 11 → 2x = 8 → x = 4. Chaque transformation conserve les solutions.'}
 ]);
 mission('a-mosaic',0,1,'La mosaïque algébrique','Lire un produit comme une somme de surfaces.',[
- {type:'fill',prompt:'Assemble les quatre zones de (x + 2)(x + 3) : quels coefficients dans x² + ax + b ?',labels:['a : coefficient de x','b : constante'],answer:[5,6],hint:'Les bandes valent 3x et 2x ; le coin vaut 2 × 3.',explain:'x² + 3x + 2x + 6 = x² + 5x + 6.',scene:'mosaic'},
- num('La même expression vaut 30. Quelle solution positive vérifie (x + 2)(x + 3) = 30 ?',3,'x = 3 donne 5 × 6 = 30. On pourrait aussi résoudre x² + 5x − 24 = 0.','Cherche deux entiers consécutifs dont le produit vaut 30.','mosaic')
+ {type:'fill',prompt:'Le rectangle est partagé en quatre zones : x², 3x, 2x et 6. Complète 3x + 2x = … × x, puis donne l’aire du petit rectangle de côtés 2 et 3.',labels:['Nombre de x : 3 + 2 =','Aire du petit rectangle : 2 × 3 ='],answer:[5,6],hint:'3x signifie 3 fois x. Comme 3 pommes et 2 pommes font 5 pommes, 3x et 2x font 5x. Le petit rectangle a pour aire longueur × largeur.',explain:'3x + 2x = (3 + 2) × x = 5x. On additionne 3 et 2 parce que ces deux termes comptent la même quantité x. Le petit rectangle vaut 2 × 3 = 6. Au total : x² + 5x + 6.',scene:'mosaic'},
+ num('Le grand rectangle a une largeur x + 3 et une hauteur x + 2. Son aire vaut 30. Quel nombre positif faut-il mettre à la place de x ?',3,'x = 3 donne 5 × 6 = 30. On pourrait aussi résoudre x² + 5x − 24 = 0.','Cherche deux entiers consécutifs dont le produit vaut 30.','mosaic')
 ]);
 mission('a-roots',0,1,'Trois courbes, trois verdicts','Relier le discriminant aux intersections avec l’axe.',[
  {type:'match',prompt:'Associe chaque parabole à son nombre de racines réelles.',rows:['x² − 1','x²','x² + 1'],choices:['0 racine','1 racine double','2 racines'],answer:[2,1,0],explain:'Une parabole peut couper l’axe deux fois, le toucher une fois ou rester au-dessus.',hint:'Regarde où chaque courbe rencontre y = 0.',scene:'parabolas'},
@@ -138,3 +138,4 @@ mission('l-stats',7,2,'Le centre et la dispersion','Calculer l’espérance, pui
  num('Quelle est E(X²) ?',1.5,'E(X²) = 0² × 1/4 + 1² × 1/2 + 2² × 1/4 = 1,5.','Élève les valeurs au carré, pas les probabilités.', 'histogram'),
  num('Calcule V(X).',.5,'V(X) = E(X²) − E(X)² = 1,5 − 1 = 0,5.','Utilise les deux résultats précédents.', 'histogram')
 ]);
+
