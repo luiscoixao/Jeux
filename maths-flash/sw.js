@@ -1,5 +1,5 @@
-const CACHE='maths-flash-bac-v11';
-const FILES=['./','./index.html','./journey.css?v=11','./missions.js?v=11','./game.js?v=11','./manifest.json?v=11','./icon.svg?v=11','./icon-pi-180.png','./icon-pi-192.png','./icon-pi-512.png'];
+const CACHE='maths-flash-bac-v12';
+const FILES=['./','./index.html','./journey.css?v=12','./missions.js?v=12','./game.js?v=12','./manifest.json?v=12','./icon.svg?v=12','./icon-pi-180.png','./icon-pi-192.png','./icon-pi-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('maths-flash-bac-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||!e.request.url.startsWith(self.registration.scope))return;e.respondWith(fetch(e.request).then(r=>{if(r.ok){const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));}return r;}).catch(()=>caches.match(e.request).then(r=>r|| (e.request.mode==='navigate'?caches.match('./index.html'):Response.error()))));});
