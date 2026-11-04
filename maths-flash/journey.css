@@ -2,3 +2,5 @@
 
 
 button:disabled{opacity:.45;cursor:not-allowed}.notice{padding:12px 15px}.notice p{margin:6px 0;line-height:1.45}.playbox h1{font-size:clamp(1.2rem,3vw,1.65rem);line-height:1.35}
+
+.playbox{padding:20px}.playbox h1{margin:12px 0 20px;font-size:clamp(1.15rem,3vw,1.5rem);font-weight:600}.course{margin:16px 0}.course summary{font-size:.9rem}.course p{font-size:.9rem;line-height:1.5}.inputrow{margin:12px 0}.bottomrow{margin-top:12px}
