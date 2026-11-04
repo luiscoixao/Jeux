@@ -6,3 +6,5 @@ button:disabled{opacity:.45;cursor:not-allowed}.notice{padding:12px 15px}.notice
 .playbox{padding:20px}.playbox h1{margin:12px 0 20px;font-size:clamp(1.15rem,3vw,1.5rem);font-weight:600}.course{margin:16px 0}.course summary{font-size:.9rem}.course p{font-size:.9rem;line-height:1.5}.inputrow{margin:12px 0}.bottomrow{margin-top:12px}
 
 .math-figure{margin:10px auto 14px;max-width:340px}.math-figure svg{display:block;width:100%;height:auto;max-height:210px}.math-figure+ #widget{margin-top:0}
+
+.level-progress{margin:14px 0 16px}.level-progress h2{font-size:1.1rem;margin:0 0 10px}.level-row{display:block;width:100%;text-align:left;margin:8px 0;padding:12px 14px;border:1px solid #35415a;border-radius:12px;background:#1c2230;color:#edf2ff}.level-row.selected{border-color:#8aafff}.level-track{display:block;height:8px;border-radius:8px;background:#343d50;overflow:hidden;margin:8px 0}.level-track i{display:block;height:100%;background:#8ce89d;transition:width .2s}.review-entry{margin:8px 0 18px;padding:12px;border:1px solid #d4a54e;border-radius:12px;background:#ffce6e12;color:#ffda91}.level-row:disabled{opacity:.65}
