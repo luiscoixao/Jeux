@@ -77,7 +77,7 @@ button.primary:hover { background: #dcfbea; }
 #work { padding: clamp(14px, 3vw, 30px); }
 #work h2 { margin-top: 8px; }
 #work p { max-width: 72ch; }
-.lesson-body h3 { margin: 14px 0 7px; font-size: 16px; }\n.course-point { display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line); }\n.course-point strong { color:var(--accent); }\n.course-point p { margin:5px 0 0;color:var(--ink); }\n.course-num { display:grid;place-items:center;flex:0 0 26px;height:26px;border-radius:8px;background:#203447;color:var(--accent);font-weight:700; }\n.course-explain { display:block;color:var(--muted);margin-top:4px;font-size:14px; }
+.lesson-body h3 { margin: 14px 0 7px; font-size: 16px; }\n.reading-page {max-width:760px;margin:auto;line-height:1.8;font-size:17px;}\n.reading-page .lead {font-size:19px;line-height:1.65;color:var(--ink);font-weight:500;}\n.reading-page h3 {font-size:20px;margin:24px 0 10px;color:var(--accent);letter-spacing:-.02em;}\n.reading-page p {margin:0 0 15px;}\n.reading-close {color:var(--muted);font-style:italic;border-top:1px solid var(--line);padding-top:16px;}\n.course-point { display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line); }\n.course-point strong { color:var(--accent); }\n.course-point p { margin:5px 0 0;color:var(--ink); }\n.course-num { display:grid;place-items:center;flex:0 0 26px;height:26px;border-radius:8px;background:#203447;color:var(--accent);font-weight:700; }\n.course-explain { display:block;color:var(--muted);margin-top:4px;font-size:14px; }
 .lesson-example { margin: 16px 0; padding: 12px 14px; border-left: 3px solid var(--accent); border-radius: 0 9px 9px 0; background: #162536; }
 .lesson-example p { margin: 0; }
 .rows, .answers { display: grid; gap: 8px; margin: 15px 0; }
@@ -299,10 +299,51 @@ function openDomain(d){
 }
 
 /* Contrat pédagogique : chaque réponse évaluée est enseignée avant le quiz. */
-function courseNotes(lesson,items){
-  const seen=new Set();
-  return items.filter(q=>!q.generated).filter(q=>{const key=q.prompt+'|'+q.choices[0];if(seen.has(key))return false;seen.add(key);return true;})
-    .map((q,i)=>'<div class="course-point"><span class="course-num">'+(i+1)+'</span><div><strong>'+escapeHTML(q.choices[0])+'</strong><p>'+escapeHTML(q.prompt)+'<span class="course-explain">'+escapeHTML(q.explanation||'')+'</span></p></div></div>').join('');
+/* Une page de lecture continue, sans afficher les questions ni leurs réponses sous forme de fiche. */
+const editorialContext={
+'Histoire':[
+"L'histoire ne consiste pas seulement à mémoriser des dates. Elle cherche à comprendre comment les sociétés s'organisent, comment les pouvoirs se justifient et pourquoi certaines transformations durent. Pour situer une période, il faut observer les institutions, les techniques, les échanges et la vie quotidienne.",
+"Un même événement n'a pas les mêmes conséquences pour tous. Les sources historiques — textes, objets, monuments ou témoignages — sont confrontées entre elles afin de distinguer les faits établis des interprétations. Les chronologies servent à relier les causes, les ruptures et les héritages."
+],
+'Géographie':[
+"La géographie étudie les territoires comme des espaces vécus et transformés. Les phénomènes naturels, les activités humaines et les décisions politiques interagissent à plusieurs échelles, du quartier à la planète. Une carte est une représentation choisie de la réalité, jamais la réalité entière.",
+"Pour comprendre un territoire, on compare sa situation, ses ressources, ses contraintes et ses réseaux. Les différences observées ne s'expliquent presque jamais par une cause unique : climat, histoire, économie et mobilités se combinent."
+],
+'Sciences de la vie':[
+"Les sciences du vivant relient plusieurs niveaux d'organisation : molécules, cellules, organismes, populations et écosystèmes. Un phénomène observable à une échelle peut dépendre de mécanismes invisibles à une autre. L'observation, l'expérience et la comparaison permettent d'en proposer des explications.",
+"Les organismes ne sont pas des machines isolées. Ils échangent de la matière et de l'énergie avec leur milieu, transmettent de l'information et évoluent au cours du temps. Les modèles biologiques décrivent des tendances et des mécanismes, avec des exceptions et des limites."
+],
+'Arts et littérature':[
+"Une œuvre s'inscrit dans une époque, mais elle peut aussi s'en affranchir. Son langage — formes, couleurs, rythme, récit ou composition — influence ce que nous percevons et ressentons. Comprendre une création suppose de regarder à la fois la technique, l'intention et la réception.",
+"Les mouvements artistiques ne se succèdent pas comme des cases fermées : ils dialoguent, s'opposent et se transforment. Une même œuvre peut être analysée sous plusieurs angles, sans que toutes les interprétations aient la même solidité."
+],
+'Philosophie':[
+"La philosophie commence lorsqu'une évidence devient une question. Elle distingue les opinions, les arguments et les preuves, puis examine les présupposés d'un raisonnement. Définir les termes est essentiel : deux personnes peuvent employer le même mot pour désigner des idées différentes.",
+"Un philosophe répond souvent à d'autres penseurs. Pour comprendre sa position, il faut reconstruire le problème auquel il fait face, l'argument qu'il propose et les objections possibles. La difficulté n'est pas de réciter une formule, mais d'en saisir la portée."
+],
+'Mathématiques':[
+"En mathématiques, comprendre une notion signifie savoir pourquoi une méthode fonctionne, dans quelles conditions elle s'applique et comment contrôler le résultat. Les définitions fixent le sens des objets étudiés ; les propriétés permettent ensuite de raisonner avec rigueur.",
+"Un calcul juste ne suffit pas toujours : il faut interpréter ce que représentent les nombres, vérifier les unités et repérer les hypothèses. Les exemples particuliers aident à construire une intuition, tandis que les démonstrations établissent ce qui est vrai dans le cas général."
+],
+'Physique et chimie':[
+"La physique cherche des lois quantitatives pour décrire les phénomènes naturels ; la chimie étudie notamment la composition et les transformations de la matière. Toutes deux relient des observations à des modèles que l'on peut tester expérimentalement.",
+"Un modèle n'est utile que dans un domaine de validité. Pour résoudre un problème, il faut identifier les grandeurs, les unités, les interactions et les conditions de l'expérience. Les ordres de grandeur sont souvent aussi instructifs que les valeurs exactes."
+],
+'Économie et société':[
+"Les sciences économiques et sociales étudient les choix individuels et les structures collectives. Les institutions, les règles, les ressources et les rapports de pouvoir façonnent les comportements. Un indicateur éclaire une réalité, mais n'en résume jamais toutes les dimensions.",
+"Une corrélation ne suffit pas à établir une causalité. Pour interpréter un phénomène social, on compare des situations, on examine les mécanismes possibles et on distingue les constats des jugements de valeur. Les décisions publiques impliquent souvent des arbitrages."
+]};
+function courseArticle(lesson,domain){
+ const context=editorialContext[domain.name]||[];
+ const unique=[...new Set(lesson.questions.map(q=>q.explanation).filter(x=>x&&x!==lesson.text))];
+ const passage=unique.slice(0,3).map(x=>'<p>'+escapeHTML(x)+'</p>').join('');
+ return '<article class="reading-page">'+
+ '<p class="lead">'+escapeHTML(lesson.text)+'</p>'+
+ '<h3>Comprendre le sujet</h3><p>'+escapeHTML(context[0]||'')+'</p>'+
+ '<h3>Comment cela fonctionne</h3><p>'+escapeHTML(lesson.example)+'</p>'+passage+
+ '<h3>Prendre du recul</h3><p>'+escapeHTML(context[1]||'')+'</p>'+
+ '<p class="reading-close">À présent, prenez un instant pour relier ces idées entre elles. Le questionnaire qui suit vérifie votre compréhension du cours, sans reprendre son texte mot pour mot.</p>'+
+ '</article>';
 }
 function balancedShuffle(items){
   const list=shuffle(items);
@@ -322,13 +363,10 @@ function openLesson(lesson){
   const unseen=lesson.questions.filter(isNew);
   const items=adaptiveItems(lesson);
   recordDomain(lesson);
-  show('<div class="eyebrow">1 / 2 · Apprendre · '+escapeHTML(domain.name)+'</div>'+
+  show('<div class="eyebrow">Lecture · '+escapeHTML(domain.name)+'</div>'+
     '<h2>'+escapeHTML(lesson.title)+'</h2>'+
-    '<div class="lesson-body"><h3>La notion</h3><p>'+escapeHTML(lesson.text)+'</p>'+
-    '<div class="lesson-example"><h3>Un exemple</h3><p>'+escapeHTML(lesson.example)+'</p></div><h3>Les points essentiels à connaître</h3><p class="muted">Chaque question du quiz porte sur un point présenté ci-dessous.</p>'+courseNotes(lesson,items)+'</div>'+
-    '<div class="actions"><button class="primary" id="launch">'+
-    (unseen.length?'Passer au quiz':'Reprendre le quiz')+' · '+items.length+
-    (items.length===1?' question':' questions')+'</button>'+back+'</div>',true);
+    courseArticle(lesson,domain)+
+    '<div class="actions"><button class="primary" id="launch">Tester ma compréhension</button>'+back+'</div>',true);
   byId('launch').onclick=()=>launch(lesson.title,items);
   if(domainOf(lesson)===5){const b=document.createElement('button');b.textContent='Défi mathématique inédit';b.onclick=()=>{const generated=[generatedMath(),generatedMath(),generatedMath()];show('<div class="eyebrow">Méthode avant le défi</div><h2>Calculs variés</h2>'+courseForMath(generated)+'<div class="actions"><button class="primary" id="math-go">Commencer le défi</button>'+back+'</div>',true);byId('math-go').onclick=()=>launch('Entraînement mathématique',generated);bindBack();};work.querySelector('.actions').append(b);}
   bindBack();
