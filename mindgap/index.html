@@ -196,6 +196,7 @@ progress{height:3px;border-radius:0;accent-color:#d5f1b5}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.node,.node:hover{transition:none}}
 
 .hero{min-height:0;padding:28px 0 25px}.hero h1{font-size:clamp(35px,5vw,58px);margin:0;line-height:1.05}.hero h1 span{font-size:.58em;letter-spacing:-.025em;font-style:normal;margin-top:5px}.hero:before{display:none}@media(max-width:700px){.hero{padding:23px 0}.hero h1{font-size:clamp(35px,10vw,52px)}.hero .actions{margin-top:17px}}\n.lesson-diagram{margin:25px 0;padding:18px 12px;border:1px solid rgba(174,223,194,.28);border-radius:17px;background:linear-gradient(120deg,rgba(137,210,185,.10),rgba(36,83,97,.18))}.diagram-track{display:flex;align-items:center;justify-content:space-between;gap:6px}.diagram-step{min-width:0;flex:1;text-align:center;padding:12px 4px;border-radius:11px;background:rgba(174,223,194,.09)}.diagram-step strong{display:block;font-size:clamp(11px,2.8vw,15px);line-height:1.35;color:#d7f1df}.diagram-index{display:block;font:600 11px system-ui;color:#9ad7ba;margin-bottom:7px}.diagram-arrow{color:#a6dabb;font-size:20px;flex-shrink:0}@media(max-width:360px){.diagram-track{gap:3px}.diagram-step{padding:9px 2px}.diagram-arrow{font-size:15px}}
+.lesson-globe{margin:24px auto;padding:14px 8px 16px;max-width:500px;border:1px solid rgba(175,229,204,.25);border-radius:18px;background:radial-gradient(circle at 50% 30%,rgba(39,101,111,.32),rgba(8,25,35,.65));text-align:center}.lesson-globe svg{display:block;width:100%;height:auto;max-height:350px}.lesson-globe figcaption{font:13px/1.55 system-ui,sans-serif;color:#c5dfd5;padding:0 10px}.lesson-globe figcaption strong{color:#e3f6df}
 </style></head><body><main>
 <header><span class="mark" aria-hidden="true"><img src="./apple-touch-icon.png?v=brain-compass-20261105-4" alt="" style="width:30px;height:30px;border-radius:8px"></span>MINDGAP <span class="edition">CULTURE GÉNÉRALE</span></header>
 <section class="hero"><div><h1>MINDGAP <span>CULTURE GÉNÉRALE</span></h1></div><div class="actions"><button id="start" class="primary">Commencer le parcours</button><button id="review">Revoir mes erreurs</button></div></section>
@@ -420,23 +421,27 @@ const editorialContext={
 "Une corrélation ne suffit pas à établir une causalité. Pour interpréter un phénomène social, on compare des situations, on examine les mécanismes possibles et on distingue les constats des jugements de valeur. Les décisions publiques impliquent souvent des arbitrages."
 ]};
 function lessonDiagram(lesson,domain){
- const name=domain.name;
- const themes={
- 'Histoire':['Causes','Événement','Conséquences'],
- 'Géographie':['Territoire','Milieux','Activités humaines'],
- 'Sciences de la vie':['Structure','Fonction','Organisme'],
- 'Physique et chimie':['Situation','Transformation','Résultat'],
- 'Mathématiques':['Données','Méthode','Résultat'],
- 'Arts et littérature':['Contexte','Œuvre','Influence'],
- 'Philosophie':['Question','Arguments','Conclusion'],
- 'Économie et société':['Acteurs','Échanges','Effets']
- };
- const labels=themes[name];
- if(!labels)return '';
- const index=domain.lessons.indexOf(lesson);
- if(index<0||index%3!==0)return '';
- const cells=labels.map((label,i)=>'<div class="diagram-step"><span class="diagram-index">0'+(i+1)+'</span><strong>'+escapeHTML(label)+'</strong></div>').join('<span class="diagram-arrow" aria-hidden="true">→</span>');
- return '<figure class="lesson-diagram" role="group" aria-label="Schéma : '+escapeHTML(labels.join(', '))+'"><div class="diagram-track">'+cells+'</div></figure>';
+ const subject=[lesson.title||'',lesson.text||'',lesson.example||''].join(' ').toLowerCase();
+ if(domain.name!=='Géographie'||!(/latitude|longitude|méridien|parallèle|équateur/.test(subject)))return '';
+ return `<figure class="lesson-globe" aria-label="Globe terrestre illustrant les parallèles de latitude et les méridiens de longitude">
+ <svg viewBox="0 0 420 320" role="img" aria-labelledby="globeTitle globeDesc" xmlns="http://www.w3.org/2000/svg">
+ <title id="globeTitle">Latitude et longitude</title><desc id="globeDesc">Globe avec équateur horizontal, parallèles de latitude, méridiens courbes passant par les pôles, et point de repère.</desc>
+ <defs><radialGradient id="globeSea" cx="32%" cy="27%" r="80%"><stop stop-color="#2b7f87"/><stop offset="1" stop-color="#10313f"/></radialGradient><clipPath id="globeClip"><circle cx="210" cy="151" r="119"/></clipPath></defs>
+ <circle cx="210" cy="151" r="119" fill="url(#globeSea)" stroke="#bce9d3" stroke-width="2"/>
+ <g clip-path="url(#globeClip)" fill="none" stroke="#b4dfd6" stroke-width="1.5" opacity=".75">
+ <ellipse cx="210" cy="151" rx="35" ry="119"/><ellipse cx="210" cy="151" rx="82" ry="119"/>
+ <path d="M210 32 V270" stroke-dasharray="4 5" opacity=".65"/>
+ <ellipse cx="210" cy="151" rx="119" ry="34"/><ellipse cx="210" cy="151" rx="119" ry="79"/>
+ <path d="M91 151 H329" stroke="#ffe0a4" stroke-width="2.8"/>
+ </g>
+ <g clip-path="url(#globeClip)" fill="#8dd7b3" opacity=".24"><path d="M125 82l30-16 19 9 5 20-13 14-9 30-19 2-14-27zM178 151l28-9 20 12-5 27-13 16-6 38-15-21-8-33zM251 78l39 3 19 27-18 14-15 31-20-9-10-28z"/></g>
+ <circle cx="210" cy="151" r="4" fill="#ffe0a4"/>
+ <path d="M330 151 H380" stroke="#ffe0a4" stroke-width="1.5"/><text x="383" y="155" fill="#ffe0a4" font-size="12" font-family="system-ui" text-anchor="start">0°</text>
+ <path d="M210 32 V15 H280" stroke="#bce9d3" stroke-width="1.5"/><text x="284" y="19" fill="#d6f3e6" font-size="12" font-family="system-ui">Pôle Nord</text>
+ <text x="210" y="296" text-anchor="middle" fill="#ffe0a4" font-size="13" font-family="system-ui">Équateur · latitude 0°</text>
+ <text x="210" y="314" text-anchor="middle" fill="#bce9d3" font-size="12" font-family="system-ui">Courbes verticales : méridiens</text>
+ </svg>
+ <figcaption>Les <strong>parallèles</strong> indiquent la latitude ; les <strong>méridiens</strong>, la longitude.</figcaption></figure>`;
 }
 function courseArticle(lesson,domain){
  const context=editorialContext[domain.name]||[];
