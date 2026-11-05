@@ -77,7 +77,7 @@ button.primary:hover { background: #dcfbea; }
 #work { padding: clamp(14px, 3vw, 30px); }
 #work h2 { margin-top: 8px; }
 #work p { max-width: 72ch; }
-.lesson-body h3 { margin: 0 0 5px; font-size: 15px; }
+.lesson-body h3 { margin: 14px 0 7px; font-size: 16px; }\n.course-point { display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line); }\n.course-point strong { color:var(--accent); }\n.course-point p { margin:5px 0 0;color:var(--ink); }\n.course-num { display:grid;place-items:center;flex:0 0 26px;height:26px;border-radius:8px;background:#203447;color:var(--accent);font-weight:700; }\n.course-explain { display:block;color:var(--muted);margin-top:4px;font-size:14px; }
 .lesson-example { margin: 16px 0; padding: 12px 14px; border-left: 3px solid var(--accent); border-radius: 0 9px 9px 0; background: #162536; }
 .lesson-example p { margin: 0; }
 .rows, .answers { display: grid; gap: 8px; margin: 15px 0; }
@@ -230,10 +230,10 @@ function chooseLesson(){
   return candidates.sort((a,b)=>b.priority-a.priority)[0].l;
 }
 function adaptiveItems(lesson){
-  const dueItems=lesson.questions.filter(due);
-  const fresh=lesson.questions.filter(isNew);
-  const weak=lesson.questions.filter(q=>!due(q)&&!isNew(q)&&strength(q)<1);
-  return [...dueItems,...fresh,...weak,...lesson.questions].filter((q,i,a)=>a.findIndex(x=>x.id===q.id)===i).slice(0,6);
+  const dueItems=shuffle(lesson.questions.filter(due));
+  const fresh=shuffle(lesson.questions.filter(isNew));
+  const weak=shuffle(lesson.questions.filter(q=>!due(q)&&!isNew(q)&&strength(q)<1));
+  return [...dueItems,...fresh,...weak,...shuffle(lesson.questions)].filter((q,i,a)=>a.findIndex(x=>x.id===q.id)===i).slice(0,6);
 }
 function updateMemory(q,correct){
   if(q.generated)return;
@@ -297,6 +297,26 @@ function openDomain(d){
   work.querySelectorAll('[data-lesson]').forEach(b=>b.onclick=()=>openLesson(d.lessons[Number(b.dataset.lesson)]));
   bindBack();
 }
+
+/* Contrat pédagogique : chaque réponse évaluée est enseignée avant le quiz. */
+function courseNotes(lesson,items){
+  const seen=new Set();
+  return items.filter(q=>!q.generated).filter(q=>{const key=q.prompt+'|'+q.choices[0];if(seen.has(key))return false;seen.add(key);return true;})
+    .map((q,i)=>'<div class="course-point"><span class="course-num">'+(i+1)+'</span><div><strong>'+escapeHTML(q.choices[0])+'</strong><p>'+escapeHTML(q.prompt)+'<span class="course-explain">'+escapeHTML(q.explanation||'')+'</span></p></div></div>').join('');
+}
+function balancedShuffle(items){
+  const list=shuffle(items);
+  try{
+    const previous=JSON.parse(localStorage.getItem('mindgap-last-order')||'[]');
+    if(list.length>1&&list[0].id===previous[0])list.push(list.shift());
+    localStorage.setItem('mindgap-last-order',JSON.stringify(list.map(q=>q.id)));
+  }catch{}
+  return list;
+}
+function courseForMath(items){
+  return '<div class="course-point"><div><strong>Calculs et méthode</strong><p>Pour multiplier, décompose les facteurs. Pour résoudre x + a = b, soustrais a des deux côtés. Pour un pourcentage, multiplie le taux divisé par 100 par la quantité. Pour une fonction f(x)=ax+b, remplace x par sa valeur puis calcule.</p></div></div>';
+}
+
 function openLesson(lesson){
   const domain=domains.find(d=>d.lessons.includes(lesson));
   const unseen=lesson.questions.filter(isNew);
@@ -305,12 +325,12 @@ function openLesson(lesson){
   show('<div class="eyebrow">1 / 2 · Apprendre · '+escapeHTML(domain.name)+'</div>'+
     '<h2>'+escapeHTML(lesson.title)+'</h2>'+
     '<div class="lesson-body"><h3>La notion</h3><p>'+escapeHTML(lesson.text)+'</p>'+
-    '<div class="lesson-example"><h3>Un exemple</h3><p>'+escapeHTML(lesson.example)+'</p></div></div>'+
+    '<div class="lesson-example"><h3>Un exemple</h3><p>'+escapeHTML(lesson.example)+'</p></div><h3>Les points essentiels à connaître</h3><p class="muted">Chaque question du quiz porte sur un point présenté ci-dessous.</p>'+courseNotes(lesson,items)+'</div>'+
     '<div class="actions"><button class="primary" id="launch">'+
     (unseen.length?'Passer au quiz':'Reprendre le quiz')+' · '+items.length+
     (items.length===1?' question':' questions')+'</button>'+back+'</div>',true);
   byId('launch').onclick=()=>launch(lesson.title,items);
-  if(domainOf(lesson)===5){const b=document.createElement('button');b.textContent='Défi mathématique inédit';b.onclick=()=>launch('Entraînement mathématique',[generatedMath(),generatedMath(),generatedMath()]);work.querySelector('.actions').append(b);}
+  if(domainOf(lesson)===5){const b=document.createElement('button');b.textContent='Défi mathématique inédit';b.onclick=()=>{const generated=[generatedMath(),generatedMath(),generatedMath()];show('<div class="eyebrow">Méthode avant le défi</div><h2>Calculs variés</h2>'+courseForMath(generated)+'<div class="actions"><button class="primary" id="math-go">Commencer le défi</button>'+back+'</div>',true);byId('math-go').onclick=()=>launch('Entraînement mathématique',generated);bindBack();};work.querySelector('.actions').append(b);}
   bindBack();
 }
 function shuffle(items){
@@ -319,7 +339,7 @@ function shuffle(items){
   return list;
 }
 function launch(title,items,review=false){
-  session={title,items:[...items],index:0,correct:0,review};
+  session={title,items:balancedShuffle(items),index:0,correct:0,review};
   ask();
 }
 function nextLesson(){
