@@ -198,6 +198,7 @@ progress{height:3px;border-radius:0;accent-color:#d5f1b5}
 .hero{min-height:0;padding:28px 0 25px}.hero h1{font-size:clamp(35px,5vw,58px);margin:0;line-height:1.05}.hero h1 span{font-size:.58em;letter-spacing:-.025em;font-style:normal;margin-top:5px}.hero:before{display:none}@media(max-width:700px){.hero{padding:23px 0}.hero h1{font-size:clamp(35px,10vw,52px)}.hero .actions{margin-top:17px}}\n.lesson-diagram{margin:25px 0;padding:18px 12px;border:1px solid rgba(174,223,194,.28);border-radius:17px;background:linear-gradient(120deg,rgba(137,210,185,.10),rgba(36,83,97,.18))}.diagram-track{display:flex;align-items:center;justify-content:space-between;gap:6px}.diagram-step{min-width:0;flex:1;text-align:center;padding:12px 4px;border-radius:11px;background:rgba(174,223,194,.09)}.diagram-step strong{display:block;font-size:clamp(11px,2.8vw,15px);line-height:1.35;color:#d7f1df}.diagram-index{display:block;font:600 11px system-ui;color:#9ad7ba;margin-bottom:7px}.diagram-arrow{color:#a6dabb;font-size:20px;flex-shrink:0}@media(max-width:360px){.diagram-track{gap:3px}.diagram-step{padding:9px 2px}.diagram-arrow{font-size:15px}}
 .lesson-globe{margin:24px auto;padding:14px 8px 16px;max-width:500px;border:1px solid rgba(175,229,204,.25);border-radius:18px;background:radial-gradient(circle at 50% 30%,rgba(39,101,111,.32),rgba(8,25,35,.65));text-align:center}.lesson-globe svg{display:block;width:100%;height:auto;max-height:350px}.lesson-globe figcaption{font:13px/1.55 system-ui,sans-serif;color:#c5dfd5;padding:0 10px}.lesson-globe figcaption strong{color:#e3f6df}
 .lesson-visual{margin:25px auto;padding:10px 12px 13px;max-width:450px;border:1px solid rgba(175,229,204,.22);border-radius:18px;background:radial-gradient(circle at 50% 35%,#17343d,#0b1c26);text-align:center}.lesson-visual svg{display:block;width:100%;height:auto;max-height:275px}.lesson-visual figcaption{font:13px/1.5 system-ui,sans-serif;color:#b9d8cf;margin-top:2px}
+.fundamentals{margin:28px 0 6px;padding:16px 20px 20px;border-left:3px solid #bfe4c3;background:rgba(159,210,180,.07);border-radius:0 12px 12px 0}.fundamentals h3{margin:4px 0 15px}.fundamentals ul{margin:0;padding-left:22px}.fundamentals li{margin:0 0 13px;line-height:1.65}.lesson-visual,.lesson-globe,.lesson-diagram{display:none!important}
 </style></head><body><main>
 <header><span class="mark" aria-hidden="true"><img src="./apple-touch-icon.png?v=brain-compass-20261105-4" alt="" style="width:30px;height:30px;border-radius:8px"></span>MINDGAP <span class="edition">CULTURE GÉNÉRALE</span></header>
 <section class="hero"><div><h1>MINDGAP <span>CULTURE GÉNÉRALE</span></h1></div><div class="actions"><button id="start" class="primary">Commencer le parcours</button><button id="review">Revoir mes erreurs</button></div></section>
@@ -301,20 +302,18 @@ const domainOf=l=>domains.findIndex(d=>d.lessons.includes(l));
 const lastDomain=()=>{try{const v=localStorage.getItem('mindgap-last-domain');return v===null?-1:Number(v);}catch{return -1;}};
 const recordDomain=l=>{try{localStorage.setItem('mindgap-last-domain',String(domainOf(l)));}catch{}};
 function chooseLesson(){
-  const candidates=lessons.map(l=>{
-    const overdue=l.questions.reduce((n,q)=>n+(due(q)?1+Math.min(2,(now()-(progress(q).dueAt||now()))/(7*DAY)):0),0);
-    const fresh=lessonNew(l);
-    const weak=l.questions.filter(q=>!isNew(q)&&strength(q)<1).length;
-    const recency=l.questions.reduce((m,q)=>Math.max(m,progress(q).seenAt||0),0);
-    const rotation=domainOf(l)===lastDomain()?-2:1;
-    const priority=overdue*7+(fresh?5:0)+weak*1.4+rotation-Math.max(0,4-(now()-recency)/DAY)*.5;
-    return {l,priority,overdue,fresh};
-  });
-  const overdue=candidates.filter(c=>c.overdue>0).sort((a,b)=>b.priority-a.priority);
-  if(overdue.length)return overdue[0].l;
-  const fresh=candidates.filter(c=>c.fresh>0).sort((a,b)=>b.priority-a.priority);
-  if(fresh.length)return fresh[0].l;
-  return candidates.sort((a,b)=>b.priority-a.priority)[0].l;
+ const fresh=lessons.filter(l=>lessonNew(l)>0);
+ const pool=fresh.length?fresh:lessons.filter(l=>lessonDue(l)>0||lessonScore(l)<1);
+ if(!pool.length)return null;
+ let history=[];
+ try{history=JSON.parse(localStorage.getItem('mindgap-lesson-history')||'[]');}catch{}
+ const eligible=pool.filter(l=>!history.includes(l.title));
+ const options=eligible.length?eligible:pool;
+ const weighted=options.map(l=>({l,score:lessonNew(l)*3+lessonDue(l)*2+(domainOf(l)===lastDomain()?-2:2)+Math.random()*12}));
+ weighted.sort((a,b)=>b.score-a.score);
+ const selected=weighted[0].l;
+ try{localStorage.setItem('mindgap-lesson-history',JSON.stringify([...history.filter(x=>x!==selected.title),selected.title].slice(-Math.min(35,Math.max(1,lessons.length-1)))));}catch{}
+ return selected;
 }
 function adaptiveItems(lesson){
   const dueItems=shuffle(lesson.questions.filter(due));
@@ -421,57 +420,16 @@ const editorialContext={
 "Les sciences économiques et sociales étudient les choix individuels et les structures collectives. Les institutions, les règles, les ressources et les rapports de pouvoir façonnent les comportements. Un indicateur éclaire une réalité, mais n'en résume jamais toutes les dimensions.",
 "Une corrélation ne suffit pas à établir une causalité. Pour interpréter un phénomène social, on compare des situations, on examine les mécanismes possibles et on distingue les constats des jugements de valeur. Les décisions publiques impliquent souvent des arbitrages."
 ]};
-function lessonDiagram(lesson,domain){
- const title=(lesson.title||'').toLowerCase();
- const pick=(re)=>re.test(title);
- let type='';
- if(pick(/latitude|longitude|se repérer|lire une carte/))type='globe';
- else if(pick(/climat|océan|courant|fleuve|relief|risques naturels|biome/))type='layers';
- else if(pick(/ville|population|démograph|urbanis|port|commerce|route de la soie/))type='network';
- else if(pick(/cellule|microbe|fermentation|génétique|atome|molécule|liaison chimique/))type='cell';
- else if(pick(/photosynthèse|écosystème|pollinisation|respiration|énergie|matière|mélange/))type='cycle';
- else if(pick(/circulation du sang|neurone|synapse|immunitaire/))type='network';
- else if(pick(/géométrie|pythagore|trigonométrie|architecture|art roman|gothique/))type='triangle';
- else if(pick(/proportion|fraction|probabilité|statistique|moyenne|médiane|sondage/))type='bars';
- else if(pick(/équation|croissance|dérivée|intégrale|offre et demande|prix|produit intérieur|puissance/))type='graph';
- else if(pick(/circuit électrique/))type='circuit';
- else if(pick(/lumière|ombre|optique/))type='light';
- else if(pick(/mouvement|newton|astronomie/))type='orbit';
- else if(pick(/peinture|impressionnisme|cubisme|baroque|musique|harmonie|poésie|roman|montage|pessoa/))type='art';
- else if(domain.name==='Histoire'||pick(/révolution|guerre|empire|civilisation|imprimerie|industrialisation|égypte|grèce|renaissance|portugal/))type='timeline';
- else if(domain.name==='Philosophie'||pick(/raison|éthique|liberté|preuve|socrate|platon|aristote|descartes|hume|kant|existentialisme|épistémologie/))type='logic';
- else if(domain.name==='Économie et société')type='network';
- if(!type)return '';
- const stroke='#a9e0cc',gold='#f0ce91';
- const art={
- globe:`<circle cx="160" cy="116" r="88" fill="#164956" stroke="${stroke}" stroke-width="2"/><ellipse cx="160" cy="116" rx="31" ry="88" fill="none" stroke="${stroke}"/><ellipse cx="160" cy="116" rx="65" ry="88" fill="none" stroke="${stroke}"/><ellipse cx="160" cy="116" rx="88" ry="32" fill="none" stroke="${stroke}"/><ellipse cx="160" cy="116" rx="88" ry="62" fill="none" stroke="${stroke}"/><path d="M72 116h176" stroke="${gold}" stroke-width="3"/><text x="160" y="226" text-anchor="middle" fill="${gold}" font-size="12">Équateur 0°</text>`,
- layers:`<path d="M28 180Q75 95 120 153T210 120T292 76" fill="none" stroke="${stroke}" stroke-width="3"/><path d="M28 196Q75 111 120 169T210 136T292 92" fill="none" stroke="${gold}" stroke-width="2"/><path d="M28 211Q75 126 120 184T210 151T292 107" fill="none" stroke="#5d9ea7" stroke-width="2"/><path d="M50 45h220" stroke="${stroke}" opacity=".3"/><circle cx="210" cy="120" r="6" fill="${gold}"/>`,
- network:`<g stroke="${stroke}" stroke-width="2" opacity=".75"><path d="M62 76L160 45 255 91 208 183 100 186 62 76 208 183M160 45L100 186M255 91L100 186"/></g><g fill="#1b5661" stroke="${gold}" stroke-width="2"><circle cx="62" cy="76" r="17"/><circle cx="160" cy="45" r="19"/><circle cx="255" cy="91" r="15"/><circle cx="208" cy="183" r="21"/><circle cx="100" cy="186" r="16"/></g>`,
- cell:`<ellipse cx="160" cy="116" rx="112" ry="81" fill="#1b5661" stroke="${stroke}" stroke-width="3"/><ellipse cx="163" cy="114" rx="43" ry="37" fill="#315e66" stroke="${gold}" stroke-width="2"/><circle cx="168" cy="111" r="13" fill="${gold}" opacity=".7"/><g fill="none" stroke="${stroke}" stroke-width="4"><path d="M72 106q20-30 30 2t-24 27"/><path d="M213 77q26-20 32 7t-26 18"/><path d="M196 152q30-13 34 12t-28 10"/></g>`,
- cycle:`<g fill="none" stroke="${stroke}" stroke-width="4"><path d="M98 74Q160 8 229 76"/><path d="M244 94Q286 158 209 194"/><path d="M182 199Q85 218 75 116"/></g><g fill="${gold}"><path d="M229 76l-22-8 17-17z"/><path d="M209 194l2-24 20 15z"/><path d="M75 116l-13 20 25 1z"/></g><circle cx="160" cy="119" r="30" fill="#1b5661" stroke="${gold}"/>`,
- triangle:`<path d="M75 195V57L251 195Z" fill="#1b5661" stroke="${stroke}" stroke-width="3"/><path d="M75 172h23v23" fill="none" stroke="${gold}" stroke-width="2"/><path d="M75 195h176" stroke="${gold}" stroke-width="3"/><text x="155" y="215" fill="${gold}" font-size="13">a</text><text x="54" y="130" fill="${stroke}" font-size="13">b</text><text x="175" y="115" fill="${stroke}" font-size="13">c</text>`,
- bars:`<g fill="#28727b"><rect x="49" y="133" width="39" height="68"/><rect x="105" y="95" width="39" height="106"/><rect x="161" y="60" width="39" height="141"/><rect x="217" y="113" width="39" height="88"/></g><path d="M40 38v166h245" fill="none" stroke="${stroke}" stroke-width="2"/><path d="M48 145L125 105 182 74 239 120" fill="none" stroke="${gold}" stroke-width="3"/>`,
- graph:`<path d="M40 30v174h247" fill="none" stroke="${stroke}" stroke-width="2"/><path d="M45 187Q116 181 159 127T277 39" fill="none" stroke="${gold}" stroke-width="4"/><path d="M45 55Q120 81 172 129T277 194" fill="none" stroke="#65a5b0" stroke-width="3"/><circle cx="171" cy="129" r="6" fill="${stroke}"/>`,
- circuit:`<path d="M65 72H250V177H65Z" fill="none" stroke="${stroke}" stroke-width="3"/><path d="M65 104v42M54 105h22M59 116h12" stroke="${gold}" stroke-width="3"/><circle cx="250" cy="124" r="24" fill="#164956" stroke="${gold}" stroke-width="2"/><path d="M235 109l30 30m0-30l-30 30" stroke="${gold}" stroke-width="2"/>`,
- light:`<circle cx="68" cy="111" r="27" fill="${gold}" opacity=".9"/><path d="M95 111h135M95 111l135-60M95 111l135 60" stroke="${gold}" stroke-width="2"/><path d="M230 32v160" stroke="${stroke}" stroke-width="4"/><path d="M230 51l62-19v160l-62-21" fill="#174552" opacity=".6"/>`,
- orbit:`<ellipse cx="160" cy="115" rx="116" ry="48" fill="none" stroke="${stroke}" stroke-width="2" transform="rotate(-25 160 115)"/><ellipse cx="160" cy="115" rx="80" ry="90" fill="none" stroke="#5d9ea7" transform="rotate(35 160 115)"/><circle cx="160" cy="115" r="23" fill="${gold}"/><circle cx="62" cy="158" r="10" fill="${stroke}"/><circle cx="227" cy="51" r="8" fill="#65a5b0"/>`,
- art:`<rect x="55" y="37" width="210" height="161" rx="7" fill="#163f4a" stroke="${stroke}" stroke-width="3"/><circle cx="113" cy="86" r="25" fill="${gold}" opacity=".8"/><path d="M65 180l58-61 38 35 36-59 58 85" fill="#438c8a" opacity=".8"/><path d="M65 180l58-61 38 35 36-59 58 85" fill="none" stroke="${stroke}" stroke-width="2"/>`,
- timeline:`<path d="M35 122H285" stroke="${stroke}" stroke-width="3"/><g fill="${gold}"><circle cx="65" cy="122" r="10"/><circle cx="160" cy="122" r="10"/><circle cx="255" cy="122" r="10"/></g><g stroke="${stroke}" stroke-width="2"><path d="M65 110V58M160 134v50M255 110V58"/></g><g fill="#2d7278"><rect x="35" y="35" width="60" height="22" rx="5"/><rect x="130" y="185" width="60" height="22" rx="5"/><rect x="225" y="35" width="60" height="22" rx="5"/></g>`,
- logic:`<rect x="110" y="25" width="100" height="43" rx="12" fill="#1b5661" stroke="${gold}"/><path d="M160 68v31M160 99L89 135M160 99l71 36" fill="none" stroke="${stroke}" stroke-width="3"/><rect x="35" y="135" width="108" height="53" rx="12" fill="#1b5661" stroke="${stroke}"/><rect x="177" y="135" width="108" height="53" rx="12" fill="#1b5661" stroke="${stroke}"/><text x="160" y="52" text-anchor="middle" fill="#e9f7e9" font-size="14">Question</text><text x="89" y="166" text-anchor="middle" fill="#e9f7e9" font-size="13">Argument A</text><text x="231" y="166" text-anchor="middle" fill="#e9f7e9" font-size="13">Argument B</text>`
- };
- return '<figure class="lesson-visual" aria-label="Illustration : '+escapeHTML(lesson.title)+'"><svg viewBox="0 0 320 240" role="img" aria-label="'+escapeHTML(lesson.title)+'" xmlns="http://www.w3.org/2000/svg">'+art[type]+'</svg><figcaption>'+escapeHTML(lesson.title)+'</figcaption></figure>';
-}
 function courseArticle(lesson,domain){
- const context=editorialContext[domain.name]||[];
- const unique=[...new Set(lesson.questions.map(q=>q.explanation).filter(x=>x&&x!==lesson.text))];
- const passage=unique.slice(0,3).map(x=>'<p>'+escapeHTML(x)+'</p>').join('');
- return '<article class="reading-page">'+
- '<p class="lead">'+escapeHTML(lesson.text)+'</p>'+
- '<h3>Comprendre le sujet</h3><p>'+escapeHTML(context[0]||'')+'</p>'+
- '<h3>Comment cela fonctionne</h3><p>'+escapeHTML(lesson.example)+'</p>'+lessonDiagram(lesson,domain)+passage+
- '<h3>Prendre du recul</h3><p>'+escapeHTML(context[1]||'')+'</p>'+
- ''+
- '</article>';
+ const facts=[lesson.text,lesson.example,...lesson.questions.map(q=>q.explanation)].filter(Boolean);
+ const unique=[...new Set(facts.map(x=>x.trim()))];
+ const body='<p class="lead">'+escapeHTML(lesson.text)+'</p>'+
+ '<h3>Exemple</h3><p>'+escapeHTML(lesson.example)+'</p>';
+ const fundamentals=unique.filter(x=>x!==lesson.text&&x!==lesson.example).slice(0,5);
+ return '<article class="reading-page">'+body+
+ '<section class="fundamentals"><h3>Les fondamentaux</h3><ul>'+
+ fundamentals.map(x=>'<li>'+escapeHTML(x)+'</li>').join('')+
+ '</ul></section></article>';
 }
 function balancedShuffle(items){
   const list=shuffle(items);
