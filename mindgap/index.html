@@ -195,7 +195,8 @@ progress{height:3px;border-radius:0;accent-color:#d5f1b5}
 @media(max-width:390px){.map{min-height:470px}.node{width:110px;font-size:10px}.core{width:98px;height:98px}.hero .actions{flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.node,.node:hover{transition:none}}
 
-.hero{min-height:0;padding:28px 0 25px}.hero h1{font-size:clamp(35px,5vw,58px);margin:0;line-height:1.05}.hero h1 span{font-size:.58em;letter-spacing:-.025em;font-style:normal;margin-top:5px}.hero:before{display:none}@media(max-width:700px){.hero{padding:23px 0}.hero h1{font-size:clamp(35px,10vw,52px)}.hero .actions{margin-top:17px}}\n</style></head><body><main>
+.hero{min-height:0;padding:28px 0 25px}.hero h1{font-size:clamp(35px,5vw,58px);margin:0;line-height:1.05}.hero h1 span{font-size:.58em;letter-spacing:-.025em;font-style:normal;margin-top:5px}.hero:before{display:none}@media(max-width:700px){.hero{padding:23px 0}.hero h1{font-size:clamp(35px,10vw,52px)}.hero .actions{margin-top:17px}}\n.lesson-diagram{margin:25px 0;padding:18px 12px;border:1px solid rgba(174,223,194,.28);border-radius:17px;background:linear-gradient(120deg,rgba(137,210,185,.10),rgba(36,83,97,.18))}.diagram-track{display:flex;align-items:center;justify-content:space-between;gap:6px}.diagram-step{min-width:0;flex:1;text-align:center;padding:12px 4px;border-radius:11px;background:rgba(174,223,194,.09)}.diagram-step strong{display:block;font-size:clamp(11px,2.8vw,15px);line-height:1.35;color:#d7f1df}.diagram-index{display:block;font:600 11px system-ui;color:#9ad7ba;margin-bottom:7px}.diagram-arrow{color:#a6dabb;font-size:20px;flex-shrink:0}@media(max-width:360px){.diagram-track{gap:3px}.diagram-step{padding:9px 2px}.diagram-arrow{font-size:15px}}
+</style></head><body><main>
 <header><span class="mark" aria-hidden="true"><img src="./apple-touch-icon.png?v=brain-compass-20261105-4" alt="" style="width:30px;height:30px;border-radius:8px"></span>MINDGAP <span class="edition">CULTURE GÉNÉRALE</span></header>
 <section class="hero"><div><h1>MINDGAP <span>CULTURE GÉNÉRALE</span></h1></div><div class="actions"><button id="start" class="primary">Commencer le parcours</button><button id="review">Revoir mes erreurs</button></div></section>
 <section id="dashboard" class="panel" aria-labelledby="map-title"><div class="panel-head"><h2 id="map-title">Connaissances</h2><div class="legend"><span class="status0"><i class="dot"></i>À découvrir</span><span class="status1"><i class="dot"></i>Fragile</span><span class="status2"><i class="dot"></i>En cours</span><span class="status3"><i class="dot"></i>Bien avancé</span><span class="status4"><i class="dot"></i>Maîtrisé</span></div></div><div id="map" class="map"></div><div id="stats" class="stats"></div></section>
@@ -418,6 +419,25 @@ const editorialContext={
 "Les sciences économiques et sociales étudient les choix individuels et les structures collectives. Les institutions, les règles, les ressources et les rapports de pouvoir façonnent les comportements. Un indicateur éclaire une réalité, mais n'en résume jamais toutes les dimensions.",
 "Une corrélation ne suffit pas à établir une causalité. Pour interpréter un phénomène social, on compare des situations, on examine les mécanismes possibles et on distingue les constats des jugements de valeur. Les décisions publiques impliquent souvent des arbitrages."
 ]};
+function lessonDiagram(lesson,domain){
+ const name=domain.name;
+ const themes={
+ 'Histoire':['Causes','Événement','Conséquences'],
+ 'Géographie':['Territoire','Milieux','Activités humaines'],
+ 'Sciences de la vie':['Structure','Fonction','Organisme'],
+ 'Physique et chimie':['Situation','Transformation','Résultat'],
+ 'Mathématiques':['Données','Méthode','Résultat'],
+ 'Arts et littérature':['Contexte','Œuvre','Influence'],
+ 'Philosophie':['Question','Arguments','Conclusion'],
+ 'Économie et société':['Acteurs','Échanges','Effets']
+ };
+ const labels=themes[name];
+ if(!labels)return '';
+ const index=domain.lessons.indexOf(lesson);
+ if(index<0||index%3!==0)return '';
+ const cells=labels.map((label,i)=>'<div class="diagram-step"><span class="diagram-index">0'+(i+1)+'</span><strong>'+escapeHTML(label)+'</strong></div>').join('<span class="diagram-arrow" aria-hidden="true">→</span>');
+ return '<figure class="lesson-diagram" role="group" aria-label="Schéma : '+escapeHTML(labels.join(', '))+'"><div class="diagram-track">'+cells+'</div></figure>';
+}
 function courseArticle(lesson,domain){
  const context=editorialContext[domain.name]||[];
  const unique=[...new Set(lesson.questions.map(q=>q.explanation).filter(x=>x&&x!==lesson.text))];
@@ -425,7 +445,7 @@ function courseArticle(lesson,domain){
  return '<article class="reading-page">'+
  '<p class="lead">'+escapeHTML(lesson.text)+'</p>'+
  '<h3>Comprendre le sujet</h3><p>'+escapeHTML(context[0]||'')+'</p>'+
- '<h3>Comment cela fonctionne</h3><p>'+escapeHTML(lesson.example)+'</p>'+passage+
+ '<h3>Comment cela fonctionne</h3><p>'+escapeHTML(lesson.example)+'</p>'+lessonDiagram(lesson,domain)+passage+
  '<h3>Prendre du recul</h3><p>'+escapeHTML(context[1]||'')+'</p>'+
  ''+
  '</article>';
