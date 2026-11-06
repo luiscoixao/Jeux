@@ -208,6 +208,88 @@ function makeQuestion(kind, level, intensity) {
   return { kind, prompt, answer, hint, suffix, lesson };
 }
 
+const financeTopics = ["spread", "margin", "recovery", "compound", "weighted", "discount", "growth"];
+const financeGoal = 14;
+
+function financeQuestion(kind, tier) {
+  const rate = pick(tier === 0 ? [10, 15, 20, 25] : tier === 1 ? [12, 18, 24, 35] : [17, 22, 28, 36]);
+  let prompt, answer, hint, lesson, unit = "%";
+  switch (kind) {
+    case "spread": {
+      const notional = pick([40, 80, 120, 240, 350, 480]);
+      const bps = pick(tier === 0 ? [15, 25, 35, 50, 75] : [18, 32, 47, 62, 85]);
+      prompt = `${bps} pb sur ${notional} M€
+Coût annuel supplémentaire ?`;
+      unit = "k€";
+      answer = notional * bps / 10;
+      hint = `10 pb sur ${notional} M€ valent ${notional} k€. Chaque pb vaut ${format(notional / 10)} k€.`;
+      lesson = ["Convertir les points de base sans écrire de décimales", "Sur 80 M€, 1 pb vaut 8 k€. Donc 25 pb valent 8 × 25 = 200 k€."];
+      break;
+    }
+    case "margin": {
+      const price = pick([80, 120, 160, 200, 250]);
+      const profit = price * rate / 100;
+      prompt = `Vente ${price} € · coût ${format(price - profit)} €
+Marge en % du prix de vente ?`;
+      answer = rate;
+      hint = `L’écart est de ${format(profit)} €. Sur ${price} €, 1 % vaut ${format(price / 100)} €. Divisez l’écart par ce repère.`;
+      lesson = ["Choisir le bon dénominateur", "Vendu 125 €, coût 100 €. Les 25 € représentent 20 % de la vente et 25 % du coût."];
+      break;
+    }
+    case "recovery": {
+      const drop = pick(tier === 0 ? [20, 50] : [20, 50, 60, 75]);
+      prompt = `Après une baisse de ${drop} %
+Quel rebond pour revenir au départ ?`;
+      answer = 100 * drop / (100 - drop);
+      hint = `Imaginez un départ à 100. Il reste ${100 - drop} et il faut récupérer ${drop}. Rapportez ${drop} à ${100 - drop}.`;
+      lesson = ["Changer de base après une perte", "Après −20 %, il reste 80. Il manque 20, soit un quart de 80. Le rebond nécessaire est de 25 %."];
+      break;
+    }
+    case "compound": {
+      const second = pick(tier === 0 ? [5, 10, 20] : [7, 12, 15, 25]);
+      prompt = `Deux hausses de ${rate} % puis ${second} %
+Hausse cumulée ?`;
+      answer = rate + second + rate * second / 100;
+      hint = `Additionnez ${rate} et ${second}, puis ajoutez leur produit divisé par 100.`;
+      lesson = ["Ajouter le terme croisé", "+20 % puis +10 % donnent 20 + 10 + 2 = 32 %. Les 2 points viennent des 10 % appliqués aux 20 % de hausse."];
+      break;
+    }
+    case "weighted": {
+      const core = pick([4, 5, 6, 7, 8]);
+      const extra = pick(tier === 0 ? [4, 8, 12] : [3, 5, 7, 9]);
+      const weight = pick(tier === 0 ? [25, 50] : [20, 25, 40, 75]);
+      prompt = `${100 - weight} % du portefeuille à ${core} %
+${weight} % à ${core + extra} % · rendement total ?`;
+      answer = core + extra * weight / 100;
+      hint = `Partez de ${core} % pour tout le portefeuille. Ajoutez seulement ${weight} % des ${extra} points de rendement supplémentaires.`;
+      lesson = ["Partir du rendement de référence", "75 % à 4 % et 25 % à 12 %. Tout à 4 %, puis un quart des 8 points supplémentaires : 6 %."];
+      break;
+    }
+    case "discount": {
+      const initial = pick([80, 120, 150, 240, 320]);
+      const final = initial * (100 - rate) / 100;
+      prompt = `${format(final)} € après une remise de ${rate} %
+Prix initial ?`;
+      unit = "€";
+      answer = initial;
+      hint = `${format(final)} € représentent ${100 - rate} % du prix. Ramenez à 100 % en simplifiant la fraction 100/${100 - rate}.`;
+      lesson = ["Inverser le coefficient de remise", "96 € après −20 %. Il reste quatre cinquièmes du prix, donc multipliez 96 par 5/4 : 24 × 5 = 120 €."];
+      break;
+    }
+    case "growth": {
+      const start = pick([80, 120, 150, 200, 250, 400]);
+      const end = start * (100 + rate) / 100;
+      prompt = `Chiffre d’affaires de ${start} à ${format(end)} M€
+Croissance en % ?`;
+      answer = rate;
+      hint = `L’écart vaut ${format(end - start)} M€. Divisez par ${format(start / 100)} M€, la valeur d’un point de croissance sur la base de départ.`;
+      lesson = ["Calculer avec le repère de 10 %", "De 240 à 276, le gain est 36. Les 10 % valent 24 et les 5 % valent 12. La croissance vaut 15 %."];
+      break;
+    }
+  }
+  return { kind, prompt, answer, hint, lesson, unit, suffix: " " + unit };
+}
+
 const key = "jeux-calcul-mental-v1";
 const emptyStage = kinds => Object.fromEntries(kinds.map(kind => [kind, { points: 0, skill: 0 }]));
 const maximum = (index, position) => {
@@ -231,7 +313,12 @@ function restore() {
     const factors = saved?.tables?.[index];
     return Array.isArray(factors) ? [...new Set(factors.filter(n => Number.isInteger(n) && n >= 1 && n <= 20))] : [];
   });
-  return { levels, tables, active: Number.isInteger(saved?.active) ? saved.active : 0 };
+  const finance = Object.fromEntries(financeTopics.map(kind => {
+    const entry = saved?.finance?.[kind];
+    const bounded = (value, max) => Number.isInteger(value) ? Math.max(0, Math.min(max, value)) : 0;
+    return [kind, { points: bounded(entry?.points, 2), skill: bounded(entry?.skill, 6) }];
+  }));
+  return { levels, tables, finance, active: Number.isInteger(saved?.active) ? saved.active : 0 };
 }
 
 const state = restore();
@@ -243,7 +330,8 @@ let current;
 let streak = 0;
 let answered = false;
 let storageFailed = false;
-let mode = "journey";
+let mode = "finance";
+const recentFinance = [];
 let table = 1;
 let lastFactor = 0;
 let advanceTimer;
@@ -274,7 +362,7 @@ function selectQuestion(index) {
 const elements = Object.fromEntries([
   "total", "overall", "mastered", "streak", "level-title", "level-count", "level-progress",
   "challenge", "answer-form", "answer", "submit", "feedback", "hint", "advance", "route",
-  "journey-mode", "tables-mode", "journey-summary", "route-panel", "table-panel", "table-select",
+  "finance-mode", "answer-unit", "journey-mode", "tables-mode", "journey-summary", "route-panel", "table-panel", "table-select",
   "table-progress", "table-count", "lesson", "lesson-title", "lesson-example", "keypad"
 ].map(id => [id, document.getElementById(id)]));
 
@@ -295,12 +383,29 @@ function tableQuestion() {
   return { prompt: `${table} × ${factor}`, answer: table * factor, factor, suffix: "", ...multiplication(table, factor) };
 }
 
+function nextFinanceQuestion() {
+  const pending = financeTopics.filter(kind => state.finance[kind].points < 2);
+  const pool = pending.length ? pending : financeTopics;
+  const weights = pool.flatMap(kind => Array(1 + Math.floor((6 - state.finance[kind].skill) / 2)).fill(kind));
+  let question;
+  for (let attempt = 0; attempt < 30; attempt++) {
+    const kind = pick(weights);
+    question = financeQuestion(kind, Math.min(2, Math.floor(state.finance[kind].skill / 2)));
+    if (!recentFinance.includes(question.prompt)) break;
+  }
+  recentFinance.push(question.prompt);
+  if (recentFinance.length > 12) recentFinance.shift();
+  return question;
+}
+
 function drawProgress() {
   const inTables = mode === "tables";
-  elements["journey-mode"].setAttribute("aria-pressed", String(!inTables));
+  const inFinance = mode === "finance";
+  elements["finance-mode"].setAttribute("aria-pressed", String(inFinance));
+  elements["journey-mode"].setAttribute("aria-pressed", String(mode === "journey"));
   elements["tables-mode"].setAttribute("aria-pressed", String(inTables));
-  elements["journey-summary"].hidden = inTables;
-  elements["route-panel"].hidden = inTables;
+  elements["journey-summary"].hidden = mode !== "journey";
+  elements["route-panel"].hidden = mode !== "journey";
   elements["table-panel"].hidden = !inTables;
   elements["level-progress"].hidden = inTables;
   elements["level-count"].hidden = inTables;
@@ -312,6 +417,16 @@ function drawProgress() {
     elements.advance.hidden = true;
     return;
   }
+  if (inFinance) {
+    const count = Object.values(state.finance).reduce((sum, topic) => sum + topic.points, 0);
+    elements["level-title"].textContent = "Calcul mental financier";
+    elements["level-count"].textContent = `${count} / ${financeGoal}`;
+    elements["level-progress"].max = financeGoal;
+    elements["level-progress"].value = count;
+    elements.advance.hidden = true;
+    return;
+  }
+  elements["level-progress"].max = target;
   const total = stages.reduce((sum, _, index) => sum + points(index), 0);
   const completed = stages.filter((_, index) => points(index) === target).length;
   elements.overall.value = total;
@@ -344,7 +459,11 @@ function drawProgress() {
 
 function newQuestion(focus = false, keepFeedback = false) {
   clearTimeout(advanceTimer);
-  current = mode === "tables" ? tableQuestion() : selectQuestion(state.active);
+  if (mode === "finance") current = nextFinanceQuestion();
+  else if (mode === "tables") current = tableQuestion();
+  else current = selectQuestion(state.active);
+  elements["answer-unit"].textContent = current.unit ? `Réponse en ${current.unit}` : "";
+  elements["answer-unit"].hidden = !current.unit;
   const [title, example] = current.lesson;
   elements["lesson-title"].textContent = "Astuce · " + title;
   elements["lesson-example"].textContent = example;
@@ -398,7 +517,14 @@ function submitAnswer(automatic = false) {
   answered = true;
   streak = correct ? streak + 1 : 0;
   let milestone = "";
-  if (mode === "tables") {
+  if (mode === "finance") {
+    const progress = state.finance[current.kind];
+    progress.skill = correct ? Math.min(6, progress.skill + 1) : Math.max(0, progress.skill - 2);
+    if (correct && progress.points < 2) {
+      progress.points++;
+      if (Object.values(state.finance).every(topic => topic.points === 2)) milestone = "Objectif Finance atteint !";
+    }
+  } else if (mode === "tables") {
     const factors = state.tables[table - 1];
     if (correct && !factors.includes(current.factor)) {
       factors.push(current.factor);
@@ -418,7 +544,7 @@ function submitAnswer(automatic = false) {
   save();
   drawProgress();
   elements.feedback.textContent = correct ? milestone || "Bien joué !" :
-    `${current.prompt} → ${format(current.answer)}${current.suffix}. ${current.hint}`;
+    `${current.prompt.replace(/\n/g, " · ")} → ${format(current.answer)}${current.suffix}. ${current.hint}`;
   elements.feedback.className = correct ? "feedback good" : "feedback try";
   elements.answer.readOnly = true;
   elements.submit.hidden = true;
@@ -454,6 +580,7 @@ function openMode(nextMode) {
   drawProgress();
   newQuestion();
 }
+elements["finance-mode"].addEventListener("click", () => openMode("finance"));
 elements["journey-mode"].addEventListener("click", () => openMode("journey"));
 elements["tables-mode"].addEventListener("click", () => openMode("tables"));
 elements["table-select"].addEventListener("change", event => {

@@ -61,3 +61,6 @@ input::placeholder { color: #d8e8dc; }
 .stage:disabled, .stage small { color: var(--muted); }
 .stage small { display: block; font-size: .69rem; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.challenge { white-space: pre-line; }
+.equation:has(#answer-unit:not([hidden])) .challenge { font-size: clamp(1.1rem, 5.2vw, 1.52rem); }
+#answer-unit { color: #d8e8dc; font-size: .75rem; margin-top: 4px; }

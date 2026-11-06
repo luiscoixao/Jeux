@@ -9,18 +9,19 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="manifest" href="app.webmanifest">
-<link rel="stylesheet" href="style.css?v=3">
-<script src="app.js?v=3" defer></script>
+<link rel="stylesheet" href="style.css?v=4">
+<script src="app.js?v=4" defer></script>
 <title>Calcul Mental</title>
 </head>
 <body>
 <main>
 <header><img src="icon.svg" width="48" height="48" alt=""><h1>Calcul <span>Mental</span></h1></header>
 <nav class="modes" aria-label="Mode de jeu">
-  <button id="journey-mode" type="button" aria-pressed="true">Parcours</button>
+  <button id="finance-mode" type="button" aria-pressed="true">Finance</button>
+  <button id="journey-mode" type="button" aria-pressed="false">Parcours</button>
   <button id="tables-mode" type="button" aria-pressed="false">Tables 1 à 20</button>
 </nav>
-<section id="journey-summary" class="summary" aria-labelledby="journey">
+<section hidden id="journey-summary" class="summary" aria-labelledby="journey">
   <div class="row"><h2 id="journey">Progression totale</h2><strong id="total">0 %</strong></div>
   <progress id="overall" value="0" max="60" aria-labelledby="journey"></progress>
   <div class="row meta"><span id="mastered"></span><span id="streak"></span></div>
@@ -35,6 +36,7 @@
   <progress id="level-progress" value="0" max="10" aria-labelledby="level-title"></progress>
   <div class="equation">
   <p id="challenge" class="challenge"></p>
+  <p id="answer-unit"></p>
   <form id="answer-form" autocomplete="off">
     <label class="sr-only" for="answer">Votre réponse</label>
     <input id="answer" type="text" inputmode="none" placeholder="?" maxlength="20" enterkeyhint="go" spellcheck="false">
@@ -56,7 +58,7 @@
   </details>
   <button id="advance" class="primary advance" hidden></button>
 </section>
-<section id="route-panel" aria-labelledby="route-title"><h2 class="route-title" id="route-title">Les niveaux</h2><div id="route" class="route"></div></section>
+<section hidden id="route-panel" aria-labelledby="route-title"><h2 class="route-title" id="route-title">Les niveaux</h2><div id="route" class="route"></div></section>
 </main>
 </body>
 </html>
