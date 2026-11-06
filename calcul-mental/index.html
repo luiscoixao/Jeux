@@ -9,17 +9,18 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="manifest" href="app.webmanifest">
-<link rel="stylesheet" href="style.css?v=4">
-<script src="app.js?v=4" defer></script>
+<link rel="stylesheet" href="style.css?v=5">
+<script src="app.js?v=5" defer></script>
 <title>Calcul Mental</title>
 </head>
 <body>
 <main>
 <header><img src="icon.svg" width="48" height="48" alt=""><h1>Calcul <span>Mental</span></h1></header>
 <nav class="modes" aria-label="Mode de jeu">
-  <button id="finance-mode" type="button" aria-pressed="true">Finance</button>
+  <button id="technique-mode" type="button" aria-pressed="true">Techniques</button>
   <button id="journey-mode" type="button" aria-pressed="false">Parcours</button>
-  <button id="tables-mode" type="button" aria-pressed="false">Tables 1 à 20</button>
+  <button id="tables-mode" type="button" aria-pressed="false">Tables 1–20</button>
+  <button id="sprint-mode" type="button" aria-pressed="false">Sprint</button>
 </nav>
 <section hidden id="journey-summary" class="summary" aria-labelledby="journey">
   <div class="row"><h2 id="journey">Progression totale</h2><strong id="total">0 %</strong></div>
@@ -31,7 +32,15 @@
   <progress id="table-progress" max="20" value="0" aria-label="Progression de la table"></progress>
   <p id="table-count" class="meta"></p>
 </section>
-<section class="game" aria-labelledby="level-title">
+<section id="technique-panel" class="summary">
+  <div class="row"><label for="technique-select">Technique</label><select id="technique-select"></select></div>
+  <div class="method"><strong id="method-example"></strong><p id="method-explanation"></p></div>
+</section>
+<section id="sprint-panel" class="summary" hidden>
+  <div class="row"><strong id="sprint-clock">60 s</strong><span id="sprint-score">0 réussi</span><button id="sprint-start" type="button">Lancer</button></div>
+  <p class="meta" id="sprint-record"></p>
+</section>
+<section class="game" id="game" aria-labelledby="level-title">
   <div class="row"><h2 id="level-title"></h2><span class="badge" id="level-count"></span></div>
   <progress id="level-progress" value="0" max="10" aria-labelledby="level-title"></progress>
   <div class="equation">
@@ -59,6 +68,7 @@
   <button id="advance" class="primary advance" hidden></button>
 </section>
 <section hidden id="route-panel" aria-labelledby="route-title"><h2 class="route-title" id="route-title">Les niveaux</h2><div id="route" class="route"></div></section>
+<button id="finance-mode" class="secondary-mode" type="button" aria-pressed="false">Exercices de finance</button>
 </main>
 </body>
 </html>

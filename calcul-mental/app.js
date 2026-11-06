@@ -290,6 +290,77 @@ Croissance en % ?`;
   return { kind, prompt, answer, hint, lesson, unit, suffix: " " + unit };
 }
 
+const techniques = {
+  round: ["Arrondir et compenser", "347 + 198 = 347 + 200 − 2 = 545", "Arrondissez l’un des termes. Pour une addition, retirez ensuite ce que vous avez ajouté en trop. Pour une soustraction, rendez ce que vous avez retiré en trop."],
+  balance: ["Doubler et diviser par deux", "48 × 25 = 24 × 50 = 12 × 100 = 1 200", "Divisez un facteur par deux et doublez l’autre. Le produit reste identique. Répétez si vous atteignez un nombre rond."],
+  square: ["Carrés terminés par 5", "65² = 6 × 7 centaines + 25 = 4 225", "Prenez le nombre avant le 5, multipliez-le par son successeur, puis accolez 25. Cela vient de (10n + 5)² = 100n(n + 1) + 25."],
+  difference: ["Produits autour d’un nombre rond", "47 × 53 = 50² − 3² = 2 491", "Quand les facteurs sont à égale distance d’un même nombre, calculez le carré du milieu et retirez le carré de l’écart."],
+  divide: ["Diviser par 5, 25 ou 125", "875 ÷ 25 = 875 × 4 ÷ 100 = 35", "Transformez le diviseur en 10, 100 ou 1 000. Multipliez les deux nombres par 2, 4 ou 8 respectivement."],
+  flip: ["Inverser un pourcentage", "16 % de 75 = 75 % de 16 = 12", "Échangez le taux et le nombre si le nouveau taux est plus commode. Les deux calculs reviennent au même produit divisé par 100."]
+};
+
+function techniqueQuestion(kind, skill) {
+  const tier = Math.min(2, Math.floor(skill / 2));
+  let prompt, answer, hint;
+  switch (kind) {
+    case "round": {
+      const a = random(240, 720 + tier * 250);
+      const base = random(1, 2 + tier) * 100;
+      const delta = random(1, 4 + tier);
+      const subtract = random(0, 1) && a >= base;
+      const b = base - delta;
+      prompt = `${a} ${subtract ? "−" : "+"} ${b}`;
+      answer = subtract ? a - b : a + b;
+      hint = `${subtract ? "Retirez" : "Ajoutez"} ${base}, puis ${subtract ? "rendez" : "retirez"} ${delta}.`;
+      break;
+    }
+    case "balance": {
+      const b = pick(tier === 0 ? [25, 50] : [25, 50, 125]);
+      const a = random(4, 13 + tier * 4) * (b === 125 ? 8 : b === 50 ? 2 : 4);
+      const steps = b === 125 ? 8 : b === 50 ? 2 : 4;
+      prompt = `${a} × ${b}`;
+      answer = a * b;
+      hint = `Divisez ${a} par ${steps} et multipliez ${b} par ${steps}. Il reste ${a / steps} × ${b * steps}.`;
+      break;
+    }
+    case "square": {
+      const n = random(3, 8 + tier * 3);
+      const a = 10 * n + 5;
+      prompt = `${a}²`;
+      answer = a * a;
+      hint = `Calculez ${n} × ${n + 1}, puis accolez 25.`;
+      break;
+    }
+    case "difference": {
+      const base = random(2, 6 + tier * 2) * 10;
+      const d = random(2, 5 + tier * 2);
+      prompt = `${base - d} × ${base + d}`;
+      answer = base * base - d * d;
+      hint = `Les facteurs sont à ${d} de ${base}. Calculez ${base}² − ${d}².`;
+      break;
+    }
+    case "divide": {
+      const b = pick(tier === 0 ? [5, 25] : [5, 25, 125]);
+      const a = random(13, 38 + tier * 13) * b;
+      const factor = b === 5 ? 2 : b === 25 ? 4 : 8;
+      prompt = `${a} ÷ ${b}`;
+      answer = a / b;
+      hint = `Multipliez ${a} par ${factor}, puis divisez par ${b * factor}.`;
+      break;
+    }
+    case "flip": {
+      const a = pick([25, 50, 75]);
+      const rate = random(3, 14 + tier * 8) * 4;
+      prompt = `${rate} % de ${a}`;
+      answer = rate * a / 100;
+      hint = `Calculez ${a} % de ${rate}, soit ${a === 25 ? "un quart" : a === 50 ? "la moitié" : "les trois quarts"} de ${rate}.`;
+      break;
+    }
+  }
+  const [title, example] = techniques[kind];
+  return { kind, prompt, answer, hint, lesson: [title, example], suffix: "" };
+}
+
 const key = "jeux-calcul-mental-v1";
 const emptyStage = kinds => Object.fromEntries(kinds.map(kind => [kind, { points: 0, skill: 0 }]));
 const maximum = (index, position) => {
@@ -318,7 +389,12 @@ function restore() {
     const bounded = (value, max) => Number.isInteger(value) ? Math.max(0, Math.min(max, value)) : 0;
     return [kind, { points: bounded(entry?.points, 2), skill: bounded(entry?.skill, 6) }];
   }));
-  return { levels, tables, finance, active: Number.isInteger(saved?.active) ? saved.active : 0 };
+  const methods = Object.fromEntries(Object.keys(techniques).map(kind => {
+    const points = saved?.methods?.[kind];
+    return [kind, Number.isInteger(points) ? Math.max(0, Math.min(6, points)) : 0];
+  }));
+  const record = Number.isInteger(saved?.record) && saved.record >= 0 ? saved.record : 0;
+  return { levels, tables, finance, methods, record, active: Number.isInteger(saved?.active) ? saved.active : 0 };
 }
 
 const state = restore();
@@ -330,7 +406,13 @@ let current;
 let streak = 0;
 let answered = false;
 let storageFailed = false;
-let mode = "finance";
+let mode = "technique";
+let method = "round";
+let previousMethodPrompt = "";
+let sprintEnd = 0;
+let sprintScore = 0;
+let sprintClock;
+let lastSprintMethod;
 const recentFinance = [];
 let table = 1;
 let lastFactor = 0;
@@ -362,7 +444,8 @@ function selectQuestion(index) {
 const elements = Object.fromEntries([
   "total", "overall", "mastered", "streak", "level-title", "level-count", "level-progress",
   "challenge", "answer-form", "answer", "submit", "feedback", "hint", "advance", "route",
-  "finance-mode", "answer-unit", "journey-mode", "tables-mode", "journey-summary", "route-panel", "table-panel", "table-select",
+  "technique-mode", "technique-panel", "technique-select", "method-example", "method-explanation",
+  "sprint-mode", "sprint-panel", "sprint-clock", "sprint-score", "sprint-start", "sprint-record", "game", "finance-mode", "answer-unit", "journey-mode", "tables-mode", "journey-summary", "route-panel", "table-panel", "table-select",
   "table-progress", "table-count", "lesson", "lesson-title", "lesson-example", "keypad"
 ].map(id => [id, document.getElementById(id)]));
 
@@ -398,23 +481,80 @@ function nextFinanceQuestion() {
   return question;
 }
 
+const methodNames = Object.keys(techniques);
+elements["technique-select"].replaceChildren(...methodNames.map(kind => {
+  const option = document.createElement("option");
+  option.value = kind;
+  option.textContent = techniques[kind][0];
+  return option;
+}));
+
+function drawSprint() {
+  const remaining = sprintEnd ? Math.max(0, Math.ceil((sprintEnd - Date.now()) / 1000)) : 60;
+  elements["sprint-clock"].textContent = remaining + " s";
+  elements["sprint-score"].textContent = sprintScore + " réussi" + (sprintScore > 1 ? "s" : "");
+  elements["sprint-record"].textContent = "Record : " + state.record;
+}
+
+function stopSprint(completed = false) {
+  clearInterval(sprintClock);
+  clearTimeout(advanceTimer);
+  if (completed && sprintScore > state.record) {
+    state.record = sprintScore;
+    save();
+  }
+  sprintEnd = 0;
+}
+
+function tickSprint() {
+  drawSprint();
+  if (Date.now() < sprintEnd) return;
+  stopSprint(true);
+  drawProgress();
+  elements["sprint-clock"].textContent = "Terminé";
+}
+
 function drawProgress() {
   const inTables = mode === "tables";
   const inFinance = mode === "finance";
+  const inTechnique = mode === "technique";
+  const inSprint = mode === "sprint";
+  elements["technique-mode"].setAttribute("aria-pressed", String(inTechnique));
+  elements["sprint-mode"].setAttribute("aria-pressed", String(inSprint));
+  elements["technique-panel"].hidden = !inTechnique;
+  elements["sprint-panel"].hidden = !inSprint;
+  elements.game.hidden = inSprint && !sprintEnd;
+  elements["sprint-start"].hidden = Boolean(sprintEnd);
   elements["finance-mode"].setAttribute("aria-pressed", String(inFinance));
   elements["journey-mode"].setAttribute("aria-pressed", String(mode === "journey"));
   elements["tables-mode"].setAttribute("aria-pressed", String(inTables));
   elements["journey-summary"].hidden = mode !== "journey";
   elements["route-panel"].hidden = mode !== "journey";
   elements["table-panel"].hidden = !inTables;
-  elements["level-progress"].hidden = inTables;
-  elements["level-count"].hidden = inTables;
+  elements["level-progress"].hidden = inTables || inSprint;
+  elements["level-count"].hidden = inTables || inSprint;
   if (inTables) {
     const count = state.tables[table - 1].length;
     elements["level-title"].textContent = `Table de ${table}`;
     elements["table-progress"].value = count;
     elements["table-count"].textContent = `${count}/20 produits réussis`;
     elements.advance.hidden = true;
+    return;
+  }
+  if (inTechnique || inSprint) {
+    elements.advance.hidden = true;
+    if (inSprint) {
+      elements["level-title"].textContent = "Sprint · calculs mélangés";
+      drawSprint();
+    } else {
+      const [title, example, explanation] = techniques[method];
+      elements["level-title"].textContent = title;
+      elements["method-example"].textContent = example;
+      elements["method-explanation"].textContent = explanation;
+      elements["level-progress"].max = 6;
+      elements["level-progress"].value = state.methods[method];
+      elements["level-count"].textContent = `${state.methods[method]} / 6`;
+    }
     return;
   }
   if (inFinance) {
@@ -459,7 +599,15 @@ function drawProgress() {
 
 function newQuestion(focus = false, keepFeedback = false) {
   clearTimeout(advanceTimer);
-  if (mode === "finance") current = nextFinanceQuestion();
+  if (mode === "technique" || mode === "sprint") {
+    const kind = mode === "technique" ? method : pick(methodNames.filter(name => name !== lastSprintMethod));
+    if (mode === "sprint") lastSprintMethod = kind;
+    for (let tries = 0; tries < 12; tries++) {
+      current = techniqueQuestion(kind, state.methods[kind]);
+      if (current.prompt !== previousMethodPrompt) break;
+    }
+    previousMethodPrompt = current.prompt;
+  } else if (mode === "finance") current = nextFinanceQuestion();
   else if (mode === "tables") current = tableQuestion();
   else current = selectQuestion(state.active);
   elements["answer-unit"].textContent = current.unit ? `Réponse en ${current.unit}` : "";
@@ -468,6 +616,9 @@ function newQuestion(focus = false, keepFeedback = false) {
   elements["lesson-title"].textContent = "Astuce · " + title;
   elements["lesson-example"].textContent = example;
   elements.lesson.open = false;
+  elements.lesson.hidden = mode === "sprint";
+  elements["lesson-example"].hidden = mode === "technique";
+  if (mode === "technique") elements["lesson-title"].textContent = "Indice pour ce calcul";
   answered = false;
   elements.challenge.textContent = current.prompt;
   elements.hint.textContent = current.hint;
@@ -499,6 +650,7 @@ function clearFeedback() {
 }
 
 function submitAnswer(automatic = false) {
+  if (mode === "sprint" && (!sprintEnd || Date.now() >= sprintEnd)) return;
   if (answered) return;
   const value = parseAnswer(elements.answer.value);
   if (!Number.isFinite(value)) {
@@ -517,7 +669,13 @@ function submitAnswer(automatic = false) {
   answered = true;
   streak = correct ? streak + 1 : 0;
   let milestone = "";
-  if (mode === "finance") {
+  if (mode === "technique") {
+    const previous = state.methods[method];
+    if (correct) state.methods[method] = Math.min(6, previous + 1);
+    if (previous === 5 && correct) milestone = "Technique travaillée !";
+  } else if (mode === "sprint") {
+    if (correct) sprintScore++;
+  } else if (mode === "finance") {
     const progress = state.finance[current.kind];
     progress.skill = correct ? Math.min(6, progress.skill + 1) : Math.max(0, progress.skill - 2);
     if (correct && progress.points < 2) {
@@ -541,14 +699,14 @@ function submitAnswer(automatic = false) {
       milestone = index === stages.length - 1 ? "Parcours terminé !" : "Niveau suivant débloqué !";
     }
   }
-  save();
+  if (mode !== "sprint") save();
   drawProgress();
   elements.feedback.textContent = correct ? milestone || "Bien joué !" :
     `${current.prompt.replace(/\n/g, " · ")} → ${format(current.answer)}${current.suffix}. ${current.hint}`;
   elements.feedback.className = correct ? "feedback good" : "feedback try";
   elements.answer.readOnly = true;
   elements.submit.hidden = true;
-  advanceTimer = setTimeout(() => newQuestion(false, !correct || Boolean(milestone)), correct ? 550 : 1800);
+  advanceTimer = setTimeout(() => newQuestion(false, !correct || Boolean(milestone)), mode === "sprint" ? 250 : correct ? 550 : 1800);
 }
 
 elements["answer-form"].addEventListener("submit", event => {
@@ -575,11 +733,27 @@ elements.submit.addEventListener("click", () => submitAnswer());
 elements.advance.addEventListener("click", () => openLevel(state.active + 1));
 function openMode(nextMode) {
   if (nextMode === mode) return;
+  if (mode === "sprint") stopSprint();
   mode = nextMode;
   streak = 0;
   drawProgress();
-  newQuestion();
+  if (mode !== "sprint") newQuestion();
 }
+elements["technique-mode"].addEventListener("click", () => openMode("technique"));
+elements["technique-select"].addEventListener("change", event => {
+  method = event.target.value;
+  drawProgress();
+  newQuestion();
+});
+elements["sprint-mode"].addEventListener("click", () => openMode("sprint"));
+elements["sprint-start"].addEventListener("click", () => {
+  if (sprintEnd) return;
+  sprintScore = 0;
+  sprintEnd = Date.now() + 60000;
+  drawProgress();
+  newQuestion();
+  sprintClock = setInterval(tickSprint, 250);
+});
 elements["finance-mode"].addEventListener("click", () => openMode("finance"));
 elements["journey-mode"].addEventListener("click", () => openMode("journey"));
 elements["tables-mode"].addEventListener("click", () => openMode("tables"));
