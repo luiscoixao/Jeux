@@ -13,9 +13,48 @@ const random = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
 const pick = values => values[random(0, values.length - 1)];
 const format = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 6 }).format;
 
+const lessons = {
+  add: ["Faire un nombre rond", "8 + 7 = 10 + 5 = 15. Prenez 2 dans le 7 pour compléter le 8 à 10."],
+  sub: ["Compter l’écart", "43 − 38 : de 38 à 40, il y a 2, puis 3 jusqu’à 43. L’écart vaut 5."],
+  mul: ["Décomposer un produit", "17 × 14 = 17 × 10 + 17 × 4 = 170 + 68 = 238."],
+  div: ["Retrouver le produit", "144 ÷ 12 : 12 × 10 = 120 et il reste 24, soit 2 × 12. Le quotient vaut 12."],
+  decimal: ["Calculer en dixièmes ou en centièmes", "2,8 + 0,6 = 28 dixièmes + 6 dixièmes = 34 dixièmes, soit 3,4."],
+  scale: ["Déplacer la virgule", "3,7 × 100 = 370. Pour diviser par 100, déplacez la virgule de deux rangs vers la gauche."],
+  priority: ["Repérer l’opération à faire d’abord", "5 + 4 × 6 = 5 + 24 = 29. Les parenthèses passent d’abord, puis les multiplications et divisions."],
+  percent: ["Combiner des pourcentages faciles", "15 % de 80 = 10 % de 80 + 5 % de 80 = 8 + 4 = 12. Les 5 % sont la moitié des 10 %."],
+  change: ["Calculer la variation puis l’appliquer", "80 € avec 15 % de remise : 10 % valent 8 €, 5 % valent 4 €. Le prix final est 80 − 12 = 68 €."],
+  ratio: ["Ramener le total à 100", "18 sur 60 = 3 sur 10 = 30 sur 100, soit 30 %."],
+  reverse: ["Retrouver la valeur de départ", "Après une baisse de 20 %, il reste 64 €. Les 80 % valent 64 €, donc 10 % valent 8 € et 100 % valent 80 €."]
+};
+
+function multiplication(a, b) {
+  const [small, large] = [Math.min(a, b), Math.max(a, b)];
+  if (small === 1) return { lesson: ["Multiplier par 1", "1 × 17 = 17. Multiplier par 1 conserve le nombre."], hint: "Multiplier par 1 conserve le nombre." };
+  if (small === 2) return { lesson: ["Doubler", "2 × 17 = 17 + 17 = 34."], hint: `Additionnez ${large} et ${large}.` };
+  if (small === 5) return { lesson: ["Prendre la moitié de × 10", "5 × 16 = 160 ÷ 2 = 80."], hint: `Prenez la moitié de ${large} × 10.` };
+  if (small === 10 || large === 10 || large === 20) {
+    const factor = large === 20 ? 20 : 10;
+    const other = a === factor ? b : a;
+    return { lesson: factor === 20 ? ["Doubler puis multiplier par 10", "20 × 14 = 28 × 10 = 280."] : ["Multiplier par 10", "10 × 14 = 140."],
+      hint: factor === 20 ? `Doublez ${other}, puis multipliez par 10.` : `Multipliez ${other} par 10.` };
+  }
+  const near = [a, b].find(value => [9, 11, 19, 21].includes(value));
+  if (near) {
+    const other = near === a ? b : a;
+    const round = Math.round(near / 10) * 10;
+    const add = near > round;
+    return { lesson: ["Arrondir puis compenser", "19 × 14 = 20 × 14 − 14 = 280 − 14 = 266. Pour 11, partez de 10 et ajoutez une fois le nombre."],
+      hint: `Calculez ${round} × ${other}, puis ${add ? "ajoutez" : "retirez"} ${other}.` };
+  }
+  if (small === 4 || small === 8) return { lesson: ["Doubler plusieurs fois", "8 × 13 : 13 → 26 → 52 → 104. Trois doubles remplacent la multiplication par 8."], hint: `Doublez ${large} ${small === 4 ? "deux" : "trois"} fois.` };
+  const tens = Math.floor(large / 10) * 10;
+  return { lesson: lessons.mul, hint: tens ? `Calculez ${small} × ${tens}, puis ajoutez ${small} × ${large - tens}.` : `Calculez ${large} × ${small - 1}, puis ajoutez ${large}.` };
+}
+
 function makeQuestion(kind, level, intensity) {
   const tier = intensity + 1;
   let a, b, c, p, prompt, answer, hint, suffix = "";
+  let lesson = lessons[kind];
   switch (kind) {
     case "add":
     case "sub": {
@@ -24,6 +63,16 @@ function makeQuestion(kind, level, intensity) {
       b = random(1, kind === "add" ? limits[level] : a);
       prompt = kind === "add" ? `${a} + ${b}` : `${a} − ${b}`;
       answer = kind === "add" ? a + b : a - b;
+      const gap = kind === "sub" && a - b <= 12;
+      if (gap) {
+        hint = `Partez de ${b} et comptez ce qu’il faut ajouter pour atteindre ${a}.`;
+        break;
+      }
+      const bridge = (10 - a % 10) % 10;
+      if (kind === "add" && bridge && b > bridge) {
+        hint = `Ajoutez ${bridge} pour atteindre ${a + bridge}, puis ajoutez les ${b - bridge} qui restent.`;
+        break;
+      }
       const tens = Math.floor(b / 10) * 10;
       const action = kind === "add" ? "Ajoutez" : "Retirez";
       hint = tens ? `${action} ${tens}, puis ${b - tens}.` :
@@ -32,13 +81,12 @@ function makeQuestion(kind, level, intensity) {
     }
     case "mul":
     case "div":
-      a = random(2, level === 5 ? 22 + tier * 9 : level === 2 ? 12 + tier * 6 : 4 + tier * 2);
-      b = random(2, level === 5 ? 12 + tier * 5 : 4 + tier * 2);
+      a = random(2, level === 5 ? 22 + tier * 9 : level === 2 ? 14 + tier * 2 : 6 + tier * 2);
+      b = random(2, level === 5 ? 12 + tier * 5 : level === 2 ? 14 + tier * 2 : 6 + tier * 2);
       if (kind === "mul") {
         prompt = `${a} × ${b}`;
         answer = a * b;
-        hint = b < 10 ? `Calculez ${a} × ${b - 1}, puis ajoutez ${a}.` :
-          `Décomposez ${b} en ${Math.floor(b / 10) * 10} + ${b % 10}, puis additionnez les deux produits.`;
+        ({ lesson, hint } = multiplication(a, b));
       } else {
         prompt = `${a * b} ÷ ${b}`;
         answer = a;
@@ -115,7 +163,7 @@ function makeQuestion(kind, level, intensity) {
       hint = `Le résultat représente ${b} % de la valeur initiale. Ramenez-le à 100 %.`;
       break;
   }
-  return { kind, prompt, answer, hint, suffix };
+  return { kind, prompt, answer, hint, suffix, lesson };
 }
 
 const key = "jeux-calcul-mental-v1";
@@ -137,7 +185,11 @@ function restore() {
     });
     return level;
   });
-  return { levels, active: Number.isInteger(saved?.active) ? saved.active : 0 };
+  const tables = Array.from({ length: 20 }, (_, index) => {
+    const factors = saved?.tables?.[index];
+    return Array.isArray(factors) ? [...new Set(factors.filter(n => Number.isInteger(n) && n >= 1 && n <= 20))] : [];
+  });
+  return { levels, tables, active: Number.isInteger(saved?.active) ? saved.active : 0 };
 }
 
 const state = restore();
@@ -149,6 +201,11 @@ let current;
 let streak = 0;
 let answered = false;
 let storageFailed = false;
+let mode = "journey";
+let table = 1;
+let lastFactor = 0;
+let advanceTimer;
+const shownLessons = new Set();
 
 function save() {
   try { localStorage.setItem(key, JSON.stringify(state)); } catch { storageFailed = true; }
@@ -174,10 +231,45 @@ function selectQuestion(index) {
 
 const elements = Object.fromEntries([
   "total", "overall", "mastered", "streak", "level-title", "level-count", "level-progress",
-  "challenge", "answer-form", "answer", "submit", "next", "feedback", "help", "hint", "advance", "route"
+  "challenge", "answer-form", "answer", "submit", "next", "feedback", "help", "hint", "advance", "route",
+  "journey-mode", "tables-mode", "journey-summary", "route-panel", "table-panel", "table-select",
+  "table-progress", "table-count", "lesson", "lesson-title", "lesson-example", "keypad"
 ].map(id => [id, document.getElementById(id)]));
 
+const allFactors = Array.from({ length: 20 }, (_, i) => i + 1);
+elements["table-select"].replaceChildren(...allFactors.map(n => {
+  const option = document.createElement("option");
+  option.value = n;
+  option.textContent = "× " + n;
+  return option;
+}));
+
+function tableQuestion() {
+  const pending = allFactors.filter(n => !state.tables[table - 1].includes(n));
+  const pool = pending.length ? pending : allFactors;
+  const alternatives = pool.filter(n => n !== lastFactor);
+  const factor = pick(alternatives.length ? alternatives : pool);
+  lastFactor = factor;
+  return { prompt: `${table} × ${factor}`, answer: table * factor, factor, suffix: "", ...multiplication(table, factor) };
+}
+
 function drawProgress() {
+  const inTables = mode === "tables";
+  elements["journey-mode"].setAttribute("aria-pressed", String(!inTables));
+  elements["tables-mode"].setAttribute("aria-pressed", String(inTables));
+  elements["journey-summary"].hidden = inTables;
+  elements["route-panel"].hidden = inTables;
+  elements["table-panel"].hidden = !inTables;
+  elements["level-progress"].hidden = inTables;
+  elements["level-count"].hidden = inTables;
+  if (inTables) {
+    const count = state.tables[table - 1].length;
+    elements["level-title"].textContent = `Table de ${table}`;
+    elements["table-progress"].value = count;
+    elements["table-count"].textContent = `${count}/20 produits réussis`;
+    elements.advance.hidden = true;
+    return;
+  }
   const total = stages.reduce((sum, _, index) => sum + points(index), 0);
   const completed = stages.filter((_, index) => points(index) === target).length;
   elements.overall.value = total;
@@ -209,7 +301,13 @@ function drawProgress() {
 }
 
 function newQuestion(focus = false) {
-  current = selectQuestion(state.active);
+  clearTimeout(advanceTimer);
+  current = mode === "tables" ? tableQuestion() : selectQuestion(state.active);
+  const [title, example] = current.lesson;
+  elements["lesson-title"].textContent = title;
+  elements["lesson-example"].textContent = example;
+  elements.lesson.open = !shownLessons.has(title);
+  shownLessons.add(title);
   answered = false;
   elements.challenge.textContent = current.prompt;
   elements.hint.textContent = current.hint;
@@ -220,6 +318,7 @@ function newQuestion(focus = false) {
   elements.feedback.className = "feedback";
   elements.submit.hidden = false;
   elements.next.hidden = true;
+
   if (focus) elements.answer.focus();
 }
 
@@ -237,48 +336,87 @@ function parseAnswer(value) {
   return /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(input) ? Number(input) : NaN;
 }
 
-elements["answer-form"].addEventListener("submit", event => {
-  event.preventDefault();
-  if (answered) {
-    newQuestion(true);
-    return;
-  }
+function submitAnswer(automatic = false) {
+  if (answered) return;
   const value = parseAnswer(elements.answer.value);
   if (!Number.isFinite(value)) {
+    if (automatic) return;
     elements.feedback.textContent = "Saisissez un nombre, par exemple 12 ou 2,5.";
     elements.feedback.className = "feedback try";
-    elements.answer.focus();
     return;
   }
-  answered = true;
-  const index = state.active;
-  const progress = state.levels[index][current.kind];
-  const position = stages[index][1].indexOf(current.kind);
-  const before = points(index);
   const correct = Math.abs(value - current.answer) < 1e-8;
-  if (correct) {
-    streak++;
-    progress.skill = Math.min(6, progress.skill + 1);
-    progress.points = Math.min(maximum(index, position), progress.points + 1);
+  if (automatic && !correct) {
+    const typed = elements.answer.value.replace(/[\s.,]/g, "").replace(/^0+(?=\d)/, "");
+    const expected = format(current.answer).replace(/[\s.,]/g, "").replace(/^0+(?=\d)/, "");
+    const needsDecimal = !Number.isInteger(current.answer) && !/[.,]/.test(elements.answer.value);
+    if (needsDecimal || /[.,]$/.test(elements.answer.value) || typed.length < Math.max(1, expected.length)) return;
+  }
+  answered = true;
+  streak = correct ? streak + 1 : 0;
+  let milestone = "";
+  if (mode === "tables") {
+    const factors = state.tables[table - 1];
+    if (correct && !factors.includes(current.factor)) {
+      factors.push(current.factor);
+      if (factors.length === 20) milestone = "Table complète !";
+    }
   } else {
-    streak = 0;
-    progress.skill = Math.max(0, progress.skill - 2);
-    elements.help.open = true;
+    const index = state.active;
+    const progress = state.levels[index][current.kind];
+    const position = stages[index][1].indexOf(current.kind);
+    const before = points(index);
+    progress.skill = correct ? Math.min(6, progress.skill + 1) : Math.max(0, progress.skill - 2);
+    if (correct) progress.points = Math.min(maximum(index, position), progress.points + 1);
+    if (before < target && points(index) === target) {
+      milestone = index === stages.length - 1 ? "Parcours terminé !" : "Niveau suivant débloqué !";
+    }
   }
   save();
   drawProgress();
-  const mastered = before < target && points(index) === target;
-  elements.feedback.textContent = correct
-    ? mastered ? (index === stages.length - 1 ? "Parcours terminé !" : "Bravo, niveau suivant débloqué !") : "Bien joué !"
-    : `Réponse : ${format(current.answer)}${current.suffix}.`;
+  elements.feedback.textContent = correct ? milestone || "Bien joué !" : `Réponse : ${format(current.answer)}${current.suffix}.`;
   elements.feedback.className = correct ? "feedback good" : "feedback try";
   elements.answer.readOnly = true;
   elements.submit.hidden = true;
-  elements.next.hidden = false;
-  elements.next.focus();
-});
+  elements.next.hidden = correct && !milestone;
+  if (!correct) elements.help.open = true;
+  if (correct && !milestone) advanceTimer = setTimeout(() => newQuestion(), 850);
+}
 
-elements.next.addEventListener("click", () => newQuestion(true));
+elements["answer-form"].addEventListener("submit", event => {
+  event.preventDefault();
+  if (answered && !elements.next.hidden) newQuestion(true);
+  else submitAnswer();
+});
+elements.answer.addEventListener("input", () => submitAnswer(true));
+elements.keypad.addEventListener("click", event => {
+  const key = event.target.closest("[data-key]")?.dataset.key;
+  if (!key || answered) return;
+  const input = elements.answer;
+  if (key === "erase") input.value = input.value.slice(0, -1);
+  else if (key === ",") {
+    if (/[.,]/.test(input.value)) return;
+    input.value = (input.value || "0") + key;
+  } else if (input.value.length < 20) input.value += key;
+  if (key !== "erase") submitAnswer(true);
+});
+elements.submit.addEventListener("click", () => submitAnswer());
+elements.next.addEventListener("click", () => newQuestion());
 elements.advance.addEventListener("click", () => openLevel(state.active + 1));
+function openMode(nextMode) {
+  if (nextMode === mode) return;
+  mode = nextMode;
+  streak = 0;
+  drawProgress();
+  newQuestion();
+}
+elements["journey-mode"].addEventListener("click", () => openMode("journey"));
+elements["tables-mode"].addEventListener("click", () => openMode("tables"));
+elements["table-select"].addEventListener("change", event => {
+  table = Number(event.target.value);
+  lastFactor = 0;
+  drawProgress();
+  newQuestion();
+});
 drawProgress();
 newQuestion();

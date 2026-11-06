@@ -56,3 +56,20 @@ summary { cursor: pointer; padding: 6px 0; }
 .stage:disabled { color: var(--muted); cursor: default; }
 .stage small { display: block; margin-top: 1px; color: var(--muted); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.modes { display: flex; gap: 8px; margin: 0 0 12px; }
+.modes button, select { background: #181c32; color: var(--ink); border: 1px solid var(--border); border-radius: 12px; padding: 8px 14px; font: inherit; }
+.modes button { flex: 1; font-weight: 650; }
+.modes button[aria-pressed="true"] { background: #353257; border-color: var(--violet); }
+.lesson { background: #292448; border: 1px solid #49416b; border-radius: 12px; padding: 0 10px; margin-top: 10px; }
+.lesson summary { padding: 8px 0; font-weight: 700; }
+.lesson p { padding: 0 0 9px; }
+.challenge { margin: 10px 0; }
+form { justify-content: center; }
+input { width: min(100%, 220px); text-align: center; font-weight: 750; font-size: 1.3rem; }
+.feedback { text-align: center; margin: 5px 0; }
+.keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; max-width: 360px; margin: 4px auto; }
+.keypad button { touch-action: manipulation; min-height: 40px; border: 1px solid #494d73; font-weight: 750; }
+.keypad [data-key] { background: #2b2e50; color: var(--ink); font-size: 1.15rem; }
+.keypad [data-key]:active { background: #46426f; }
+.keypad #submit, .keypad #next { grid-column: 1 / -1; }
+.keypad #submit { background: #171a31; color: var(--muted); font-size: .82rem; min-height: 32px; }
