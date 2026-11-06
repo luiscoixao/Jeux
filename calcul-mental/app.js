@@ -38,6 +38,12 @@ function multiplication(a, b) {
     return { lesson: factor === 20 ? ["Doubler puis multiplier par 10", "20 × 14 = 28 × 10 = 280."] : ["Multiplier par 10", "10 × 14 = 140."],
       hint: factor === 20 ? `Doublez ${other}, puis multipliez par 10.` : `Multipliez ${other} par 10.` };
   }
+  const quarter = [a, b].find(value => value === 25);
+  if (quarter) {
+    const other = a === quarter ? b : a;
+    return { lesson: ["Multiplier par 25", "16 × 25 = 1600 ÷ 4 = 400. Si possible, divisez d’abord par 4."],
+      hint: other % 4 === 0 ? `Divisez ${other} par 4, puis multipliez par 100.` : `Multipliez ${other} par 100, puis divisez par 4.` };
+  }
   const near = [a, b].find(value => [9, 11, 19, 21].includes(value));
   if (near) {
     const other = near === a ? b : a;
@@ -63,20 +69,31 @@ function makeQuestion(kind, level, intensity) {
       b = random(1, kind === "add" ? limits[level] : a);
       prompt = kind === "add" ? `${a} + ${b}` : `${a} − ${b}`;
       answer = kind === "add" ? a + b : a - b;
-      const gap = kind === "sub" && a - b <= 12;
-      if (gap) {
-        hint = `Partez de ${b} et comptez ce qu’il faut ajouter pour atteindre ${a}.`;
-        break;
-      }
+      const add = kind === "add";
+      const round = Math.round(b / 10) * 10;
+      const offset = round - b;
       const bridge = (10 - a % 10) % 10;
-      if (kind === "add" && bridge && b > bridge) {
-        hint = `Ajoutez ${bridge} pour atteindre ${a + bridge}, puis ajoutez les ${b - bridge} qui restent.`;
-        break;
+      if (b <= 3) {
+        lesson = ["Avancer ou reculer de quelques unités", "12 − 1 = 11. Pour retirer 1, prenez directement le nombre précédent."];
+        hint = `${add ? "Avancez" : "Reculez"} de ${b} à partir de ${a}.`;
+      } else if (offset && Math.abs(offset) <= 2 && round > 0 && (add || a >= round)) {
+        const base = add ? a + round : a - round;
+        const adjustment = add ? -offset : offset;
+        lesson = ["Arrondir puis corriger", "64 − 29 = 64 − 30 + 1 = 35. On a retiré 1 de trop, donc on le rend."];
+        hint = `Faites ${a} ${add ? "+" : "−"} ${round} = ${base}, puis ${adjustment > 0 ? "ajoutez" : "retirez"} ${Math.abs(adjustment)}.`;
+      } else if (!add && a - b <= 12) {
+        const nextTen = Math.ceil(b / 10) * 10;
+        hint = nextTen > b && nextTen < a
+          ? `De ${b} à ${nextTen}, il y a ${nextTen - b}, puis ${a - nextTen} jusqu’à ${a}. Additionnez les deux écarts.`
+          : `Cherchez combien il faut ajouter à ${b} pour atteindre ${a}.`;
+      } else if (add && bridge && b > bridge && bridge < 5) {
+        hint = `Prenez ${bridge} dans ${b} pour atteindre ${a + bridge}, puis ajoutez les ${b - bridge} qui restent.`;
+      } else {
+        const tens = Math.floor(b / 10) * 10;
+        lesson = ["Séparer dizaines et unités", "67 − 24 = 67 − 20 − 4 = 43. Calculez de gauche à droite."];
+        hint = tens ? `${add ? "Ajoutez" : "Retirez"} ${tens}, puis ${b - tens}.` :
+          `${add ? "Avancez" : "Reculez"} de ${b} à partir de ${a}.`;
       }
-      const tens = Math.floor(b / 10) * 10;
-      const action = kind === "add" ? "Ajoutez" : "Retirez";
-      hint = tens ? `${action} ${tens}, puis ${b - tens}.` :
-        `${action} ${b} en comptant ${kind === "add" ? "vers le haut" : "vers le bas"} à partir de ${a}.`;
       break;
     }
     case "mul":
@@ -90,7 +107,19 @@ function makeQuestion(kind, level, intensity) {
       } else {
         prompt = `${a * b} ÷ ${b}`;
         answer = a;
-        hint = `Quel nombre multiplié par ${b} donne ${a * b} ?`;
+        if (b % 2 === 0 && b >= 4) {
+          let numerator = a * b;
+          let denominator = b;
+          while (denominator % 2 === 0) {
+            numerator /= 2;
+            denominator /= 2;
+          }
+          lesson = ["Simplifier la division en divisant les deux nombres", "96 ÷ 16 = 48 ÷ 8 = 24 ÷ 4 = 12 ÷ 2 = 6. Diviser les deux nombres par 2 conserve le quotient."];
+          hint = denominator === 1 ? `Divisez les deux nombres par 2 jusqu’à obtenir ${numerator} ÷ 1.` :
+            `Divisez les deux nombres par 2 autant que possible. Il reste ${numerator} ÷ ${denominator}.`;
+        } else {
+          hint = `Quel nombre multiplié par ${b} donne ${a * b} ?`;
+        }
       }
       break;
     case "decimal": {
@@ -133,7 +162,20 @@ function makeQuestion(kind, level, intensity) {
         pick(tier === 1 ? [10, 25, 50] : tier === 2 ? [5, 15, 20, 25, 40, 75] : [12, 18, 30, 35, 45, 65]);
       a = random(2, 12 * tier) * (tier === 1 && level !== 5 ? 20 : 5);
       const delta = a * p / 100;
-      hint = `1 % de ${a} vaut ${format(a / 100)}. Multipliez par ${p}.`;
+      if ([25, 50, 75].includes(p)) {
+        lesson = ["Transformer un pourcentage en fraction", "75 % de 48 = trois quarts de 48. Un quart vaut 12, donc trois quarts valent 36."];
+        hint = p === 50 ? `Prenez la moitié de ${a}.` :
+          `Divisez ${a} par 4${p === 75 ? ", puis triplez" : ""}.`;
+      } else if (p % 10 === 0 || p % 10 === 5) {
+        const tens = Math.floor(p / 10);
+        hint = `10 % de ${a} valent ${format(a / 10)}.`;
+        if (p === 5) hint += " Prenez la moitié.";
+        else if (tens > 1 || p % 10) hint += ` Prenez ${tens} fois cette valeur${p % 10 ? " et ajoutez-en la moitié" : ""}.`;
+      } else {
+        const tens = Math.floor(p / 10);
+        hint = tens ? `Prenez ${tens} fois les 10 % (${format(a / 10)}), puis ajoutez ${p % 10} fois les 1 % (${format(a / 100)}).` :
+          `1 % de ${a} vaut ${format(a / 100)}. Multipliez par ${p}.`;
+      }
       if (kind === "change") {
         const raise = random(0, 1);
         prompt = `${a} après ${raise ? "une hausse" : "une baisse"} de ${p} %`;
@@ -205,7 +247,7 @@ let mode = "journey";
 let table = 1;
 let lastFactor = 0;
 let advanceTimer;
-const shownLessons = new Set();
+
 
 function save() {
   try { localStorage.setItem(key, JSON.stringify(state)); } catch { storageFailed = true; }
@@ -231,7 +273,7 @@ function selectQuestion(index) {
 
 const elements = Object.fromEntries([
   "total", "overall", "mastered", "streak", "level-title", "level-count", "level-progress",
-  "challenge", "answer-form", "answer", "submit", "next", "feedback", "help", "hint", "advance", "route",
+  "challenge", "answer-form", "answer", "submit", "feedback", "hint", "advance", "route",
   "journey-mode", "tables-mode", "journey-summary", "route-panel", "table-panel", "table-select",
   "table-progress", "table-count", "lesson", "lesson-title", "lesson-example", "keypad"
 ].map(id => [id, document.getElementById(id)]));
@@ -300,24 +342,20 @@ function drawProgress() {
   elements.advance.textContent = stages[nextLevel] ? `Niveau suivant · ${stages[nextLevel][0]} →` : "";
 }
 
-function newQuestion(focus = false) {
+function newQuestion(focus = false, keepFeedback = false) {
   clearTimeout(advanceTimer);
   current = mode === "tables" ? tableQuestion() : selectQuestion(state.active);
   const [title, example] = current.lesson;
-  elements["lesson-title"].textContent = title;
+  elements["lesson-title"].textContent = "Astuce · " + title;
   elements["lesson-example"].textContent = example;
-  elements.lesson.open = !shownLessons.has(title);
-  shownLessons.add(title);
+  elements.lesson.open = false;
   answered = false;
   elements.challenge.textContent = current.prompt;
   elements.hint.textContent = current.hint;
-  elements.help.open = false;
   elements.answer.value = "";
   elements.answer.readOnly = false;
-  elements.feedback.textContent = "";
-  elements.feedback.className = "feedback";
+  if (!keepFeedback) clearFeedback();
   elements.submit.hidden = false;
-  elements.next.hidden = true;
 
   if (focus) elements.answer.focus();
 }
@@ -334,6 +372,11 @@ function openLevel(index) {
 function parseAnswer(value) {
   const input = value.trim().replace(/[\u202f\u00a0 ]/g, "").replace(",", ".");
   return /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(input) ? Number(input) : NaN;
+}
+
+function clearFeedback() {
+  elements.feedback.textContent = "";
+  elements.feedback.className = "feedback";
 }
 
 function submitAnswer(automatic = false) {
@@ -374,21 +417,22 @@ function submitAnswer(automatic = false) {
   }
   save();
   drawProgress();
-  elements.feedback.textContent = correct ? milestone || "Bien joué !" : `Réponse : ${format(current.answer)}${current.suffix}.`;
+  elements.feedback.textContent = correct ? milestone || "Bien joué !" :
+    `${current.prompt} → ${format(current.answer)}${current.suffix}. ${current.hint}`;
   elements.feedback.className = correct ? "feedback good" : "feedback try";
   elements.answer.readOnly = true;
   elements.submit.hidden = true;
-  elements.next.hidden = correct && !milestone;
-  if (!correct) elements.help.open = true;
-  if (correct && !milestone) advanceTimer = setTimeout(() => newQuestion(), 850);
+  advanceTimer = setTimeout(() => newQuestion(false, !correct || Boolean(milestone)), correct ? 550 : 1800);
 }
 
 elements["answer-form"].addEventListener("submit", event => {
   event.preventDefault();
-  if (answered && !elements.next.hidden) newQuestion(true);
-  else submitAnswer();
+  submitAnswer();
 });
-elements.answer.addEventListener("input", () => submitAnswer(true));
+elements.answer.addEventListener("input", () => {
+  clearFeedback();
+  submitAnswer(true);
+});
 elements.keypad.addEventListener("click", event => {
   const key = event.target.closest("[data-key]")?.dataset.key;
   if (!key || answered) return;
@@ -398,10 +442,10 @@ elements.keypad.addEventListener("click", event => {
     if (/[.,]/.test(input.value)) return;
     input.value = (input.value || "0") + key;
   } else if (input.value.length < 20) input.value += key;
+  clearFeedback();
   if (key !== "erase") submitAnswer(true);
 });
 elements.submit.addEventListener("click", () => submitAnswer());
-elements.next.addEventListener("click", () => newQuestion());
 elements.advance.addEventListener("click", () => openLevel(state.active + 1));
 function openMode(nextMode) {
   if (nextMode === mode) return;

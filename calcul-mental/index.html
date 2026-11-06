@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#101326">
+<meta name="theme-color" content="#f4f2e9">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Calcul Mental">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="manifest" href="app.webmanifest">
-<link rel="stylesheet" href="style.css?v=2">
-<script src="app.js?v=2" defer></script>
+<link rel="stylesheet" href="style.css?v=3">
+<script src="app.js?v=3" defer></script>
 <title>Calcul Mental</title>
 </head>
 <body>
@@ -33,26 +33,27 @@
 <section class="game" aria-labelledby="level-title">
   <div class="row"><h2 id="level-title"></h2><span class="badge" id="level-count"></span></div>
   <progress id="level-progress" value="0" max="10" aria-labelledby="level-title"></progress>
-  <details id="lesson" class="lesson">
-    <summary id="lesson-title"></summary>
-    <p id="lesson-example"></p>
-  </details>
+  <div class="equation">
   <p id="challenge" class="challenge"></p>
   <form id="answer-form" autocomplete="off">
     <label class="sr-only" for="answer">Votre réponse</label>
     <input id="answer" type="text" inputmode="none" placeholder="?" maxlength="20" enterkeyhint="go" spellcheck="false">
 
   </form>
-  <p class="feedback" id="feedback" role="status" aria-live="polite"></p>
+  </div>
   <div class="keypad" id="keypad" role="group" aria-label="Pavé numérique">
     <button type="button" data-key="1">1</button><button type="button" data-key="2">2</button><button type="button" data-key="3">3</button>
     <button type="button" data-key="4">4</button><button type="button" data-key="5">5</button><button type="button" data-key="6">6</button>
     <button type="button" data-key="7">7</button><button type="button" data-key="8">8</button><button type="button" data-key="9">9</button>
     <button type="button" data-key="," aria-label="Virgule">,</button><button type="button" data-key="0">0</button><button type="button" data-key="erase" aria-label="Effacer le dernier chiffre">⌫</button>
     <button id="submit" type="button" aria-label="Valider la réponse">✓ Valider</button>
-    <button id="next" class="primary" type="button" hidden>Continuer →</button>
   </div>
-  <details id="help"><summary>Un indice</summary><p id="hint"></p></details>
+  <p class="feedback" id="feedback" role="status" aria-live="polite"></p>
+  <details id="lesson" class="lesson">
+    <summary id="lesson-title"></summary>
+    <p id="lesson-example"></p>
+    <p id="hint"></p>
+  </details>
   <button id="advance" class="primary advance" hidden></button>
 </section>
 <section id="route-panel" aria-labelledby="route-title"><h2 class="route-title" id="route-title">Les niveaux</h2><div id="route" class="route"></div></section>
